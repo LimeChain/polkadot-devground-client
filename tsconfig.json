@@ -1,0 +1,58 @@
+{
+  "compilerOptions": {
+    // Type Checking
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    // Modules
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    // Emit
+    "noEmit": true,
+    "verbatimModuleSyntax": true,
+    // JavaScript Support
+    "allowJs": true,
+    // Interop Constraints
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    // Language and Environment
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
+    "target": "ESNext",
+    "jsx": "react-jsx",
+    // Completeness
+    "skipLibCheck": true,
+    "paths": {
+      "@custom-types/*": [
+        "./src/types/*"
+      ],
+      "@components/*": [
+        "./src/components/*"
+      ],
+      "@views/*": [
+        "./src/views/*"
+      ],
+      "@utils/*": [
+        "./src/utils/*"
+      ],
+      "@services/*": [
+        "./src/services/*"
+      ],
+      "@stores/*": [
+        "./src/stores/*"
+      ]
+    }
+  },
+  "include": [
+    "src",
+    "vite.config.ts",
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+}
