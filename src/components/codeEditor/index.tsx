@@ -218,7 +218,6 @@ const TypeScriptEditor = () => {
 
       const blob = new Blob([blobContent], { type: 'application/javascript' });
       refURL.current = URL.createObjectURL(blob);
-      console.log(refURL.current);
 
       const iframeDoc = refIframe.current?.contentWindow?.document;
       if (iframeDoc) {
@@ -233,7 +232,6 @@ const TypeScriptEditor = () => {
         }, 60000);
       }
     } catch (err) {
-      console.log('Error:', err);
       setResult((log) => {
         const message = {
           ts: new Date().getTime(),
@@ -377,13 +375,13 @@ const TypeScriptEditor = () => {
                 </button>
               </div>
               <Console
-                // data={result}
+                data={result}
                 // for testing purposes
-                data={Array.from({ length: 100 }, (_, index) => ({
-                  ts: new Date().getTime(),
-                  message: `Message ${index}`
-                })
-                )}
+                // data={Array.from({ length: 100 }, (_, index) => ({
+                //   ts: new Date().getTime(),
+                //   message: `Message ${index}`
+                // })
+                // )}
               />
             </div>
           </Panel>

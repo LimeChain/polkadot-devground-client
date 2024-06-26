@@ -1,3 +1,4 @@
+import { format } from 'date-fns';
 import { ScrollArea } from "@components/scrollArea";
 import type { IConsoleMessage } from "@custom-types/global";
 import { cn } from "@utils/helpers";
@@ -28,6 +29,7 @@ export const Console = (props: IConsoleProps) => {
         ref={refContainer}
         className={cn(
           'flex-1 flex flex-col overflow-scroll text-sm font-mono text-white text-opacity-60',
+          'whitespace-nowrap'
         )}
         style={{ paddingTop: topPadding, paddingBottom: bottomPadding }}
       >
@@ -36,8 +38,10 @@ export const Console = (props: IConsoleProps) => {
             return (
               <div
                 key={data[index].ts + index}
+                className='relative pt-5 pointer-events-none'
               >
-                {data[index].message}
+                <div className='absolute top-0 left-0 text-[9px] text-gray-500'>{format(new Date(data[index].ts), 'yyyy-MM-dd HH:mm:ss')}</div>
+                <div>{data[index].message}</div>
               </div>
             )
           })

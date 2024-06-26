@@ -24,6 +24,7 @@
     "@rollup/plugin-typescript": "11.1.6",
     "@vitejs/plugin-react-swc": "3.7.0",
     "clsx": "2.1.1",
+    "date-fns": "^3.6.0",
     "i": "0.3.7",
     "monaco-editor": "0.50.0",
     "monaco-editor-auto-typings": "0.4.5",
@@ -50,7 +51,7 @@
     "eslint-plugin-react-hooks": "4.6.2",
     "eslint-plugin-react-refresh": "0.4.7",
     "tailwindcss": "3.4.4",
-    "typescript": "5.5.2",
+    "typescript": "5.4.5",
     "vite-tsconfig-paths": "4.3.2"
   }
 }
