@@ -16,30 +16,32 @@ type PropsOf<T extends As> = ComponentPropsWithoutRef<T> & {
 
 type OmitCommonProps<
   Target,
-  OmitAdditionalProps extends keyof never = never
+  OmitAdditionalProps extends keyof never = never,
 > = Omit<Target, 'as' | OmitAdditionalProps>;
 
 type RightJoinProps<
   SourceProps extends object = object,
-  OverrideProps extends object = object
+  OverrideProps extends object = object,
 > = OmitCommonProps<SourceProps, keyof OverrideProps> & OverrideProps;
 
 type MergeWithAs<
   ComponentProps extends object,
   AsProps extends object,
   AdditionalProps extends object = object,
-  AsComponent extends As = As
+  AsComponent extends As = As,
 > = RightJoinProps<ComponentProps, AdditionalProps> &
   RightJoinProps<AsProps, AdditionalProps> & {
     as?: AsComponent;
   };
 
-type PolymorphicComponent<
-  C extends As,
-  Props extends object = object
-> = {
+type PolymorphicComponent<C extends As, Props extends object = object> = {
   <AsComponent extends As = C>(
-    props: MergeWithAs<ComponentProps<C>, ComponentProps<AsComponent>, Props, AsComponent>
+    props: MergeWithAs<
+      ComponentProps<C>,
+      ComponentProps<AsComponent>,
+      Props,
+      AsComponent
+    >,
   ): JSX.Element;
 
   displayName?: string;
@@ -49,7 +51,7 @@ type PolymorphicComponent<
 
 export const polymorphicComponent = <
   C extends As,
-  Props extends object = object
+  Props extends object = object,
 >(
   render: ForwardRefRenderFunction<
     unknown,

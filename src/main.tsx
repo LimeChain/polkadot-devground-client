@@ -1,13 +1,14 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
+import { createRoot } from 'react-dom/client';
 
-import 'virtual:svg-icons-register';
-
-import './workers/monaco-worker';
 import { ReloadPrompt } from '@components/reloadPrompt';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+import App from './App';
+
+import './workers/monaco-worker';
+import 'virtual:svg-icons-register';
+
+createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <>
       <App />

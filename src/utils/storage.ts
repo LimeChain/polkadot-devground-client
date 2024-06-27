@@ -3,10 +3,15 @@
  * @param key The key under which the value will be stored
  * @param value The value to store
  */
-export async function storageSetItem(key: string, value: unknown): Promise<void> {
+export async function storageSetItem(
+  key: string,
+  value: unknown,
+): Promise<void> {
   const cache = await caches.open('my-cache');
   const serializedValue = JSON.stringify(value);
-  const response = new Response(serializedValue, { headers: { 'Content-Type': 'application/json' } });
+  const response = new Response(serializedValue, {
+    headers: { 'Content-Type': 'application/json' },
+  });
   await cache.put(key, response);
 }
 
@@ -50,7 +55,10 @@ export async function storageClear(): Promise<void> {
  * @param str The prefix or suffix to match keys against
  * @param isPrefix If true, match keys that start with `str`. If false, match keys that end with `str`.
  */
-export async function storageClearByPrefixOrSuffix(str: string, isPrefix: boolean = true): Promise<void> {
+export async function storageClearByPrefixOrSuffix(
+  str: string,
+  isPrefix: boolean = true,
+): Promise<void> {
   const cache = await caches.open('my-cache');
   const keys = await cache.keys();
   for (const request of keys) {
@@ -79,5 +87,5 @@ export async function storageExists(key: string): Promise<boolean> {
 export async function storageGetAllKeys(): Promise<string[]> {
   const cache = await caches.open('my-cache');
   const keys = await cache.keys();
-  return keys.map(request => request.url.split('/').pop()!); // Extracting key from URL
+  return keys.map((request) => request.url.split('/').pop()!); // Extracting key from URL
 }

@@ -1,20 +1,43 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+busDispatch,
+useEventBus,
+} from '@pivanov/event-bus';
 import * as monaco from 'monaco-editor';
+import { chainSpec } from 'polkadot-api/chains/polkadot';
+import {
+useCallback,
+useEffect,
+useRef,
+useState,
+} from 'react';
+import {
+Panel,
+PanelGroup,
+PanelResizeHandle,
+} from 'react-resizable-panels';
 import * as ts from 'typescript';
+
+import { Icon } from '@components/icon';
+import { STORAGE_PREFIX } from '@utils/constants';
+import { cn } from '@utils/helpers';
+import {
+  storageExists,
+  storageGetItem,
+  storageRemoveItem,
+  storageSetItem,
+} from '@utils/storage';
+
+import { Console } from './console';
+import { generateOutput } from './helpers';
 import oneDarkPro from './one-dark-pro.json';
 import { demoCodes } from './snippets';
-import type { IEventBusConsoleMessage, IEventBusConsoleMessageReset, IEventBusDemoCode } from '@custom-types/eventBus';
-import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
 
-import { chainSpec } from 'polkadot-api/chains/polkadot';
-import { generateOutput } from './helpers';
-import { storageExists, storageGetItem, storageRemoveItem, storageSetItem } from '@utils/storage';
-import { Icon } from '@components/icon';
-import { cn } from '@utils/helpers';
+import type {
+  IEventBusConsoleMessage,
+  IEventBusConsoleMessageReset,
+  IEventBusDemoCode,
+} from '@custom-types/eventBus';
 import type { IConsoleMessage } from '@custom-types/global';
-import { Console } from './console';
-import { busDispatch, useEventBus } from '@pivanov/event-bus';
-import { STORAGE_PREFIX } from '@utils/constants';
 
 const bg = '#282c34';
 
@@ -25,14 +48,18 @@ const TypeScriptEditor = () => {
   const refIframe = useRef<HTMLIFrameElement | null>(null);
   const refURL = useRef<string>('');
   const refEditor = useRef<HTMLDivElement | null>(null);
-  const refMonacoEditor = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const refMonacoEditor = useRef<monaco.editor.IStandaloneCodeEditor | null>(
+    null,
+  );
   const refCompiledCode = useRef<string>('');
   const refCode = useRef<string>('');
   const [isLoading, setIsLoading] = useState(false);
 
   const destroyIframe = useCallback(() => {
     if (refIframe.current) {
-      const iframeDoc = refIframe.current.contentDocument || refIframe.current.contentWindow?.document;
+      const iframeDoc =
+        refIframe.current.contentDocument
+        || refIframe.current.contentWindow?.document;
       if (iframeDoc) {
         iframeDoc.open();
         iframeDoc.write('');
@@ -56,10 +83,14 @@ const TypeScriptEditor = () => {
     const selectedCodeSnippet = demoCodes[codeSnippetIndex];
     refExampleIndex.current = selectedCodeSnippet.id;
 
-    const isTempVersionExist = await storageExists(`${STORAGE_PREFIX}-${codeSnippetIndex}`);
+    const isTempVersionExist = await storageExists(
+      `${STORAGE_PREFIX}-${codeSnippetIndex}`,
+    );
     let code = selectedCodeSnippet.code;
     if (isTempVersionExist) {
-      const existingCode = await storageGetItem<string>(`${STORAGE_PREFIX}-${codeSnippetIndex}`);
+      const existingCode = await storageGetItem<string>(
+        `${STORAGE_PREFIX}-${codeSnippetIndex}`,
+      );
       code = existingCode || code;
     }
     const snippet = await generateOutput(code, isTempVersionExist);
@@ -67,34 +98,41 @@ const TypeScriptEditor = () => {
     refCode.current = snippet.code;
 
     refTimeout.current = setTimeout(async () => {
-      monaco.languages.typescript.typescriptDefaults.addExtraLib(snippet.types, 'types.d.ts');
+      monaco.languages.typescript.typescriptDefaults.addExtraLib(
+        snippet.types,
+        'types.d.ts',
+      );
       refMonacoEditor.current?.setValue(snippet.code);
 
       if (!isTempVersionExist) {
-        refMonacoEditor.current?.trigger(null, 'editor.fold', { selectionLines: [2] });
+        refMonacoEditor.current?.trigger(null, 'editor.fold', {
+          selectionLines: [2],
+        });
       }
 
       refTimeout.current = setTimeout(async () => {
         setIsLoading(false);
         refMonacoEditor.current?.onDidChangeModelContent(() => {
           refCode.current = refMonacoEditor.current?.getValue() || '';
-          storageSetItem(`${STORAGE_PREFIX}-${refExampleIndex.current}`, refCode.current);
+          void storageSetItem(
+            `${STORAGE_PREFIX}-${refExampleIndex.current}`,
+            refCode.current,
+          );
         });
       }, 400);
     }, 200);
-
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    loadSnippet(0);
+    void loadSnippet(0);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEventBus<IEventBusDemoCode>('@@-example-code', ({ data }) => {
-    loadSnippet(data);
+    void loadSnippet(data);
   });
 
   useEffect(() => {
@@ -127,7 +165,9 @@ const TypeScriptEditor = () => {
     try {
       const filteredCode = refCode.current
         .split('\n')
-        .filter((line) => !line.startsWith('import ') && !line.startsWith('require('))
+        .filter(
+          (line) => !line.startsWith('import ') && !line.startsWith('require('),
+        )
         .join('\n');
 
       const result = ts.transpileModule(filteredCode, {
@@ -229,10 +269,12 @@ const TypeScriptEditor = () => {
         }, 60000);
       }
     } catch (err) {
-      const messages: IConsoleMessage[] = [{
-        ts: new Date().getTime(),
-        message: `Error: ${(err as Error).message}`,
-      }];
+      const messages: IConsoleMessage[] = [
+        {
+          ts: new Date().getTime(),
+          message: `Error: ${(err as Error).message}`,
+        },
+      ];
 
       busDispatch<IEventBusConsoleMessage>({
         type: '@@-console-message',
@@ -249,19 +291,28 @@ const TypeScriptEditor = () => {
     });
   }, []);
 
+  const handleStop = useCallback(() => {
+    destroyIframe();
+    window.location.reload();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleReloadSnipped = useCallback(() => {
-    storageRemoveItem(`${STORAGE_PREFIX}-${refExampleIndex.current}`);
+    void storageRemoveItem(`${STORAGE_PREFIX}-${refExampleIndex.current}`);
     window.location.reload();
   }, []);
 
   const handleMessage = useCallback((event: MessageEvent) => {
     if (event.data.type === 'customLog') {
-      const messages: IConsoleMessage[] = event.data.args.map((arg: unknown) => {
-        return {
-          ts: new Date().getTime(),
-          message: arg,
-        }
-      });
+      const messages: IConsoleMessage[] = event.data.args.map(
+        (arg: unknown) => {
+          return {
+            ts: new Date().getTime(),
+            message: arg,
+          };
+        },
+      );
 
       busDispatch<IEventBusConsoleMessage>({
         type: '@@-console-message',
@@ -279,8 +330,8 @@ const TypeScriptEditor = () => {
 
   return (
     <>
-      <div className='relative flex flex-1 p-4 overflow-hidden'>
-        <PanelGroup direction="horizontal" className='gap-x-3'>
+      <div className="relative flex flex-1 overflow-hidden p-4">
+        <PanelGroup direction="horizontal" className="gap-x-3">
           <Panel
             defaultSize={50}
             minSize={20}
@@ -291,28 +342,21 @@ const TypeScriptEditor = () => {
               'overflow-hidden',
             )}
           >
-            <div ref={refEditor} className='w-full h-full p-2' />
+            <div ref={refEditor} className="size-full p-2" />
             <div
-              className={cn(
-                'absolute top-0 left-0',
-                'flex flex-col gap-y-3',
-              )}
+              className={cn('absolute left-0 top-0', 'flex flex-col gap-y-3')}
             >
-
               <button
                 type="button"
                 className={cn(
-                  "flex items-center justify-center",
-                  "w-8 h-8",
-                  "text-gray-500 hover:text-gray-300",
-                  "transition-colors duration-300"
+                  'flex items-center justify-center',
+                  'h-8 w-8',
+                  'text-gray-500 hover:text-gray-300',
+                  'transition-colors duration-300',
                 )}
                 onClick={handleReloadSnipped}
               >
-                <Icon
-                  name="icon-reload"
-                  size={[16]}
-                />
+                <Icon name="icon-reload" size={[16]} />
               </button>
             </div>
           </Panel>
@@ -324,13 +368,13 @@ const TypeScriptEditor = () => {
               'relative rounded-lg',
               `bg-[#282c34]`,
               'overflow-hidden',
-              'flex flex-col'
+              'flex flex-col',
             )}
           >
-            <div className='py-2 pl-3 pr-1.5 flex-1 overflow-hidden flex items-stretch'>
+            <div className="flex flex-1 items-stretch overflow-hidden py-2 pl-3 pr-1.5">
               <div
                 className={cn(
-                  'absolute top-2 right-4',
+                  'absolute right-4 top-2',
                   'flex items-center gap-x-3',
                   'z-10',
                 )}
@@ -349,10 +393,7 @@ const TypeScriptEditor = () => {
                   className={cn(
                     'rounded bg-indigo-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
                   )}
-                  onClick={() => {
-                    destroyIframe();
-                    window.location.reload();
-                  }}
+                  onClick={handleStop}
                 >
                   Stop
                 </button>
@@ -372,12 +413,12 @@ const TypeScriptEditor = () => {
         </PanelGroup>
         <div
           className={cn(
-            `flex items-center justify-center z-20 absolute inset-0 bg-gray-900`,
-            'opacity-0 pointer-events-none',
+            `absolute inset-0 z-20 flex items-center justify-center bg-gray-900`,
+            'pointer-events-none opacity-0',
             'transition-opacity duration-300 ease-in-out',
             {
               'opacity-100': isLoading,
-            }
+            },
           )}
         >
           <div
@@ -388,7 +429,7 @@ const TypeScriptEditor = () => {
           />
         </div>
       </div>
-      <iframe ref={refIframe} className='hidden' />
+      <iframe ref={refIframe} className="hidden" />
     </>
   );
 };

@@ -7,10 +7,11 @@
     "build": "vite build",
     "dev": "vite",
     "generate-one-dark-pro-theme": "node scripts/onedark-pro-to-monaco-theme.cjs",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "postinstall": "npx papi add dot -n polkadot && npx papi",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "preview": "vite preview",
-    "start": "vite",
-    "postinstall": "npx papi add dot -n polkadot && npx papi"
+    "start": "vite"
   },
   "dependencies": {
     "@pivanov/event-bus": "1.0.0",
@@ -44,15 +45,26 @@
   "devDependencies": {
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
-    "@typescript-eslint/eslint-plugin": "7.13.1",
+    "@typescript-eslint/eslint-plugin": "7.14.1",
     "@typescript-eslint/parser": "7.13.1",
     "autoprefixer": "10.4.19",
     "eslint": "8.57.0",
+    "eslint-import-resolver-typescript": "3.6.1",
+    "eslint-plugin-import": "2.29.1",
+    "eslint-plugin-import-newlines": "1.4.0",
+    "eslint-plugin-prefer-arrow": "1.2.3",
+    "eslint-plugin-react": "7.34.3",
     "eslint-plugin-react-hooks": "4.6.2",
     "eslint-plugin-react-refresh": "0.4.7",
+    "eslint-plugin-tailwindcss": "3.17.4",
+    "eslint-plugin-unused-imports": "4.0.0",
+    "lint-staged": "15.2.7",
     "tailwindcss": "3.4.4",
     "typescript": "5.4.5",
     "vite-plugin-pwa": "0.20.0",
     "vite-tsconfig-paths": "4.3.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

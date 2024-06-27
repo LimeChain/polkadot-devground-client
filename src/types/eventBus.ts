@@ -1,4 +1,4 @@
-import type { IConsoleMessage } from "./global";
+import type { IConsoleMessage } from './global';
 
 export interface IEventBusDemoCode {
   type: '@@-example-code';

@@ -32,7 +32,7 @@ const snippet0 = {
         console.log(finalizedBlock.number, finalizedBlock.hash),
       );
     })();
-  `
+  `,
 };
 
 const snippet1 = {
@@ -54,7 +54,7 @@ const snippet1 = {
 
       console.log('@@@ accountInfo', accountInfo);
     })();
-  `
+  `,
 };
 
 const snippet2 = {
@@ -90,11 +90,7 @@ const snippet2 = {
 
     console.log('Alice account entry has a value hash of', currHash, 'with a size of', currSize);
   })();
-  `
+  `,
 };
 
-export const demoCodes = [
-  snippet0,
-  snippet1,
-  snippet2
-];
+export const demoCodes = [snippet0, snippet1, snippet2];
