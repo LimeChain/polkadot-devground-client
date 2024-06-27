@@ -1,6 +1,7 @@
 import { useEventBus } from '@pivanov/event-bus';
 import { format } from 'date-fns';
 import {
+  useCallback,
   useRef,
   useState,
 } from 'react';
@@ -22,19 +23,19 @@ import type { IConsoleMessage } from '@custom-types/global';
 
 export const Console = () => {
   const refTimeout = useRef<NodeJS.Timeout>();
-
   const refScrollArea = useRef<HTMLDivElement | null>(null);
+  const refIsUserScrolling = useRef(false);
 
   const [messages, setMessages] = useState<IConsoleMessage[]>([]);
 
   const refContainer = useRef<HTMLDivElement | null>(null);
 
-  const { visibleItems, topPadding, bottomPadding, handleScroll } =
-    useVirtualScroll({
-      totalItems: messages.length,
-      itemHeight: 20,
-      containerHeight: refContainer.current?.clientHeight,
-    });
+  const { visibleItems, topPadding, bottomPadding, handleScroll } = useVirtualScroll({
+    totalItems: messages.length,
+    itemHeight: 80,
+    containerHeight: refContainer.current?.clientHeight,
+    buffer: 10,
+  });
 
   useEventBus<IEventBusConsoleMessage>('@@-console-message', ({ data }) => {
     clearTimeout(refTimeout.current);
@@ -46,12 +47,11 @@ export const Console = () => {
       return log;
     });
 
-    refTimeout.current = setTimeout(() => {
-      refScrollArea.current?.scrollTo({
-        top: refContainer.current?.clientHeight,
-        behavior: 'smooth',
-      });
-    }, 100);
+    if (!refIsUserScrolling.current) {
+      refTimeout.current = setTimeout(() => {
+        refScrollArea.current?.scrollTo({ top: refContainer.current?.clientHeight, behavior: 'smooth' });
+      }, 100);
+    }
   });
 
   useEventBus<IEventBusConsoleMessageReset>('@@-console-message-reset', () => {
@@ -59,34 +59,47 @@ export const Console = () => {
     setMessages([]);
   });
 
+  const handleOnScroll = useCallback((event: React.UIEvent<HTMLDivElement>) => {
+    if (event.currentTarget.scrollTop + event.currentTarget.clientHeight >= event.currentTarget.scrollHeight) {
+      refIsUserScrolling.current = false;
+    } else {
+      refIsUserScrolling.current = true;
+    }
+    handleScroll(event);
+  }, [handleScroll]);
+
   return (
     <ScrollArea
       ref={refScrollArea}
       type="auto"
-      onScroll={handleScroll}
+      onScroll={handleOnScroll}
     >
       <div
         ref={refContainer}
         className={cn(
-          'flex flex-1 flex-col overflow-scroll font-mono text-sm text-white text-opacity-60',
-          'whitespace-nowrap',
+          'flex flex-1 flex-col font-mono text-sm text-white text-opacity-60',
+          'overflow-x-hidden',
         )}
-        style={{ paddingTop: topPadding, paddingBottom: bottomPadding }}
+        style={{
+          width: refScrollArea.current?.clientWidth,
+          paddingTop: topPadding,
+          paddingBottom: bottomPadding,
+          overflowWrap: 'anywhere',
+        }}
       >
-        {!!messages.length
-          && visibleItems.map((index) => {
+        {
+          !!messages.length && visibleItems.map((index) => {
             return (
               <div
                 key={messages[index].ts + index}
                 className="pointer-events-none relative pt-5"
               >
-                <div className="absolute left-0 top-0 text-[9px] text-gray-500">
-                  {format(new Date(messages[index].ts), 'yyyy-MM-dd HH:mm:ss')}
-                </div>
+                <div className="absolute left-0 top-0 text-[9px] text-gray-500">{format(new Date(messages[index].ts), 'yyyy-MM-dd HH:mm:ss')}</div>
                 <div>{messages[index].message}</div>
               </div>
             );
-          })}
+          })
+        }
       </div>
     </ScrollArea>
   );

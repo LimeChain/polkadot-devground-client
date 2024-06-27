@@ -22,5 +22,6 @@ dist-ssr
 *.sln
 *.sw?
 
+.vite
 *.scale
 *-api.json
