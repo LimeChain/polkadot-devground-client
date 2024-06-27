@@ -262,7 +262,7 @@
   "overrides": [
     {
       "files": [
-        "src/workers/*.ts"
+        "src/assets/workers/*.ts"
       ],
       "rules": {
         "import/default": "off"

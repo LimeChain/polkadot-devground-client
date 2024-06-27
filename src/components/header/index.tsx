@@ -1,9 +1,9 @@
 import { busDispatch } from '@pivanov/event-bus';
 import { useCallback } from 'react';
 
-import { demoCodes } from '@components/codeEditor/snippets';
 import { Icon } from '@components/icon';
 import { Button } from '@components/ui';
+import { demoCodes } from '@views/codeEditor/snippets';
 
 import type { IEventBusDemoCode } from '@custom-types/eventBus';
 
@@ -24,9 +24,9 @@ export const Header = () => {
       <div className="flex gap-x-4 self-end">
         {demoCodes.map((_, index) => (
           <Button
-key={index}
-onClick={handleClick}
-data-example={index}
+            key={index}
+            onClick={handleClick}
+            data-example={index}
           >
             {`Demo ${index + 1}`}
           </Button>

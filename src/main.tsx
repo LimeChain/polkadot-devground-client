@@ -1,18 +1,23 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+import {
+  Helmet,
+  HelmetProvider,
+} from 'react-helmet-async';
 
 import { ReloadPrompt } from '@components/reloadPrompt';
 
-import App from './App';
+import { App } from './app';
 
-import './workers/monaco-worker';
+import './assets/workers/monaco-worker';
 import 'virtual:svg-icons-register';
 
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <>
+    <HelmetProvider>
+      <Helmet defaultTitle="Polkadot Devground" titleTemplate="%s - Polkadot Devground" />
       <App />
       <ReloadPrompt />
-    </>
+    </HelmetProvider>
   </React.StrictMode>,
 );

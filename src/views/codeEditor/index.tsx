@@ -1,21 +1,21 @@
 import {
-busDispatch,
-useEventBus,
+  busDispatch,
+  useEventBus,
 } from '@pivanov/event-bus';
 import * as monaco from 'monaco-editor';
 import { chainSpec } from 'polkadot-api/chains/polkadot';
 import {
-useCallback,
-useEffect,
-useRef,
-useState,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
 } from 'react';
 import {
-Panel,
-PanelGroup,
-PanelResizeHandle,
+  Panel,
+  PanelGroup,
+  PanelResizeHandle,
 } from 'react-resizable-panels';
-import * as ts from 'typescript';
+import { transform } from 'sucrase';
 
 import { Icon } from '@components/icon';
 import { STORAGE_PREFIX } from '@utils/constants';
@@ -170,11 +170,8 @@ const TypeScriptEditor = () => {
         )
         .join('\n');
 
-      const result = ts.transpileModule(filteredCode, {
-        compilerOptions: { module: ts.ModuleKind.ESNext },
-      });
+      const compiledCode = transform(filteredCode, { transforms: ['typescript'] }).code;
 
-      const compiledCode = result.outputText;
       refCompiledCode.current = compiledCode;
 
       const blobContent = `
