@@ -35,7 +35,65 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,json,ico,png,jpg,jpeg,svg}'],
         navigateFallback: null,
+        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 6 MB limit
       },
     }),
   ],
+  build: {
+    minify: 'terser',
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          if (
+            id.includes('/node_modules/react/')
+            || id.includes('/node_modules/react-dom/')
+            || id.includes('/node_modules/react-is/')
+            || id.includes('/node_modules/scheduler/')
+            || id.includes('/node_modules/prop-types/')
+          ) {
+            return 'react';
+          }
+
+          if (
+            id.includes('/node_modules/tailwindcss/')
+            || id.includes('/node_modules/tailwind-merge/')
+          ) {
+            return 'tailwind';
+          }
+
+          if (id.includes('/node_modules/@radix')) {
+            return 'radix';
+          }
+
+          if (id.includes('/node_modules/monaco-editor')) {
+            return 'monaco-editor';
+          }
+
+          if (id.includes('/node_modules/prettier')) {
+            return 'prettier';
+          }
+
+          if (id.includes('/node_modules/typescript')) {
+            return 'typescript';
+          }
+
+          if (id.includes('/node_modules/sucrase')) {
+            return 'sucrase';
+          }
+
+          if (id.includes('/node_modules/@polkadot')) {
+            return '@polkadot';
+          }
+
+          if (id.includes('/node_modules/polkadot-api')) {
+            return 'polkadot-api';
+          }
+
+          if (id.includes('/node_modules/')) {
+            return 'vendor';
+          }
+        },
+      },
+    },
+  },
 });
