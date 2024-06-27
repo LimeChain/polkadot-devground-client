@@ -1,8 +1,9 @@
 import {
-  useCallback,
-  useEffect,
+useCallback,
+useEffect,
 } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
+
 import { Button } from '@components/ui';
 
 export const ReloadPrompt = () => {
@@ -16,7 +17,6 @@ export const ReloadPrompt = () => {
       const el = document.getElementById('root');
       (el as HTMLElement).innerHTML = '';
     }
-
   }, [needRefresh]);
 
   const handleReload = useCallback(async () => {
@@ -25,10 +25,11 @@ export const ReloadPrompt = () => {
 
   const Content = () => {
     return (
-      <div className='fixed inset-0 bg-gray-600 z-[9999]'>
+      <div className="fixed inset-0 z-[9999] bg-gray-600">
         <h2 className="truncate">
           <span className="mr-2 text-2xl leading-none">{'\uD83D\uDE80'}</span>
-          New <span className="font-semibold">Polkadot Devground</span> version is available!
+          New <span className="font-semibold">Polkadot Devground</span> version
+          is available!
         </h2>
 
         <Button onClick={handleReload}>Reload</Button>

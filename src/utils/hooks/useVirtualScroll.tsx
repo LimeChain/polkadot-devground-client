@@ -22,13 +22,22 @@ export function useVirtualScroll({
   const [visibleItems, setVisibleItems] = useState<number[]>([]);
   const [containerScrollTop, setContainerScrollTop] = useState(0);
 
-  const refTimer: { current: ReturnType<typeof setTimeout> | null } = useRef(null);
+  const refTimer: { current: ReturnType<typeof setTimeout> | null } =
+    useRef(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const containerOffsetHeight = containerHeight;
 
   const bufferHeight = buffer * itemHeight;
-  const endIndex = Math.min(totalItems - 1, Math.ceil((containerScrollTop + containerOffsetHeight + bufferHeight) / itemHeight));
-  const startIndex = Math.max(0, endIndex - (Math.floor(containerHeight / itemHeight) + buffer * 2));
+  const endIndex = Math.min(
+    totalItems - 1,
+    Math.ceil(
+      (containerScrollTop + containerOffsetHeight + bufferHeight) / itemHeight,
+    ),
+  );
+  const startIndex = Math.max(
+    0,
+    endIndex - (Math.floor(containerHeight / itemHeight) + buffer * 2),
+  );
 
   const handleScroll = useCallback((e: SyntheticEvent<HTMLElement>) => {
     setContainerScrollTop(e.currentTarget.scrollTop);
@@ -61,8 +70,16 @@ export function useVirtualScroll({
   let bottomPadding = 0;
   if (visibleItems.length > 0) {
     topPadding = visibleItems[0] * itemHeight;
-    bottomPadding = (totalItems - 1 - visibleItems[visibleItems.length - 1]) * itemHeight;
+    bottomPadding =
+      (totalItems - 1 - visibleItems[visibleItems.length - 1]) * itemHeight;
   }
 
-  return { visibleItems, containerRef, topPadding, bottomPadding, handleScroll, setScrollTop: setContainerScrollTop };
+  return {
+    visibleItems,
+    containerRef,
+    topPadding,
+    bottomPadding,
+    handleScroll,
+    setScrollTop: setContainerScrollTop,
+  };
 }

@@ -1,9 +1,10 @@
 import { resolve } from 'path';
-import { defineConfig } from 'vite';
+
 import react from '@vitejs/plugin-react-swc';
-import tsconfigPaths from 'vite-tsconfig-paths';
-import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
+import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
   plugins: [
@@ -15,7 +16,12 @@ export default defineConfig({
       customDomId: 'svg-sprite',
     }),
     VitePWA({
-      includeAssets: ['favicon.png', 'robots.txt', 'apple-touch-icon.png', 'safari-pinned-tab.svg'],
+      includeAssets: [
+        'favicon.png',
+        'robots.txt',
+        'apple-touch-icon.png',
+        'safari-pinned-tab.svg',
+      ],
       registerType: 'prompt',
       manifest: {
         name: 'polkadot-devground',

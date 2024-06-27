@@ -1,10 +1,11 @@
+import { busDispatch } from '@pivanov/event-bus';
+import { useCallback } from 'react';
 
-import { demoCodes } from "@components/codeEditor/snippets";
-import { Icon } from "@components/icon";
-import { Button } from "@components/ui";
-import type { IEventBusDemoCode } from "@custom-types/eventBus";
-import { busDispatch } from "@pivanov/event-bus";
-import { useCallback } from "react";
+import { demoCodes } from '@components/codeEditor/snippets';
+import { Icon } from '@components/icon';
+import { Button } from '@components/ui';
+
+import type { IEventBusDemoCode } from '@custom-types/eventBus';
 
 export const Header = () => {
   const handleClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
@@ -16,22 +17,23 @@ export const Header = () => {
   }, []);
 
   return (
-    <div className="flex justify-between items-center p-4 pb-0 text-white]">
+    <div className="text-white] flex items-center justify-between p-4 pb-0">
       <div className="text-lg font-semibold tracking-wider">
-        <Icon
-          name="logo-polkadot"
-          size={[132, 28]}
-        />
+        <Icon name="logo-polkadot" size={[132, 28]} />
       </div>
-      <div className="self-end flex gap-x-4">
-        {
-          demoCodes.map((_, index) => (
-            <Button key={index} onClick={handleClick} data-example={index}>{`Demo ${index + 1}`}</Button>
-          ))
-        }
+      <div className="flex gap-x-4 self-end">
+        {demoCodes.map((_, index) => (
+          <Button
+key={index}
+onClick={handleClick}
+data-example={index}
+          >
+            {`Demo ${index + 1}`}
+          </Button>
+        ))}
       </div>
     </div>
-  )
+  );
 };
 
 Header.displayName = 'Header';

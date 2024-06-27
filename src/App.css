@@ -51,14 +51,14 @@ pre {
   opacity: 0 !important;
 }
 
-.monaco-scrollable-element>.scrollbar.vertical>.slider {
+.monaco-scrollable-element > .scrollbar.vertical > .slider {
   border-radius: 10px !important;
   width: 4px !important;
   left: auto !important;
   right: 0px !important;
 }
 
-.monaco-scrollable-element>.scrollbar.horizontal>.slider {
+.monaco-scrollable-element > .scrollbar.horizontal > .slider {
   border-radius: 10px !important;
   height: 4px !important;
   top: auto !important;

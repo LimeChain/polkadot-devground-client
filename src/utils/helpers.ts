@@ -2,8 +2,8 @@ import {
   type ClassValue,
   clsx,
 } from 'clsx';
-import { twMerge } from 'tailwind-merge';
 import { nanoid } from 'nanoid';
+import { twMerge } from 'tailwind-merge';
 
 export const cn = (...inputs: ClassValue[]): string => {
   return twMerge(clsx(inputs));
@@ -11,4 +11,4 @@ export const cn = (...inputs: ClassValue[]): string => {
 
 export const uid = (length = 8): string => {
   return nanoid(length);
-}
+};
