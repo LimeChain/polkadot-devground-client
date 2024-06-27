@@ -3,7 +3,7 @@ import * as monaco from 'monaco-editor';
 import * as ts from 'typescript';
 import oneDarkPro from './one-dark-pro.json';
 import { demoCodes } from './snippets';
-import type { IEventBusDemoCode } from '@custom-types/eventBus';
+import type { IEventBusConsoleMessage, IEventBusConsoleMessageReset, IEventBusDemoCode } from '@custom-types/eventBus';
 import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
 
 import { chainSpec } from 'polkadot-api/chains/polkadot';
@@ -13,12 +13,10 @@ import { Icon } from '@components/icon';
 import { cn } from '@utils/helpers';
 import type { IConsoleMessage } from '@custom-types/global';
 import { Console } from './console';
-import { useEventBus } from '@pivanov/event-bus';
+import { busDispatch, useEventBus } from '@pivanov/event-bus';
+import { STORAGE_PREFIX } from '@utils/constants';
 
 const bg = '#282c34';
-
-const STORAGE_PREFIX = 'tmp-example-index';
-const STORAGE_PREFIX_CACHE = `${STORAGE_PREFIX}-cache`;
 
 const TypeScriptEditor = () => {
   const refExampleIndex = useRef<number>(0);
@@ -30,11 +28,7 @@ const TypeScriptEditor = () => {
   const refMonacoEditor = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const refCompiledCode = useRef<string>('');
   const refCode = useRef<string>('');
-
-  const [result, setResult] = useState<IConsoleMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  console.log('@@@ result', result);
 
   const destroyIframe = useCallback(() => {
     if (refIframe.current) {
@@ -55,7 +49,10 @@ const TypeScriptEditor = () => {
 
     setIsLoading(true);
 
-    setResult([]);
+    busDispatch<IEventBusConsoleMessageReset>({
+      type: '@@-console-message-reset',
+    });
+
     const selectedCodeSnippet = demoCodes[codeSnippetIndex];
     refExampleIndex.current = selectedCodeSnippet.id;
 
@@ -232,16 +229,14 @@ const TypeScriptEditor = () => {
         }, 60000);
       }
     } catch (err) {
-      setResult((log) => {
-        const message = {
-          ts: new Date().getTime(),
-          message: `Error: ${(err as Error).message}`,
-        };
+      const messages: IConsoleMessage[] = [{
+        ts: new Date().getTime(),
+        message: `Error: ${(err as Error).message}`,
+      }];
 
-        log.push(message);
-        storageSetItem(STORAGE_PREFIX_CACHE, log);
-
-        return log;
+      busDispatch<IEventBusConsoleMessage>({
+        type: '@@-console-message',
+        data: messages,
       });
     }
 
@@ -249,10 +244,9 @@ const TypeScriptEditor = () => {
   }, []);
 
   const handleClear = useCallback(() => {
-    destroyIframe();
-    setResult([]);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    busDispatch<IEventBusConsoleMessageReset>({
+      type: '@@-console-message-reset',
+    });
   }, []);
 
   const handleReloadSnipped = useCallback(() => {
@@ -262,18 +256,16 @@ const TypeScriptEditor = () => {
 
   const handleMessage = useCallback((event: MessageEvent) => {
     if (event.data.type === 'customLog') {
-      setResult((log) => {
-        const messages = event.data.args.map((arg: unknown) => {
-          return {
-            ts: new Date().getTime(),
-            message: arg,
-          }
-        });
+      const messages: IConsoleMessage[] = event.data.args.map((arg: unknown) => {
+        return {
+          ts: new Date().getTime(),
+          message: arg,
+        }
+      });
 
-        log.push(...messages);
-        storageSetItem(STORAGE_PREFIX_CACHE, log);
-
-        return log;
+      busDispatch<IEventBusConsoleMessage>({
+        type: '@@-console-message',
+        data: messages,
       });
     }
   }, []);
@@ -374,15 +366,7 @@ const TypeScriptEditor = () => {
                   Run
                 </button>
               </div>
-              <Console
-                data={result}
-                // for testing purposes
-                // data={Array.from({ length: 100 }, (_, index) => ({
-                //   ts: new Date().getTime(),
-                //   message: `Message ${index}`
-                // })
-                // )}
-              />
+              <Console />
             </div>
           </Panel>
         </PanelGroup>

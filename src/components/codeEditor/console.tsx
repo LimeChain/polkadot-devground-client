@@ -3,25 +3,50 @@ import { ScrollArea } from "@components/scrollArea";
 import type { IConsoleMessage } from "@custom-types/global";
 import { cn } from "@utils/helpers";
 import { useVirtualScroll } from "@utils/hooks/useVirtualScroll";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import type { IEventBusConsoleMessage, IEventBusConsoleMessageReset } from '@custom-types/eventBus';
+import { useEventBus } from '@pivanov/event-bus';
+import { storageRemoveItem, storageSetItem } from '@utils/storage';
+import { STORAGE_PREFIX_CONSOLE_OUTPUT } from '@utils/constants';
 
-interface IConsoleProps {
-  data: IConsoleMessage[];
-}
+export const Console = () => {
+  const refTimeout = useRef<NodeJS.Timeout>();
 
-export const Console = (props: IConsoleProps) => {
-  const { data } = props;
+  const refScrollArea = useRef<HTMLDivElement | null>(null);
+
+  const [messages, setMessages] = useState<IConsoleMessage[]>([]);
 
   const refContainer = useRef<HTMLDivElement | null>(null);
 
   const { visibleItems, topPadding, bottomPadding, handleScroll } = useVirtualScroll({
-    totalItems: data.length,
+    totalItems: messages.length,
     itemHeight: 20,
     containerHeight: refContainer.current?.clientHeight,
   });
 
+  useEventBus<IEventBusConsoleMessage>('@@-console-message', ({ data }) => {
+    clearTimeout(refTimeout.current);
+    setMessages((state) => {
+      const log = [...state];
+      log.push(...data);
+
+      storageSetItem(STORAGE_PREFIX_CONSOLE_OUTPUT, log);
+      return log;
+    });
+
+    refTimeout.current = setTimeout(() => {
+      refScrollArea.current?.scrollTo({ top: refContainer.current?.clientHeight, behavior: 'smooth' });
+    }, 100);
+  });
+
+  useEventBus<IEventBusConsoleMessageReset>('@@-console-message-reset', () => {
+    storageRemoveItem(STORAGE_PREFIX_CONSOLE_OUTPUT);
+    setMessages([]);
+  });
+
   return (
     <ScrollArea
+      ref={refScrollArea}
       type="auto"
       onScroll={handleScroll}
     >
@@ -34,14 +59,14 @@ export const Console = (props: IConsoleProps) => {
         style={{ paddingTop: topPadding, paddingBottom: bottomPadding }}
       >
         {
-          visibleItems.map((index) => {
+          !!messages.length && visibleItems.map((index) => {
             return (
               <div
-                key={data[index].ts + index}
+                key={messages[index].ts + index}
                 className='relative pt-5 pointer-events-none'
               >
-                <div className='absolute top-0 left-0 text-[9px] text-gray-500'>{format(new Date(data[index].ts), 'yyyy-MM-dd HH:mm:ss')}</div>
-                <div>{data[index].message}</div>
+                <div className='absolute top-0 left-0 text-[9px] text-gray-500'>{format(new Date(messages[index].ts), 'yyyy-MM-dd HH:mm:ss')}</div>
+                <div>{messages[index].message}</div>
               </div>
             )
           })
@@ -50,5 +75,3 @@ export const Console = (props: IConsoleProps) => {
     </ScrollArea>
   )
 };
-
-Console.displayName = 'Console';
