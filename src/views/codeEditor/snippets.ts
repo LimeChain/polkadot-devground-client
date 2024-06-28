@@ -6,7 +6,6 @@ const snippet0 = {
     import { getPolkadotSigner } from "polkadot-api/signer";
     import { sr25519CreateDerive } from '@polkadot-labs/hdkd';
 
-    import { DEV_PHRASE, mnemonicToEntropy, entropyToMiniSecret } from "@polkadot-labs/hdkd-helpers";
     (async () => {
       try {
         const provider = WebSocketProvider("wss://rococo-rpc.polkadot.io");
@@ -14,24 +13,23 @@ const snippet0 = {
         const dotApi = client.getTypedApi(dotDescriptor.dot);
 
         const myAddress = "5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7";
-        const aliceAddress = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
         const bobAddress = "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty";
 
         const entropy = mnemonicToEntropy(DEV_PHRASE);
         const miniSecret = entropyToMiniSecret(entropy);
-        const hdkdKeyPair = sr25519CreateDerive(miniSecret)("//Alice");
+        const hdkdKeyPair = sr25519CreateDerive(miniSecret)("//Bob");
         const signer = getPolkadotSigner(
           hdkdKeyPair.publicKey,
           "Sr25519",
           (input) => hdkdKeyPair.sign(input)
         );
 
-        const {data:{free}} = await dotApi.query.System.Account.getValue(aliceAddress);
-        console.log(free);
+        const {data:{free}} = await dotApi.query.System.Account.getValue(bobAddress);
+        console.log("Bob has: ",free);
 
         const tx = dotApi.tx.Balances.transfer_allow_death({
           dest: dotDescriptor.MultiAddress.Id(myAddress),
-          value: free / 2n,
+          value: 100n,
         })
           .signSubmitAndWatch(signer)
           .subscribe((d) => {
@@ -44,6 +42,7 @@ const snippet0 = {
     })();
     `,
 };
+
 
 const snippet1 = {
   id: 1,
@@ -139,4 +138,46 @@ const snippet3 = {
     })();
   `,
 };
-export const demoCodes = [snippet0, snippet1, snippet2, snippet3];
+
+const snippet4 = {
+  id: 4,
+  code: `
+    import { createClient } from "polkadot-api";
+    import { WebSocketProvider } from "polkadot-api/ws-provider/web";
+    import { getPolkadotSigner } from "polkadot-api/signer";
+    import { sr25519CreateDerive } from '@polkadot-labs/hdkd';
+
+
+    (async () => {
+      try {
+        const extensions = getInjectedExtensions() || []
+        const selectedExtension = await connectInjectedExtension(
+          extensions[0]
+        )
+        const accounts = selectedExtension.getAccounts()
+        
+        const polkadotSigner = accounts[0].polkadotSigner
+
+        const provider = WebSocketProvider("wss://rococo-rpc.polkadot.io");
+        const client = createClient(provider);
+        const dotApi = client.getTypedApi(dotDescriptor.dot);
+
+        const myAddress = "5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7";
+        const aliceAddress = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
+        const bobAddress = "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty";
+
+        const tx = dotApi.tx.Balances.transfer_allow_death({
+          dest: dotDescriptor.MultiAddress.Id(myAddress),
+          value: 100n,
+        }).signSubmitAndWatch(polkadotSigner)
+          .subscribe((d) => {
+            console.log(d);
+          });
+
+      } catch (err) {
+        console.log(err)
+      }
+    })();
+    `,
+};
+export const demoCodes = [snippet0, snippet1, snippet2, snippet3,snippet4,];

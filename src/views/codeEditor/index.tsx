@@ -109,11 +109,9 @@ const TypeScriptEditor = () => {
 
       refMonacoEditor.current?.setValue(snippet.code);
 
-      if (!isTempVersionExist) {
-        refMonacoEditor.current?.trigger(null, 'editor.fold', {
-          selectionLines: [2],
-        });
-      }
+      refMonacoEditor.current?.trigger(null, 'editor.fold', {
+        selectionLines: [2],
+      });
 
       refTimeout.current = setTimeout(async () => {
         setIsLoading(false);
@@ -219,6 +217,8 @@ const TypeScriptEditor = () => {
     clearTimeout(refTimeout.current);
     destroyIframe();
 
+    window.pivanov = dotDescriptor;
+
     try {
       const filteredCode = refCode.current.replace(/import[\s\S]+?from\s+['"][^'"]+['"];?/g, '');
 
@@ -237,8 +237,10 @@ const TypeScriptEditor = () => {
         import { getPolkadotSigner } from 'https://cdn.jsdelivr.net/npm/@polkadot-api/signer@0.0.1/+esm';
         import { DEV_PHRASE, entropyToMiniSecret, mnemonicToEntropy, ss58Address } from 'https://cdn.jsdelivr.net/npm/@polkadot-labs/hdkd-helpers@0.0.6/+esm';
         import { sr25519CreateDerive } from 'https://cdn.jsdelivr.net/npm/@polkadot-labs/hdkd@0.0.6/+esm';
+        import { getInjectedExtensions, connectInjectedExtension } from "https://cdn.jsdelivr.net/npm/@polkadot-api/pjs-signer@0.2.0/+esm";
 
         const dotDescriptor = window.parent.dotDescriptor;
+        window.injectedWeb3 = window.parent.injectedWeb3;
 
         class CustomLogger {
           constructor() {
