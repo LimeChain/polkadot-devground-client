@@ -2199,6 +2199,6 @@ fs.writeFile(
   JSON.stringify(output, null, 2),
   (err) => {
     if (err) throw err;
-    console.log("Theme has been saved!");
+    console.info("Theme has been saved!");
   }
 );

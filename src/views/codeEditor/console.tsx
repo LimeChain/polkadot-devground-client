@@ -47,12 +47,14 @@ export const Console = () => {
       return log;
     });
 
-    refTimeout.current = setTimeout(() => {
-      refScrollArea.current?.scrollTo({
-        top: refContainer.current?.clientHeight,
-        behavior: 'smooth',
-      });
-    }, 100);
+    if (!refIsUserScrolling.current) {
+      refTimeout.current = setTimeout(() => {
+        refScrollArea.current?.scrollTo({
+          top: refContainer.current?.clientHeight,
+          behavior: 'smooth',
+        });
+      }, 100);
+    }
   });
 
   useEventBus<IEventBusConsoleMessageReset>('@@-console-message-reset', () => {

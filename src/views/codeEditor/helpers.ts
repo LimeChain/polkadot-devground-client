@@ -80,7 +80,13 @@ export const prepareComments = (
           console.warn(`Package path ${path} not found in packages.`);
         }
         const keys = Object.keys(packages[path] as PackageModule);
-        return `import { ${keys.join(', ')} } from "${path}";`;
+
+        // Check if keys length exceeds the threshold
+        if (keys.length > 2) {
+          return `import {\n *   ${keys.join(',\n *   ')}\n * } from "${path}";`;
+        } else {
+          return `import { ${keys.join(', ')} } from "${path}";`;
+        }
       }
     })
     .filter(Boolean);
@@ -90,7 +96,7 @@ export const prepareComments = (
       /* Available imports and packages */
       /*
        * ${availableImports.join('\n * ')}
-       */\n
+      */\n
     `;
   }
 
@@ -134,5 +140,14 @@ export const generateOutput = async (
   } catch (error) {
     console.error('Error formatting code:', error);
     throw new Error('Error formatting code');
+  }
+};
+
+export const prettyPrintMessage = (message: unknown) => {
+  try {
+    const parsedMessage = JSON.parse(String(message));
+    return JSON.stringify(parsedMessage, null, 2);
+  } catch (e) {
+    return message;
   }
 };
