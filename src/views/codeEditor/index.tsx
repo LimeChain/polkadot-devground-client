@@ -1,19 +1,19 @@
 import {
-busDispatch,
-useEventBus,
+  busDispatch,
+  useEventBus,
 } from '@pivanov/event-bus';
 import * as dotDescriptor from '@polkadot-api/descriptors';
 import * as monaco from 'monaco-editor';
 import {
-useCallback,
-useEffect,
-useRef,
-useState,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
 } from 'react';
 import {
-Panel,
-PanelGroup,
-PanelResizeHandle,
+  Panel,
+  PanelGroup,
+  PanelResizeHandle,
 } from 'react-resizable-panels';
 import { transform } from 'sucrase';
 
@@ -28,7 +28,10 @@ import {
 } from '@utils/storage';
 
 import { Console } from './console';
-import { generateOutput } from './helpers';
+import {
+  generateOutput,
+  prettyPrintMessage,
+} from './helpers';
 import oneDarkPro from './one-dark-pro.json';
 import { demoCodes } from './snippets';
 
@@ -42,14 +45,14 @@ import type { IConsoleMessage } from '@custom-types/global';
 const bg = '#282c34';
 
 const TypeScriptEditor = () => {
-  const refExampleIndex = useRef<number>(0);
   const refTimeout = useRef<NodeJS.Timeout>();
+  const refExampleIndex = useRef<number>(0);
   const refIframe = useRef<HTMLIFrameElement | null>(null);
   const refURL = useRef<string>('');
   const refEditor = useRef<HTMLDivElement | null>(null);
-  const refMonacoEditor = useRef<monaco.editor.IStandaloneCodeEditor | null>(
-    null,
-  );
+  const refMonacoDisposable1 = useRef<monaco.IDisposable | null>(null);
+  const refMonacoDisposable2 = useRef<monaco.IDisposable | null>(null);
+  const refMonacoEditor = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const refCompiledCode = useRef<string>('');
   const refCode = useRef<string>('');
   const [isLoading, setIsLoading] = useState(false);
@@ -78,6 +81,7 @@ const TypeScriptEditor = () => {
     busDispatch<IEventBusConsoleMessageReset>({
       type: '@@-console-message-reset',
     });
+
     const selectedCodeSnippet = demoCodes[codeSnippetIndex];
 
     refExampleIndex.current = selectedCodeSnippet.id;
@@ -98,10 +102,11 @@ const TypeScriptEditor = () => {
     refCode.current = snippet.code;
 
     refTimeout.current = setTimeout(async () => {
-      monaco.languages.typescript.typescriptDefaults.addExtraLib(
-        snippet.types,
-        'types.d.ts',
-      );
+      monaco.languages.typescript.typescriptDefaults.addExtraLib(`
+        declare const dotDescriptor: uknown;
+        ${snippet.types}
+      `, 'global.d.ts');
+
       refMonacoEditor.current?.setValue(snippet.code);
 
       if (!isTempVersionExist) {
@@ -139,6 +144,11 @@ const TypeScriptEditor = () => {
     if (refEditor.current) {
       monaco.editor.defineTheme('one-dark-pro', oneDarkPro as never);
 
+      monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+        noSemanticValidation: true,
+        noSyntaxValidation: true,
+      });
+
       refMonacoEditor.current = monaco.editor.create(refEditor.current, {
         value: refCode.current,
         language: 'typescript',
@@ -150,11 +160,58 @@ const TypeScriptEditor = () => {
         automaticLayout: true,
         folding: true,
       });
+
+      const dotDescriptorKeys = Object.keys(dotDescriptor);
+
+      refMonacoDisposable1.current = monaco.languages.registerCompletionItemProvider('typescript', {
+        provideCompletionItems: (model, position) => {
+          const word = model.getWordAtPosition(position);
+          const range = {
+            startLineNumber: position.lineNumber,
+            endLineNumber: position.lineNumber,
+            startColumn: word ? word.startColumn : position.column,
+            endColumn: word ? word.endColumn : position.column,
+          };
+
+          const suggestions = dotDescriptorKeys.map(key => ({
+            label: key,
+            kind: monaco.languages.CompletionItemKind.Field,
+            insertText: key,
+            detail: `Property from dotDescriptor`,
+            range,
+          }));
+
+          return { suggestions };
+        },
+      });
+
+      refMonacoDisposable2.current = monaco.languages.registerHoverProvider('typescript', {
+        provideHover: (model, position) => {
+          const word = model.getWordAtPosition(position);
+          if (word && word.word === 'dotDescriptor') {
+            return {
+              range: new monaco.Range(
+                position.lineNumber,
+                word.startColumn,
+                position.lineNumber,
+                word.endColumn,
+              ),
+              contents: [
+                { value: '**dotDescriptor**' },
+                { value: 'default export from `@polkadot-api/descriptors`' },
+              ],
+            };
+          }
+          return null;
+        },
+      });
     }
 
     return () => {
       clearTimeout(refTimeout.current);
       refMonacoEditor.current?.dispose();
+      refMonacoDisposable1.current?.dispose();
+      refMonacoDisposable2.current?.dispose();
     };
   }, []);
 
@@ -162,15 +219,8 @@ const TypeScriptEditor = () => {
     clearTimeout(refTimeout.current);
     destroyIframe();
 
-    window.pivanov = dotDescriptor;
-
     try {
-      const filteredCode = refCode.current
-        .split('\n')
-        .filter(
-          (line) => !line.startsWith('import ') && !line.startsWith('require('),
-        )
-        .join('\n');
+      const filteredCode = refCode.current.replace(/import[\s\S]+?from\s+['"][^'"]+['"];?/g, '');
 
       const compiledCode = transform(filteredCode, { transforms: ['typescript'] }).code;
 
@@ -189,7 +239,7 @@ const TypeScriptEditor = () => {
         import { sr25519CreateDerive } from 'https://cdn.jsdelivr.net/npm/@polkadot-labs/hdkd@0.0.6/+esm';
         import { getInjectedExtensions, connectInjectedExtension } from "https://cdn.jsdelivr.net/npm/@polkadot-api/pjs-signer@0.2.0/+esm";
 
-        const dotDescriptor = window.parent.pivanov;
+        const dotDescriptor = window.parent.dotDescriptor;
 
         class CustomLogger {
           constructor() {
@@ -315,7 +365,7 @@ const TypeScriptEditor = () => {
         (arg: unknown) => {
           return {
             ts: new Date().getTime(),
-            message: arg,
+            message: prettyPrintMessage(arg),
           };
         },
       );

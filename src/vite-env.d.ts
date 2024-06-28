@@ -1,7 +1,11 @@
 /// <reference types="vite/client" />
 /// <reference types="vite-plugin-pwa/client" />
 
-// for testing purposes
-interface Window {
-  pivanov?: unknown;
+import type * as dotDescriptor from '@polkadot-api/descriptors';
+
+declare global {
+  interface Window {
+    pivanov?: unknown; // for testing purposes
+    dotDescriptor: typeof dotDescriptor;
+  }
 }
