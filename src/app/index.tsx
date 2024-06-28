@@ -1,4 +1,8 @@
-import { useRef } from 'react';
+import * as dotDescriptor from '@polkadot-api/descriptors';
+import {
+  useEffect,
+  useRef,
+} from 'react';
 import {
   createBrowserRouter,
   RouterProvider,
@@ -11,13 +15,13 @@ import '../assets/styles/index.css';
 export const App = () => {
   const refRoutes = useRef(createBrowserRouter(routes()));
 
+  useEffect(() => {
+    window.dotDescriptor = dotDescriptor;
+  }, []);
+
   return (
     <>
       <RouterProvider router={refRoutes.current} />
-      {/* <div className="flex h-screen w-screen flex-col items-stretch justify-stretch">
-        <Header />
-        <Monaco />
-      </div> */}
     </>
   );
 };
