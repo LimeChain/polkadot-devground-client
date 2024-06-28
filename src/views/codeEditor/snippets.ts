@@ -13,24 +13,23 @@ const snippet0 = {
         const dotApi = client.getTypedApi(dotDescriptor.dot);
 
         const myAddress = "5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7";
-        const aliceAddress = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
         const bobAddress = "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty";
 
         const entropy = mnemonicToEntropy(DEV_PHRASE);
         const miniSecret = entropyToMiniSecret(entropy);
-        const hdkdKeyPair = sr25519CreateDerive(miniSecret)("//Alice");
+        const hdkdKeyPair = sr25519CreateDerive(miniSecret)("//Bob");
         const signer = getPolkadotSigner(
           hdkdKeyPair.publicKey,
           "Sr25519",
           (input) => hdkdKeyPair.sign(input)
         );
 
-        const {data:{free}} = await dotApi.query.System.Account.getValue(aliceAddress);
-        console.log(free);
+        const {data:{free}} = await dotApi.query.System.Account.getValue(bobAddress);
+        console.log("Bob has: ",free);
 
         const tx = dotApi.tx.Balances.transfer_allow_death({
           dest: dotDescriptor.MultiAddress.Id(myAddress),
-          value: free / 2n,
+          value: 100n,
         })
           .signSubmitAndWatch(signer)
           .subscribe((d) => {
@@ -151,6 +150,13 @@ const snippet4 = {
 
     (async () => {
       try {
+        const extensions = getInjectedExtensions() || []
+        const selectedExtension = await connectInjectedExtension(
+          extensions[0]
+        )
+        const accounts = selectedExtension.getAccounts()
+        
+        const polkadotSigner = accounts[0].polkadotSigner
 
         const provider = WebSocketProvider("wss://rococo-rpc.polkadot.io");
         const client = createClient(provider);
@@ -160,20 +166,18 @@ const snippet4 = {
         const aliceAddress = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
         const bobAddress = "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty";
 
-        const {data:{free}} = await dotApi.query.System.Account.getValue(aliceAddress);
-
         const tx = dotApi.tx.Balances.transfer_allow_death({
           dest: dotDescriptor.MultiAddress.Id(myAddress),
-          value: free / 2n,
-        }).signSubmitAndWatch(signer)
+          value: 100n,
+        }).signSubmitAndWatch(polkadotSigner)
           .subscribe((d) => {
             console.log(d);
           });
-       
+
       } catch (err) {
         console.log(err)
       }
     })();
     `,
 };
-export const demoCodes = [snippet4,snippet0, snippet1, snippet2, snippet3];
+export const demoCodes = [snippet0, snippet1, snippet2, snippet3,snippet4,];

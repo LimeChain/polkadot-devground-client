@@ -42,6 +42,25 @@ import type {
 } from '@custom-types/eventBus';
 import type { IConsoleMessage } from '@custom-types/global';
 
+import {
+  // getInjectedExtensions,
+  // connectInjectedExtension,
+  type InjectedExtension,
+  type InjectedPolkadotAccount,
+} from "polkadot-api/pjs-signer"
+
+import { ApiPromise, WsProvider } from 'https://cdn.jsdelivr.net/npm/@polkadot/api@11.3.1/+esm';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/+esm'
+import { getSmProvider } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/sm-provider/+esm';
+import { start } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/smoldot/+esm';
+import { WebSocketProvider } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/ws-provider/web/+esm';
+import { startFromWorker } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/smoldot/from-worker/+esm';
+
+import { getPolkadotSigner } from 'https://cdn.jsdelivr.net/npm/@polkadot-api/signer@0.0.1/+esm';
+import { DEV_PHRASE, entropyToMiniSecret, mnemonicToEntropy, ss58Address } from 'https://cdn.jsdelivr.net/npm/@polkadot-labs/hdkd-helpers@0.0.6/+esm';
+import { sr25519CreateDerive } from 'https://cdn.jsdelivr.net/npm/@polkadot-labs/hdkd@0.0.6/+esm';
+import { getInjectedExtensions, connectInjectedExtension } from "https://cdn.jsdelivr.net/npm/@polkadot-api/pjs-signer@0.2.0/+esm";
+
 const bg = '#282c34';
 
 const TypeScriptEditor = () => {
@@ -219,6 +238,41 @@ const TypeScriptEditor = () => {
     clearTimeout(refTimeout.current);
     destroyIframe();
 
+    window.pivanov = dotDescriptor;
+
+    const extensions: string[] = getInjectedExtensions() || []
+ 
+    // Connect to an extension
+    const selectedExtension: InjectedExtension = await connectInjectedExtension(
+      extensions[0],
+    )
+    
+    // Get accounts registered in the extension
+    const accounts: InjectedPolkadotAccount[] = selectedExtension.getAccounts()
+    
+    // The signer for each account is in the `polkadotSigner` property of `InjectedPolkadotAccount`
+    const polkadotSigner = accounts[0].polkadotSigner
+
+    const provider = WebSocketProvider("wss://rococo-rpc.polkadot.io");
+    const client = createClient(provider);
+    const dotApi = client.getTypedApi(dotDescriptor.dot);
+
+    const myAddress = "5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7";
+    const aliceAddress = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
+    const bobAddress = "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty";
+
+    const tx = dotApi.tx.Balances.transfer_allow_death({
+      dest: dotDescriptor.MultiAddress.Id(myAddress),
+      value: 100n,
+    }).signSubmitAndWatch(polkadotSigner)
+      .subscribe((d) => {
+        console.log(d);
+      });
+
+    console.log(polkadotSigner)
+
+    window.signer = polkadotSigner;
+
     try {
       const filteredCode = refCode.current.replace(/import[\s\S]+?from\s+['"][^'"]+['"];?/g, '');
 
@@ -240,6 +294,7 @@ const TypeScriptEditor = () => {
         import { getInjectedExtensions, connectInjectedExtension } from "https://cdn.jsdelivr.net/npm/@polkadot-api/pjs-signer@0.2.0/+esm";
 
         const dotDescriptor = window.parent.dotDescriptor;
+        const signer = window.parent.signer;
 
         class CustomLogger {
           constructor() {
