@@ -1,19 +1,19 @@
 import {
-  busDispatch,
-  useEventBus,
+busDispatch,
+useEventBus,
 } from '@pivanov/event-bus';
+import * as dotDescriptor from '@polkadot-api/descriptors';
 import * as monaco from 'monaco-editor';
-import { chainSpec } from 'polkadot-api/chains/polkadot';
 import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
+useCallback,
+useEffect,
+useRef,
+useState,
 } from 'react';
 import {
-  Panel,
-  PanelGroup,
-  PanelResizeHandle,
+Panel,
+PanelGroup,
+PanelResizeHandle,
 } from 'react-resizable-panels';
 import { transform } from 'sucrase';
 
@@ -43,7 +43,6 @@ const bg = '#282c34';
 
 const TypeScriptEditor = () => {
   const refExampleIndex = useRef<number>(0);
-
   const refTimeout = useRef<NodeJS.Timeout>();
   const refIframe = useRef<HTMLIFrameElement | null>(null);
   const refURL = useRef<string>('');
@@ -79,14 +78,15 @@ const TypeScriptEditor = () => {
     busDispatch<IEventBusConsoleMessageReset>({
       type: '@@-console-message-reset',
     });
-
     const selectedCodeSnippet = demoCodes[codeSnippetIndex];
+
     refExampleIndex.current = selectedCodeSnippet.id;
 
     const isTempVersionExist = await storageExists(
       `${STORAGE_PREFIX}-${codeSnippetIndex}`,
     );
     let code = selectedCodeSnippet.code;
+
     if (isTempVersionExist) {
       const existingCode = await storageGetItem<string>(
         `${STORAGE_PREFIX}-${codeSnippetIndex}`,
@@ -162,6 +162,8 @@ const TypeScriptEditor = () => {
     clearTimeout(refTimeout.current);
     destroyIframe();
 
+    window.pivanov = dotDescriptor;
+
     try {
       const filteredCode = refCode.current
         .split('\n')
@@ -176,14 +178,17 @@ const TypeScriptEditor = () => {
 
       const blobContent = `
         import { ApiPromise, WsProvider } from 'https://cdn.jsdelivr.net/npm/@polkadot/api@11.3.1/+esm';
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/+esm';
-
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/+esm'
         import { getSmProvider } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/sm-provider/+esm';
         import { start } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/smoldot/+esm';
         import { WebSocketProvider } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/ws-provider/web/+esm';
         import { startFromWorker } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/smoldot/from-worker/+esm';
 
-        const dot = ${chainSpec};
+        import { getPolkadotSigner } from 'https://cdn.jsdelivr.net/npm/@polkadot-api/signer@0.0.1/+esm';
+        import { DEV_PHRASE, entropyToMiniSecret, mnemonicToEntropy, ss58Address } from 'https://cdn.jsdelivr.net/npm/@polkadot-labs/hdkd-helpers@0.0.6/+esm';
+        import { sr25519CreateDerive } from 'https://cdn.jsdelivr.net/npm/@polkadot-labs/hdkd@0.0.6/+esm';
+
+        const dotDescriptor = window.parent.pivanov;
 
         class CustomLogger {
           constructor() {
@@ -209,6 +214,9 @@ const TypeScriptEditor = () => {
 
           _logMessage(type, ...args) {
             const serializedArgs = args.map(arg => {
+              if (typeof arg === "bigint") {
+                return arg.toString();
+              }
               if (typeof arg === 'object') {
                 try {
                   return JSON.stringify(arg, (key, value) => {
@@ -301,6 +309,7 @@ const TypeScriptEditor = () => {
   }, []);
 
   const handleMessage = useCallback((event: MessageEvent) => {
+    console.log(event);
     if (event.data.type === 'customLog') {
       const messages: IConsoleMessage[] = event.data.args.map(
         (arg: unknown) => {

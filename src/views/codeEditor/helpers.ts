@@ -1,6 +1,10 @@
 import * as AT_POLKADOT_SLASH_API from '@polkadot/api';
+import * as POLKADOT_LABS_HDKD from '@polkadot-labs/hdkd';
+import * as POLKADOT_LABS_HDKD_HELPERS from '@polkadot-labs/hdkd-helpers';
 import * as POLKADOT_API from 'polkadot-api';
 import * as PA_CHAINS_POLKADOT from 'polkadot-api/chains/polkadot';
+import * as POLKADOT_API_SIGNER from 'polkadot-api/signer';
+import * as POLKADOT_API_SM_PROVIDER from 'polkadot-api/sm-provider';
 import * as POLKADOT_API_WS_PROVIDER_WEB from 'polkadot-api/ws-provider/web';
 // eslint-disable-next-line import/default
 import prettierPluginEstree from 'prettier/plugins/estree';
@@ -20,6 +24,10 @@ const packages: IPackageType = {
   'polkadot-api': POLKADOT_API,
   'polkadot-api/chains/polkadot': PA_CHAINS_POLKADOT,
   'polkadot-api/ws-provider/web': POLKADOT_API_WS_PROVIDER_WEB,
+  'polkadot-api/signer': POLKADOT_API_SIGNER,
+  '@polkadot-labs/hdkd': POLKADOT_LABS_HDKD,
+  '@polkadot-labs/hdkd-helpers': POLKADOT_LABS_HDKD_HELPERS,
+  'polkadot-api/sm-provider': POLKADOT_API_SM_PROVIDER,
 };
 
 export const parseImports = (code: string): string[] | null => {

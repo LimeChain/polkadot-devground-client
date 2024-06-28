@@ -1,3 +1,5 @@
+import { formatConsoleMessage } from './helpers';
+
 /**
  * Set a value in Cache API
  * @param key The key under which the value will be stored
@@ -8,7 +10,7 @@ export async function storageSetItem(
   value: unknown,
 ): Promise<void> {
   const cache = await caches.open('my-cache');
-  const serializedValue = JSON.stringify(value);
+  const serializedValue = JSON.stringify(value, formatConsoleMessage);
   const response = new Response(serializedValue, {
     headers: { 'Content-Type': 'application/json' },
   });

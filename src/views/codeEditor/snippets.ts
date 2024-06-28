@@ -3,6 +3,113 @@ const snippet0 = {
   code: `
     import { createClient } from "polkadot-api";
     import { WebSocketProvider } from "polkadot-api/ws-provider/web";
+    import { getPolkadotSigner } from "polkadot-api/signer";
+    import { sr25519CreateDerive } from '@polkadot-labs/hdkd';
+
+    import { DEV_PHRASE, mnemonicToEntropy, entropyToMiniSecret } from "@polkadot-labs/hdkd-helpers";
+    (async () => {
+      try {
+       
+
+        const provider = WebSocketProvider("wss://rococo-rpc.polkadot.io");
+        const client = createClient(provider);
+        const dotApi = client.getTypedApi(dotDescriptor.dot);
+
+        const myAddress = "5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7";
+        const aliceAddress = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
+        const bobAddress = "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty";
+
+        const entropy = mnemonicToEntropy(DEV_PHRASE);
+        const miniSecret = entropyToMiniSecret(entropy);
+        const hdkdKeyPair = sr25519CreateDerive(miniSecret)("//Alice");
+        const signer = getPolkadotSigner(
+          hdkdKeyPair.publicKey,
+          "Sr25519",
+          (input) => hdkdKeyPair.sign(input)
+        );
+
+        const {data:{free}} = await dotApi.query.System.Account.getValue(aliceAddress);
+        console.log(free);
+
+        const tx = dotApi.tx.Balances.transfer_allow_death({
+          dest: dotDescriptor.MultiAddress.Id(myAddress),
+          value: free / 2n,
+        })
+          .signSubmitAndWatch(signer)
+          .subscribe((d) => {
+            console.log(d);
+          });
+       
+      } catch (err) {
+        console.log(err)
+      }
+    })();
+    `,
+};
+
+const snippet1 = {
+  id: 1,
+  code: `
+  import { ApiPromise, WsProvider } from '@polkadot/api';
+  
+  (async () => {
+    const provider = new WsProvider('wss://dot-rpc.stakeworld.io');
+    const api = await ApiPromise.create({ provider });
+    
+    // Subscribe to the latest block headers
+    api.rpc.chain.subscribeFinalizedHeads((header) => {
+      console.log(header.number.toNumber(), header.hash.toHex());
+    });
+    
+    // Get the value for an account
+    const accountInfo = await api.query.system.account('16JGzEsi8gcySKjpmxHVrkLTHdFHodRepEz8n244gNZpr9J');
+    
+    console.log('@@@ accountInfo', accountInfo);
+  })();
+  `,
+};
+
+const snippet2 = {
+  id: 2,
+  code: `
+  import { ApiPromise, WsProvider } from '@polkadot/api';
+  
+  (async () => {
+    const provider = new WsProvider('wss://dot-rpc.stakeworld.io');
+    const api = await ApiPromise.create({ provider });
+    const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
+    
+    // retrieve the balance, once-off at the latest block
+    const { data: { free } } = await api.query.system.account(ALICE);
+    
+    console.log('Alice has a current balance of', free.toHuman());
+    
+    // retrieve balance updates with an optional value callback
+    const balanceUnsub = await api.query.system.account(ALICE, ({ data: { free } }) => {
+      console.log('Alice has an updated balance of', free.toHuman());
+    });
+    
+    // retrieve the balance at a block hash in the past
+    const header = await api.rpc.chain.getHeader();
+    const prevHash = await api.rpc.chain.getBlockHash(header.number.unwrap().subn(42));
+    const { data: { free: prev } } = await api.query.system.account.at(prevHash, ALICE);
+    
+    console.log('Alice had a balance of', prev.toHuman(), '(42 blocks ago)');
+    
+    // useful in some situations - the value hash and storage entry size
+    const currHash = await api.query.system.account.hash(ALICE);
+    const currSize = await api.query.system.account.size(ALICE);
+    
+    console.log('Alice account entry has a value hash of', currHash, 'with a size of', currSize);
+  })();
+  `,
+};
+
+const snippet3 = {
+  id: 3,
+  code: `
+    import { createClient } from "polkadot-api";
+    import { WebSocketProvider } from "polkadot-api/ws-provider/web";
 
     (async () => {
       // Connect to the polkadot relay chain.
@@ -34,63 +141,4 @@ const snippet0 = {
     })();
   `,
 };
-
-const snippet1 = {
-  id: 1,
-  code: `
-    import { ApiPromise, WsProvider } from '@polkadot/api';
-
-    (async () => {
-      const provider = new WsProvider('wss://dot-rpc.stakeworld.io');
-      const api = await ApiPromise.create({ provider });
-
-      // Subscribe to the latest block headers
-      api.rpc.chain.subscribeFinalizedHeads((header) => {
-        console.log(header.number.toNumber(), header.hash.toHex());
-      });
-
-      // Get the value for an account
-      const accountInfo = await api.query.system.account('16JGzEsi8gcySKjpmxHVrkLTHdFHodRepEz8n244gNZpr9J');
-
-      console.log('@@@ accountInfo', accountInfo);
-    })();
-  `,
-};
-
-const snippet2 = {
-  id: 2,
-  code: `
-  import { ApiPromise, WsProvider } from '@polkadot/api';
-
-  (async () => {
-    const provider = new WsProvider('wss://dot-rpc.stakeworld.io');
-    const api = await ApiPromise.create({ provider });
-    const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
-
-    // retrieve the balance, once-off at the latest block
-    const { data: { free } } = await api.query.system.account(ALICE);
-
-    console.log('Alice has a current balance of', free.toHuman());
-
-    // retrieve balance updates with an optional value callback
-    const balanceUnsub = await api.query.system.account(ALICE, ({ data: { free } }) => {
-      console.log('Alice has an updated balance of', free.toHuman());
-    });
-
-    // retrieve the balance at a block hash in the past
-    const header = await api.rpc.chain.getHeader();
-    const prevHash = await api.rpc.chain.getBlockHash(header.number.unwrap().subn(42));
-    const { data: { free: prev } } = await api.query.system.account.at(prevHash, ALICE);
-
-    console.log('Alice had a balance of', prev.toHuman(), '(42 blocks ago)');
-
-    // useful in some situations - the value hash and storage entry size
-    const currHash = await api.query.system.account.hash(ALICE);
-    const currSize = await api.query.system.account.size(ALICE);
-
-    console.log('Alice account entry has a value hash of', currHash, 'with a size of', currSize);
-  })();
-  `,
-};
-
-export const demoCodes = [snippet0, snippet1, snippet2];
+export const demoCodes = [snippet0, snippet1, snippet2, snippet3];
