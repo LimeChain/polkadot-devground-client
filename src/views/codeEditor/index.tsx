@@ -187,6 +187,7 @@ const TypeScriptEditor = () => {
         import { getPolkadotSigner } from 'https://cdn.jsdelivr.net/npm/@polkadot-api/signer@0.0.1/+esm';
         import { DEV_PHRASE, entropyToMiniSecret, mnemonicToEntropy, ss58Address } from 'https://cdn.jsdelivr.net/npm/@polkadot-labs/hdkd-helpers@0.0.6/+esm';
         import { sr25519CreateDerive } from 'https://cdn.jsdelivr.net/npm/@polkadot-labs/hdkd@0.0.6/+esm';
+        import { getInjectedExtensions, connectInjectedExtension } from "https://cdn.jsdelivr.net/npm/@polkadot-api/pjs-signer@0.2.0/+esm";
 
         const dotDescriptor = window.parent.pivanov;
 
@@ -309,7 +310,6 @@ const TypeScriptEditor = () => {
   }, []);
 
   const handleMessage = useCallback((event: MessageEvent) => {
-    console.log(event);
     if (event.data.type === 'customLog') {
       const messages: IConsoleMessage[] = event.data.args.map(
         (arg: unknown) => {
