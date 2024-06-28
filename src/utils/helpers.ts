@@ -12,3 +12,7 @@ export const cn = (...inputs: ClassValue[]): string => {
 export const uid = (length = 8): string => {
   return nanoid(length);
 };
+
+export const formatConsoleMessage = (_key: string, value: unknown) => {
+  return typeof value === 'bigint' ? value.toString() : value;
+};

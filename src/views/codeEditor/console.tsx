@@ -11,8 +11,8 @@ import { STORAGE_PREFIX_CONSOLE_OUTPUT } from '@utils/constants';
 import { cn } from '@utils/helpers';
 import { useVirtualScroll } from '@utils/hooks/useVirtualScroll';
 import {
-  storageRemoveItem,
-  storageSetItem,
+storageRemoveItem,
+storageSetItem,
 } from '@utils/storage';
 
 import type {
@@ -47,11 +47,12 @@ export const Console = () => {
       return log;
     });
 
-    if (!refIsUserScrolling.current) {
-      refTimeout.current = setTimeout(() => {
-        refScrollArea.current?.scrollTo({ top: refContainer.current?.clientHeight, behavior: 'smooth' });
-      }, 100);
-    }
+    refTimeout.current = setTimeout(() => {
+      refScrollArea.current?.scrollTo({
+        top: refContainer.current?.clientHeight,
+        behavior: 'smooth',
+      });
+    }, 100);
   });
 
   useEventBus<IEventBusConsoleMessageReset>('@@-console-message-reset', () => {
@@ -77,8 +78,8 @@ export const Console = () => {
       <div
         ref={refContainer}
         className={cn(
-          'flex flex-1 flex-col font-mono text-sm text-white text-opacity-60',
-          'overflow-x-hidden',
+          'flex flex-1 flex-col overflow-scroll font-mono text-sm text-white text-opacity-60',
+          'whitespace-nowrap',
         )}
         style={{
           width: refScrollArea.current?.clientWidth,
@@ -89,13 +90,16 @@ export const Console = () => {
       >
         {
           !!messages.length && visibleItems.map((index) => {
+            const { ts, message } = messages[index];
             return (
               <div
-                key={messages[index].ts + index}
+                key={ts + index}
                 className="pointer-events-none relative pt-5"
               >
-                <div className="absolute left-0 top-0 text-[9px] text-gray-500">{format(new Date(messages[index].ts), 'yyyy-MM-dd HH:mm:ss')}</div>
-                <div>{messages[index].message}</div>
+                <div className="absolute left-0 top-0 text-[9px] text-gray-500">{format(new Date(ts), 'yyyy-MM-dd HH:mm:ss')}</div>
+                <pre>
+                  {JSON.parse(JSON.stringify(message, null, 2))}
+                </pre>
               </div>
             );
           })
