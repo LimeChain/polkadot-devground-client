@@ -6,6 +6,7 @@ import * as PA_CHAINS_POLKADOT from 'polkadot-api/chains/polkadot';
 import * as POLKADOT_API_SIGNER from 'polkadot-api/signer';
 import * as POLKADOT_API_SM_PROVIDER from 'polkadot-api/sm-provider';
 import * as POLKADOT_API_WS_PROVIDER_WEB from 'polkadot-api/ws-provider/web';
+import * as POLKADOT_API_PJS_SIGNER from 'polkadot-api/pjs-signer';
 // eslint-disable-next-line import/default
 import prettierPluginEstree from 'prettier/plugins/estree';
 import parserTypeScript from 'prettier/plugins/typescript';
@@ -28,6 +29,7 @@ const packages: IPackageType = {
   '@polkadot-labs/hdkd': POLKADOT_LABS_HDKD,
   '@polkadot-labs/hdkd-helpers': POLKADOT_LABS_HDKD_HELPERS,
   'polkadot-api/sm-provider': POLKADOT_API_SM_PROVIDER,
+  'polkadot-api/pjs-signer': POLKADOT_API_PJS_SIGNER,
 };
 
 export const parseImports = (code: string): string[] | null => {
