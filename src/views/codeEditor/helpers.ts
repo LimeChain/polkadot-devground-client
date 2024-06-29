@@ -149,9 +149,9 @@ export const generateOutput = async (
   }
 };
 
-export const prettyPrintMessage = (message: unknown) => {
+export const prettyPrintMessage = (message: string): string => {
   try {
-    const parsedMessage = JSON.parse(String(message));
+    const parsedMessage = JSON.parse(message);
     return JSON.stringify(parsedMessage, null, 2);
   } catch (e) {
     return message;

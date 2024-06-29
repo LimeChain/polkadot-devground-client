@@ -1,7 +1,7 @@
 import {
-type CSSProperties,
-type ForwardedRef,
-forwardRef,
+  type CSSProperties,
+  type ForwardedRef,
+  forwardRef,
 } from 'react';
 
 interface SVGIconProps {
@@ -38,10 +38,10 @@ export const Icon = forwardRef(
 
     return (
       <svg
-ref={ref}
-{...attributes}
-fill={color}
-data-testid={testId}
+        ref={ref}
+        {...attributes}
+        fill={color}
+        data-testid={testId}
       >
         <use href={`${path}`} />
       </svg>

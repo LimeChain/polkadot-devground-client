@@ -11,8 +11,8 @@ import { STORAGE_PREFIX_CONSOLE_OUTPUT } from '@utils/constants';
 import { cn } from '@utils/helpers';
 import { useVirtualScroll } from '@utils/hooks/useVirtualScroll';
 import {
-storageRemoveItem,
-storageSetItem,
+  storageRemoveItem,
+  storageSetItem,
 } from '@utils/storage';
 
 import type {

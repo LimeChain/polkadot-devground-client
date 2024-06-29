@@ -1,9 +1,9 @@
 import * as RadixScrollArea from '@radix-ui/react-scroll-area';
 import {
-type CSSProperties,
-type RefObject,
-useCallback,
-useRef,
+  type CSSProperties,
+  type RefObject,
+  useCallback,
+  useRef,
 } from 'react';
 
 import { polymorphicComponent } from '@utils/components';
@@ -16,8 +16,8 @@ interface IScrollAreaProps {
   scrollHideDelay?: number;
   onScroll?: (event: React.MouseEvent<HTMLDivElement>) => void;
   refScrollVertical?:
-    | RefObject<HTMLDivElement>
-    | ((node: HTMLDivElement) => void);
+  | RefObject<HTMLDivElement>
+  | ((node: HTMLDivElement) => void);
   verticalScrollClassNames?: string;
   verticalScrollThumbClassNames?: string;
   refScrollHorizontal?: RefObject<HTMLDivElement>;
