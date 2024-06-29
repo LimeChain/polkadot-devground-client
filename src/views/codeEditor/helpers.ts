@@ -3,10 +3,10 @@ import * as POLKADOT_LABS_HDKD from '@polkadot-labs/hdkd';
 import * as POLKADOT_LABS_HDKD_HELPERS from '@polkadot-labs/hdkd-helpers';
 import * as POLKADOT_API from 'polkadot-api';
 import * as PA_CHAINS_POLKADOT from 'polkadot-api/chains/polkadot';
+import * as POLKADOT_API_PJS_SIGNER from 'polkadot-api/pjs-signer';
 import * as POLKADOT_API_SIGNER from 'polkadot-api/signer';
 import * as POLKADOT_API_SM_PROVIDER from 'polkadot-api/sm-provider';
 import * as POLKADOT_API_WS_PROVIDER_WEB from 'polkadot-api/ws-provider/web';
-import * as POLKADOT_API_PJS_SIGNER from 'polkadot-api/pjs-signer';
 // eslint-disable-next-line import/default
 import prettierPluginEstree from 'prettier/plugins/estree';
 import parserTypeScript from 'prettier/plugins/typescript';
@@ -33,7 +33,7 @@ const packages: IPackageType = {
 };
 
 export const parseImports = (code: string): string[] | null => {
-  const importRegex = /import\s+{[^}]+}\s+from\s+['"][^'"]+['"]/g;
+  const importRegex = /import\s+((\*\s+as\s+\w+)|(\w+\s*,\s*)?{[^}]+}|(\w+))\s+from\s+['"][^'"]+['"]/g;
   return code.match(importRegex);
 };
 
@@ -114,6 +114,13 @@ export const generateOutput = async (
   snippet: string,
   skipFormat = false,
 ): Promise<IOutput> => {
+  if (skipFormat) {
+    return {
+      types: '',
+      code: snippet,
+    };
+  }
+
   const imports = parseImports(snippet);
   if (!imports) {
     throw new Error('No imports found in the provided code.');
@@ -122,18 +129,15 @@ export const generateOutput = async (
   const comments = prepareComments(imports, packages);
 
   try {
-    let code = snippet;
-    if (!skipFormat) {
-      code = await format(`${comments}\n\n${snippet}`, {
-        parser: 'typescript',
-        plugins: [parserTypeScript, prettierPluginEstree],
-        semi: true,
-        singleQuote: false,
-        trailingComma: 'all',
-        bracketSpacing: true,
-        arrowParens: 'always',
-      });
-    }
+    const code = await format(`${comments}\n\n${snippet}`, {
+      parser: 'typescript',
+      plugins: [parserTypeScript, prettierPluginEstree],
+      semi: true,
+      singleQuote: false,
+      trailingComma: 'all',
+      bracketSpacing: true,
+      arrowParens: 'always',
+    });
 
     return {
       types,
