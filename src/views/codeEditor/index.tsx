@@ -143,8 +143,10 @@ const TypeScriptEditor = () => {
       monaco.editor.defineTheme('one-dark-pro', oneDarkPro as never);
 
       monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+        // change noSemanticValidation to false to see errors in the editor
+        // we should generate and load types when load snippet from storage (Cache API)
         noSemanticValidation: true,
-        noSyntaxValidation: true,
+        noSyntaxValidation: false,
       });
 
       refMonacoEditor.current = monaco.editor.create(refEditor.current, {
@@ -362,14 +364,10 @@ const TypeScriptEditor = () => {
 
   const handleMessage = useCallback((event: MessageEvent) => {
     if (event.data.type === 'customLog') {
-      const messages: IConsoleMessage[] = event.data.args.map(
-        (arg: unknown) => {
-          return {
-            ts: new Date().getTime(),
-            message: prettyPrintMessage(arg),
-          };
-        },
-      );
+      const messages: IConsoleMessage[] = [{
+        ts: new Date().getTime(),
+        message: prettyPrintMessage(event.data.args.join(' ')),
+      }];
 
       busDispatch<IEventBusConsoleMessage>({
         type: '@@-console-message',

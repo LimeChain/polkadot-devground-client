@@ -80,6 +80,13 @@
     ],
     "react/no-danger-with-children": "error",
     "@typescript-eslint/consistent-type-imports": "error",
+    "@typescript-eslint/indent": [
+      "error",
+      2,
+      {
+        "SwitchCase": 1
+      }
+    ],
     "@typescript-eslint/member-delimiter-style": "error",
     "@typescript-eslint/no-floating-promises": "error",
     "@typescript-eslint/semi": "error",

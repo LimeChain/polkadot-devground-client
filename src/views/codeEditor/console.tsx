@@ -11,8 +11,8 @@ import { STORAGE_PREFIX_CONSOLE_OUTPUT } from '@utils/constants';
 import { cn } from '@utils/helpers';
 import { useVirtualScroll } from '@utils/hooks/useVirtualScroll';
 import {
-storageRemoveItem,
-storageSetItem,
+  storageRemoveItem,
+  storageSetItem,
 } from '@utils/storage';
 
 import type {
@@ -93,6 +93,12 @@ export const Console = () => {
         {
           !!messages.length && visibleItems.map((index) => {
             const { ts, message } = messages[index];
+            let msg: string | undefined;
+            try {
+              msg = JSON.parse(JSON.stringify(message, null, 2));
+            } catch (error) {
+              msg = '';
+            }
             return (
               <div
                 key={ts + index}
@@ -100,7 +106,7 @@ export const Console = () => {
               >
                 <div className="absolute left-0 top-0 text-[9px] text-gray-500">{format(new Date(ts), 'yyyy-MM-dd HH:mm:ss')}</div>
                 <pre>
-                  {JSON.parse(JSON.stringify(message, null, 2))}
+                  {msg}
                 </pre>
               </div>
             );

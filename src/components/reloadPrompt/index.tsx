@@ -1,6 +1,6 @@
 import {
-useCallback,
-useEffect,
+  useCallback,
+  useEffect,
 } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 

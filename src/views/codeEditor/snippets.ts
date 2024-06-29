@@ -5,6 +5,7 @@ const snippet0 = {
     import { WebSocketProvider } from "polkadot-api/ws-provider/web";
     import { getPolkadotSigner } from "polkadot-api/signer";
     import { sr25519CreateDerive } from '@polkadot-labs/hdkd';
+    import { mnemonicToEntropy, entropyToMiniSecret, DEV_PHRASE } from '@polkadot-labs/hdkd-helpers';
 
     (async () => {
       try {
@@ -42,7 +43,6 @@ const snippet0 = {
     })();
     `,
 };
-
 
 const snippet1 = {
   id: 1,
@@ -155,7 +155,7 @@ const snippet4 = {
           extensions[0]
         )
         const accounts = selectedExtension.getAccounts()
-        
+
         const polkadotSigner = accounts[0].polkadotSigner
 
         const provider = WebSocketProvider("wss://rococo-rpc.polkadot.io");
@@ -180,4 +180,4 @@ const snippet4 = {
     })();
     `,
 };
-export const demoCodes = [snippet0, snippet1, snippet2, snippet3,snippet4,];
+export const demoCodes = [snippet0, snippet1, snippet2, snippet3, snippet4];
