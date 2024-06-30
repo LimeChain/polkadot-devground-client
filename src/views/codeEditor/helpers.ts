@@ -20,7 +20,7 @@ interface IPackageType {
   [key: string]: PackageModule;
 }
 
-const packages: IPackageType = {
+export const packages: IPackageType = {
   '@polkadot/api': AT_POLKADOT_SLASH_API,
   'polkadot-api': POLKADOT_API,
   'polkadot-api/chains/polkadot': PA_CHAINS_POLKADOT,
@@ -32,27 +32,28 @@ const packages: IPackageType = {
   'polkadot-api/pjs-signer': POLKADOT_API_PJS_SIGNER,
 };
 
-export const parseImports = (code: string): string[] | null => {
-  const importRegex = /import\s+((\*\s+as\s+\w+)|(\w+\s*,\s*)?{[^}]+}|(\w+))\s+from\s+['"][^'"]+['"]/g;
-  return code.match(importRegex);
+export const parseImports = (code: string): string[] => {
+  const importRegex = /import\s+(?:\*\s+as\s+\w+|\w+\s*,\s*)?(?:{[^}]+}|\w+)?\s+from\s+['"][^'"]+['"]/g;
+  return code.match(importRegex) || [];
 };
 
 export const prepareDeclarations = (
-  imports: string[],
-  packages: IPackageType,
-): string => {
+  imports: string[] | null,
+): { types: string; pkgs: string[] } => {
+  if (!imports?.length) {
+    return { types: '', pkgs: [] };
+  }
+
   const uniquePaths = new Set<string>();
 
   imports.forEach((importStatement) => {
-    const match = importStatement.match(
-      /import\s+{([^}]+)}\s+from\s+['"]([^'"]+)['"]/,
-    );
+    const match = importStatement.match(/from\s+['"]([^'"]+)['"]/);
     if (match) {
-      uniquePaths.add(match[2].trim());
+      uniquePaths.add(match[1].trim());
     }
   });
 
-  return Array.from(uniquePaths)
+  const types = Array.from(uniquePaths)
     .map((path) => {
       if (!(path in packages)) {
         console.warn(`Package path ${path} not found in packages.`);
@@ -62,11 +63,15 @@ export const prepareDeclarations = (
       return `declare module '${path}' {\n  export { ${keys.join(', ')} } from '${path}';\n}`;
     })
     .join('\n');
+
+  return {
+    types,
+    pkgs: Array.from(uniquePaths),
+  };
 };
 
 export const prepareComments = (
   imports: string[],
-  packages: IPackageType,
 ): string => {
   const uniquePaths = new Set<string>();
 
@@ -114,22 +119,13 @@ export const generateOutput = async (
   snippet: string,
   skipFormat = false,
 ): Promise<IOutput> => {
-  if (skipFormat) {
-    return {
-      types: '',
-      code: snippet,
-    };
-  }
-
   const imports = parseImports(snippet);
-  if (!imports) {
-    throw new Error('No imports found in the provided code.');
-  }
-  const types = prepareDeclarations(imports, packages);
-  const comments = prepareComments(imports, packages);
+  const { types } = prepareDeclarations(imports);
+
+  const comments = skipFormat ? '' : `${prepareComments(imports)}\n\n`;
 
   try {
-    const code = await format(`${comments}\n\n${snippet}`, {
+    const code = await format(`${comments}${snippet}`, {
       parser: 'typescript',
       plugins: [parserTypeScript, prettierPluginEstree],
       semi: true,
