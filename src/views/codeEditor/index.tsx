@@ -5,6 +5,7 @@ import {
 import * as dotDescriptor from '@polkadot-api/descriptors';
 import * as monaco from 'monaco-editor';
 import {
+  Suspense,
   useCallback,
   useEffect,
   useRef,
@@ -18,7 +19,6 @@ import {
 import { transform } from 'sucrase';
 
 import { Icon } from '@components/icon';
-import { STORAGE_PREFIX } from '@utils/constants';
 import { cn } from '@utils/helpers';
 import {
   storageExists,
@@ -28,6 +28,12 @@ import {
 } from '@utils/storage';
 
 import { Console } from './console';
+import {
+  iframeConsole,
+  iframeImports,
+  STORAGE_CACHE_NAME,
+  STORAGE_PREFIX,
+} from './constants';
 import {
   generateOutput,
   prettyPrintMessage,
@@ -50,12 +56,81 @@ const TypeScriptEditor = () => {
   const refIframe = useRef<HTMLIFrameElement | null>(null);
   const refURL = useRef<string>('');
   const refEditor = useRef<HTMLDivElement | null>(null);
-  const refMonacoDisposable1 = useRef<monaco.IDisposable | null>(null);
-  const refMonacoDisposable2 = useRef<monaco.IDisposable | null>(null);
   const refMonacoEditor = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const refCompiledCode = useRef<string>('');
   const refCode = useRef<string>('');
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (refEditor.current) {
+      monaco.editor.defineTheme('one-dark-pro', oneDarkPro as never);
+
+      monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+        noSemanticValidation: false,
+        noSyntaxValidation: false,
+      });
+
+      refMonacoEditor.current = monaco.editor.create(refEditor.current, {
+        value: refCode.current,
+        language: 'typescript',
+        theme: 'one-dark-pro',
+        minimap: { enabled: false },
+        wordWrap: 'wordWrapColumn',
+        wordWrapColumn: 140,
+        wordWrapBreakAfterCharacters: ' ,.;',
+        automaticLayout: true,
+        folding: true,
+      });
+
+      const compilerOptions = {
+        experimentalDecorators: true,
+        emitDecoratorMetadata: true,
+        allowSyntheticDefaultImports: true,
+        allowUmdGlobalAccess: true,
+        esModuleInterop: true,
+        module: monaco.languages.typescript.ModuleKind.ESNext,
+        lib: ['esnext', 'dom'],
+        typeRoots: ['node_modules/@types'],
+        skipLibCheck: true,
+        resolveJsonModule: true,
+        target: monaco.languages.typescript.ScriptTarget.ES2020,
+        allowNonTsExtensions: true,
+        noEmit: true,
+        strict: true,
+        moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+      };
+
+      monaco.languages.typescript.typescriptDefaults.setCompilerOptions(compilerOptions);
+
+      monaco.languages.typescript.typescriptDefaults.addExtraLib(`
+        declare const dotDescriptor = ${JSON.stringify(dotDescriptor)};
+      `, 'dotDescriptor.d.ts');
+
+      refMonacoEditor.current?.onDidChangeModelContent(() => {
+        clearTimeout(refTimeout.current);
+        refCode.current = refMonacoEditor.current?.getValue() || '';
+
+        void storageSetItem(
+          STORAGE_CACHE_NAME,
+          `${STORAGE_PREFIX}-${refExampleIndex.current}`,
+          refCode.current,
+        );
+
+        refTimeout.current = setTimeout(async () => {
+          const snippet = await generateOutput(refCode.current);
+          monaco.languages.typescript.typescriptDefaults.addExtraLib(`
+            ${snippet.types}
+          `, 'global.d.ts');
+        }, 200);
+      });
+
+    }
+
+    return () => {
+      clearTimeout(refTimeout.current);
+      refMonacoEditor.current?.dispose();
+    };
+  }, []);
 
   const destroyIframe = useCallback(() => {
     if (refIframe.current) {
@@ -87,12 +162,14 @@ const TypeScriptEditor = () => {
     refExampleIndex.current = selectedCodeSnippet.id;
 
     const isTempVersionExist = await storageExists(
+      STORAGE_CACHE_NAME,
       `${STORAGE_PREFIX}-${codeSnippetIndex}`,
     );
     let code = selectedCodeSnippet.code;
 
     if (isTempVersionExist) {
       const existingCode = await storageGetItem<string>(
+        STORAGE_CACHE_NAME,
         `${STORAGE_PREFIX}-${codeSnippetIndex}`,
       );
       code = existingCode || code;
@@ -102,26 +179,13 @@ const TypeScriptEditor = () => {
     refCode.current = snippet.code;
 
     refTimeout.current = setTimeout(async () => {
-      monaco.languages.typescript.typescriptDefaults.addExtraLib(`
-        declare const dotDescriptor: uknown;
-        ${snippet.types}
-      `, 'global.d.ts');
-
       refMonacoEditor.current?.setValue(snippet.code);
-
       refMonacoEditor.current?.trigger(null, 'editor.fold', {
         selectionLines: [2],
       });
 
       refTimeout.current = setTimeout(async () => {
         setIsLoading(false);
-        refMonacoEditor.current?.onDidChangeModelContent(() => {
-          refCode.current = refMonacoEditor.current?.getValue() || '';
-          void storageSetItem(
-            `${STORAGE_PREFIX}-${refExampleIndex.current}`,
-            refCode.current,
-          );
-        });
       }, 400);
     }, 200);
 
@@ -138,83 +202,6 @@ const TypeScriptEditor = () => {
     void loadSnippet(data);
   });
 
-  useEffect(() => {
-    if (refEditor.current) {
-      monaco.editor.defineTheme('one-dark-pro', oneDarkPro as never);
-
-      monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-        // change noSemanticValidation to false to see errors in the editor
-        // we should generate and load types when load snippet from storage (Cache API)
-        noSemanticValidation: true,
-        noSyntaxValidation: false,
-      });
-
-      refMonacoEditor.current = monaco.editor.create(refEditor.current, {
-        value: refCode.current,
-        language: 'typescript',
-        theme: 'one-dark-pro',
-        minimap: { enabled: false },
-        wordWrap: 'wordWrapColumn',
-        wordWrapColumn: 140,
-        wordWrapBreakAfterCharacters: ' ,.;',
-        automaticLayout: true,
-        folding: true,
-      });
-
-      const dotDescriptorKeys = Object.keys(dotDescriptor);
-
-      refMonacoDisposable1.current = monaco.languages.registerCompletionItemProvider('typescript', {
-        provideCompletionItems: (model, position) => {
-          const word = model.getWordAtPosition(position);
-          const range = {
-            startLineNumber: position.lineNumber,
-            endLineNumber: position.lineNumber,
-            startColumn: word ? word.startColumn : position.column,
-            endColumn: word ? word.endColumn : position.column,
-          };
-
-          const suggestions = dotDescriptorKeys.map(key => ({
-            label: key,
-            kind: monaco.languages.CompletionItemKind.Field,
-            insertText: key,
-            detail: `Property from dotDescriptor`,
-            range,
-          }));
-
-          return { suggestions };
-        },
-      });
-
-      refMonacoDisposable2.current = monaco.languages.registerHoverProvider('typescript', {
-        provideHover: (model, position) => {
-          const word = model.getWordAtPosition(position);
-          if (word && word.word === 'dotDescriptor') {
-            return {
-              range: new monaco.Range(
-                position.lineNumber,
-                word.startColumn,
-                position.lineNumber,
-                word.endColumn,
-              ),
-              contents: [
-                { value: '**dotDescriptor**' },
-                { value: 'default export from `@polkadot-api/descriptors`' },
-              ],
-            };
-          }
-          return null;
-        },
-      });
-    }
-
-    return () => {
-      clearTimeout(refTimeout.current);
-      refMonacoEditor.current?.dispose();
-      refMonacoDisposable1.current?.dispose();
-      refMonacoDisposable2.current?.dispose();
-    };
-  }, []);
-
   const handleRun = useCallback(async () => {
     clearTimeout(refTimeout.current);
     destroyIframe();
@@ -229,80 +216,8 @@ const TypeScriptEditor = () => {
       refCompiledCode.current = compiledCode;
 
       const blobContent = `
-        import { ApiPromise, WsProvider } from 'https://cdn.jsdelivr.net/npm/@polkadot/api@11.3.1/+esm';
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/+esm'
-        import { getSmProvider } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/sm-provider/+esm';
-        import { start } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/smoldot/+esm';
-        import { WebSocketProvider } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/ws-provider/web/+esm';
-        import { startFromWorker } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/smoldot/from-worker/+esm';
-
-        import { getPolkadotSigner } from 'https://cdn.jsdelivr.net/npm/@polkadot-api/signer@0.0.1/+esm';
-        import { DEV_PHRASE, entropyToMiniSecret, mnemonicToEntropy, ss58Address } from 'https://cdn.jsdelivr.net/npm/@polkadot-labs/hdkd-helpers@0.0.6/+esm';
-        import { sr25519CreateDerive } from 'https://cdn.jsdelivr.net/npm/@polkadot-labs/hdkd@0.0.6/+esm';
-        import { getInjectedExtensions, connectInjectedExtension } from "https://cdn.jsdelivr.net/npm/@polkadot-api/pjs-signer@0.2.0/+esm";
-
-        const dotDescriptor = window.parent.dotDescriptor;
-        window.injectedWeb3 = window.parent.injectedWeb3;
-
-        class CustomLogger {
-          constructor() {
-            this.webSockets = new Set();
-            this.fetchControllers = new Set();
-          }
-
-          log(...args) {
-            this._logMessage('log', ...args);
-          }
-
-          info(...args) {
-            this._logMessage('info', ...args);
-          }
-
-          warn(...args) {
-            this._logMessage('warn', ...args);
-          }
-
-          error(...args) {
-            this._logMessage('error', ...args);
-          }
-
-          _logMessage(type, ...args) {
-            const serializedArgs = args.map(arg => {
-              if (typeof arg === "bigint") {
-                return arg.toString();
-              }
-              if (typeof arg === 'object') {
-                try {
-                  return JSON.stringify(arg, (key, value) => {
-                    return typeof value === 'bigint' ? value.toString() : value;
-                  });
-                } catch (e) {
-                  return '[Object]';
-                }
-              }
-              return arg;
-            });
-            window.parent.postMessage({ type: 'customLog', args: serializedArgs }, '*');
-          }
-        }
-
-        const logger = new CustomLogger();
-        console.log = (...args) => {
-          logger.log(...args);
-        };
-
-        console.info = (...args) => {
-          logger.info(...args);
-        };
-
-        console.warn = (...args) => {
-          logger.warn(...args);
-        };
-
-        console.error = (...args) => {
-          logger.error(...args);
-        };
-
+        ${iframeConsole}
+        ${iframeImports}
         (async () => {
           try {
             ${compiledCode}
@@ -317,11 +232,11 @@ const TypeScriptEditor = () => {
 
       const iframeDoc = refIframe.current?.contentWindow?.document;
       if (iframeDoc) {
-        const script = iframeDoc.createElement('script');
-        script.type = 'module';
-        script.src = refURL.current;
+        const scriptBlob = iframeDoc.createElement('script');
+        scriptBlob.type = 'module';
+        scriptBlob.src = refURL.current;
 
-        iframeDoc.body.appendChild(script);
+        iframeDoc.body.appendChild(scriptBlob);
 
         refTimeout.current = setTimeout(() => {
           destroyIframe();
@@ -358,7 +273,7 @@ const TypeScriptEditor = () => {
   }, []);
 
   const handleReloadSnipped = useCallback(() => {
-    void storageRemoveItem(`${STORAGE_PREFIX}-${refExampleIndex.current}`);
+    void storageRemoveItem(STORAGE_CACHE_NAME, `${STORAGE_PREFIX}-${refExampleIndex.current}`);
     window.location.reload();
   }, []);
 
@@ -384,7 +299,7 @@ const TypeScriptEditor = () => {
   }, [handleMessage]);
 
   return (
-    <>
+    <Suspense>
       <div className="relative flex flex-1 overflow-hidden p-4">
         <PanelGroup direction="horizontal" className="gap-x-3">
           <Panel
@@ -485,7 +400,7 @@ const TypeScriptEditor = () => {
         </div>
       </div>
       <iframe ref={refIframe} className="hidden" />
-    </>
+    </Suspense>
   );
 };
 

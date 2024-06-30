@@ -7,13 +7,17 @@ import {
 } from 'react';
 
 import { ScrollArea } from '@components/scrollArea';
-import { STORAGE_PREFIX_CONSOLE_OUTPUT } from '@utils/constants';
 import { cn } from '@utils/helpers';
 import { useVirtualScroll } from '@utils/hooks/useVirtualScroll';
 import {
   storageRemoveItem,
   storageSetItem,
 } from '@utils/storage';
+
+import {
+  STORAGE_CACHE_NAME,
+  STORAGE_PREFIX_CONSOLE_OUTPUT,
+} from './constants';
 
 import type {
   IEventBusConsoleMessage,
@@ -43,7 +47,7 @@ export const Console = () => {
       const log = [...state];
       log.push(...data);
 
-      void storageSetItem(STORAGE_PREFIX_CONSOLE_OUTPUT, log);
+      void storageSetItem(STORAGE_CACHE_NAME, STORAGE_PREFIX_CONSOLE_OUTPUT, log);
       return log;
     });
 
@@ -58,7 +62,7 @@ export const Console = () => {
   });
 
   useEventBus<IEventBusConsoleMessageReset>('@@-console-message-reset', () => {
-    void storageRemoveItem(STORAGE_PREFIX_CONSOLE_OUTPUT);
+    void storageRemoveItem(STORAGE_CACHE_NAME, STORAGE_PREFIX_CONSOLE_OUTPUT);
     setMessages([]);
   });
 
