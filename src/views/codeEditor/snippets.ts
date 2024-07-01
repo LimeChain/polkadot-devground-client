@@ -1,3 +1,5 @@
+import { startChainClient } from "./helpers";
+
 const snippet0 = {
   id: 0,
   code: `
@@ -7,14 +9,10 @@ const snippet0 = {
     import { sr25519CreateDerive } from '@polkadot-labs/hdkd';
     import { mnemonicToEntropy, entropyToMiniSecret, DEV_PHRASE } from '@polkadot-labs/hdkd-helpers';
     import { start } from "polkadot-api/smoldot";
-    
+
     (async () => {
       try {
-        const smoldot = start();
-        const chain = await smoldot.addChain({ chainSpec: polkadotApiknownChains.rococo_v2_2 });
-        const provider = getSmProvider(chain)
-        const client = createClient(provider);
-        const dotApi = client.getTypedApi(papiDescriptors.dot);
+        ${startChainClient({chain:"rococo"})}
 
         const myAddress = "5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7";
         const bobAddress = "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty";
@@ -28,10 +26,10 @@ const snippet0 = {
           (input) => hdkdKeyPair.sign(input)
         );
 
-        const {data:{free}} = await dotApi.query.System.Account.getValue(bobAddress);
+        const {data:{free}} = await api.query.System.Account.getValue(bobAddress);
         console.log("Bob has: ",free);
 
-        const tx = dotApi.tx.Balances.transfer_allow_death({
+        const tx = api.tx.Balances.transfer_allow_death({
           dest: papiDescriptors.MultiAddress.Id(myAddress),
           value: 100n,
         })
@@ -163,17 +161,13 @@ const snippet4 = {
         
         const polkadotSigner = accounts[0].polkadotSigner
         
-        const smoldot = start();
-        const chain = await smoldot.addChain({ chainSpec: polkadotApiknownChains.rococo_v2_2 });
-        const provider = getSmProvider(chain)
-        const client = createClient(provider);
-        const dotApi = client.getTypedApi(papiDescriptors.dot);
+        ${startChainClient({chain:"rococo"})}
 
         const myAddress = "5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7";
         const aliceAddress = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
         const bobAddress = "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty";
 
-        const tx = dotApi.tx.Balances.transfer_allow_death({
+        const tx = api.tx.Balances.transfer_allow_death({
           dest: papiDescriptors.MultiAddress.Id(myAddress),
           value: 100n,
         }).signSubmitAndWatch(polkadotSigner)

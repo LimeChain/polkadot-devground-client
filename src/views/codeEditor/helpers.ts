@@ -157,3 +157,28 @@ export const prettyPrintMessage = (message: string): string => {
     return message;
   }
 };
+
+type ChainClient = "polkadot" | 'rococo'
+
+export const startChainClient = ( {chain} :  {chain: ChainClient}):string => {
+
+  const chainsLib : {
+    [key in ChainClient]: {
+      knownChain: string;
+      descriptor:string;
+    }
+  } = {
+    polkadot : {
+      knownChain: 'polkadot',descriptor: 'dot'
+    } , 
+    rococo: { knownChain: 'rococo_v2_2' , descriptor: 'rococo'}
+  }
+
+  return `
+    const smoldot = start();
+    const chain = await smoldot.addChain({ chainSpec: polkadotApiknownChains.${chainsLib[chain].knownChain} });
+    const provider = getSmProvider(chain);
+    const client = createClient(provider);
+    const api = client.getTypedApi(papiDescriptors.${chainsLib[chain].descriptor});
+  `
+}
