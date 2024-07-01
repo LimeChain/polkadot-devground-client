@@ -160,19 +160,19 @@ export const prettyPrintMessage = (message: string): string => {
 
 type ChainClient = "polkadot" | 'rococo'
 
-export const startChainClient = ( {chain} :  {chain: ChainClient}):string => {
-
-  const chainsLib : {
-    [key in ChainClient]: {
-      knownChain: string;
-      descriptor:string;
-    }
-  } = {
-    polkadot : {
-      knownChain: 'polkadot',descriptor: 'dot'
-    } , 
-    rococo: { knownChain: 'rococo_v2_2' , descriptor: 'rococo'}
+const chainsLib : {
+  [key in ChainClient]: {
+    knownChain: string;
+    descriptor:string;
   }
+} = {
+  polkadot : {
+    knownChain: 'polkadot',descriptor: 'dot'
+  } , 
+  rococo: { knownChain: 'rococo_v2_2' , descriptor: 'rococo'}
+}
+
+export const startChainClient = ( {chain} :  {chain: ChainClient}):string => {
 
   return `
     const smoldot = start();
