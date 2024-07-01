@@ -1,4 +1,4 @@
-import * as dotDescriptor from '@polkadot-api/descriptors';
+import * as papiDescriptors from '@polkadot-api/descriptors';
 import {
   useEffect,
   useRef,
@@ -13,10 +13,11 @@ import { routes } from './routes';
 import '../assets/styles/index.css';
 
 export const App = () => {
+  
   const refRoutes = useRef(createBrowserRouter(routes()));
 
   useEffect(() => {
-    window.dotDescriptor = dotDescriptor;
+    window.papiDescriptors = papiDescriptors;
   }, []);
 
   return (

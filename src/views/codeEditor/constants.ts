@@ -76,6 +76,6 @@ export const iframeImports = `
   import { sr25519CreateDerive } from 'https://cdn.jsdelivr.net/npm/@polkadot-labs/hdkd@0.0.6/+esm';
   import { getInjectedExtensions, connectInjectedExtension } from "https://cdn.jsdelivr.net/npm/@polkadot-api/pjs-signer@0.2.0/+esm";
 
-  const dotDescriptor = window.parent.dotDescriptor;
+  const papiDescriptors = window.parent.papiDescriptors;
   window.injectedWeb3 = window.parent.injectedWeb3;
 `;
