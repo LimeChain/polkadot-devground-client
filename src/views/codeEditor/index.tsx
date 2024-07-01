@@ -2,7 +2,7 @@ import {
   busDispatch,
   useEventBus,
 } from '@pivanov/event-bus';
-import * as dotDescriptor from '@polkadot-api/descriptors';
+import * as papiDescriptors from '@polkadot-api/descriptors';
 import * as monaco from 'monaco-editor';
 import {
   Suspense,
@@ -103,8 +103,8 @@ const TypeScriptEditor = () => {
       monaco.languages.typescript.typescriptDefaults.setCompilerOptions(compilerOptions);
 
       monaco.languages.typescript.typescriptDefaults.addExtraLib(`
-        declare const dotDescriptor = ${JSON.stringify(dotDescriptor)};
-      `, 'dotDescriptor.d.ts');
+        declare const papiDescriptors = ${JSON.stringify(papiDescriptors)};
+      `, 'papiDescriptors.d.ts');
 
       refMonacoEditor.current?.onDidChangeModelContent(() => {
         clearTimeout(refTimeout.current);
@@ -205,8 +205,6 @@ const TypeScriptEditor = () => {
   const handleRun = useCallback(async () => {
     clearTimeout(refTimeout.current);
     destroyIframe();
-
-    window.pivanov = dotDescriptor;
 
     try {
       const filteredCode = refCode.current.replace(/import[\s\S]+?from\s+['"][^'"]+['"];?/g, '');
