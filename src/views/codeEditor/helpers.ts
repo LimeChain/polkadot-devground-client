@@ -2,7 +2,9 @@ import * as AT_POLKADOT_SLASH_API from '@polkadot/api';
 import * as POLKADOT_LABS_HDKD from '@polkadot-labs/hdkd';
 import * as POLKADOT_LABS_HDKD_HELPERS from '@polkadot-labs/hdkd-helpers';
 import * as POLKADOT_API from 'polkadot-api';
-import * as PA_CHAINS_POLKADOT from 'polkadot-api/chains/polkadot';
+import * as POLKADOT_SMOLDOT from 'polkadot-api/smoldot';
+// import * as PA_CHAINS_POLKADOT from 'polkadot-api/chains/polkadot';
+// import * as PA_CHAINS_ROCOCO from 'polkadot-api/chains/rococo_v2_2';
 import * as POLKADOT_API_PJS_SIGNER from 'polkadot-api/pjs-signer';
 import * as POLKADOT_API_SIGNER from 'polkadot-api/signer';
 import * as POLKADOT_API_SM_PROVIDER from 'polkadot-api/sm-provider';
@@ -23,13 +25,15 @@ interface IPackageType {
 export const packages: IPackageType = {
   '@polkadot/api': AT_POLKADOT_SLASH_API,
   'polkadot-api': POLKADOT_API,
-  'polkadot-api/chains/polkadot': PA_CHAINS_POLKADOT,
+  // 'polkadot-api/chains/polkadot': PA_CHAINS_POLKADOT,
+  // 'polkadot-api/chains/rococo_v2_2': PA_CHAINS_ROCOCO,
   'polkadot-api/ws-provider/web': POLKADOT_API_WS_PROVIDER_WEB,
   'polkadot-api/signer': POLKADOT_API_SIGNER,
   '@polkadot-labs/hdkd': POLKADOT_LABS_HDKD,
   '@polkadot-labs/hdkd-helpers': POLKADOT_LABS_HDKD_HELPERS,
   'polkadot-api/sm-provider': POLKADOT_API_SM_PROVIDER,
   'polkadot-api/pjs-signer': POLKADOT_API_PJS_SIGNER,
+  'polkadot-api/smoldot': POLKADOT_SMOLDOT,
 };
 
 export const parseImports = (code: string): string[] => {

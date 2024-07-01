@@ -6,10 +6,13 @@ const snippet0 = {
     import { getPolkadotSigner } from "polkadot-api/signer";
     import { sr25519CreateDerive } from '@polkadot-labs/hdkd';
     import { mnemonicToEntropy, entropyToMiniSecret, DEV_PHRASE } from '@polkadot-labs/hdkd-helpers';
-
+    import { start } from "polkadot-api/smoldot";
+    
     (async () => {
       try {
-        const provider = WebSocketProvider("wss://rococo-rpc.polkadot.io");
+        const smoldot = start();
+        const chain = await smoldot.addChain({ chainSpec: polkadotApiknownChains.rococo_v2_2 });
+        const provider = getSmProvider(chain)
         const client = createClient(provider);
         const dotApi = client.getTypedApi(papiDescriptors.dot);
 
@@ -151,6 +154,7 @@ const snippet4 = {
     
     (async () => {
       try {
+        
         const extensions = getInjectedExtensions() || []
         const selectedExtension = await connectInjectedExtension(
           extensions[0]
@@ -160,9 +164,8 @@ const snippet4 = {
         const polkadotSigner = accounts[0].polkadotSigner
         
         const smoldot = start();
-        const chain = await smoldot.addChain({ chainSpec });
+        const chain = await smoldot.addChain({ chainSpec: polkadotApiknownChains.rococo_v2_2 });
         const provider = getSmProvider(chain)
-        // const provider = WebSocketProvider("wss://rococo-rpc.polkadot.io");
         const client = createClient(provider);
         const dotApi = client.getTypedApi(papiDescriptors.dot);
 
