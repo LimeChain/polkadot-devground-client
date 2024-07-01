@@ -68,6 +68,9 @@ export const iframeImports = `
   import { createClient } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/+esm'
   import { getSmProvider } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/sm-provider/+esm';
   import { start } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/smoldot/+esm';
+
+  import * as polkadotApiknownChains from 'https://cdn.jsdelivr.net/npm/@polkadot-api/known-chains@0.1.6/+esm'
+
   import { WebSocketProvider } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/ws-provider/web/+esm';
   import { startFromWorker } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/smoldot/from-worker/+esm';
 
@@ -76,6 +79,6 @@ export const iframeImports = `
   import { sr25519CreateDerive } from 'https://cdn.jsdelivr.net/npm/@polkadot-labs/hdkd@0.0.6/+esm';
   import { getInjectedExtensions, connectInjectedExtension } from "https://cdn.jsdelivr.net/npm/@polkadot-api/pjs-signer@0.2.0/+esm";
 
-  const dotDescriptor = window.parent.dotDescriptor;
+  const papiDescriptors = window.parent.papiDescriptors;
   window.injectedWeb3 = window.parent.injectedWeb3;
 `;

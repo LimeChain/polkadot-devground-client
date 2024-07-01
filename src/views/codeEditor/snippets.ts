@@ -1,3 +1,5 @@
+import { startChainClient } from "./helpers";
+
 const snippet0 = {
   id: 0,
   code: `
@@ -6,12 +8,11 @@ const snippet0 = {
     import { getPolkadotSigner } from "polkadot-api/signer";
     import { sr25519CreateDerive } from '@polkadot-labs/hdkd';
     import { mnemonicToEntropy, entropyToMiniSecret, DEV_PHRASE } from '@polkadot-labs/hdkd-helpers';
+    import { start } from "polkadot-api/smoldot";
 
     (async () => {
       try {
-        const provider = WebSocketProvider("wss://rococo-rpc.polkadot.io");
-        const client = createClient(provider);
-        const dotApi = client.getTypedApi(dotDescriptor.dot);
+        ${startChainClient({chain:"rococo"})}
 
         const myAddress = "5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7";
         const bobAddress = "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty";
@@ -25,11 +26,11 @@ const snippet0 = {
           (input) => hdkdKeyPair.sign(input)
         );
 
-        const {data:{free}} = await dotApi.query.System.Account.getValue(bobAddress);
+        const {data:{free}} = await api.query.System.Account.getValue(bobAddress);
         console.log("Bob has: ",free);
 
-        const tx = dotApi.tx.Balances.transfer_allow_death({
-          dest: dotDescriptor.MultiAddress.Id(myAddress),
+        const tx = api.tx.Balances.transfer_allow_death({
+          dest: papiDescriptors.MultiAddress.Id(myAddress),
           value: 100n,
         })
           .signSubmitAndWatch(signer)
@@ -116,7 +117,7 @@ const snippet3 = {
 
       // To interact with the chain, you need to get the "TypedApi", which includes
       // all the types for every call in that chain:
-      const dotApi = client.getTypedApi(dotDescriptor.dot);
+      const dotApi = client.getTypedApi(papiDescriptors.dot);
 
       console.log(Object.keys(dotApi.query.System.Account));
 
@@ -146,28 +147,28 @@ const snippet4 = {
     import { WebSocketProvider } from "polkadot-api/ws-provider/web";
     import { getPolkadotSigner } from "polkadot-api/signer";
     import { sr25519CreateDerive } from '@polkadot-labs/hdkd';
-
-
+    import { start } from "polkadot-api/smoldot";
+    import { getSmProvider } from "polkadot-api/sm-provider";
+    
     (async () => {
       try {
+        
         const extensions = getInjectedExtensions() || []
         const selectedExtension = await connectInjectedExtension(
           extensions[0]
         )
         const accounts = selectedExtension.getAccounts()
-
+        
         const polkadotSigner = accounts[0].polkadotSigner
-
-        const provider = WebSocketProvider("wss://rococo-rpc.polkadot.io");
-        const client = createClient(provider);
-        const dotApi = client.getTypedApi(dotDescriptor.dot);
+        
+        ${startChainClient({chain:"rococo"})}
 
         const myAddress = "5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7";
         const aliceAddress = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
         const bobAddress = "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty";
 
-        const tx = dotApi.tx.Balances.transfer_allow_death({
-          dest: dotDescriptor.MultiAddress.Id(myAddress),
+        const tx = api.tx.Balances.transfer_allow_death({
+          dest: papiDescriptors.MultiAddress.Id(myAddress),
           value: 100n,
         }).signSubmitAndWatch(polkadotSigner)
           .subscribe((d) => {
