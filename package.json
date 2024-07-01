@@ -7,7 +7,7 @@
     "build": "vite build",
     "dev": "vite",
     "generate-one-dark-pro-theme": "node scripts/onedark-pro-to-monaco-theme.cjs",
-    "postinstall": "npx papi add dot -n polkadot && npx papi",
+    "postinstall": "npx papi add dot -n polkadot && npx papi add rococo -n rococo_v2_2 && npx papi",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "preview": "vite preview",
