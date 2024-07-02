@@ -3,32 +3,34 @@ import { useCallback } from 'react';
 
 import { Icon } from '@components/icon';
 import { Button } from '@components/ui';
-import { demoCodes } from '@views/codeEditor/snippets';
+import { snippets } from '@views/codeEditor/snippets';
 
-import type { IEventBusDemoCode } from '@custom-types/eventBus';
+import type { IEventBusDemoCodeIndex } from '@custom-types/eventBus';
 
 export const Header = () => {
   const handleClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     const exampleIndex = Number(e.currentTarget.getAttribute('data-example'));
-    busDispatch<IEventBusDemoCode>({
-      type: '@@-example-code',
+    busDispatch<IEventBusDemoCodeIndex>({
+      type: '@@-example-code-index',
       data: exampleIndex,
     });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <div className="text-white] flex items-center justify-between p-4 pb-0">
+    <div className="text-white] flex items-center justify-between px-6 py-4">
       <div className="text-lg font-semibold tracking-wider">
-        <Icon name="logo-polkadot" size={[132, 28]} />
+        <Icon name="logo-polkadot" size={[128, 40]} />
       </div>
       <div className="flex gap-x-4 self-end">
-        {demoCodes.map((_, index) => (
+        {snippets.map((snippet) => (
           <Button
-            key={index}
+            key={snippet.id}
             onClick={handleClick}
-            data-example={index}
+            data-example={snippet.id}
           >
-            {`Demo ${index + 1}`}
+            Demo {snippet.id}
           </Button>
         ))}
       </div>

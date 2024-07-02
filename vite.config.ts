@@ -65,7 +65,9 @@ export default defineConfig({
             return 'radix';
           }
 
-          if (id.includes('/node_modules/monaco-editor')) {
+          if (
+            id.includes('/node_modules/monaco-editor')
+          ) {
             return 'monaco-editor';
           }
 
@@ -73,20 +75,14 @@ export default defineConfig({
             return 'prettier';
           }
 
-          if (id.includes('/node_modules/typescript')) {
+          if (
+            id.includes('/node_modules/typescript')
+          ) {
             return 'typescript';
           }
 
           if (id.includes('/node_modules/sucrase')) {
             return 'sucrase';
-          }
-
-          if (id.includes('/node_modules/@polkadot')) {
-            return '@polkadot';
-          }
-
-          if (id.includes('/node_modules/polkadot-api')) {
-            return 'polkadot-api';
           }
 
           if (id.includes('/node_modules/')) {

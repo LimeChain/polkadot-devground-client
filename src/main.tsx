@@ -12,7 +12,7 @@ import { App } from './app';
 import './assets/workers/monaco-worker';
 import 'virtual:svg-icons-register';
 
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById('pd-root')!).render(
   <React.StrictMode>
     <HelmetProvider>
       <Helmet defaultTitle="Polkadot Devground" titleTemplate="%s - Polkadot Devground" />

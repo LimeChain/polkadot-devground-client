@@ -1,8 +1,13 @@
 import type { IConsoleMessage } from './global';
 
+export interface IEventBusDemoCodeIndex {
+  type: '@@-example-code-index';
+  data: number;
+}
+
 export interface IEventBusDemoCode {
   type: '@@-example-code';
-  data: number;
+  data: string;
 }
 
 export interface IEventBusConsoleMessage {
@@ -11,4 +16,8 @@ export interface IEventBusConsoleMessage {
 }
 export interface IEventBusConsoleMessageReset {
   type: '@@-console-message-reset';
+}
+
+export interface IEventBusIframeDestroy {
+  type: '@@-iframe-destroy';
 }
