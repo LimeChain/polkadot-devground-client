@@ -74,8 +74,102 @@ export default {
         },
       },
       fontFamily: {
-        popins: ["'Poppins'",  ...defaultTheme.fontFamily.sans],
-        geist: ["'Geist'",  ...defaultTheme.fontFamily.sans]
+        popins: ['"Poppins"',  ...defaultTheme.fontFamily.sans],
+        geist: ['"Geist"',  ...defaultTheme.fontFamily.sans]
+      },
+      fontSize : {
+        "h1-extraLight" : ["4rem" , {
+          lineHeight: '5rem',
+          fontWeight: '275',
+        }],
+        "h1-regular" : ["4rem" , {
+          lineHeight: '5rem',
+          fontWeight: '400',
+        }],
+        "h1-bold" : ["4rem" , {
+          lineHeight: '5rem',
+          fontWeight: '600',
+        }],
+        "h2-extraLight" : ["3rem" , {
+          lineHeight: '4rem',
+          fontWeight: '275',
+        }],
+        "h2-regular" : ["3rem" , {
+          lineHeight: '4rem',
+          fontWeight: '400',
+        }],
+        "h2-bold" : ["3rem" , {
+          lineHeight: '4rem',
+          fontWeight: '600',
+        }],
+        "h3-extraLight" : ["2rem" , {
+          lineHeight: '3rem',
+          fontWeight: '300',
+        }],
+        "h3-regular" : ["2rem" , {
+          lineHeight: '3rem',
+          fontWeight: '400',
+        }],
+        "h3-bold" : ["2rem" , {
+          lineHeight: '3rem',
+          fontWeight: '600',
+        }],
+        "h4-light" : ["1.5rem" , {
+          lineHeight: '1.98rem',
+          fontWeight: '300',
+        }],
+        "h4-regular" : ["1.5rem" , {
+          lineHeight: '1.98rem',
+          fontWeight: '400',
+        }],
+        "h4-bold" : ["1.5rem" , {
+          lineHeight: '1.98rem',
+          fontWeight: '600',
+        }],
+        "h5-light" : ["1.125rem" , {
+          lineHeight: '1.53rem',
+          fontWeight: '300',
+        }],
+        "h5-regular" : ["1.125rem" , {
+          lineHeight: '1.53rem',
+          fontWeight: '400',
+        }],
+        "h5-bold" : ["1.125rem" , {
+          lineHeight: '1.53rem',
+          fontWeight: '600',
+        }],
+        "body1-regular" : ["1rem" , {
+          lineHeight: '1.5rem',
+          fontWeight: '400',
+        }],
+        "body1-bold" : ["1rem" , {
+          lineHeight: '1.5rem',
+          fontWeight: '700',
+        }],
+        "body2-regular" : ["0.875rem" , {
+          lineHeight: '1.278rem',
+          fontWeight: '400',
+        }],
+        "body2-bold" : ["0.875rem" , {
+          lineHeight: '1.278rem',
+          fontWeight: '700',
+        }],
+        "body3-regular" : ["0.75rem" , {
+          lineHeight: '1.02rem',
+          fontWeight: '400',
+        }],
+        "body3-bold" : ["0.75rem" , {
+          lineHeight: '1.02rem',
+          fontWeight: '700',
+        }],
+        "body4-regular" : ["0.625rem" , {
+          lineHeight: '0.9rem',
+          fontWeight: '400',
+        }],
+        "body4-bold" : ["0.625rem" , {
+          lineHeight: '0.9rem',
+          fontWeight: '700',
+        }],
       }
     },
   },
