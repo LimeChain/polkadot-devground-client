@@ -21,6 +21,7 @@
     "target": "ESNext",
     "jsx": "react-jsx",
     // Completeness
+    "baseUrl": ".",
     "skipLibCheck": true,
     "paths": {
       "@custom-types/*": ["./src/types/*"],
@@ -28,8 +29,16 @@
       "@views/*": ["./src/views/*"],
       "@utils/*": ["./src/utils/*"],
       "@services/*": ["./src/services/*"],
-      "@stores/*": ["./src/stores/*"]
-    }
+      "@stores/*": [
+        "./src/stores/*"
+      ],
+      "polkadot-api/*": [
+        "node_modules/polkadot-api/dist/*"
+      ],
+      "polkadot-api/ws-provider/web": [
+        "node_modules/polkadot-api/ws-provider/web"
+      ]
+    },
   },
   "include": ["src", "vite.config.ts"],
   "exclude": ["node_modules", "dist"]

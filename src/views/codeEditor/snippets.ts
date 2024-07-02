@@ -1,17 +1,18 @@
-const snippet0 = {
-  id: 0,
+import { startChainClient } from './helpers';
+
+const snippet1 = {
+  id: 1,
   code: `
     import { createClient } from "polkadot-api";
     import { WebSocketProvider } from "polkadot-api/ws-provider/web";
     import { getPolkadotSigner } from "polkadot-api/signer";
     import { sr25519CreateDerive } from '@polkadot-labs/hdkd';
     import { mnemonicToEntropy, entropyToMiniSecret, DEV_PHRASE } from '@polkadot-labs/hdkd-helpers';
+    import { start } from "polkadot-api/smoldot";
 
     (async () => {
       try {
-        const provider = WebSocketProvider("wss://rococo-rpc.polkadot.io");
-        const client = createClient(provider);
-        const dotApi = client.getTypedApi(dotDescriptor.dot);
+        ${startChainClient({ chain: 'rococo' })}
 
         const myAddress = "5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7";
         const bobAddress = "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty";
@@ -25,11 +26,11 @@ const snippet0 = {
           (input) => hdkdKeyPair.sign(input)
         );
 
-        const {data:{free}} = await dotApi.query.System.Account.getValue(bobAddress);
+        const {data:{free}} = await api.query.System.Account.getValue(bobAddress);
         console.log("Bob has: ",free);
 
-        const tx = dotApi.tx.Balances.transfer_allow_death({
-          dest: dotDescriptor.MultiAddress.Id(myAddress),
+        const tx = api.tx.Balances.transfer_allow_death({
+          dest: papiDescriptors.MultiAddress.Id(myAddress),
           value: 100n,
         })
           .signSubmitAndWatch(signer)
@@ -44,8 +45,8 @@ const snippet0 = {
     `,
 };
 
-const snippet1 = {
-  id: 1,
+const snippet2 = {
+  id: 2,
   code: `
   import { ApiPromise, WsProvider } from '@polkadot/api';
 
@@ -66,8 +67,8 @@ const snippet1 = {
   `,
 };
 
-const snippet2 = {
-  id: 2,
+const snippet3 = {
+  id: 3,
   code: `
   import { ApiPromise, WsProvider } from '@polkadot/api';
 
@@ -102,8 +103,8 @@ const snippet2 = {
   `,
 };
 
-const snippet3 = {
-  id: 3,
+const snippet4 = {
+  id: 4,
   code: `
     import { createClient } from "polkadot-api";
     import { WebSocketProvider } from "polkadot-api/ws-provider/web";
@@ -116,7 +117,7 @@ const snippet3 = {
 
       // To interact with the chain, you need to get the "TypedApi", which includes
       // all the types for every call in that chain:
-      const dotApi = client.getTypedApi(dotDescriptor.dot);
+      const dotApi = client.getTypedApi(papiDescriptors.dot);
 
       console.log(Object.keys(dotApi.query.System.Account));
 
@@ -139,17 +140,19 @@ const snippet3 = {
   `,
 };
 
-const snippet4 = {
-  id: 4,
+const snippet5 = {
+  id: 5,
   code: `
     import { createClient } from "polkadot-api";
     import { WebSocketProvider } from "polkadot-api/ws-provider/web";
     import { getPolkadotSigner } from "polkadot-api/signer";
     import { sr25519CreateDerive } from '@polkadot-labs/hdkd';
-
+    import { start } from "polkadot-api/smoldot";
+    import { getSmProvider } from "polkadot-api/sm-provider";
 
     (async () => {
       try {
+
         const extensions = getInjectedExtensions() || []
         const selectedExtension = await connectInjectedExtension(
           extensions[0]
@@ -158,16 +161,14 @@ const snippet4 = {
 
         const polkadotSigner = accounts[0].polkadotSigner
 
-        const provider = WebSocketProvider("wss://rococo-rpc.polkadot.io");
-        const client = createClient(provider);
-        const dotApi = client.getTypedApi(dotDescriptor.dot);
+        ${startChainClient({ chain: 'rococo' })}
 
         const myAddress = "5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7";
         const aliceAddress = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
         const bobAddress = "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty";
 
-        const tx = dotApi.tx.Balances.transfer_allow_death({
-          dest: dotDescriptor.MultiAddress.Id(myAddress),
+        const tx = api.tx.Balances.transfer_allow_death({
+          dest: papiDescriptors.MultiAddress.Id(myAddress),
           value: 100n,
         }).signSubmitAndWatch(polkadotSigner)
           .subscribe((d) => {
@@ -180,4 +181,38 @@ const snippet4 = {
     })();
     `,
 };
-export const demoCodes = [snippet0, snippet1, snippet2, snippet3, snippet4];
+
+const snippet6 = {
+  id: 6,
+  code: `
+  import { create } from "@shined/reactive";
+  import { createRoot } from "react-dom/client";
+  import { useMouse, useDateFormat } from "@shined/react-use";
+
+  const store = create({ count: 1, time: Date.now() });
+  const addOne = () => store.mutate.count++;
+  const updateTime = () => (store.mutate.time = Date.now());
+
+  setInterval(updateTime, 1000);
+
+  const App = () => {
+    const { x, y } = useMouse();
+    const [count, time] = store.useSnapshot((s) => [s.count, s.time]);
+    const formatted = useDateFormat(time, "YYYY/MM/DD HH:mm:ss");
+
+    return (
+      <div className="bg-blue-100 size-full">
+        <div>
+          (x, y): ({x}, {y})
+        </div>
+        <div>Time: {formatted}</div>
+        <button onClick={addOne}>Count: {count}</button>
+      </div>
+    );
+  };
+
+  createRoot(document.getElementById("root")!).render(<App />);
+  `,
+};
+
+export const snippets = [snippet1, snippet2, snippet3, snippet4, snippet5, snippet6];
