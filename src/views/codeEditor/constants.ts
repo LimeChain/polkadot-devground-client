@@ -1,6 +1,55 @@
+import type { editor } from 'monaco-editor';
+
 export const STORAGE_CACHE_NAME = 'polkadot-devground-ide-cache';
 export const STORAGE_PREFIX = 'tmp-example-index';
 export const STORAGE_PREFIX_CONSOLE_OUTPUT = `${STORAGE_PREFIX}-console-output`;
+
+export const monacoEditorConfig: editor.IEditorOptions & editor.IGlobalEditorOptions = {
+  inlayHints: {
+    enabled: 'on',
+  },
+  tabSize: 2,
+  guides: {
+    bracketPairs: true,
+    highlightActiveBracketPair: true,
+  },
+  hover: {
+    delay: 100,
+  },
+  unicodeHighlight: {
+    ambiguousCharacters: false,
+  },
+  bracketPairColorization: {
+    enabled: true,
+    independentColorPoolPerBracketType: true,
+  },
+  find: {
+    addExtraSpaceOnTop: false,
+    seedSearchStringFromSelection: 'never',
+  },
+  padding: {
+    top: 14,
+  },
+  contextmenu: false,
+  wordWrap: 'on',
+  smoothScrolling: true,
+  stickyTabStops: true,
+  fontLigatures: true,
+  fontSize: 14,
+  fontFamily:
+    '"FiraCode Nerd Font Mono", FiraCode, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+  quickSuggestions: false,
+  minimap: {
+    enabled: false,
+  },
+  autoClosingBrackets: 'always',
+  autoClosingComments: 'always',
+  autoIndent: 'advanced',
+  autoClosingDelete: 'always',
+  autoClosingQuotes: 'always',
+  autoDetectHighContrast: true,
+  autoClosingOvertype: 'always',
+} as const;
 
 export const iframeConsole = `
   class CustomLogger {
@@ -82,3 +131,17 @@ export const iframeImports = `
   const papiDescriptors = window.parent.papiDescriptors;
   window.injectedWeb3 = window.parent.injectedWeb3;
 `;
+
+export const defaultImportMap = {
+  imports: {
+    // 'polkadot-api': 'https://esm.sh/polkadot-api@0.9.0',
+    // 'polkadot-api/ws-provider/web': 'https://esm.sh/polkadot-api@0.9.0/ws-provider/web.js',
+    'dayjs': 'https://esm.sh/dayjs',
+    'react': 'https://esm.sh/react',
+    'react/jsx-runtime': 'https://esm.sh/react/jsx-runtime',
+    '@shined/reactive': 'https://esm.sh/@shined/reactive',
+    '@shined/react-use': 'https://esm.sh/@shined/react-use',
+    'react-dom/client': 'https://esm.sh/react-dom/client',
+  },
+  scopes: {},
+};

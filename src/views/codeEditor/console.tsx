@@ -84,8 +84,10 @@ export const Console = () => {
       <div
         ref={refContainer}
         className={cn(
-          'flex flex-1 flex-col overflow-scroll font-mono text-sm text-white text-opacity-60',
-          'whitespace-nowrap',
+          'flex flex-1 flex-col',
+          'pl-2',
+          'whitespace-nowrap font-mono text-sm text-white text-opacity-60',
+          'overflow-scroll',
         )}
         style={{
           width: refScrollArea.current?.clientWidth,

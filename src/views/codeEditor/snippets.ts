@@ -1,7 +1,7 @@
-import { startChainClient } from "./helpers";
+import { startChainClient } from './helpers';
 
-const snippet0 = {
-  id: 0,
+const snippet1 = {
+  id: 1,
   code: `
     import { createClient } from "polkadot-api";
     import { WebSocketProvider } from "polkadot-api/ws-provider/web";
@@ -12,7 +12,7 @@ const snippet0 = {
 
     (async () => {
       try {
-        ${startChainClient({chain:"rococo"})}
+        ${startChainClient({ chain: 'rococo' })}
 
         const myAddress = "5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7";
         const bobAddress = "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty";
@@ -45,8 +45,8 @@ const snippet0 = {
     `,
 };
 
-const snippet1 = {
-  id: 1,
+const snippet2 = {
+  id: 2,
   code: `
   import { ApiPromise, WsProvider } from '@polkadot/api';
 
@@ -67,8 +67,8 @@ const snippet1 = {
   `,
 };
 
-const snippet2 = {
-  id: 2,
+const snippet3 = {
+  id: 3,
   code: `
   import { ApiPromise, WsProvider } from '@polkadot/api';
 
@@ -103,8 +103,8 @@ const snippet2 = {
   `,
 };
 
-const snippet3 = {
-  id: 3,
+const snippet4 = {
+  id: 4,
   code: `
     import { createClient } from "polkadot-api";
     import { WebSocketProvider } from "polkadot-api/ws-provider/web";
@@ -140,8 +140,8 @@ const snippet3 = {
   `,
 };
 
-const snippet4 = {
-  id: 4,
+const snippet5 = {
+  id: 5,
   code: `
     import { createClient } from "polkadot-api";
     import { WebSocketProvider } from "polkadot-api/ws-provider/web";
@@ -149,19 +149,19 @@ const snippet4 = {
     import { sr25519CreateDerive } from '@polkadot-labs/hdkd';
     import { start } from "polkadot-api/smoldot";
     import { getSmProvider } from "polkadot-api/sm-provider";
-    
+
     (async () => {
       try {
-        
+
         const extensions = getInjectedExtensions() || []
         const selectedExtension = await connectInjectedExtension(
           extensions[0]
         )
         const accounts = selectedExtension.getAccounts()
-        
+
         const polkadotSigner = accounts[0].polkadotSigner
-        
-        ${startChainClient({chain:"rococo"})}
+
+        ${startChainClient({ chain: 'rococo' })}
 
         const myAddress = "5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7";
         const aliceAddress = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
@@ -181,4 +181,38 @@ const snippet4 = {
     })();
     `,
 };
-export const demoCodes = [snippet0, snippet1, snippet2, snippet3, snippet4];
+
+const snippet6 = {
+  id: 6,
+  code: `
+  import { create } from "@shined/reactive";
+  import { createRoot } from "react-dom/client";
+  import { useMouse, useDateFormat } from "@shined/react-use";
+
+  const store = create({ count: 1, time: Date.now() });
+  const addOne = () => store.mutate.count++;
+  const updateTime = () => (store.mutate.time = Date.now());
+
+  setInterval(updateTime, 1000);
+
+  const App = () => {
+    const { x, y } = useMouse();
+    const [count, time] = store.useSnapshot((s) => [s.count, s.time]);
+    const formatted = useDateFormat(time, "YYYY/MM/DD HH:mm:ss");
+
+    return (
+      <div className="bg-blue-100 size-full">
+        <div>
+          (x, y): ({x}, {y})
+        </div>
+        <div>Time: {formatted}</div>
+        <button onClick={addOne}>Count: {count}</button>
+      </div>
+    );
+  };
+
+  createRoot(document.getElementById("root")!).render(<App />);
+  `,
+};
+
+export const snippets = [snippet1, snippet2, snippet3, snippet4, snippet5, snippet6];
