@@ -32,17 +32,6 @@ export const Header = () => {
           />
         </button>
       </div>
-      {/* <div className="flex gap-x-4 self-end">
-        {snippets.map((snippet) => (
-          <Button
-            key={snippet.id}
-            onClick={handleClick}
-            data-example={snippet.id}
-          >
-            Demo {snippet.id}
-          </Button>
-        ))}
-      </div> */}
     </div>
   );
 };
