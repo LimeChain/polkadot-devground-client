@@ -5,8 +5,8 @@ import { cn } from '@utils/helpers';
 import type { LinkProps } from 'react-router-dom';
 
 interface IFeaturesCard {
-  link: LinkProps['to'];
-  
+  link: LinkProps;
+
   icon?: string;
   title?:string;
   subTitle?:string;
@@ -30,7 +30,7 @@ const FeatureCard = ({ icon, link, subTitle, title, className } : IFeaturesCard)
         'hover:after:opacity-100',
         className,
       )}
-      to={link}
+      {...link}
     >
       <Icon
         name="icon-linkArrow"

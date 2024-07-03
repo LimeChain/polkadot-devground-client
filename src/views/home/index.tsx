@@ -18,13 +18,16 @@ const Home = () => {
       <div className={cn('grid w-full max-w-[880px] grid-cols-2 gap-4 [&>*]:min-h-[320px]')} > 
         <FeatureCard
           icon="icon-github"
-          link={'https://github.com/LimeChain/polkadot-devground-client'}
+          link={
+            { to: 'https://github.com/LimeChain/polkadot-devground-client',
+              target: '_blank', 
+            }}
           title="Code"
           subTitle="Explore our GitHub repository for comprehensive documentation, code examples, and contributions. Join our developer community to enhance your Polkadot projects."
         />
         <FeatureCard
           icon="icon-brackets"
-          link={'/code?s=1'}
+          link={{ to: '/code?s=1' }}
           title="Developer Console"
           subTitle="Dive into our advanced developer console for seamless on-chain interaction and rapid prototyping. Experience a streamlined, user-friendly environment designed to accelerate your development process and boost productivity."
         />
