@@ -9,10 +9,17 @@
 
   color-scheme: light dark;
 
+  @apply bg-dev-purple-50 dark:bg-dev-black-1000 transition-colors;
+  @apply text-dev-black-1000 dark:text-dev-purple-50;
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+*,*::after,*::before {
+  /* outline: 1px solid green; */
 }
 
 a {
@@ -74,8 +81,7 @@ pre {
 }
 
 #pd-root {
-  @apply bg-dev-purple-50 dark:bg-dev-black-1000 transition-colors;
-  @apply text-dev-black-1000 dark:text-dev-purple-50;
+  
 
   &:before {
     content: '';

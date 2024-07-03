@@ -8,7 +8,9 @@ export const LayoutBasic = () => {
     <div className="flex h-screen w-screen flex-col items-stretch justify-stretch">
       <Header />
       <Suspense>
-        <Outlet />
+        <div className="flex flex-1 flex-col px-14 pb-16 pt-8">
+          <Outlet />
+        </div>
       </Suspense>
     </div>
   );
