@@ -5,7 +5,7 @@ import { cn } from '@utils/helpers';
 import type { LinkProps } from 'react-router-dom';
 
 interface IFeaturesCard {
-  link: LinkProps;
+  linkProps: LinkProps;
 
   icon?: string;
   title?:string;
@@ -14,7 +14,7 @@ interface IFeaturesCard {
   className?:string;
 }
 
-const FeatureCard = ({ icon, link, subTitle, title, className } : IFeaturesCard) => {
+const FeatureCard = ({ icon, linkProps, subTitle, title, className } : IFeaturesCard) => {
   return (
     <PDLink 
       className={cn(
@@ -30,7 +30,7 @@ const FeatureCard = ({ icon, link, subTitle, title, className } : IFeaturesCard)
         'hover:after:opacity-100',
         className,
       )}
-      {...link}
+      {...linkProps}
     >
       <Icon
         name="icon-linkArrow"
