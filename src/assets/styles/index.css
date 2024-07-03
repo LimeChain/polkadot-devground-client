@@ -107,7 +107,6 @@ pre {
   position: absolute;
   left: 50%;
   top: 50%;
-  /* background-color: #E6007A; */
   @apply bg-dev-pink-500;
   border-radius: 100%;
   transform: translate(-50%, -50%);
