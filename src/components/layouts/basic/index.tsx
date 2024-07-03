@@ -9,16 +9,16 @@ export const LayoutBasic = () => {
   return (
     <div className="flex h-screen w-screen flex-col items-stretch justify-stretch">
       <Header />
-      <Suspense>
-        <div className={cn(
-          'flex flex-1 flex-col',
-          'lg:px-14 lg:pb-16 lg:pt-8',
-          'px-6 pb-8 pt-4',
-        )}
-        >
+      <div className={cn(
+        'flex flex-1 flex-col',
+        'lg:px-14 lg:pb-16 lg:pt-8',
+        'px-6 pb-8 pt-4',
+      )}
+      >
+        <Suspense>
           <Outlet />
-        </div>
-      </Suspense>
+        </Suspense>
+      </div>
       <Footer/>
     </div>
   );
