@@ -1,31 +1,25 @@
 import { lazy } from 'react';
-import { Navigate } from 'react-router-dom';
 
 import { LayoutBasic } from '@components/layouts/basic';
 import { NotFound } from '@views/notFound';
 
-// const Home = lazy(() => import('../views/home'));
+const Home = lazy(() => import('../views/home'));
 const CodeEditor = lazy(() => import('../views/codeEditor'));
 // const CodeEditorV2 = lazy(() => import('../../codeEditorV2'));
 
 export const routes = () => ([
   {
     path: '/*',
+    element: <LayoutBasic/>,
     children: [
       {
         path: '',
-        element: <Navigate to="code" replace />,
-        // element: <Home />,
+        // element: <Navigate to="code" replace />,
+        element: <Home />,
       },
       {
         path: 'code',
-        element: <LayoutBasic />,
-        children: [
-          {
-            path: '',
-            element: <CodeEditor />,
-          },
-        ],
+        element: <CodeEditor />,
       },
       // {
       //   path: 'code-v2',
