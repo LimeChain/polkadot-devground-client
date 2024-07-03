@@ -24,6 +24,7 @@ import {
 import { getSingletonHighlighter } from 'shiki/index.mjs';
 
 import { Icon } from '@components/icon';
+import { Button } from '@components/ui';
 import {
   cn,
   getSearchParam,
@@ -276,8 +277,29 @@ const TypeScriptEditor = () => {
 
   const canPreview = refCode.current.includes('createRoot');
 
+  const handleClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    const exampleIndex = Number(e.currentTarget.getAttribute('data-example'));
+    busDispatch<IEventBusDemoCodeIndex>({
+      type: '@@-example-code-index',
+      data: exampleIndex,
+    });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <Suspense>
+      <div className="flex gap-x-4 self-end px-4">
+        {snippets.map((snippet) => (
+          <Button
+            key={snippet.id}
+            onClick={handleClick}
+            data-example={snippet.id}
+          >
+            Demo {snippet.id}
+          </Button>
+        ))}
+      </div>
       <div className="relative flex flex-1">
         <PanelGroup
           direction="horizontal"
