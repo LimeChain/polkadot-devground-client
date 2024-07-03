@@ -1,4 +1,5 @@
 import FeatureCard from '@components/featureCard';
+import { GITHUB_REPO_LINK } from '@utils/constants';
 import { cn } from '@utils/helpers';
 
 const Home = () => {
@@ -31,7 +32,7 @@ const Home = () => {
         <FeatureCard
           icon="icon-github"
           linkProps={
-            { to: 'https://github.com/LimeChain/polkadot-devground-client',
+            { to: GITHUB_REPO_LINK,
               target: '_blank', 
             }}
           title="Code"

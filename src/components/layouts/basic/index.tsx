@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 
+import Footer from '@components/footer';
 import { Header } from '@components/header';
 import { cn } from '@utils/helpers';
 
@@ -18,6 +19,7 @@ export const LayoutBasic = () => {
           <Outlet />
         </div>
       </Suspense>
+      <Footer/>
     </div>
   );
 };
