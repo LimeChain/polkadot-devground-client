@@ -1,22 +1,18 @@
 import { Icon } from '@components/icon';
-import PDLink from '@components/ui/PDLink';
 import { cn } from '@utils/helpers';
 
-import type { LinkProps } from 'react-router-dom';
+import type React from 'react';
 
 interface IFeaturesCard {
-  linkProps: LinkProps;
+  children:React.ReactNode;
 
   icon?: string;
-  title?:string;
-  subTitle?:string;
-
   className?:string;
 }
 
-const FeatureCard = ({ icon, linkProps, subTitle, title, className } : IFeaturesCard) => {
+const FeatureCard = ({ className, children, icon = 'icon-linkArrow' } : IFeaturesCard) => {
   return (
-    <PDLink 
+    <div 
       className={cn(
         'group', 
         'relative overflow-hidden border border-transparent p-6 text-current hover:text-current',
@@ -30,10 +26,9 @@ const FeatureCard = ({ icon, linkProps, subTitle, title, className } : IFeatures
         'hover:after:opacity-100',
         className,
       )}
-      {...linkProps}
     >
       <Icon
-        name="icon-linkArrow"
+        name={icon}
         size={[24]}
         className={cn(
           'absolute right-4 top-4', 
@@ -41,22 +36,8 @@ const FeatureCard = ({ icon, linkProps, subTitle, title, className } : IFeatures
           'group-hover:-translate-y-1 group-hover:translate-x-1',
         )}
       />
-      {icon 
-        ? (
-          <Icon
-            name={icon}
-            className="mb-8 text-dev-pink-500"
-            size={[40]}
-          />
-        )
-        : null}
-      {title 
-        ? <h4 className={cn('text-h4-bold', { 'mb-2': subTitle })}>{title}</h4>
-        : null}
-      {subTitle 
-        ? <p className="font-geist text-body2-regular text-dev-black-300 dark:text-dev-purple-300">{subTitle}</p>
-        : null}
-    </PDLink>
+      {children}
+    </div>
   );
 };
 
