@@ -21,6 +21,7 @@ const FeatureCard = ({ icon, linkProps, subTitle, title, className } : IFeatures
         'group', 
         'relative overflow-hidden border border-transparent p-6 text-current hover:text-current',
         'hover:border-dev-pink-500',
+        'flex flex-col',
         'transition-[border-color] duration-200 ease-linear',
         'bg-dev-purple-100 dark:bg-dev-black-900',
 

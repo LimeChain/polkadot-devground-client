@@ -11,6 +11,7 @@ interface ILayoutBasic {
 
 export const LayoutBasic = (props: ILayoutBasic) => {
   const { hasFooter } = props;
+
   return (
     <Suspense>
       <div className="grid min-h-screen w-full grid-rows-layout">

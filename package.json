@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@pivanov/event-bus": "1.0.0",
+    "@pivanov/use-toggle-visibility": "0.0.1",
     "@polkadot-api/descriptors": "0.0.1",
     "@polkadot-labs/hdkd": "0.0.6",
     "@polkadot-labs/hdkd-helpers": "0.0.6",
