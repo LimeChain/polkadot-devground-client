@@ -1,12 +1,17 @@
 import { useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import {
+  Link,
+  useLocation,
+} from 'react-router-dom';
 
+import ChainSelect from '@components/chainSelect';
 import { Icon } from '@components/icon';
 import { useTheme } from '@utils/hooks/useTheme';
 
 export const Header = () => {
-
   const { isDarkTheme, changeTheme } = useTheme();
+  const { pathname } = useLocation();
+  const isHomePage = pathname === '/';
 
   const handleChangeTheme = useCallback(async () => {
     await changeTheme(isDarkTheme ? 'light' : 'dark');
@@ -14,9 +19,12 @@ export const Header = () => {
   
   return (
     <div className="flex items-center justify-between px-6 py-4">
-      <Link to="/" className="text-current hover:text-current">
-        <Icon name="logo-polkadot" size={[128, 40]} />
-      </Link>
+      <div className="flex items-center gap-12">
+        <Link to="/" className="-mt-2 text-current hover:text-current">
+          <Icon name="logo-polkadot" size={[128, 40]} />
+        </Link>
+        {!isHomePage && <ChainSelect/>}
+      </div>
       <div className="flex">
         <button type="button" onClick={handleChangeTheme}>
           <Icon
