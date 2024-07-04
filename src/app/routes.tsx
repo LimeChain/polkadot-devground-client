@@ -1,12 +1,11 @@
 import { lazy } from 'react';
-import { Navigate } from 'react-router-dom';
 
 import { LayoutBasic } from '@components/layouts/basic';
 import { NotFound } from '@views/notFound';
 
-// const Home = lazy(() => import('../views/home'));
+const Home = lazy(() => import('../views/home'));
+const HomeV2 = lazy(() => import('../views/home-v2'));
 const CodeEditor = lazy(() => import('../views/codeEditor'));
-// const CodeEditorV2 = lazy(() => import('../../codeEditorV2'));
 
 export const routes = () => ([
   {
@@ -14,12 +13,21 @@ export const routes = () => ([
     children: [
       {
         path: '',
-        element: <Navigate to="code" replace />,
-        // element: <Home />,
+        element: <LayoutBasic hasFooter />,
+        children: [
+          {
+            path: '',
+            element: <Home />,
+          },
+          {
+            path: 'v2',
+            element: <HomeV2 />,
+          },
+        ],
       },
       {
         path: 'code',
-        element: <LayoutBasic />,
+        element: <LayoutBasic hasFooter />,
         children: [
           {
             path: '',
@@ -27,16 +35,6 @@ export const routes = () => ([
           },
         ],
       },
-      // {
-      //   path: 'code-v2',
-      //   element: <LayoutBasic />,
-      //   children: [
-      //     {
-      //       path: '',
-      //       element: <CodeEditorV2 />,
-      //     },
-      //   ],
-      // },
       {
         path: '*',
         element: <NotFound />,

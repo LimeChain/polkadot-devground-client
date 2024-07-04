@@ -17,7 +17,7 @@ interface SVGIconProps {
 export const Icon = forwardRef(
   (props: SVGIconProps, ref: ForwardedRef<SVGSVGElement>) => {
     const {
-      size,
+      size = [24],
       name,
       fill,
       className,

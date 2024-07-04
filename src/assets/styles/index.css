@@ -8,13 +8,19 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  @apply bg-black;
+
+  @apply bg-dev-purple-50 dark:bg-dev-black-1000 transition-colors;
+  @apply text-dev-black-1000 dark:text-dev-purple-50;
+  @apply font-popins;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+*,*::after,*::before {
+  /* outline: 1px solid green; */
 }
 
 a {
@@ -29,8 +35,6 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
@@ -69,10 +73,10 @@ pre {
   position: relative;
   width: 100%;
   height: 100vh;
-  background: linear-gradient(to bottom, #000000, #282828);
   display: flex;
   justify-content: center;
   align-items: center;
+
 }
 
 #pd-root {
@@ -83,10 +87,10 @@ pre {
     left: 0;
     width: 1440px;
     height: 1440px;
-    background-color: #6D3AEE;
+    @apply bg-transparent dark:bg-dev-purple-400 transition-colors pointer-events-none;
     opacity: .4;
     filter: blur(500px);
-    z-index: -1;
+    z-index: 1;
   }
 }
 
@@ -106,7 +110,7 @@ pre {
   position: absolute;
   left: 50%;
   top: 50%;
-  background-color: #E6007A;
+  @apply bg-dev-pink-500;
   border-radius: 100%;
   transform: translate(-50%, -50%);
   animation: 400ms bounce infinite alternate;

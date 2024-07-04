@@ -9,6 +9,7 @@ import { ReloadPrompt } from '@components/reloadPrompt';
 
 import { App } from './app';
 
+import './assets/fonts/fonts.css';
 import './assets/workers/monaco-worker';
 import 'virtual:svg-icons-register';
 
