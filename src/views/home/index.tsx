@@ -1,6 +1,4 @@
 import FeatureCard from '@components/featureCard';
-import { Icon } from '@components/icon';
-import PDLink from '@components/ui/PDLink';
 import { cn } from '@utils/helpers';
 
 const Home = () => {
@@ -30,38 +28,21 @@ const Home = () => {
       > 
         <FeatureCard
           className="featureCard"
-        >
-          <PDLink to={'https://github.com/LimeChain/polkadot-devground-client'} target="_blank">
-            <Icon
-              name={'icon-github'}
-              className="mb-8 text-dev-pink-500"
-              size={[40]}
-            />
-            <h4 className="mb-2 text-h4-bold">Code</h4>
-            <p className="font-geist text-body2-regular
-            text-dev-black-300 dark:text-dev-purple-300"
-            >
-              Explore our GitHub repository for comprehensive documentation, code examples, and contributions. Join our developer community to enhance your Polkadot projects.
-            </p>
-          </PDLink>
-        </FeatureCard>
+          icon="icon-github"
+          linkProps={
+            { to: 'https://github.com/LimeChain/polkadot-devground-client',
+              target: '_blank', 
+            }}
+          title="Code"
+          subTitle="Explore our GitHub repository for comprehensive documentation, code examples, and contributions. Join our developer community to enhance your Polkadot projects."
+        />
         <FeatureCard
           className="featureCard"
-        >
-          <PDLink to={'/code?s=1'} target="_blank">
-            <Icon
-              name={'icon-brackets'}
-              className="mb-8 text-dev-pink-500"
-              size={[40]}
-            />
-            <h4 className="mb-2 text-h4-bold">Developer Console</h4>
-            <p className="font-geist text-body2-regular
-            text-dev-black-300 dark:text-dev-purple-300"
-            >
-             "Dive into our advanced developer console for seamless on-chain interaction and rapid prototyping. Experience a streamlined, user-friendly environment designed to accelerate your development process and boost productivity."
-            </p>
-          </PDLink>
-        </FeatureCard>
+          icon="icon-brackets"
+          linkProps={{ to: '/code?s=1' }}
+          title="Developer Console"
+          subTitle="Dive into our advanced developer console for seamless on-chain interaction and rapid prototyping. Experience a streamlined, user-friendly environment designed to accelerate your development process and boost productivity."
+        />
       </div>
     </section>
   );
