@@ -23,10 +23,11 @@ const Home = () => {
 
       <div className={cn(
         'grid w-full max-w-[880px] grid-cols-1 gap-4',
-        'md:grid-cols-2 [&>*]:md:min-h-[320px]',
+        'md:grid-cols-2 [&>.featureCard]:md:min-h-[320px]',
       )}
       > 
         <FeatureCard
+          className="featureCard"
           icon="icon-github"
           linkProps={
             { to: 'https://github.com/LimeChain/polkadot-devground-client',
@@ -36,6 +37,7 @@ const Home = () => {
           subTitle="Explore our GitHub repository for comprehensive documentation, code examples, and contributions. Join our developer community to enhance your Polkadot projects."
         />
         <FeatureCard
+          className="featureCard"
           icon="icon-brackets"
           linkProps={{ to: '/code?s=1' }}
           title="Developer Console"
