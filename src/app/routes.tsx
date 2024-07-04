@@ -4,33 +4,37 @@ import { LayoutBasic } from '@components/layouts/basic';
 import { NotFound } from '@views/notFound';
 
 const Home = lazy(() => import('../views/home'));
+const HomeV2 = lazy(() => import('../views/home-v2'));
 const CodeEditor = lazy(() => import('../views/codeEditor'));
-// const CodeEditorV2 = lazy(() => import('../../codeEditorV2'));
 
 export const routes = () => ([
   {
     path: '/*',
-    element: <LayoutBasic/>,
     children: [
       {
         path: '',
-        // element: <Navigate to="code" replace />,
-        element: <Home />,
+        element: <LayoutBasic hasFooter />,
+        children: [
+          {
+            path: '',
+            element: <Home />,
+          },
+          {
+            path: 'v2',
+            element: <HomeV2 />,
+          },
+        ],
       },
       {
         path: 'code',
-        element: <CodeEditor />,
+        element: <LayoutBasic hasFooter />,
+        children: [
+          {
+            path: '',
+            element: <CodeEditor />,
+          },
+        ],
       },
-      // {
-      //   path: 'code-v2',
-      //   element: <LayoutBasic />,
-      //   children: [
-      //     {
-      //       path: '',
-      //       element: <CodeEditorV2 />,
-      //     },
-      //   ],
-      // },
       {
         path: '*',
         element: <NotFound />,

@@ -6,30 +6,29 @@ const Home = () => {
   return (
     <section className={cn(
       'flex flex-1 flex-col items-center',
+      'pt-10',
       'lg:pb-[10.75rem] lg:pt-[8rem]',
     )}
     >
       <h1 className={cn(
         'pb-4 text-center text-h3-bold',
         'lg:text-h2-bold',
+
+        'before:text-h1-bold before:text-dev-pink-500 before:content-["["]',
+        'after:text-h1-bold after:text-dev-pink-500 after:content-["]"]',
       )}
       > 
-        <span className="hidden pr-2 text-h1-bold text-dev-pink-500 lg:inline">
-        [
-        </span>
-          Empower Your Polkadot Development
-        <span className="hidden pl-2 text-h1-bold text-dev-pink-500 lg:inline">
-        ]
-        </span>
+        Empower Your Polkadot Development
       </h1>
       <p className={cn('pb-14 text-center text-body1-regular lg:pb-20 lg:text-h5-regular')}>Elevate your development experience with our next-gen platform for Polkadot developers</p>
 
       <div className={cn(
         'grid w-full max-w-[880px] grid-cols-1 gap-4',
-        'md:grid-cols-2 [&>*]:md:min-h-[320px]',
+        'md:grid-cols-2 [&>.featureCard]:md:min-h-[320px]',
       )}
       > 
         <FeatureCard
+          className="featureCard"
           icon="icon-github"
           linkProps={
             { to: GITHUB_REPO_LINK,
@@ -39,6 +38,7 @@ const Home = () => {
           subTitle="Explore our GitHub repository for comprehensive documentation, code examples, and contributions. Join our developer community to enhance your Polkadot projects."
         />
         <FeatureCard
+          className="featureCard"
           icon="icon-brackets"
           linkProps={{ to: '/code?s=1' }}
           title="Developer Console"

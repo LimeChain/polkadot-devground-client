@@ -6,7 +6,7 @@ import {
   useState,
 } from 'react';
 
-import { ScrollArea } from '@components/scrollArea';
+import { PDScrollArea } from '@components/scrollArea';
 import { cn } from '@utils/helpers';
 import { useVirtualScroll } from '@utils/hooks/useVirtualScroll';
 import {
@@ -76,7 +76,7 @@ export const Console = () => {
   }, [handleScroll]);
 
   return (
-    <ScrollArea
+    <PDScrollArea
       ref={refScrollArea}
       type="auto"
       onScroll={handleOnScroll}
@@ -119,6 +119,6 @@ export const Console = () => {
           })
         }
       </div>
-    </ScrollArea>
+    </PDScrollArea>
   );
 };
