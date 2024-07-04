@@ -7,6 +7,9 @@ export default {
   darkMode: ["selector" , '[data-color-scheme="dark"]'],
   theme: {
     extend: {
+      gridTemplateRows: {
+        'layout': '64px 1fr 60px',
+      },
       colors: {
         "dev-pink" : {
           600: '#A80059',

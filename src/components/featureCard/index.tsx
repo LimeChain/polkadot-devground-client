@@ -24,7 +24,7 @@ const FeatureCard = ({ icon, linkProps, subTitle, title, className } : IFeatures
         'transition-[border-color] duration-200 ease-linear',
         'bg-dev-purple-100 dark:bg-dev-black-900',
 
-        'after:pointer-events-none after:absolute after:z-0 after:opacity-0 after:content-["*"]',
+        'after:pointer-events-none after:absolute after:z-0 after:opacity-0 after:content-[""]',
         'after:-right-3/4 after:-top-3/4 after:size-3/4 after:bg-dev-purple-500 after:blur-[150px]',
         'after:transition-opacity after:duration-200',
         'hover:after:opacity-100',
@@ -54,7 +54,7 @@ const FeatureCard = ({ icon, linkProps, subTitle, title, className } : IFeatures
         ? <h4 className={cn('text-h4-bold', { 'mb-2': subTitle })}>{title}</h4>
         : null}
       {subTitle 
-        ? <p className="text-body2-regular text-dev-black-300 dark:text-dev-purple-300">{subTitle}</p>
+        ? <p className="font-geist text-body2-regular text-dev-black-300 dark:text-dev-purple-300">{subTitle}</p>
         : null}
     </PDLink>
   );

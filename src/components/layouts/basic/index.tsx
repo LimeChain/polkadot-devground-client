@@ -1,26 +1,26 @@
 import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 
-import Footer from '@components/footer';
 import { Header } from '@components/header';
-import { cn } from '@utils/helpers';
 
-export const LayoutBasic = () => {
+interface ILayoutBasic {
+  hasFooter: boolean;
+}
+
+export const LayoutBasic = (props: ILayoutBasic) => {
+  const { hasFooter } = props;
   return (
-    <div className="flex h-screen w-screen flex-col items-stretch justify-stretch">
-      <Header />
-      <div className={cn(
-        'flex flex-1 flex-col',
-        'lg:px-14 lg:pb-16 lg:pt-8',
-        'px-6 pb-8 pt-4',
-      )}
-      >
-        <Suspense>
-          <Outlet />
-        </Suspense>
+    <Suspense>
+      <div className="grid min-h-screen w-full grid-rows-layout">
+        <Header />
+        <Outlet />
+        {
+          hasFooter && (
+            <div className="flex items-center bg-dev-black-900">LimeChain</div>
+          )
+        }
       </div>
-      <Footer/>
-    </div>
+    </Suspense>
   );
 };
 
