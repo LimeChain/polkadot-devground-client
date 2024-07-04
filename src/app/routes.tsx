@@ -27,7 +27,7 @@ export const routes = () => ([
       },
       {
         path: 'code',
-        element: <LayoutBasic hasFooter={false} />,
+        element: <LayoutBasic hasFooter />,
         children: [
           {
             path: '',
