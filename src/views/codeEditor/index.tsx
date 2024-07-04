@@ -287,7 +287,7 @@ const TypeScriptEditor = () => {
   }, []);
 
   return (
-    <>
+    <div className="max-w-screen flex flex-col overflow-hidden">
       <div className="mb-4 flex gap-x-4 self-end">
         {snippets.map((snippet) => (
           <Button
@@ -460,7 +460,7 @@ const TypeScriptEditor = () => {
           />
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
