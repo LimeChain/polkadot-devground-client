@@ -3,14 +3,24 @@ import { Outlet } from 'react-router-dom';
 
 import { Header } from '@components/header';
 
-export const LayoutBasic = () => {
+interface ILayoutBasic {
+  hasFooter: boolean;
+}
+
+export const LayoutBasic = (props: ILayoutBasic) => {
+  const { hasFooter } = props;
   return (
-    <div className="flex h-screen w-screen flex-col items-stretch justify-stretch">
-      <Header />
-      <Suspense>
+    <Suspense>
+      <div className="grid min-h-screen w-full grid-rows-layout">
+        <Header />
         <Outlet />
-      </Suspense>
-    </div>
+        {
+          hasFooter && (
+            <div className="flex items-center bg-dev-black-900">LimeChain</div>
+          )
+        }
+      </div>
+    </Suspense>
   );
 };
 

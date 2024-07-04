@@ -9,10 +9,18 @@
 
   color-scheme: light dark;
 
+  @apply bg-dev-purple-50 dark:bg-dev-black-1000 transition-colors;
+  @apply text-dev-black-1000 dark:text-dev-purple-50;
+  @apply font-popins;
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+*,*::after,*::before {
+  /* outline: 1px solid green; */
 }
 
 a {
@@ -27,8 +35,6 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
@@ -70,13 +76,10 @@ pre {
   display: flex;
   justify-content: center;
   align-items: center;
-  
+
 }
 
 #pd-root {
-  @apply bg-dev-purple-50 dark:bg-dev-black-1000 transition-colors;
-  @apply text-dev-black-1000 dark:text-dev-purple-50;
-
   &:before {
     content: '';
     position: absolute;

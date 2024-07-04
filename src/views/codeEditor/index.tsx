@@ -10,7 +10,6 @@ import { format } from 'prettier';
 import prettierPluginEstree from 'prettier/plugins/estree';
 import parserTypeScript from 'prettier/plugins/typescript';
 import {
-  Suspense,
   useCallback,
   useEffect,
   useRef,
@@ -288,8 +287,8 @@ const TypeScriptEditor = () => {
   }, []);
 
   return (
-    <Suspense>
-      <div className="flex gap-x-4 self-end px-4">
+    <div className="max-w-screen flex flex-col overflow-hidden">
+      <div className="mb-4 flex gap-x-4 self-end">
         {snippets.map((snippet) => (
           <Button
             key={snippet.id}
@@ -304,7 +303,6 @@ const TypeScriptEditor = () => {
         <PanelGroup
           direction="horizontal"
           className={cn(
-            'p-4',
             'opacity-0',
             'transition-opacity delay-0 duration-0 ease-in-out',
             {
@@ -462,7 +460,7 @@ const TypeScriptEditor = () => {
           />
         </div>
       </div>
-    </Suspense>
+    </div>
   );
 };
 
