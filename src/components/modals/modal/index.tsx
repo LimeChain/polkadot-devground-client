@@ -1,3 +1,4 @@
+import { useEventBus } from '@pivanov/event-bus';
 import {
   type ReactNode,
   useCallback,
@@ -7,6 +8,8 @@ import {
 
 import { Icon } from '@components/icon';
 import { cn } from '@utils/helpers';
+
+import type { IEventBusSetChain } from '@custom-types/eventBus';
 
 export interface IModal {
   onClose : () => void;
@@ -36,6 +39,10 @@ export const Modal = ({ onClose, children, className }:IModal) => {
     });
     
   }, [handleClose]);
+
+  useEventBus<IEventBusSetChain>('@@-set-chain', () => {
+    handleClose();
+  });
 
   return (
     <>

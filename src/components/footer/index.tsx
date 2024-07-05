@@ -1,10 +1,11 @@
-import { Icon } from '@components/icon';
-import PDLink from '@components/ui/PDLink';
 import {
   GITHUB_REPO_LINK,
   LIMECHAIN_LINK,
   X_LINK,
-} from '@utils/constants';
+} from '@constants/links';
+
+import { Icon } from '@components/icon';
+import PDLink from '@components/ui/PDLink';
 import { cn } from '@utils/helpers';
 
 const Footer = () => {

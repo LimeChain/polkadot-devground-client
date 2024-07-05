@@ -1,21 +1,23 @@
 export interface ISupportedChains {
   [key:string] : {
     name: string;
-    id:string;
-    chains: {
-      name:string;
-      icon:string;
-    }[];
+    chains: IChain[];
   };
 }
+export interface IChain {
+  name:string;
+  id:string;
+  icon:`icon-chain-${string}`;
+}
+
 export const SUPPORTED_CHAINS:ISupportedChains = 
     {
       'polkadot': {
         name: 'Polkadot & Parachains',
-        id: 'polkadot',
         chains: [
           {
             name: 'Polkadot',
+            id: 'polkadot',
             icon: 'icon-chain-polkadot',
           },
           // {
@@ -26,10 +28,10 @@ export const SUPPORTED_CHAINS:ISupportedChains =
       }, 
       'rococo': {
         name: 'Rococo & Parachains',
-        id: 'rococo',
         chains: [
           {
             name: 'Rococo',
+            id: 'rococo',
             icon: 'icon-chain-rococo',
           },
         ],

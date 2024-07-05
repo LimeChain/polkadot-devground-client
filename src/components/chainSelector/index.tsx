@@ -1,3 +1,4 @@
+import { busDispatch } from '@pivanov/event-bus';
 import {
   useCallback,
   useEffect,
@@ -7,10 +8,14 @@ import {
 import { Icon } from '@components/icon';
 import { PDScrollArea } from '@components/scrollArea';
 import {
+  type IChain,
   type ISupportedChains,
   SUPPORTED_CHAINS,
 } from '@constants/chains';
+import { useStoreChain } from '@stores/chain';
 import { cn } from '@utils/helpers';
+
+import type { IEventBusSetChain } from '@custom-types/eventBus';
 
 const CHAINS = Object.keys(SUPPORTED_CHAINS);
 const ALL_CHAINS = CHAINS.reduce((acc :ISupportedChains['<chain_name>']['chains'], curr) => {
@@ -21,17 +26,26 @@ const ALL_CHAINS = CHAINS.reduce((acc :ISupportedChains['<chain_name>']['chains'
 }, []);
 
 const ChainSelector = () => {
-
+  const { setChain } = useStoreChain.use.actions();
+  
   const [selectedChain, setSelectedChain] = useState('');
   const [filteredChains, setFilteredChains] = useState<ISupportedChains['<chain_name>']['chains']>(ALL_CHAINS);
-
-  const handleSelectGroup = useCallback((chain:string) => {
+  
+  const handleSelectGroup = useCallback((e:React.MouseEvent<HTMLButtonElement>) => {
+    const chain = e.currentTarget.getAttribute('data-chain-group') || '';
     if (chain === selectedChain) {
       setSelectedChain('');
     } else {
       setSelectedChain(chain);
     }
   }, [selectedChain]);
+  
+  const handleSetChain = useCallback((e:React.MouseEvent<HTMLButtonElement>) => {
+    const chain = JSON.parse(e.currentTarget.getAttribute('data-chain-data') || '') as unknown as IChain;
+    
+    setChain(chain);
+    busDispatch<IEventBusSetChain>({ type: '@@-set-chain', data: chain });
+  }, [setChain]);
 
   useEffect(() => {
     if (selectedChain) {
@@ -51,7 +65,8 @@ const ChainSelector = () => {
             >
               <button
                 type="button"
-                onClick={() => handleSelectGroup(chain)}
+                onClick={handleSelectGroup}
+                data-chain-group={chain}
                 className={cn(
                   'w-full p-4 text-left',
                   'font-geist !text-body2-regular',
@@ -73,6 +88,8 @@ const ChainSelector = () => {
             key={`chain-list-${chain.name}`}
           >
             <button
+              onClick={handleSetChain}
+              data-chain-data={JSON.stringify(chain)}
               className={cn(
                 'flex w-full items-center gap-3 p-4',
                 'transition-colors',

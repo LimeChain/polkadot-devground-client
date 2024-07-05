@@ -1,5 +1,5 @@
 import FeatureCard from '@components/featureCard';
-import { GITHUB_REPO_LINK } from '@utils/constants';
+import { GITHUB_REPO_LINK } from '@constants/links';
 import { cn } from '@utils/helpers';
 
 const Home = () => {
