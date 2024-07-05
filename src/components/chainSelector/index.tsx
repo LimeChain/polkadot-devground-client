@@ -82,7 +82,13 @@ const ChainSelector = () => {
           )}
         </ul>
       </PDScrollArea>
-      <ul className="grid grid-cols-4 gap-2 p-2 [&>li]:h-[64px]">
+      <ul className={cn(
+        'grid gap-2 p-2 [&>li]:h-[64px]',
+        'lg:grid-cols-4',
+        'md:grid-cols-2',
+        'grid-cols-1',
+      )}
+      >
         {filteredChains.map(chain => (
           <li
             key={`chain-list-${chain.name}`}
@@ -97,7 +103,11 @@ const ChainSelector = () => {
               )}
               type="button"
             >
-              <Icon name={chain.icon} size={[28]}/>
+              <Icon
+                name={chain.icon}
+                size={[28]}
+                className="shrink-0"
+              />
               <span>
                 {chain.name}
               </span>
