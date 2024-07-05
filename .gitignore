@@ -25,3 +25,5 @@ dist-ssr
 .vite
 *.scale
 *-api.json
+
+.env
