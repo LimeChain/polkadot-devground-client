@@ -49,9 +49,7 @@ const chainsLib : {
 
 export const startChainClient = ({ chain }: { chain: ChainClient }): string => {
   return `
-    const smoldot = start();
-    const chain = await smoldot.addChain({ chainSpec: polkadotApiknownChains.${chainsLib[chain].knownChain} });
-    const provider = getSmProvider(chain);
+    const provider = WebSocketProvider("wss://rococo-rpc.polkadot.io")
     const client = createClient(provider);
     const api = client.getTypedApi(papiDescriptors.${chainsLib[chain].descriptor});
   `;

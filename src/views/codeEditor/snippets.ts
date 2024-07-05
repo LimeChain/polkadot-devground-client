@@ -150,6 +150,11 @@ const snippet5 = {
     import { start } from "polkadot-api/smoldot";
     import { getSmProvider } from "polkadot-api/sm-provider";
 
+    import {
+      getInjectedExtensions,
+      connectInjectedExtension,
+    } from "polkadot-api/pjs-signer"
+
     (async () => {
       try {
 
