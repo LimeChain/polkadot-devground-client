@@ -59,7 +59,7 @@ const ChainSelector = () => {
   }, [setChain]);
 
   const filterChainsByQuery = useCallback((chain:IChain) => {
-    return chain.id.toLowerCase().startsWith(query);
+    return chain.id.toLowerCase().startsWith(query.toLowerCase());
   }, [query]);
 
   useEffect(() => {
@@ -97,40 +97,49 @@ const ChainSelector = () => {
           )}
         </ul>
       </PDScrollArea>
-      <ul className={cn(
-        'grid gap-2 p-2 [&>li]:h-[64px]',
-        'lg:grid-cols-4',
-        'md:grid-cols-2',
-        'grid-cols-1',
-      )}
-      >
-        {filteredChains.map(chain => (
-          <li
-            key={`chain-list-${chain.name}`}
-          >
-            <button
-              onClick={handleSetChain}
-              data-chain-data={JSON.stringify(chain)}
-              className={cn(
-                'flex w-full items-center gap-3 p-4',
-                'transition-colors',
-                'hover:bg-dev-purple-200 dark:hover:bg-dev-black-800',
+      <PDScrollArea>
+        <div className="flex flex-col gap-2 self-stretch p-2">
+          {query ? <span className="font-geist text-body2-regular">Search Results for "{query}"</span> : null}
+          {filteredChains.length > 0 ? (
+            <>
+              <ul className={cn(
+                'grid gap-2 [&>li]:h-[64px]',
+                'lg:grid-cols-4',
+                'md:grid-cols-2',
+                'grid-cols-1',
               )}
-              type="button"
-            >
-              <Icon
-                name={chain.icon}
-                size={[28]}
-                className="shrink-0"
-              />
-              <span>
-                {chain.name}
-              </span>
-            </button>
-          </li>
-        ),
-        )}
-      </ul>
+              >
+                {filteredChains.map(chain => (
+                  <li
+                    key={`chain-list-${chain.name}`}
+                  >
+                    <button
+                      onClick={handleSetChain}
+                      data-chain-data={JSON.stringify(chain)}
+                      className={cn(
+                        'flex w-full items-center gap-3 p-4',
+                        'transition-colors',
+                        'hover:bg-dev-purple-200 dark:hover:bg-dev-black-800',
+                      )}
+                      type="button"
+                    >
+                      <Icon
+                        name={chain.icon}
+                        size={[28]}
+                        className="shrink-0"
+                      />
+                      <span>
+                        {chain.name}
+                      </span>
+                    </button>
+                  </li>
+                ),
+                )}
+              </ul>
+            </>
+          ) : <span className="my-5 flex flex-1 items-center justify-center">No Results</span> }
+        </div>
+      </PDScrollArea>
     </div>
   );
 };
