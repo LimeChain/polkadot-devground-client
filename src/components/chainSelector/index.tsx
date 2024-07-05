@@ -28,32 +28,32 @@ const ALL_CHAINS = CHAINS.reduce((acc :ISupportedChains['<chain_name>']['chains'
 const ChainSelector = () => {
   const { setChain } = useStoreChain.use.actions();
   
-  const [selectedChain, setSelectedChain] = useState('');
+  const [selectedChainGroup, setSelectedChainGroup] = useState('');
   const [filteredChains, setFilteredChains] = useState<ISupportedChains['<chain_name>']['chains']>(ALL_CHAINS);
   
   const handleSelectGroup = useCallback((e:React.MouseEvent<HTMLButtonElement>) => {
     const chain = e.currentTarget.getAttribute('data-chain-group') || '';
-    if (chain === selectedChain) {
-      setSelectedChain('');
+    if (chain === selectedChainGroup) {
+      setSelectedChainGroup('');
     } else {
-      setSelectedChain(chain);
+      setSelectedChainGroup(chain);
     }
-  }, [selectedChain]);
+  }, [selectedChainGroup]);
   
   const handleSetChain = useCallback((e:React.MouseEvent<HTMLButtonElement>) => {
     const chain = JSON.parse(e.currentTarget.getAttribute('data-chain-data') || '') as unknown as IChain;
-    
+
     setChain(chain);
     busDispatch<IEventBusSetChain>({ type: '@@-set-chain', data: chain });
   }, [setChain]);
 
   useEffect(() => {
-    if (selectedChain) {
-      setFilteredChains(SUPPORTED_CHAINS[selectedChain].chains);
+    if (selectedChainGroup) {
+      setFilteredChains(SUPPORTED_CHAINS[selectedChainGroup].chains);
     } else {
       setFilteredChains(ALL_CHAINS);
     }
-  }, [selectedChain]);
+  }, [selectedChainGroup]);
 
   return (
     <div className="grid grid-cols-[276fr_708fr]">
@@ -72,7 +72,7 @@ const ChainSelector = () => {
                   'font-geist !text-body2-regular',
                   'transition-colors',
                   ' hover:bg-dev-purple-200 dark:hover:bg-dev-purple-400/20',
-                  { 'text-dev-pink-500': chain === selectedChain },
+                  { 'text-dev-pink-500': chain === selectedChainGroup },
                 )}
               >
                 {SUPPORTED_CHAINS[chain].name}
