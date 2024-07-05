@@ -1,4 +1,4 @@
-type ISupportedChains = {
+export interface ISupportedChains {
   [key:string] : {
     name: string;
     id:string;
@@ -7,7 +7,7 @@ type ISupportedChains = {
       icon:string;
     }[];
   };
-};
+}
 export const SUPPORTED_CHAINS:ISupportedChains = 
     {
       'polkadot': {
