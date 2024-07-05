@@ -1,4 +1,7 @@
-import { busDispatch } from '@pivanov/event-bus';
+import {
+  busDispatch,
+  useEventBus,
+} from '@pivanov/event-bus';
 import {
   useCallback,
   useEffect,
@@ -15,7 +18,10 @@ import {
 import { useStoreChain } from '@stores/chain';
 import { cn } from '@utils/helpers';
 
-import type { IEventBusSetChain } from '@custom-types/eventBus';
+import type {
+  IEventBusSearchChain,
+  IEventBusSetChain,
+} from '@custom-types/eventBus';
 
 const CHAINS = Object.keys(SUPPORTED_CHAINS);
 const ALL_CHAINS = CHAINS.reduce((acc :ISupportedChains['<chain_name>']['chains'], curr) => {
@@ -30,6 +36,11 @@ const ChainSelector = () => {
   
   const [selectedChainGroup, setSelectedChainGroup] = useState('');
   const [filteredChains, setFilteredChains] = useState<ISupportedChains['<chain_name>']['chains']>(ALL_CHAINS);
+  const [query, setQuery] = useState('');
+
+  useEventBus<IEventBusSearchChain>('@@-search-chain', ({ data }) => {
+    setQuery(data);
+  });
   
   const handleSelectGroup = useCallback((e:React.MouseEvent<HTMLButtonElement>) => {
     const chain = e.currentTarget.getAttribute('data-chain-group') || '';
@@ -47,13 +58,17 @@ const ChainSelector = () => {
     busDispatch<IEventBusSetChain>({ type: '@@-set-chain', data: chain });
   }, [setChain]);
 
+  const filterChainsByQuery = useCallback((chain:IChain) => {
+    return chain.id.toLowerCase().startsWith(query);
+  }, [query]);
+
   useEffect(() => {
     if (selectedChainGroup) {
-      setFilteredChains(SUPPORTED_CHAINS[selectedChainGroup].chains);
+      setFilteredChains(SUPPORTED_CHAINS[selectedChainGroup].chains.filter(filterChainsByQuery));
     } else {
-      setFilteredChains(ALL_CHAINS);
+      setFilteredChains(ALL_CHAINS.filter(filterChainsByQuery));
     }
-  }, [selectedChainGroup]);
+  }, [selectedChainGroup, filterChainsByQuery]);
 
   return (
     <div className="grid grid-cols-[276fr_708fr]">

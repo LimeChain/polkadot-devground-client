@@ -26,4 +26,9 @@ export interface IEventBusIframeDestroy {
 export interface IEventBusSetChain {
   type: '@@-set-chain';
   data: IChain;
+
+}
+export interface IEventBusSearchChain {
+  type: '@@-search-chain';
+  data: string;
 }
