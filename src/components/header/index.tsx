@@ -6,6 +6,7 @@ import {
 
 import ChainSelectButton from '@components/chainSelectButton';
 import { Icon } from '@components/icon';
+import { cn } from '@utils/helpers';
 import { useTheme } from '@utils/hooks/useTheme';
 
 export const Header = () => {
@@ -23,10 +24,21 @@ export const Header = () => {
         <Link to="/" className="-mt-2 text-current hover:text-current">
           <Icon name="logo-polkadot" size={[128, 40]} />
         </Link>
-        {!isHomePage && <ChainSelectButton/>}
       </div>
-      <div className="flex">
-        <button type="button" onClick={handleChangeTheme}>
+      <div className="flex gap-5">
+        {!isHomePage && <ChainSelectButton/> }
+        <button 
+          className={cn(
+            'relative before:absolute',
+            'before:size-full before:w-[1px]',
+            'before:-left-5 before:top-0',
+            'before:transition-colors before:content-none',
+            'before:bg-dev-purple-300 dark:before:bg-dev-purple-700',
+            { 'before:content-[""] ml-5 ': !isHomePage },
+          )}
+          type="button" 
+          onClick={handleChangeTheme}
+        >
           <Icon
             name={isDarkTheme ? 'icon-lightMode' : 'icon-darkMode'}
             size={[24]}
