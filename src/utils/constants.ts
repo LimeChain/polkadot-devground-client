@@ -2,23 +2,35 @@ export const GITHUB_REPO_LINK = 'https://github.com/LimeChain/polkadot-devground
 export const X_LINK = 'https://x.com/LimeChainHQ';
 export const LIMECHAIN_LINK = 'https://limechain.tech/';
 
-export const CHAINS = [
+type ISupportedChains = {
+  [key:string] : {
+    name: string;
+    id:string;
+    chains: {
+      name:string;
+      icon:string;
+    }[];
+  };
+};
+export const SUPPORTED_CHAINS:ISupportedChains = 
   {
     'polkadot': {
       name: 'Polkadot & Parachains',
+      id: 'polkadot',
       chains: [
         {
           name: 'Polkadot',
           icon: 'icon-chain-polkadot',
         },
-        {
-          name: 'Astar',
-          icon: 'icon-chain-astar',
-        },
+        // {
+        //   name: 'Astar',
+        //   icon: 'icon-chain-astar',
+        // },
       ],
     }, 
     'rococo': {
       name: 'Rococo & Parachains',
+      id: 'rococo',
       chains: [
         {
           name: 'Rococo',
@@ -26,5 +38,4 @@ export const CHAINS = [
         },
       ],
     }, 
-  },
-];
+  };

@@ -4,7 +4,7 @@ import {
   useLocation,
 } from 'react-router-dom';
 
-import ChainSelect from '@components/chainSelect';
+import ChainSelectButton from '@components/chainSelectButton';
 import { Icon } from '@components/icon';
 import { useTheme } from '@utils/hooks/useTheme';
 
@@ -23,7 +23,7 @@ export const Header = () => {
         <Link to="/" className="-mt-2 text-current hover:text-current">
           <Icon name="logo-polkadot" size={[128, 40]} />
         </Link>
-        {!isHomePage && <ChainSelect/>}
+        {!isHomePage && <ChainSelectButton/>}
       </div>
       <div className="flex">
         <button type="button" onClick={handleChangeTheme}>

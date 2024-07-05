@@ -3,7 +3,7 @@ import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import { Icon } from '@components/icon';
 import { ChainSelectModal as _ChainSelectModal } from '@components/modals/chainSelectModal';
 
-const ChainSelect = () => {
+const ChainSelectButton = () => {
   const [ChainSelectModal, toggleVisibility] = useToggleVisibility(_ChainSelectModal);
   
   return (
@@ -22,4 +22,4 @@ const ChainSelect = () => {
   );
 };
 
-export default ChainSelect;
+export default ChainSelectButton;

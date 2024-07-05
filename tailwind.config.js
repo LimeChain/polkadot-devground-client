@@ -10,6 +10,9 @@ export default {
       gridTemplateRows: {
         'layout': '64px 1fr 60px',
       },
+      gridTemplateColumns: {
+        'chainSelect' : '276fr 708fr'
+      },
       colors: {
         "dev-pink" : {
           600: '#A80059',

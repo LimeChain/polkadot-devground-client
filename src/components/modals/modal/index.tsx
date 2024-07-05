@@ -30,7 +30,6 @@ export const Modal = ({ onClose, children, className }:IModal) => {
   useEffect(() => {
     setOpen(true);
     window.document.addEventListener('keydown', (e) => {
-      e.preventDefault();
       if (e.key === 'Escape') {
         handleClose();
       }
@@ -43,15 +42,17 @@ export const Modal = ({ onClose, children, className }:IModal) => {
       <div
         onTransitionEnd={handleTransitionEnd}
         className={cn(
-          'fixed left-0 top-0 z-[99] size-full cursor-pointer bg-dev-black-1000 opacity-0 transition-opacity',
+          'fixed left-0 top-0 z-[99] size-full cursor-pointer opacity-0 transition-opacity',
+          'bg-dev-purple-50 dark:bg-dev-black-1000',
           { 'opacity-70': open }, 
         )}
         onClick={handleClose}
       />
-
       <div className={cn(
         'fixed left-1/2 top-32 z-[100] w-full -translate-x-1/2 opacity-0 transition-opacity',
-        'max-h-[calc(100%-16px-8rem)] max-w-[calc(100%-32px)]',
+        'shadow-[0_0_12px_0_#0000000F]',
+        'bg-dev-white-200 dark:bg-dev-black-950',
+        'max-h-[calc(100%-16px-8rem)]',
         'flex flex-col',
         { 'opacity-100': open }, className,
       )}
