@@ -8,6 +8,7 @@
     "dev": "vite",
     "generate-one-dark-pro-theme": "node scripts/onedark-pro-to-monaco-theme.cjs",
     "add-descriptors": "papi add dot -n polkadot && papi add rococo -n rococo_v2_2 && papi",
+    "remove-descriptors": "rm -rf node_modules dot.scale rococo.scale polkadot-api.json",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "preview": "vite preview",
