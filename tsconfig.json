@@ -28,6 +28,7 @@
       "@components/*": ["./src/components/*"],
       "@views/*": ["./src/views/*"],
       "@utils/*": ["./src/utils/*"],
+      "@constants/*": ["./src/constants/*"],
       "@services/*": ["./src/services/*"],
       "@stores/*": [
         "./src/stores/*"
