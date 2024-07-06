@@ -54,7 +54,7 @@ export const setSearchParam = (
   }
 };
 
-export const debounce = (func:any, wait: number) => {
+export const debounce = (func:(...args:unknown[]) => unknown, wait: number) => {
   let timeout:NodeJS.Timeout;
   
   return (...args:unknown[]) => {
