@@ -20,17 +20,29 @@ export const Footer = () => {
         className="flex items-center gap-2"
       >
         <span className="text-body2-regular">Made by</span>
-        <Icon name="icon-limeChain" size={[94, 28]}/>
+        <Icon
+          name="icon-limeChain"
+          size={[94, 28]}
+        />
       </PDLink>
       <div className="flex items-center gap-5">
-        <PDLink to={LINK_GITHUB_REPO} target="_blank">
-          <Icon name="icon-github" size={[24]}/>
+        <PDLink
+          to={LINK_GITHUB_REPO}
+          target="_blank"
+        >
+          <Icon
+            name="icon-github"
+            size={[24]}
+          />
         </PDLink>
         <PDLink
           to={LINK_X}
           target="_blank"
         >
-          <Icon name="icon-x" size={[24]}/>
+          <Icon
+            name="icon-x"
+            size={[24]}
+          />
         </PDLink>
       </div>
     </footer>
