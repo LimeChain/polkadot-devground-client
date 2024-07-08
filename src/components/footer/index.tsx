@@ -1,14 +1,13 @@
+import { Icon } from '@components/icon';
+import { PDLink } from '@components/ui/PDLink';
 import {
   GITHUB_REPO_LINK,
   LIMECHAIN_LINK,
   X_LINK,
 } from '@constants/links';
-
-import { Icon } from '@components/icon';
-import PDLink from '@components/ui/PDLink';
 import { cn } from '@utils/helpers';
 
-const Footer = () => {
+export const Footer = () => {
   return (
     <footer className={cn(
       'flex items-center justify-between bg-dev-purple-100 dark:bg-dev-black-900',
@@ -37,5 +36,3 @@ const Footer = () => {
     </footer>
   );
 };
-
-export default Footer;

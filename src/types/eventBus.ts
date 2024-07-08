@@ -1,5 +1,5 @@
+import type { IChain } from './chain';
 import type { IConsoleMessage } from './global';
-import type { IChain } from '@constants/chains';
 
 export interface IEventBusDemoCodeIndex {
   type: '@@-example-code-index';
@@ -26,7 +26,6 @@ export interface IEventBusIframeDestroy {
 export interface IEventBusSetChain {
   type: '@@-set-chain';
   data: IChain;
-
 }
 export interface IEventBusSearchChain {
   type: '@@-search-chain';
