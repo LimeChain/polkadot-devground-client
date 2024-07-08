@@ -31,7 +31,7 @@ export const routes = () => ([
         children: [
           {
             path: '',
-            element: <></>,
+            element: <CodeEditor />,
           },
         ],
       },

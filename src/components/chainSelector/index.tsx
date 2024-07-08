@@ -10,28 +10,28 @@ import {
 
 import { Icon } from '@components/icon';
 import { PDScrollArea } from '@components/scrollArea';
-import {
-  type IChain,
-  type ISupportedChains,
-  SUPPORTED_CHAINS,
-} from '@constants/chains';
+import { SUPPORTED_CHAIN_GROUPS } from '@constants/chains';
 import { useStoreChain } from '@stores/chain';
 import { cn } from '@utils/helpers';
 
+import type {
+  IChain,
+  ISupportedChains,
+} from '@custom-types/chain';
 import type {
   IEventBusSearchChain,
   IEventBusSetChain,
 } from '@custom-types/eventBus';
 
-const CHAINS = Object.keys(SUPPORTED_CHAINS);
-const ALL_CHAINS = CHAINS.reduce((acc :ISupportedChains['<chain_name>']['chains'], curr) => {
-  SUPPORTED_CHAINS[curr].chains.forEach(chain => {
+const CHAIN_GROUPS = Object.keys(SUPPORTED_CHAIN_GROUPS);
+const ALL_CHAINS = CHAIN_GROUPS.reduce((acc: ISupportedChains['<chain_name>']['chains'], curr) => {
+  SUPPORTED_CHAIN_GROUPS[curr].chains.forEach(chain => {
     acc.push(chain);
   });
   return acc;
 }, []);
 
-const ChainSelector = () => {
+export const ChainSelector = () => {
   const { setChain } = useStoreChain.use.actions();
 
   const [selectedChainGroup, setSelectedChainGroup] = useState('');
@@ -42,76 +42,85 @@ const ChainSelector = () => {
     setQuery(data);
   });
 
-  const handleSelectGroup = useCallback((e:React.MouseEvent<HTMLButtonElement>) => {
-    const chain = e.currentTarget.getAttribute('data-chain-group') || '';
-    if (chain === selectedChainGroup) {
+  const handleSelectGroup = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    const chainGroup = e.currentTarget.getAttribute('data-chain-group') || '';
+    if (chainGroup === selectedChainGroup) {
       setSelectedChainGroup('');
     } else {
-      setSelectedChainGroup(chain);
+      setSelectedChainGroup(chainGroup);
     }
   }, [selectedChainGroup]);
 
-  const handleSetChain = useCallback((e:React.MouseEvent<HTMLButtonElement>) => {
-    const chain = JSON.parse(e.currentTarget.getAttribute('data-chain-data') || '') as unknown as IChain;
+  const handleSetChain = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    const chainId = e.currentTarget.getAttribute('data-chain-id') || '';
+    const chain = SUPPORTED_CHAIN_GROUPS[chainId].chains.find(c => c.id === chainId);
 
-    setChain(chain);
-    busDispatch<IEventBusSetChain>({ type: '@@-set-chain', data: chain });
+    if (chain) {
+      setChain(chain);
+      busDispatch<IEventBusSetChain>({
+        type: '@@-set-chain',
+        data: chain,
+      });
+    }
   }, [setChain]);
 
-  const filterChainsByQuery = useCallback((chain:IChain) => {
+  const filterChainsByQuery = useCallback((chain: IChain) => {
     return chain.id.toLowerCase().startsWith(query.toLowerCase());
   }, [query]);
 
   useEffect(() => {
     if (selectedChainGroup) {
-      setFilteredChains(SUPPORTED_CHAINS[selectedChainGroup].chains.filter(filterChainsByQuery));
+      setFilteredChains(SUPPORTED_CHAIN_GROUPS[selectedChainGroup].chains.filter(filterChainsByQuery));
     } else {
       setFilteredChains(ALL_CHAINS.filter(filterChainsByQuery));
     }
   }, [selectedChainGroup, filterChainsByQuery]);
 
   return (
-    <div className="grid grid-cols-[276fr_708fr]">
+    <div className="grid grid-cols-chainSelect">
       <PDScrollArea>
         <ul className="bg-dev-purple-100 p-2 dark:bg-dev-black-900">
-          {CHAINS.map(chain => (
-            <li
-              key={`chain-${chain}`}
-            >
-              <button
-                type="button"
-                onClick={handleSelectGroup}
-                data-chain-group={chain}
-                className={cn(
-                  'w-full p-4 text-left',
-                  'font-geist !text-body2-regular',
-                  'transition-colors',
-                  ' hover:bg-dev-purple-200 dark:hover:bg-dev-purple-400/20',
-                  { 'text-dev-pink-500': chain === selectedChainGroup },
-                )}
-              >
-                {SUPPORTED_CHAINS[chain].name}
-              </button>
-            </li>
-          ),
-          )}
+          {
+            CHAIN_GROUPS.map(chainGroup => {
+              return (
+                <li
+                  key={`chain-group-${chainGroup}`}
+                >
+                  <button
+                    type="button"
+                    data-chain-group={chainGroup}
+                    onClick={handleSelectGroup}
+                    className={cn(
+                      'w-full p-4 text-left',
+                      'font-geist !text-body2-regular',
+                      'transition-colors',
+                      ' hover:bg-dev-purple-200 dark:hover:bg-dev-purple-400/20',
+                      {
+                        'text-dev-pink-500': chainGroup === selectedChainGroup,
+                      },
+                    )}
+                  >
+                    {SUPPORTED_CHAIN_GROUPS[chainGroup].name}
+                  </button>
+                </li>
+              );
+            })
+          }
         </ul>
       </PDScrollArea>
       <PDScrollArea>
         <div className="flex flex-col gap-2 self-stretch p-2">
-          {query ? <span className="font-geist text-body2-regular">Search Results for "{query}"</span> : null}
+          {query && <span className="font-geist text-body2-regular">Search Results for "{query}"</span>}
           {
-            // filteredChains.length > 0
             filteredChains.length > 0
               ? (
                 <>
-                  <ul
-                    className={cn(
-                      'grid gap-2 [&>li]:h-[64px]',
-                      'lg:grid-cols-4',
-                      'md:grid-cols-2',
-                      'grid-cols-1',
-                    )}
+                  <ul className={cn(
+                    'grid gap-2 [&>li]:h-[64px]',
+                    'lg:grid-cols-4',
+                    'md:grid-cols-2',
+                    'grid-cols-1',
+                  )}
                   >
                     {
                       filteredChains.map(chain => {
@@ -120,14 +129,14 @@ const ChainSelector = () => {
                             key={`chain-list-${chain.name}`}
                           >
                             <button
+                              type="button"
+                              data-chain-id={chain.id}
                               onClick={handleSetChain}
-                              data-chain-data={JSON.stringify(chain)}
                               className={cn(
                                 'flex w-full items-center gap-3 p-4',
                                 'transition-colors',
                                 'hover:bg-dev-purple-200 dark:hover:bg-dev-black-800',
                               )}
-                              type="button"
                             >
                               <Icon
                                 name={chain.icon}
@@ -146,11 +155,7 @@ const ChainSelector = () => {
                 </>
               )
               : (
-                <span
-                  className="my-5 flex flex-1 items-center justify-center"
-                >
-                  No Results
-                </span>
+                <span className="my-5 flex flex-1 items-center justify-center">No Results</span>
               )
           }
         </div>
@@ -158,5 +163,3 @@ const ChainSelector = () => {
     </div>
   );
 };
-
-export default ChainSelector;

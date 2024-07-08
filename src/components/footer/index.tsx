@@ -1,12 +1,15 @@
 import { Icon } from '@components/icon';
-import PDLink from '@components/ui/PDLink';
-import { footerLinks } from '@constants/footer';
-import { LIMECHAIN_LINK } from '@constants/links';
+import { PDLink } from '@components/ui/PDLink';
+import {
+  LINK_GITHUB_REPO,
+  LINK_LIMECHAIN,
+  LINK_X,
+} from '@constants/links';
 import { cn } from '@utils/helpers';
 
 import FooterLink from './footerLink';
 
-const Footer = () => {
+export const Footer = () => {
   return (
     <footer className={cn(
       'flex items-center justify-between gap-4 bg-dev-purple-100 dark:bg-dev-black-900',
@@ -17,15 +20,24 @@ const Footer = () => {
     )}
     >
       <PDLink
-        to={LIMECHAIN_LINK}
+        to={LINK_LIMECHAIN}
         target="_blank"
         className="flex items-center gap-2"
       >
-        <span className="">Made by</span>
-        <Icon name="icon-limeChain" size={[94, 28]}/>
+        <span className="text-body2-regular">Made by</span>
+        <Icon
+          name="icon-limeChain"
+          size={[94, 28]}
+        />
       </PDLink>
       <div className="flex items-center gap-5">
-        {footerLinks.map(link => <FooterLink key={`footer-link-${link.linkProps.to}`} {...link} />)}
+        {
+          footerLinks.map(link => {
+            return (
+              <FooterLink key={`footer-link-${link.linkProps.to}`} {...link} />
+            )
+          })
+        }
       </div>
     </footer>
   );

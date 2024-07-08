@@ -1,16 +1,6 @@
-export interface ISupportedChains {
-  [key:string] : {
-    name: string;
-    chains: IChain[];
-  };
-}
-export interface IChain {
-  name: string;
-  id: string;
-  icon: `icon-chain-${string}`;
-}
+import type { ISupportedChains } from '@custom-types/chain';
 
-export const SUPPORTED_CHAINS: ISupportedChains = {
+export const SUPPORTED_CHAIN_GROUPS: ISupportedChains = {
   'polkadot': {
     name: 'Polkadot & Parachains',
     chains: [

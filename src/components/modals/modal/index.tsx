@@ -27,7 +27,7 @@ export const Modal = ({ onClose, children, className }:IModal) => {
   const handleTransitionEnd = useCallback(() => {
     if (!open) {
       onClose();
-    } 
+    }
   }, [onClose, open]);
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export const Modal = ({ onClose, children, className }:IModal) => {
         handleClose();
       }
     });
-    
+
   }, [handleClose]);
 
   useEventBus<IEventBusSetChain>('@@-set-chain', () => {
@@ -51,7 +51,7 @@ export const Modal = ({ onClose, children, className }:IModal) => {
         className={cn(
           'fixed left-0 top-0 z-[99] size-full cursor-pointer opacity-0 transition-opacity',
           'bg-dev-purple-50 dark:bg-dev-black-1000',
-          { 'opacity-70': open }, 
+          { 'opacity-70': open },
         )}
         onClick={handleClose}
       />
@@ -78,5 +78,5 @@ export const Modal = ({ onClose, children, className }:IModal) => {
       </div>
     </>
   );
-  
+
 };

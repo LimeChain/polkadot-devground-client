@@ -1,22 +1,27 @@
 import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 
 import { Icon } from '@components/icon';
-import { ChainSelectModal as _ChainSelectModal } from '@components/modals/chainSelectModal';
+import { ModalChainSelect } from '@components/modals/modalChainSelect';
 import { useStoreChain } from 'src/stores/chain';
 
 const ChainSelectButton = () => {
+  const [
+    ChainSelectModal,
+    toggleVisibility,
+  ] = useToggleVisibility(ModalChainSelect);
   const currentChain = useStoreChain.use.chain();
-  const [ChainSelectModal, toggleVisibility] = useToggleVisibility(_ChainSelectModal);
-  
+
   return (
     <>
       <button
         type="button"
-        className="flex items-center"
         onClick={toggleVisibility}
+        className="flex items-center"
       >
         <Icon name={currentChain.icon} size={[28]}/>
-        <h5 className="ml-[6px] mr-3 text-h5-bold">{currentChain.name}</h5>
+        <h5 className="ml-[6px] mr-3 text-h5-bold">
+          {currentChain.name}
+        </h5>
         <Icon name="icon-dropdownArrow" size={[16]}/>
       </button>
       <ChainSelectModal onClose={toggleVisibility}/>
