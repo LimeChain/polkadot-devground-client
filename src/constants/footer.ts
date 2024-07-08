@@ -1,31 +1,31 @@
 import {
-  GITHUB_REPO_LINK,
-  POLKADOT_GITHUB_LINK,
-  POLKADOT_WIKI_LINK,
-  X_LINK,
+  LINK_GITHUB_REPO,
+  LINK_POLKADOT_GITHUB,
+  LINK_POLKADOT_WIKI,
+  LINK_X,
 } from './links';
 
 import type { IFooterLinkProps } from '@components/footer/footerLink';
 
 export const footerLinks: IFooterLinkProps[] = [
   {
-    linkProps: { to: POLKADOT_GITHUB_LINK, target: '_blank' },
+    linkProps: { to: LINK_POLKADOT_GITHUB, target: '_blank' },
     iconProps: { name: 'icon-github' },
     text: 'Polkadot',
   },
   {
-    linkProps: { to: POLKADOT_WIKI_LINK, target: '_blank' },
+    linkProps: { to: LINK_POLKADOT_WIKI, target: '_blank' },
     iconProps: { name: 'icon-polkadot' },
     text: 'Polkadot Wiki',
   },
   {
-    linkProps: { to: GITHUB_REPO_LINK, target: '_blank' },
+    linkProps: { to: LINK_GITHUB_REPO, target: '_blank' },
     iconProps: { name: 'icon-github' },
     className: 'navSpacer ml-5',
     text: 'Limechain',
   },
   {
-    linkProps: { to: X_LINK, target: '_blank' },
+    linkProps: { to: LINK_X, target: '_blank' },
     iconProps: { name: 'icon-x' },
   },
 ];
