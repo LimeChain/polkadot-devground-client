@@ -10,7 +10,7 @@ import {
 
 import { Icon } from '@components/icon';
 import { PDScrollArea } from '@components/scrollArea';
-import { SUPPORTED_CHAINS } from '@constants/chains';
+import { SUPPORTED_CHAIN_GROUPS } from '@constants/chains';
 import { useStoreChain } from '@stores/chain';
 import { cn } from '@utils/helpers';
 
@@ -23,9 +23,9 @@ import type {
   IEventBusSetChain,
 } from '@custom-types/eventBus';
 
-const CHAINS = Object.keys(SUPPORTED_CHAINS);
-const ALL_CHAINS = CHAINS.reduce((acc :ISupportedChains['<chain_name>']['chains'], curr) => {
-  SUPPORTED_CHAINS[curr].chains.forEach(chain => {
+const CHAIN_GROUPS = Object.keys(SUPPORTED_CHAIN_GROUPS);
+const ALL_CHAINS = CHAIN_GROUPS.reduce((acc: ISupportedChains['<chain_name>']['chains'], curr) => {
+  SUPPORTED_CHAIN_GROUPS[curr].chains.forEach(chain => {
     acc.push(chain);
   });
   return acc;
@@ -53,7 +53,7 @@ export const ChainSelector = () => {
 
   const handleSetChain = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     const chainId = e.currentTarget.getAttribute('data-chain-id') || '';
-    const chain = SUPPORTED_CHAINS[chainId].chains.find(c => c.id === chainId);
+    const chain = SUPPORTED_CHAIN_GROUPS[chainId].chains.find(c => c.id === chainId);
 
     if (chain) {
       setChain(chain);
@@ -70,7 +70,7 @@ export const ChainSelector = () => {
 
   useEffect(() => {
     if (selectedChainGroup) {
-      setFilteredChains(SUPPORTED_CHAINS[selectedChainGroup].chains.filter(filterChainsByQuery));
+      setFilteredChains(SUPPORTED_CHAIN_GROUPS[selectedChainGroup].chains.filter(filterChainsByQuery));
     } else {
       setFilteredChains(ALL_CHAINS.filter(filterChainsByQuery));
     }
@@ -81,14 +81,14 @@ export const ChainSelector = () => {
       <PDScrollArea>
         <ul className="bg-dev-purple-100 p-2 dark:bg-dev-black-900">
           {
-            CHAINS.map(chain => {
+            CHAIN_GROUPS.map(chainGroup => {
               return (
                 <li
-                  key={`chain-${chain}`}
+                  key={`chain-group-${chainGroup}`}
                 >
                   <button
                     type="button"
-                    data-chain-group={chain}
+                    data-chain-group={chainGroup}
                     onClick={handleSelectGroup}
                     className={cn(
                       'w-full p-4 text-left',
@@ -96,11 +96,11 @@ export const ChainSelector = () => {
                       'transition-colors',
                       ' hover:bg-dev-purple-200 dark:hover:bg-dev-purple-400/20',
                       {
-                        'text-dev-pink-500': chain === selectedChainGroup,
+                        'text-dev-pink-500': chainGroup === selectedChainGroup,
                       },
                     )}
                   >
-                    {SUPPORTED_CHAINS[chain].name}
+                    {SUPPORTED_CHAIN_GROUPS[chainGroup].name}
                   </button>
                 </li>
               );

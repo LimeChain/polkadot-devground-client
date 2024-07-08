@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import { SUPPORTED_CHAINS } from '@constants/chains';
+import { SUPPORTED_CHAIN_GROUPS } from '@constants/chains';
 
 import { createSelectors } from '../createSelectors';
 
@@ -15,7 +15,7 @@ interface StoreInterface {
 }
 
 const initialState = {
-  chain: SUPPORTED_CHAINS['polkadot'].chains[0],
+  chain: SUPPORTED_CHAIN_GROUPS['polkadot'].chains[0],
 };
 
 const chainStore = create<StoreInterface>()((set) => ({
