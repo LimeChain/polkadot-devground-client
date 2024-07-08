@@ -43,11 +43,11 @@ export const ChainSelector = () => {
   });
 
   const handleSelectGroup = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    const chain = e.currentTarget.getAttribute('data-chain-group') || '';
-    if (chain === selectedChainGroup) {
+    const chainGroup = e.currentTarget.getAttribute('data-chain-group') || '';
+    if (chainGroup === selectedChainGroup) {
       setSelectedChainGroup('');
     } else {
-      setSelectedChainGroup(chain);
+      setSelectedChainGroup(chainGroup);
     }
   }, [selectedChainGroup]);
 
