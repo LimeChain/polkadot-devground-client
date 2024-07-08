@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 
-import Footer from '@components/footer';
+import { Footer } from '@components/footer';
 import { Header } from '@components/header';
 import { cn } from '@utils/helpers';
 
@@ -11,6 +11,7 @@ interface ILayoutBasic {
 
 export const LayoutBasic = (props: ILayoutBasic) => {
   const { hasFooter } = props;
+
   return (
     <Suspense>
       <div className="grid min-h-screen w-full grid-rows-layout">
