@@ -42,7 +42,7 @@ export const ChainSelector = () => {
     setQuery(data);
   });
 
-  const handleSelectGroup = useCallback((e:React.MouseEvent<HTMLButtonElement>) => {
+  const handleSelectGroup = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     const chain = e.currentTarget.getAttribute('data-chain-group') || '';
     if (chain === selectedChainGroup) {
       setSelectedChainGroup('');
@@ -51,14 +51,20 @@ export const ChainSelector = () => {
     }
   }, [selectedChainGroup]);
 
-  const handleSetChain = useCallback((e:React.MouseEvent<HTMLButtonElement>) => {
-    const chain = JSON.parse(e.currentTarget.getAttribute('data-chain-data') || '') as unknown as IChain;
+  const handleSetChain = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    const chainId = e.currentTarget.getAttribute('data-chain-id') || '';
+    const chain = SUPPORTED_CHAINS[chainId].chains.find(c => c.id === chainId);
 
-    setChain(chain);
-    busDispatch<IEventBusSetChain>({ type: '@@-set-chain', data: chain });
+    if (chain) {
+      setChain(chain);
+      busDispatch<IEventBusSetChain>({
+        type: '@@-set-chain',
+        data: chain,
+      });
+    }
   }, [setChain]);
 
-  const filterChainsByQuery = useCallback((chain:IChain) => {
+  const filterChainsByQuery = useCallback((chain: IChain) => {
     return chain.id.toLowerCase().startsWith(query.toLowerCase());
   }, [query]);
 
@@ -122,7 +128,7 @@ export const ChainSelector = () => {
                           >
                             <button
                               type="button"
-                              data-chain-data={JSON.stringify(chain)}
+                              data-chain-id={chain.id}
                               onClick={handleSetChain}
                               className={cn(
                                 'flex w-full items-center gap-3 p-4',

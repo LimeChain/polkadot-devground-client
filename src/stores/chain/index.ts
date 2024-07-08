@@ -1,11 +1,10 @@
 import { create } from 'zustand';
 
-import {
-  type IChain,
-  SUPPORTED_CHAINS,
-} from '@constants/chains';
+import { SUPPORTED_CHAINS } from '@constants/chains';
 
 import { createSelectors } from '../createSelectors';
+
+import type { IChain } from '@custom-types/chain';
 
 interface StoreInterface {
   chain: IChain;
@@ -29,7 +28,6 @@ const chainStore = create<StoreInterface>()((set) => ({
       set({ chain });
     },
   },
- 
 }));
 
 export const chainStoreUI = chainStore;
