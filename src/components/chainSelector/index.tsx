@@ -95,7 +95,9 @@ export const ChainSelector = () => {
                       'font-geist !text-body2-regular',
                       'transition-colors',
                       ' hover:bg-dev-purple-200 dark:hover:bg-dev-purple-400/20',
-                      { ['text-dev-pink-500']: chain === selectedChainGroup },
+                      {
+                        'text-dev-pink-500': chain === selectedChainGroup,
+                      },
                     )}
                   >
                     {SUPPORTED_CHAINS[chain].name}
