@@ -5,7 +5,4 @@
     "source.fixAll.eslint": "always"
   },
   "prettier.enable": false,
-  "[jsonc]": {
-    "editor.defaultFormatter": "vscode.json-language-features"
-  }
 }
