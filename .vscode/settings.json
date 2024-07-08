@@ -4,5 +4,8 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always"
   },
-  "prettier.enable": false
+  "prettier.enable": false,
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  }
 }

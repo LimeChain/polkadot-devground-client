@@ -5,7 +5,7 @@ import {
 
 import { cn } from '@utils/helpers';
 
-interface IPDLink extends LinkProps {}
+export interface IPDLink extends LinkProps {}
 
 const PDLink = ({ to, children, className, ...props } : IPDLink) => {
   return (
