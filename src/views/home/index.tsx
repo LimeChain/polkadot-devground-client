@@ -23,7 +23,8 @@ const Home = () => {
       <p className={cn(
         'pb-14 text-center text-body1-regular lg:pb-20 lg:text-h5-regular',
       )}
-      >Elevate your development experience with our next-gen platform for Polkadot developers
+      >
+        Elevate your development experience with our next-gen platform for Polkadot developers
       </p>
 
       <div className={cn(
