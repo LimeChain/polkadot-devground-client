@@ -1,3 +1,3 @@
-export const GITHUB_REPO_LINK = 'https://github.com/LimeChain/polkadot-devground-client';
-export const X_LINK = 'https://x.com/LimeChainHQ';
-export const LIMECHAIN_LINK = 'https://limechain.tech/';
+export const LINK_GITHUB_REPO = 'https://github.com/LimeChain/polkadot-devground-client';
+export const LINK_X = 'https://x.com/LimeChainHQ';
+export const LINK_LIMECHAIN = 'https://limechain.tech/';
