@@ -34,12 +34,9 @@ export const Header = () => {
           type="button"
           onClick={handleChangeTheme}
           className={cn(
-            'relative before:absolute',
-            'before:size-full before:w-[1px]',
-            'before:-left-5 before:top-0',
-            'before:transition-colors before:content-none',
-            'before:bg-dev-purple-300 dark:before:bg-dev-purple-700',
-            { 'before:content-[""] ml-5': !isHomePage },
+            'navSpacer',
+            { 'ml-5 ': !isHomePage },
+            { 'before:content-none': isHomePage },
           )}
         >
           <Icon

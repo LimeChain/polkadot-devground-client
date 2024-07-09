@@ -1,22 +1,24 @@
 import { Icon } from '@components/icon';
 import { PDLink } from '@components/ui/PDLink';
-import {
-  LINK_GITHUB_REPO,
-  LINK_LIMECHAIN,
-  LINK_X,
-} from '@constants/links';
+import { footerLinks } from '@constants/footer';
+import { LINK_LIMECHAIN } from '@constants/links';
 import { cn } from '@utils/helpers';
+
+import FooterLink from './footerLink';
 
 export const Footer = () => {
   return (
     <footer className={cn(
-      'flex items-center justify-between bg-dev-purple-100 dark:bg-dev-black-900',
-      'px-6 py-3 lg:px-14 lg:py-5',
+      'flex items-center justify-between gap-4',
+      ' bg-dev-purple-100 dark:bg-dev-black-900',
+      'px-6 py-3 lg:px-14 lg:py-4',
+      'font-geist text-body2-regular',
+      'flex-col-reverse md:flex-row',
     )}
     >
       <PDLink
-        to={LINK_LIMECHAIN}
         target="_blank"
+        to={LINK_LIMECHAIN}
         className="flex items-center gap-2"
       >
         <span className="text-body2-regular">Made by</span>
@@ -26,25 +28,16 @@ export const Footer = () => {
         />
       </PDLink>
       <div className="flex items-center gap-5">
-        <PDLink
-          to={LINK_GITHUB_REPO}
-          target="_blank"
-        >
-          <Icon
-            name="icon-github"
-            size={[24]}
-          />
-        </PDLink>
-        <PDLink
-          to={LINK_X}
-          target="_blank"
-        >
-          <Icon
-            name="icon-x"
-            size={[24]}
-          />
-        </PDLink>
+        {
+          footerLinks.map(link => {
+            return (
+              <FooterLink key={`footer-link-${link.linkProps.to}`} {...link} />
+            );
+          })
+        }
       </div>
     </footer>
   );
 };
+
+export default Footer;

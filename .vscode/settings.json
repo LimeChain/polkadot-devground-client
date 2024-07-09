@@ -4,5 +4,5 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always"
   },
-  "prettier.enable": false
+  "prettier.enable": false,
 }

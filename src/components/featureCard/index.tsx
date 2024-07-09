@@ -42,21 +42,37 @@ const FeatureCard = ({ icon, linkProps, subTitle, title, className } : IFeatures
           'group-hover:-translate-y-1 group-hover:translate-x-1',
         )}
       />
-      {icon
-        ? (
+      {
+        icon
+        && (
           <Icon
             name={icon}
             className="mb-8 text-dev-pink-500"
             size={[40]}
           />
         )
-        : null}
-      {title
-        ? <h4 className={cn('text-h4-bold', { 'mb-2': subTitle })}>{title}</h4>
-        : null}
-      {subTitle
-        ? <p className="font-geist text-body2-regular text-dev-black-300 dark:text-dev-purple-300">{subTitle}</p>
-        : null}
+      }
+      {
+        title
+        && (
+          <h4 className={cn(
+            'text-h4-bold',
+            { 'mb-2': subTitle },
+          )}
+          >{title}
+          </h4>
+        )
+      }
+      {
+        subTitle
+        && (
+          <p
+            className="font-geist text-body2-regular text-dev-black-300 dark:text-dev-purple-300"
+          >
+            {subTitle}
+          </p>
+        )
+      }
     </PDLink>
   );
 };
