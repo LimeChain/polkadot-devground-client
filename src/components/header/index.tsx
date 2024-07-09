@@ -1,10 +1,12 @@
+import { useCallback } from 'react';
 import {
-  useCallback,
-  useEffect,
-} from 'react';
-import { Link } from 'react-router-dom';
+  Link,
+  useLocation,
+} from 'react-router-dom';
 
+import ChainSelectButton from '@components/chainSelectButton';
 import { Icon } from '@components/icon';
+import { cn } from '@utils/helpers';
 import { Button } from '@components/ui';
 import { useStoreUI } from '@stores';
 import { useTheme } from '@utils/hooks/useTheme';
@@ -61,45 +63,34 @@ export const Header = () => {
   }, []);
 
   const { isDarkTheme, changeTheme } = useTheme();
-
-  const initStoreUI = useStoreUI.use.init?.();
-  const {
-    resetStore: resetStoreUI,
-    countIncrement,
-    countDecrement,
-  } = useStoreUI.use.actions();
-
-  const count = useStoreUI.use.count?.();
-
-  useEffect(() => {
-    initStoreUI();
-
-    return () => {
-      resetStoreUI();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { pathname } = useLocation();
+  const isHomePage = pathname === '/';
 
   const handleChangeTheme = useCallback(async () => {
     await changeTheme(isDarkTheme ? 'light' : 'dark');
   }, [isDarkTheme, changeTheme]);
 
   return (
-    <div className="flex items-center justify-between px-6 py-4">
-      <Link to="/" className="text-current hover:text-current">
-        <Icon name="logo-polkadot" size={[128, 40]} />
-      </Link>
-      <div>
-        <button type="button" onClick={countDecrement}>
-          -
-        </button>
-        <span className="mx-4 text-xl">
-          {count}
-        </span>
-        <button type="button" onClick={countIncrement}>
-          +
-        </button>
+    <div className="flex items-center justify-between px-6 ">
+      <div className="flex items-center gap-12">
+        <Link
+          to="/"
+          className="-mt-2 text-current hover:text-current"
+        >
+          <Icon name="logo-polkadot" size={[128, 40]} />
+        </Link>
       </div>
+      <div className="flex gap-5">
+        {!isHomePage && <ChainSelectButton/> }
+        <button
+          type="button"
+          onClick={handleChangeTheme}
+          className={cn(
+            'navSpacer',
+            { 'ml-5 ': !isHomePage },
+            { 'before:content-none': isHomePage },
+          )}
+        >
       {localStorage.getItem('jwt') ? <Button onClick={uploadSnippet}>Upload snippet</Button> : <Button onClick={loginWithGithub}>Login with Github</Button>}
       <div className="flex">
         <button type="button" onClick={handleChangeTheme}>

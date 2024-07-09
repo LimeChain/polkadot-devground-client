@@ -8,6 +8,7 @@
     "dev": "vite",
     "generate-one-dark-pro-theme": "node scripts/onedark-pro-to-monaco-theme.cjs",
     "add-descriptors": "papi add dot -n polkadot && papi add rococo -n rococo_v2_2 && papi",
+    "remove-descriptors": "rm -rf node_modules dot.scale rococo.scale polkadot-api.json",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "preview": "vite preview",
@@ -15,6 +16,7 @@
   },
   "dependencies": {
     "@pivanov/event-bus": "1.0.0",
+    "@pivanov/use-toggle-visibility": "0.0.1",
     "@polkadot-api/descriptors": "0.0.1",
     "@polkadot-labs/hdkd": "0.0.6",
     "@polkadot-labs/hdkd-helpers": "0.0.6",

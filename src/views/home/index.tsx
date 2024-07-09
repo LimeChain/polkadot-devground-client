@@ -1,5 +1,5 @@
 import FeatureCard from '@components/featureCard';
-import { GITHUB_REPO_LINK } from '@utils/constants';
+import { LINK_GITHUB_REPO } from '@constants/links';
 import { cn } from '@utils/helpers';
 
 const Home = () => {
@@ -17,30 +17,41 @@ const Home = () => {
         'before:text-h1-bold before:text-dev-pink-500 before:content-["["]',
         'after:text-h1-bold after:text-dev-pink-500 after:content-["]"]',
       )}
-      > 
+      >
         Empower Your Polkadot Development
       </h1>
-      <p className={cn('pb-14 text-center text-body1-regular lg:pb-20 lg:text-h5-regular')}>Elevate your development experience with our next-gen platform for Polkadot developers</p>
+      <p className={cn(
+        'pb-14 text-center text-body1-regular lg:pb-20 lg:text-h5-regular',
+      )}
+      >
+        Elevate your development experience with our next-gen platform for Polkadot developers
+      </p>
 
       <div className={cn(
         'grid w-full max-w-[880px] grid-cols-1 gap-4',
         'md:grid-cols-2 [&>.featureCard]:md:min-h-[320px]',
       )}
-      > 
+      >
         <FeatureCard
           className="featureCard"
           icon="icon-github"
           linkProps={
-            { to: GITHUB_REPO_LINK,
-              target: '_blank', 
-            }}
+            {
+              to: LINK_GITHUB_REPO,
+              target: '_blank',
+            }
+          }
           title="Code"
           subTitle="Explore our GitHub repository for comprehensive documentation, code examples, and contributions. Join our developer community to enhance your Polkadot projects."
         />
         <FeatureCard
           className="featureCard"
           icon="icon-brackets"
-          linkProps={{ to: '/code?s=1' }}
+          linkProps={
+            {
+              to: '/code?s=1',
+            }
+          }
           title="Developer Console"
           subTitle="Dive into our advanced developer console for seamless on-chain interaction and rapid prototyping. Experience a streamlined, user-friendly environment designed to accelerate your development process and boost productivity."
         />

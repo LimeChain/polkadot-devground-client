@@ -5,9 +5,9 @@ import {
 
 import { cn } from '@utils/helpers';
 
-interface IPDLink extends LinkProps {}
+export interface IPDLink extends LinkProps {}
 
-const PDLink = ({ to, children, className, ...props } : IPDLink) => {
+export const PDLink = ({ to, children, className, ...props }: IPDLink) => {
   return (
     <Link
       to={to}
@@ -17,5 +17,3 @@ const PDLink = ({ to, children, className, ...props } : IPDLink) => {
     </Link>
   );
 };
-
-export default PDLink;

@@ -116,3 +116,11 @@ pre {
   animation: 400ms bounce infinite alternate;
   animation-timing-function: cubic-bezier(0.38, 0.17, 0.11, 1);
 }
+
+.navSpacer {
+  @apply relative;
+  @apply before:absolute;
+  @apply before:size-full before:w-[1px] before:-left-5 before:top-0;
+  @apply before:transition-colors before:content-[""];
+  @apply before:bg-dev-purple-300 before:dark:bg-dev-purple-700;
+}

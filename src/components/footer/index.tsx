@@ -1,37 +1,40 @@
 import { Icon } from '@components/icon';
-import PDLink from '@components/ui/PDLink';
-import {
-  GITHUB_REPO_LINK,
-  LIMECHAIN_LINK,
-  X_LINK,
-} from '@utils/constants';
+import { PDLink } from '@components/ui/PDLink';
+import { footerLinks } from '@constants/footer';
+import { LINK_LIMECHAIN } from '@constants/links';
 import { cn } from '@utils/helpers';
 
-const Footer = () => {
+import FooterLink from './footerLink';
+
+export const Footer = () => {
   return (
     <footer className={cn(
-      'flex items-center justify-between bg-dev-purple-100 dark:bg-dev-black-900',
-      'px-6 py-3 lg:px-14 lg:py-5',
+      'flex items-center justify-between gap-4',
+      ' bg-dev-purple-100 dark:bg-dev-black-900',
+      'px-6 py-3 lg:px-14 lg:py-4',
+      'font-geist text-body2-regular',
+      'flex-col-reverse md:flex-row',
     )}
     >
       <PDLink
-        to={LIMECHAIN_LINK}
         target="_blank"
+        to={LINK_LIMECHAIN}
         className="flex items-center gap-2"
       >
         <span className="text-body2-regular">Made by</span>
-        <Icon name="icon-limeChain" size={[94, 28]}/>
+        <Icon
+          name="icon-limeChain"
+          size={[94, 28]}
+        />
       </PDLink>
       <div className="flex items-center gap-5">
-        <PDLink to={GITHUB_REPO_LINK} target="_blank">
-          <Icon name="icon-github" size={[24]}/>
-        </PDLink>
-        <PDLink
-          to={X_LINK}
-          target="_blank"
-        >
-          <Icon name="icon-x" size={[24]}/>
-        </PDLink>
+        {
+          footerLinks.map(link => {
+            return (
+              <FooterLink key={`footer-link-${link.linkProps.to}`} {...link} />
+            );
+          })
+        }
       </div>
     </footer>
   );

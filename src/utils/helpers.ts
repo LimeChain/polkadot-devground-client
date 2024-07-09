@@ -53,3 +53,14 @@ export const setSearchParam = (
     window.history.replaceState({}, '', `${window.location.pathname}?${searchParams.toString()}`);
   }
 };
+
+export const debounce = (func:(...args:unknown[]) => unknown, wait: number) => {
+  let timeout:NodeJS.Timeout;
+
+  return (...args:unknown[]) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      func(...args);
+    }, wait);
+  };
+};

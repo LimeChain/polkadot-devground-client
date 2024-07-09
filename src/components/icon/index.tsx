@@ -4,7 +4,7 @@ import {
   forwardRef,
 } from 'react';
 
-interface SVGIconProps {
+export interface SVGIconProps {
   size?: Array<number | string>;
   name: string;
   fill?: string;

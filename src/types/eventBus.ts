@@ -1,3 +1,4 @@
+import type { IChain } from './chain';
 import type { IConsoleMessage } from './global';
 
 export interface IEventBusDemoCodeIndex {
@@ -20,4 +21,13 @@ export interface IEventBusConsoleMessageReset {
 
 export interface IEventBusIframeDestroy {
   type: '@@-iframe-destroy';
+}
+
+export interface IEventBusSetChain {
+  type: '@@-set-chain';
+  data: IChain;
+}
+export interface IEventBusSearchChain {
+  type: '@@-search-chain';
+  data: string;
 }
