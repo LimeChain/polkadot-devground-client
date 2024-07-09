@@ -4,6 +4,7 @@ import {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import authService from '../../services/authService';
 const Callback = () => {
   const navigate = useNavigate();
   const codeUsed = useRef<boolean>(false);
@@ -18,18 +19,7 @@ const Callback = () => {
       }
 
       codeUsed.current = true;
-      const url = 'http://localhost:3000/auth/login';
- 
-      const body = { code };
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      });
-      const { jwtToken } = await res.json();
-      localStorage.setItem('jwt', jwtToken);
+      const jwt = await authService.login(code);
       navigate('/');
     };
 

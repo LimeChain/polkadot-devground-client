@@ -12,7 +12,7 @@ import { App } from './app';
 import './assets/fonts/fonts.css';
 import './assets/workers/monaco-worker';
 import 'virtual:svg-icons-register';
-
+import './services/axiosSetup';
 createRoot(document.getElementById('pd-root')!).render(
   <React.StrictMode>
     <HelmetProvider>

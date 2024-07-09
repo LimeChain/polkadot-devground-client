@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useCallback } from 'react';
 import {
   Link,
@@ -6,9 +7,9 @@ import {
 
 import ChainSelectButton from '@components/chainSelectButton';
 import { Icon } from '@components/icon';
-import { cn } from '@utils/helpers';
 import { Button } from '@components/ui';
-import { useStoreUI } from '@stores';
+import authService from '@services/authService';
+import { cn } from '@utils/helpers';
 import { useTheme } from '@utils/hooks/useTheme';
 import { snippets } from '@views/codeEditor/snippets';
 
@@ -20,13 +21,16 @@ export const Header = () => {
     const githubApiUrl = import.meta.env.VITE_GITHUB_API_URL;
     window.location.assign(githubApiUrl + githubClientId + '&scope=user:email%20gist');
   }, []);
+  const refreshToken = useCallback(async () => {
+
+    await authService.refreshToken();
+  }, []);
 
   const uploadSnippet = useCallback(() => {
 
     const uploadSnippet = async () => {
 
-      const jwt = localStorage.getItem('jwt');
-      if (!jwt) {
+      if (!authService.getAccessToken()) {
         return;
       }
 
@@ -42,20 +46,15 @@ export const Header = () => {
           content: 'readme content',
         },
       };
-  
-      const res = await fetch('http://localhost:3000/gists', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${jwt}`,
-        },
-        body: JSON.stringify({
-          description: 'Snippet description',
-          files,
-          publicGist: true,
-        }),
-      });
-      console.log('res', res);
+
+      const body = {
+        description: 'Snippet description',
+        files,
+        publicGist: true,
+      };
+      const response = await axios.post(`http://localhost:3000/gists`, body, { withCredentials: true });
+
+      console.log('response', response);
     };
 
     void uploadSnippet();
@@ -90,8 +89,10 @@ export const Header = () => {
             { 'ml-5 ': !isHomePage },
             { 'before:content-none': isHomePage },
           )}
-        >
-      {localStorage.getItem('jwt') ? <Button onClick={uploadSnippet}>Upload snippet</Button> : <Button onClick={loginWithGithub}>Login with Github</Button>}
+        />
+        {authService.getAccessToken() ? <Button onClick={uploadSnippet}>Upload snippet</Button> : <Button onClick={loginWithGithub}>Login with Github</Button>}
+        <Button onClick={refreshToken}>Refresh token</Button>
+      </div>
       <div className="flex">
         <button type="button" onClick={handleChangeTheme}>
           <Icon
