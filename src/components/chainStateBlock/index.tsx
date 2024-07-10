@@ -1,53 +1,56 @@
 import {
-  useCallback,
+  useEffect,
   useRef,
+  useState,
 } from 'react';
 
 import { Icon } from '@components/icon';
+import { chainStateBlockData } from '@constants/chainState';
+import {
+  cn,
+  formatNumber,
+} from '@utils/helpers';
+
+import type { TChainStateBlock } from '@custom-types/chainState';
 
 interface IChainStateBlockProps {
-  type:
-  'latest-block' |
-  'finalised-block' |
-  'signed-extrinsics' |
-  'transfers' |
-  'total-accounts' |
-  'circulating-supply';
+  type: TChainStateBlock;
 }
 
 export const ChainStateBlock = ({ type }: IChainStateBlockProps) => {
 
-  const refIconName = useRef<string>('');
+  const [value, setValue] = useState(0);
+  const refIsLoading = useRef(true);
 
-  const getIconName = useCallback(() => {
-    switch (type) {
-      case 'latest-block': {
-        return refIconName.current = 'icon-newBlock';
-      }
-      case 'finalised-block': {
-        return refIconName.current = 'icon-blocks';
-      }
-      case 'signed-extrinsics': {
-        return refIconName.current = 'icon-transfer';
-      }
-      case 'circulating-supply': {
-        return refIconName.current = 'icon-transfer';
-      }
-      case 'total-accounts': {
-        return refIconName.current = 'icon-transfer';
-      }
-      case 'transfers': {
-        return refIconName.current = 'icon-transfer';
-      }
-      default: {
-        return refIconName.current = 'icon-transfer';
-      }
-    }
-  }, [type]);
+  useEffect(() => {
+    setTimeout(() => {
+      setValue(1132312321);
+    }, Math.random() * 1000 + 400);
+    refIsLoading.current = false;
+  }, []);
 
   return (
-    <div>
-      <Icon name={getIconName()} size={[16]} />
+    <div className={cn(
+      'grid grid-cols-[16px_1fr] items-center gap-4',
+    )}
+    >
+      <Icon name={chainStateBlockData[type].icon} size={[16]} />
+      <div className="flex flex-col overflow-hidden">
+        <span className={cn(
+          'truncate font-geist text-body2-regular',
+          'text-dev-black-300 dark:text-dev-purple-300',
+        )}
+        >
+          {chainStateBlockData[type].name}
+        </span>
+        <span className="truncate font-geist text-body1-bold">
+          {
+            refIsLoading.current
+              ? 'Loading...'
+              : formatNumber(value)
+          }
+        </span>
+      </div>
     </div>
   );
 };

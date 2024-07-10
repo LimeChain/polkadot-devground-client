@@ -96,3 +96,9 @@ export const sleep = (ms: number): Promise<null> => {
     setTimeout(resolve, ms);
   });
 };
+
+export const formatNumber = (num: number) => {
+  const formater = new Intl.NumberFormat('en-GB', {});
+
+  return formater.format(num);
+};
