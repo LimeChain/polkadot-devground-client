@@ -1,3 +1,4 @@
+import { ChainData } from '@components/chainData';
 import { ChainState } from '@components/chainState';
 
 const Explorer = () => {
@@ -7,9 +8,7 @@ const Explorer = () => {
         search
       </div>
       <ChainState />
-      <div>
-        chain data
-      </div>
+      <ChainData />
     </div>
   );
 };

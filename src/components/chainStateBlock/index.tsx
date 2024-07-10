@@ -37,7 +37,7 @@ export const ChainStateBlock = ({ type }: IChainStateBlockProps) => {
       <Icon name={chainStateBlockData[type].icon} size={[16]} />
       <div className="flex flex-col overflow-hidden">
         <span className={cn(
-          'truncate font-geist text-body2-regular',
+          'truncate font-geist !text-body2-regular',
           'text-dev-black-300 dark:text-dev-purple-300',
         )}
         >
