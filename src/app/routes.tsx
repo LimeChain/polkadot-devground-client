@@ -7,6 +7,7 @@ import { NotFound } from '@views/notFound';
 
 const Home = lazy(() => import('../views/home'));
 const CodeEditor = lazy(() => import('../views/codeEditor'));
+const Explorer = lazy(() => import('../views/explorer'));
 
 export const routes = () => ([
   {
@@ -39,6 +40,16 @@ export const routes = () => ([
           {
             path: '',
             element: <Callback />,
+          },
+        ],
+      },
+      {
+        path: 'explorer',
+        element: <LayoutBasic hasFooter />,
+        children: [
+          {
+            path: '',
+            element: <Explorer />,
           },
         ],
       },
