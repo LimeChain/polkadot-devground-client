@@ -67,7 +67,7 @@ const FeatureCard = ({ icon, linkProps, subTitle, title, className } : IFeatures
         subTitle
         && (
           <p
-            className="font-geist text-body2-regular text-dev-black-300 dark:text-dev-purple-300"
+            className="font-geist !text-body2-regular text-dev-black-300 dark:text-dev-purple-300"
           >
             {subTitle}
           </p>
