@@ -1,127 +1,17 @@
-import type { editor } from 'monaco-editor';
-
 export const STORAGE_CACHE_NAME = 'polkadot-devground-ide-cache';
 export const STORAGE_PREFIX = 'tmp-example-index';
 export const STORAGE_PREFIX_CONSOLE_OUTPUT = `${STORAGE_PREFIX}-console-output`;
 
-export const monacoEditorConfig: editor.IEditorOptions & editor.IGlobalEditorOptions = {
-  inlayHints: {
-    enabled: 'on',
-  },
-  tabSize: 2,
-  guides: {
-    bracketPairs: true,
-    highlightActiveBracketPair: true,
-  },
-  hover: {
-    delay: 100,
-  },
-  unicodeHighlight: {
-    ambiguousCharacters: false,
-  },
-  bracketPairColorization: {
-    enabled: true,
-    independentColorPoolPerBracketType: true,
-  },
-  find: {
-    addExtraSpaceOnTop: false,
-    seedSearchStringFromSelection: 'never',
-  },
-  padding: {
-    top: 14,
-  },
-  contextmenu: false,
-  wordWrap: 'on',
-  smoothScrolling: true,
-  stickyTabStops: true,
-  fontLigatures: true,
-  fontSize: 14,
-  fontFamily:
-    '"FiraCode Nerd Font Mono", FiraCode, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-  quickSuggestions: false,
-  minimap: {
-    enabled: false,
-  },
-  autoClosingBrackets: 'always',
-  autoClosingComments: 'always',
-  autoIndent: 'advanced',
-  autoClosingDelete: 'always',
-  autoClosingQuotes: 'always',
-  autoDetectHighContrast: true,
-  autoClosingOvertype: 'always',
-} as const;
-
-export const iframeConsole = `
-  class CustomLogger {
-    constructor() {
-      this.webSockets = new Set();
-      this.fetchControllers = new Set();
-    }
-
-    log(...args) {
-      this._logMessage('log', ...args);
-    }
-
-    info(...args) {
-      this._logMessage('info', ...args);
-    }
-
-    warn(...args) {
-      this._logMessage('warn', ...args);
-    }
-
-    error(...args) {
-      this._logMessage('error', ...args);
-    }
-
-    _logMessage(type, ...args) {
-      const serializedArgs = args.map(arg => {
-        if (typeof arg === "bigint") {
-          return arg.toString();
-        }
-        if (typeof arg === 'object') {
-          try {
-            return JSON.stringify(arg, (key, value) => {
-              return typeof value === 'bigint' ? value.toString() : value;
-            });
-          } catch (e) {
-            return '[Object]';
-          }
-        }
-        return arg;
-      });
-      window.parent.postMessage({ type: 'customLog', args: serializedArgs }, '*');
-    }
-  }
-
-  const logger = new CustomLogger();
-  console.log = (...args) => {
-    logger.log(...args);
-  };
-
-  console.info = (...args) => {
-    logger.info(...args);
-  };
-
-  console.warn = (...args) => {
-    logger.warn(...args);
-  };
-
-  console.error = (...args) => {
-    logger.error(...args);
-  };
-`;
-
 export const iframeImports = `
   import { ApiPromise, WsProvider } from 'https://cdn.jsdelivr.net/npm/@polkadot/api@11.3.1/+esm';
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/+esm'
-  import { getSmProvider } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/sm-provider/+esm';
-  import { start } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/smoldot/+esm';
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.1/+esm'
+  import { getSmProvider } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.1/sm-provider/+esm';
+  import { start } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.1/smoldot/+esm';
 
   import * as polkadotApiknownChains from 'https://cdn.jsdelivr.net/npm/@polkadot-api/known-chains@0.1.6/+esm'
 
-  import { WebSocketProvider } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/ws-provider/web/+esm';
-  import { startFromWorker } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.0/smoldot/from-worker/+esm';
+  import { WebSocketProvider } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.1/ws-provider/web/+esm';
+  import { startFromWorker } from 'https://cdn.jsdelivr.net/npm/polkadot-api@0.9.1/smoldot/from-worker/+esm';
 
   import { getPolkadotSigner } from 'https://cdn.jsdelivr.net/npm/@polkadot-api/signer@0.0.1/+esm';
   import { DEV_PHRASE, entropyToMiniSecret, mnemonicToEntropy, ss58Address } from 'https://cdn.jsdelivr.net/npm/@polkadot-labs/hdkd-helpers@0.0.6/+esm';
@@ -134,14 +24,12 @@ export const iframeImports = `
 
 export const defaultImportMap = {
   imports: {
-    // 'polkadot-api': 'https://esm.sh/polkadot-api@0.9.0',
-    // 'polkadot-api/ws-provider/web': 'https://esm.sh/polkadot-api@0.9.0/ws-provider/web.js',
-    'dayjs': 'https://esm.sh/dayjs',
-    'react': 'https://esm.sh/react',
+    dayjs: 'https://esm.sh/dayjs',
+    react: 'https://esm.sh/react',
     'react/jsx-runtime': 'https://esm.sh/react/jsx-runtime',
+    'react-dom/client': 'https://esm.sh/react-dom/client',
     '@shined/reactive': 'https://esm.sh/@shined/reactive',
     '@shined/react-use': 'https://esm.sh/@shined/react-use',
-    'react-dom/client': 'https://esm.sh/react-dom/client',
   },
   scopes: {},
 };

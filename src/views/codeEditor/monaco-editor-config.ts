@@ -1,6 +1,8 @@
 import type { editor } from 'monaco-editor';
 
 export const monacoEditorConfig: editor.IEditorOptions & editor.IGlobalEditorOptions = {
+  automaticLayout: true,
+  folding: true,
   inlayHints: {
     enabled: 'on',
   },
@@ -32,8 +34,7 @@ export const monacoEditorConfig: editor.IEditorOptions & editor.IGlobalEditorOpt
   stickyTabStops: true,
   fontLigatures: true,
   fontSize: 14,
-  fontFamily:
-    '"FiraCode Nerd Font Mono", FiraCode, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+  fontFamily: '"FiraCode Nerd Font Mono", FiraCode, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
   quickSuggestions: false,
   minimap: {
     enabled: false,

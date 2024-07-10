@@ -118,8 +118,9 @@ export const Iframe = (props: IframeProps) => {
           'absolute inset-0 items-center justify-center',
           'pointer-events-none',
           'opacity-0',
-          'bg-[#151515]',
+          'bg-white dark:bg-[#282c34]',
           'delay-400 transition-opacity duration-500 ease-in-out',
+          'z-100',
           {
             ['opacity-100 delay-0']: showLoading,
           },

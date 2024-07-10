@@ -64,3 +64,35 @@ export const debounce = (func:(...args:unknown[]) => unknown, wait: number) => {
     }, wait);
   };
 };
+
+/**
+ * removeSearchParam - Removes a search parameter from the current URL.
+ *
+ * @param {string} key - The key of the search parameter to remove.
+ * @param {boolean} [reload=false] - Optional. If true, a full page reload will be triggered after removing the search parameter.
+ * If false (default), the URL will be updated without triggering a full page reload.
+ */
+export const removeSearchParam = (key: string, reload = false) => {
+  const searchParams = new URLSearchParams(window.location.search);
+  searchParams.delete(key);
+
+  if (reload) {
+    // Replace the current URL and trigger a full page reload
+    window.location.href = `${window.location.pathname}?${searchParams.toString()}`;
+  } else {
+    // Replace the current URL without triggering a full page reload
+    window.history.replaceState({}, '', `${window.location.pathname}?${searchParams.toString()}`);
+  }
+};
+
+/**
+ * sleep - Asynchronously waits for the specified number of milliseconds.
+ *
+ * @param {number} ms - The number of milliseconds to wait before resolving the Promise.
+ * @returns {Promise<null>} - A Promise that resolves after the specified number of milliseconds.
+ */
+export const sleep = (ms: number): Promise<null> => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+};

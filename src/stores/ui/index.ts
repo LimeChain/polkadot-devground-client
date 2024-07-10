@@ -2,19 +2,22 @@ import { create } from 'zustand';
 
 import { createSelectors } from '../createSelectors';
 
+import {
+  type ColorScheme,
+  LOCAL_STORAGE_THEME_KEY,
+  preferedTheme,
+} from './helpers';
 interface StoreInterface {
-  count?: number;
+  theme: ColorScheme;
   actions: {
     resetStore: () => void;
-    countSet: (count?: number) => void;
-    countIncrement: () => void;
-    countDecrement: () => void;
+    toggleTheme: () => void;
   };
-  init: (count?: number) => void;
+  init: () => void;
 }
 
 const initialState = {
-  count: undefined,
+  theme: preferedTheme(),
 };
 
 const baseStore = create<StoreInterface>()((set, get) => ({
@@ -23,18 +26,18 @@ const baseStore = create<StoreInterface>()((set, get) => ({
     resetStore: () => {
       set(initialState);
     },
-    countSet: (count) => {
-      set({ count });
-    },
-    countIncrement: () => {
-      set((state) => ({ count: (state.count || 0) + 1 }));
-    },
-    countDecrement: () => {
-      set((state) => ({ count: (state.count || 0) - 1 }));
+    toggleTheme: () => {
+      const newTheme = get().theme === 'dark' ? 'light' : 'dark';
+      window.document.documentElement.setAttribute('data-color-scheme', newTheme);
+      window.localStorage.setItem(LOCAL_STORAGE_THEME_KEY, newTheme);
+      set({ theme: newTheme });
     },
   },
-  init: (count) => {
-    get().actions.countSet(count || 0);
+  init: () => {
+    const theme = preferedTheme();
+    window.document.documentElement.setAttribute('data-color-scheme', theme);
+    window.localStorage.setItem(LOCAL_STORAGE_THEME_KEY, theme);
+    set({ theme });
   },
 }));
 

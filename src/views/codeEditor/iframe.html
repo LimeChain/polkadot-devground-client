@@ -56,10 +56,10 @@
       };
 
       console.warn = (...args) => {
-        if (args.some(arg => arg.includes("cdn.tailwindcss.com"))) {
-          return;
+        const filteredArgs = args.filter(arg => typeof arg !== 'string' || !arg.includes('tailwind'));
+        if (filteredArgs.length > 0) {
+          logger.warn(...filteredArgs);
         }
-        logger.warn(...args);
       };
 
       console.error = (...args) => {
