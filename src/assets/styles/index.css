@@ -19,8 +19,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-*,*::after,*::before {
-  /* outline: 1px solid green; */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #000000;
+    @apply transition-all;
+  }
 }
 
 a {
@@ -37,6 +40,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  @apply bg-white dark:bg-black;
 }
 
 #svg-sprite {
@@ -51,24 +55,6 @@ pre {
   white-space: pre-wrap;
 }
 
-.decorationsOverviewRuler {
-  opacity: 0 !important;
-}
-
-.monaco-scrollable-element>.scrollbar.vertical>.slider {
-  border-radius: 10px !important;
-  width: 4px !important;
-  left: auto !important;
-  right: 0px !important;
-}
-
-.monaco-scrollable-element>.scrollbar.horizontal>.slider {
-  border-radius: 10px !important;
-  height: 4px !important;
-  top: auto !important;
-  bottom: 0px !important;
-}
-
 .page-background {
   position: relative;
   width: 100%;
@@ -76,7 +62,6 @@ pre {
   display: flex;
   justify-content: center;
   align-items: center;
-
 }
 
 #pd-root {
@@ -90,7 +75,6 @@ pre {
     @apply bg-transparent dark:bg-dev-purple-400 transition-colors pointer-events-none;
     opacity: .4;
     filter: blur(500px);
-    z-index: 1;
   }
 }
 

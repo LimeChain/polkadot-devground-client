@@ -9,6 +9,7 @@ export default {
     extend: {
       gridTemplateRows: {
         'layout': '64px 1fr 60px',
+        'code-layout': '64px 1fr',
       },
       gridTemplateColumns: {
         'chainSelect' : '276fr 708fr'
@@ -82,7 +83,7 @@ export default {
       },
       fontFamily: {
         popins: ['"Poppins"',  ...defaultTheme.fontFamily.sans],
-        geist: ['"Geist"',  ...defaultTheme.fontFamily.sans]
+        geist: ['"Geist"', ...defaultTheme.fontFamily.sans],
       },
       fontSize : {
         "h1-extraLight" : ["4rem" , {

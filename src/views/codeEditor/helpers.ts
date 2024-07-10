@@ -1,21 +1,80 @@
 import { setupTypeAcquisition } from '@typescript/ata';
+import { format } from 'prettier';
+// eslint-disable-next-line import/default
+import prettierPluginEstree from 'prettier/plugins/estree';
+import parserTypeScript from 'prettier/plugins/typescript';
 import typescript from 'typescript';
 
-export function setupAta(
+import { sleep } from '@utils/helpers';
+
+export const setupAta = (
   onDownloadFile?: (code: string, path: string) => void,
-  onStarted?: () => void,
   onFinished?: (files: Map<string, string>) => void,
-) {
+  onStarted?: () => void,
+  onErrorMessage?: (userFacingMessage: string, error: Error) => void,
+  onProgress?: (progress: number) => void,
+  throttleMs = 100, // Throttle delay
+) => {
+  const failedDownloads = new Set<string>();
+  let lastFetchTime = 0;
+
+  const customFetcher = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    try {
+      const now = Date.now();
+      const timeSinceLastFetch = now - lastFetchTime;
+
+      if (timeSinceLastFetch < throttleMs) {
+        await sleep(throttleMs - timeSinceLastFetch);
+      }
+
+      lastFetchTime = Date.now();
+
+      // Check if fetch is available in the current context
+      if (typeof fetch === 'undefined') {
+        throw new Error('Fetch API is not available in the current environment');
+      }
+
+      return fetch(input, init);
+    } catch (err) {
+      const error = err as Error;
+      if (error.message.includes('Failed to fetch')) {
+        const path = new URL((input as Request).url || input.toString()).pathname;
+        failedDownloads.add(path);
+      }
+      throw err;
+    }
+  };
+
+  const customErrorMessage = (userFacingMessage: string, error: Error) => {
+    console.error('Error during type acquisition:', userFacingMessage, error);
+    if (error.message) {
+      const pathMatch = error.message.match(/at (\S+):/);
+      if (pathMatch && pathMatch[1]) {
+        failedDownloads.add(pathMatch[1]);
+      }
+    }
+    onErrorMessage?.(userFacingMessage, error);
+  };
+
   return setupTypeAcquisition({
     typescript,
     projectName: 'react-playground',
+    fetcher: customFetcher,
     delegate: {
       receivedFile: onDownloadFile,
       started: onStarted,
-      finished: onFinished,
+      finished: (files) => {
+        onProgress?.(100);
+        onFinished?.(files);
+      },
+      errorMessage: customErrorMessage,
+      progress: (downloaded, estimatedTotal) => {
+        const progress = Math.round((downloaded / estimatedTotal) * 100);
+        onProgress?.(progress);
+      },
     },
   });
-}
+};
 
 // @TODO: @pivanov: This function is not used anywhere in the codebase.
 // but is useful for debugging purposes.
@@ -108,3 +167,20 @@ export function mergeImportMap(...maps: ImportMap[]): ImportMap {
 
   return importMap;
 }
+
+export const formatCode = async (code: string) => {
+  try {
+    const r = await format(code, {
+      parser: 'typescript',
+      plugins: [parserTypeScript, prettierPluginEstree],
+      semi: true,
+      singleQuote: false,
+      trailingComma: 'all',
+      bracketSpacing: true,
+      arrowParens: 'always',
+    });
+    return r;
+  } catch (error) {
+    return code;
+  }
+};
