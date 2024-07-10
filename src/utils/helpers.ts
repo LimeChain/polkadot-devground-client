@@ -64,3 +64,9 @@ export const debounce = (func:(...args:unknown[]) => unknown, wait: number) => {
     }, wait);
   };
 };
+
+export const formatNumber = (num: number) => {
+  const formater = new Intl.NumberFormat('en-GB', {});
+
+  return formater.format(num);
+};
