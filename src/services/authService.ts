@@ -1,36 +1,76 @@
 import axios from 'axios';
 
+import {
+  STORAGE_AUTH_CACHE_NAME,
+  STORAGE_AUTH_JWT_TOKEN,
+} from '@constants/auth';
+import {
+  storageGetItem,
+  storageRemoveItem,
+  storageSetItem,
+} from '@utils/storage';
+
+import type { IAuthResponse } from '@custom-types/auth';
+
 const API_URL = 'http://localhost:3000/auth';
-let accessToken: string | null = null;
-interface AuthResponse {
-  jwtToken: string;
-}
 
-const login = async (code: string): Promise<AuthResponse> => {
-  const response = await axios.post<AuthResponse>(`${API_URL}/login`, { code }, { withCredentials: true });
-  if (response.data.jwtToken) {
-    accessToken = response.data.jwtToken;
-  }
+const authoriseGitHubApp = () => {
+  const githubClientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
+  const githubApiUrl = import.meta.env.VITE_GITHUB_API_URL;
+  window.location.assign(githubApiUrl + githubClientId + '&scope=user:email%20gist');
+};
+
+const login = async (code: string): Promise<IAuthResponse> => {
+  const response = await axios.post<IAuthResponse>(
+    `${API_URL}/login`,
+    { code },
+    { withCredentials: true },
+  );
+
+  await storageSetItem(
+    STORAGE_AUTH_CACHE_NAME,
+    STORAGE_AUTH_JWT_TOKEN,
+    response?.data?.jwtToken,
+  );
+
   return response.data;
 };
 
-const logout = (): void => {
-  accessToken = null;
+const logout = async (): Promise<void> => {
+  await storageRemoveItem(
+    STORAGE_AUTH_CACHE_NAME,
+    STORAGE_AUTH_JWT_TOKEN,
+  );
 };
 
-const getAccessToken = (): string | null => accessToken;
+const refreshToken = async (): Promise<IAuthResponse> => {
+  const response = await axios.post<IAuthResponse>(
+    `${API_URL}/refresh`,
+    {},
+    { withCredentials: true });
 
-const refreshToken = async (): Promise<AuthResponse> => {
-  const response = await axios.post<AuthResponse>(`${API_URL}/refresh`, {}, { withCredentials: true });
-  if (response.data.jwtToken) {
-    accessToken = response.data.jwtToken;
-  }
+  await storageSetItem(
+    STORAGE_AUTH_CACHE_NAME,
+    STORAGE_AUTH_JWT_TOKEN,
+    response?.data?.jwtToken,
+  );
+
   return response.data;
+};
+
+const getAccessToken = async (): Promise<string | null> => {
+  const token: string | null = await storageGetItem(
+    STORAGE_AUTH_CACHE_NAME,
+    STORAGE_AUTH_JWT_TOKEN,
+  );
+
+  return token;
 };
 
 export default {
   login,
-  logout,
-  getAccessToken,
   refreshToken,
+  authoriseGitHubApp,
+  getAccessToken,
+  logout,
 };

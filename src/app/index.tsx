@@ -8,12 +8,19 @@ import {
   RouterProvider,
 } from 'react-router-dom';
 
+import { useAuthStore } from '@stores/auth';
+
 import { routes } from './routes';
 
 import '../assets/styles/index.css';
 
 export const App = () => {
-  
+  const { init } = useAuthStore.use.actions();
+
+  useEffect(() => {
+    init();
+  }, [init]);
+
   const refRoutes = useRef(createBrowserRouter(routes()));
 
   useEffect(() => {
