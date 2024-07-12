@@ -1,6 +1,28 @@
-import { startChainClient } from './helpers';
+import type { ICodeSnippet } from '@custom-types/codeSnippet';
 
-const snippet1 = {
+type ChainClient = 'polkadot' | 'rococo';
+
+const chainsLib: {
+  [key in ChainClient]: {
+    knownChain: string;
+    descriptor: string;
+  }
+} = {
+  polkadot: {
+    knownChain: 'polkadot', descriptor: 'dot',
+  },
+  rococo: { knownChain: 'rococo_v2_2', descriptor: 'rococo' },
+};
+
+const startChainClient = ({ chain }: { chain: ChainClient }): string => {
+  return `
+    const provider = WebSocketProvider("wss://rococo-rpc.polkadot.io")
+    const client = createClient(provider);
+    const api = client.getTypedApi(papiDescriptors.${chainsLib[chain].descriptor});
+  `;
+};
+
+const snippet1: ICodeSnippet = {
   id: 1,
   code: `
     import { createClient } from "polkadot-api";
@@ -44,7 +66,7 @@ const snippet1 = {
     `,
 };
 
-const snippet2 = {
+const snippet2: ICodeSnippet = {
   id: 2,
   code: `
   import { ApiPromise, WsProvider } from '@polkadot/api';
@@ -66,7 +88,7 @@ const snippet2 = {
   `,
 };
 
-const snippet3 = {
+const snippet3: ICodeSnippet = {
   id: 3,
   code: `
   import { ApiPromise, WsProvider } from '@polkadot/api';
@@ -102,7 +124,7 @@ const snippet3 = {
   `,
 };
 
-const snippet4 = {
+const snippet4: ICodeSnippet = {
   id: 4,
   code: `
     import { createClient } from "polkadot-api";
@@ -139,7 +161,7 @@ const snippet4 = {
   `,
 };
 
-const snippet5 = {
+const snippet5: ICodeSnippet = {
   id: 5,
   code: `
     import { createClient } from "polkadot-api";
@@ -185,8 +207,9 @@ const snippet5 = {
     `,
 };
 
-const snippet6 = {
+const snippet6: ICodeSnippet = {
   id: 6,
+  isTSX: true,
   code: `
   import { create } from "@shined/reactive";
   import { createRoot } from "react-dom/client";
