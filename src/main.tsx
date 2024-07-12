@@ -18,6 +18,8 @@ import './services/axiosSetup';
 
 import 'virtual:svg-icons-register';
 
+import './assets/styles/index.css';
+
 createRoot(document.getElementById('pd-root')!).render(
   <HelmetProvider>
     <Helmet defaultTitle="Polkadot Devground" titleTemplate="%s - Polkadot Devground" />
