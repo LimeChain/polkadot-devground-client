@@ -1,22 +1,30 @@
 import {
   useEffect,
   useRef,
+  useState,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { STORAGE_AUTH_SUCCESSFUL_REDIRECT_TO } from '@constants/auth';
-import { useAuthStore } from '@stores';
+import { useStoreAuth } from '@stores';
+import { getSearchParam } from '@utils/helpers';
 
 const Callback = () => {
   const navigate = useNavigate();
   const codeUsed = useRef<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const { login } = useAuthStore.use.actions();
+  const { login } = useStoreAuth.use.actions();
 
   useEffect(() => {
     const getAccessToken = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
+      const code = getSearchParam('code');
+      const error = getSearchParam('error');
+
+      if (error) {
+        setError(error);
+        return;
+      }
 
       if (codeUsed.current || !code) {
         return;
@@ -28,6 +36,7 @@ const Callback = () => {
 
       if (token && successRedirectTo) {
         navigate(successRedirectTo || '/');
+        window.localStorage.removeItem(STORAGE_AUTH_SUCCESSFUL_REDIRECT_TO);
       }
     };
 
@@ -35,8 +44,18 @@ const Callback = () => {
 
   }, [navigate, login]);
 
+  if (error) {
+    return (
+      <div className="flex size-full flex-col items-center justify-center">
+        <h1>Failed to authorize with GitHub</h1>
+        <p>{error}</p>
+      </div>
+    );
+
+  }
+
   return (
-    <div>
+    <div className="flex size-full flex-col items-center justify-center">
       <h1>Successfully authorized with GitHub</h1>
     </div>
   );

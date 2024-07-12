@@ -1,12 +1,12 @@
 import { Icon } from '@components/icon';
-import { useAuthStore } from '@stores';
+import { useStoreAuth } from '@stores';
 import { cn } from '@utils/helpers';
 
 export const GithubButton = () => {
 
-  const { authorize, logout } = useAuthStore.use.actions();
-  const isAuthenticated = useAuthStore.use.jwtToken();
-  const authIsLoading = useAuthStore.use.jwtTokenIsLoading();
+  const { authorize, logout } = useStoreAuth.use.actions();
+  const isAuthenticated = useStoreAuth.use.jwtToken();
+  const authIsLoading = useStoreAuth.use.jwtTokenIsLoading();
 
   return (
     <button

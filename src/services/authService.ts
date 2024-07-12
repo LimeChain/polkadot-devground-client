@@ -20,13 +20,13 @@ const authoriseGitHubApp = () => {
   const githubClientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
   const githubApiUrl = import.meta.env.VITE_GITHUB_API_URL;
 
-  const { pathname, search } = window.location;
+  const { pathname, search } = location;
   window.localStorage.setItem(
     STORAGE_AUTH_SUCCESSFUL_REDIRECT_TO,
     `${pathname}${search}`,
   );
 
-  window.location.assign(
+  location.assign(
     githubApiUrl + githubClientId + '&scope=user:email%20gist',
   );
 };

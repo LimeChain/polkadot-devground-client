@@ -13,5 +13,5 @@ export const preferedTheme = () => {
     return storedPreference;
   }
 
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 };

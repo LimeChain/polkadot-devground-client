@@ -6,52 +6,55 @@ import { createSelectors } from '../createSelectors';
 
 import type { IAuthResponse } from '@custom-types/auth';
 
-interface IAuthStore {
+interface StoreInterface {
   jwtToken: IAuthResponse['jwtToken'];
   jwtTokenIsLoading: boolean;
   actions: {
-    init: () => void;
+    resetStore: () => void;
     login: (gitHubCode: string) => Promise<string>;
     authorize: () => void;
     refreshJwtToken: () => void;
     logout: () => void;
   };
+  init: () => void;
 }
 
-const initialState: Omit<IAuthStore, 'actions'> = {
+const initialState = {
   jwtToken: '',
   jwtTokenIsLoading: true,
 };
 
-const authStore = create<IAuthStore>()((set) => ({
+const baseStore = create<StoreInterface>()((set) => ({
   ...initialState,
   actions: {
-    async init() {
-      const token = await authService.getJwtToken();
-      set({ jwtToken: token || '', jwtTokenIsLoading: false });
+    resetStore: () => {
+      set(initialState);
     },
-
-    async login(gitHubCode: string) {
+    login: async (gitHubCode: string) => {
       const { jwtToken } = await authService.login(gitHubCode);
       set({ jwtToken });
 
       return jwtToken;
     },
-
-    authorize() {
+    authorize: () => {
       authService.authoriseGitHubApp();
     },
 
-    async refreshJwtToken() {
+    refreshJwtToken: async () => {
       const { jwtToken } = await authService.refreshJwtToken();
       set({ jwtToken });
     },
 
-    async logout() {
+    logout: async () => {
       await authService.logout();
       set({ jwtToken: '' });
     },
   },
+  init: async () => {
+    const token = await authService.getJwtToken();
+    set({ jwtToken: token || '', jwtTokenIsLoading: false });
+  },
 }));
 
-export const useAuthStore = createSelectors(authStore);
+export const baseStoreAuth = baseStore;
+export const useStoreAuth = createSelectors(baseStore);

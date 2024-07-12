@@ -20,7 +20,7 @@ export const SnippetsSwitcher = () => {
   }, []);
 
   return (
-    <div className="mb-4 flex flex-wrap gap-x-4 self-end">
+    <div className="mb-4 flex flex-wrap gap-x-4 self-end px-4">
       {snippets.map((snippet) => (
         <Button
           key={snippet.id}
