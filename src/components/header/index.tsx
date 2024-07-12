@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useCallback } from 'react';
 import {
   Link,
@@ -11,46 +10,10 @@ import { Button } from '@components/ui';
 import { useAuthStore } from '@stores/auth';
 import { cn } from '@utils/helpers';
 import { useTheme } from '@utils/hooks/useTheme';
-import { snippets } from '@views/codeEditor/snippets';
 
 export const Header = () => {
   const jwtToken = useAuthStore.use.jwtToken();
-  const { logout, authorize, refreshToken } = useAuthStore.use.actions();
-  console.log(jwtToken);
-
-  const uploadSnippet = useCallback(() => {
-    const uploadSnippet = async () => {
-
-      if (!jwtToken) {
-        return;
-      }
-
-      const snippet = snippets[0].code;
-      const files = {
-        'snippet.tsx': {
-          content: snippet,
-        },
-        'package.json': {
-          content: 'snippet2 content',
-        },
-        'readme.txt': {
-          content: 'readme content',
-        },
-      };
-
-      const body = {
-        description: 'Snippet description',
-        files,
-        publicGist: true,
-      };
-      const response = await axios.post(`http://localhost:3000/gists`, body, { withCredentials: true });
-
-      console.log('response', response);
-    };
-
-    void uploadSnippet();
-
-  }, [jwtToken]);
+  const { logout, authorize } = useAuthStore.use.actions();
 
   const { isDarkTheme, changeTheme } = useTheme();
   const { pathname } = useLocation();
@@ -84,22 +47,16 @@ export const Header = () => {
         {
           jwtToken
             ? (
-              <>
-                <Button onClick={logout}>
+              <Button onClick={logout}>
                   Logout
-                </Button>
-                <Button onClick={uploadSnippet}>
-                  Upload
-                </Button>
-              </>
+              </Button>
             )
             : (
               <Button onClick={authorize}>
-                Login with Github
+                Login
               </Button>
             )
         }
-        <Button onClick={refreshToken}>Refresh token</Button>
       </div>
       <div className="flex">
         <button type="button" onClick={handleChangeTheme}>

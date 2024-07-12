@@ -13,7 +13,7 @@ interface IAuthStore {
     init: () => void;
     login: (gitHubCode: string) => Promise<string>;
     authorize: () => void;
-    refreshToken: () => void;
+    refreshJwtToken: () => void;
     logout: () => void;
   };
 }
@@ -27,7 +27,7 @@ const authStore = create<IAuthStore>()((set) => ({
   ...initialState,
   actions: {
     async init() {
-      const token = await authService.getAccessToken();
+      const token = await authService.getJwtToken();
       set({ jwtToken: token || '', jwtTokenIsLoading: false });
     },
 
@@ -42,8 +42,8 @@ const authStore = create<IAuthStore>()((set) => ({
       authService.authoriseGitHubApp();
     },
 
-    async refreshToken() {
-      const { jwtToken } = await authService.refreshToken();
+    async refreshJwtToken() {
+      const { jwtToken } = await authService.refreshJwtToken();
       set({ jwtToken });
     },
 

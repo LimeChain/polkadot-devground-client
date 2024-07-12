@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import {
+  SERVER_URL,
   STORAGE_AUTH_CACHE_NAME,
   STORAGE_AUTH_JWT_TOKEN,
 } from '@constants/auth';
@@ -12,7 +13,7 @@ import {
 
 import type { IAuthResponse } from '@custom-types/auth';
 
-const API_URL = 'http://localhost:3000/auth';
+const AUTH_URL = `${SERVER_URL}/auth`;
 
 const authoriseGitHubApp = () => {
   const githubClientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
@@ -22,7 +23,7 @@ const authoriseGitHubApp = () => {
 
 const login = async (code: string): Promise<IAuthResponse> => {
   const response = await axios.post<IAuthResponse>(
-    `${API_URL}/login`,
+    `${AUTH_URL}/login`,
     { code },
     { withCredentials: true },
   );
@@ -43,9 +44,9 @@ const logout = async (): Promise<void> => {
   );
 };
 
-const refreshToken = async (): Promise<IAuthResponse> => {
+const refreshJwtToken = async (): Promise<IAuthResponse> => {
   const response = await axios.post<IAuthResponse>(
-    `${API_URL}/refresh`,
+    `${AUTH_URL}/refresh`,
     {},
     { withCredentials: true });
 
@@ -58,19 +59,19 @@ const refreshToken = async (): Promise<IAuthResponse> => {
   return response.data;
 };
 
-const getAccessToken = async (): Promise<string | null> => {
-  const token: string | null = await storageGetItem(
+const getJwtToken = async (): Promise<string | null> => {
+  const jwtToken: string | null = await storageGetItem(
     STORAGE_AUTH_CACHE_NAME,
     STORAGE_AUTH_JWT_TOKEN,
   );
 
-  return token;
+  return jwtToken;
 };
 
 export default {
   login,
-  refreshToken,
+  refreshJwtToken,
   authoriseGitHubApp,
-  getAccessToken,
+  getJwtToken,
   logout,
 };
