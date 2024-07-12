@@ -36,7 +36,6 @@ const Home = () => {
           linkProps={
             {
               to: '/code?s=1',
-              target: '_blank',
             }
           }
           title="Developer Console"
