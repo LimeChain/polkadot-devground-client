@@ -8,7 +8,10 @@ import {
   RouterProvider,
 } from 'react-router-dom';
 
-import { useStoreUI } from '@stores';
+import {
+  useAuthStore,
+  useStoreUI,
+} from '@stores';
 
 import { routes } from './routes';
 
@@ -21,9 +24,13 @@ export const App = () => {
   const {
     resetStore: resetStoreUI,
   } = useStoreUI.use.actions();
+  const {
+    init: initAuthStore,
+  } = useAuthStore.use.actions();
 
   useEffect(() => {
     initStoreUI();
+    initAuthStore();
     window.papiDescriptors = papiDescriptors;
 
     return () => {
