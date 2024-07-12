@@ -5,15 +5,10 @@ import {
 
 import ChainSelectButton from '@components/chainSelectButton';
 import { Icon } from '@components/icon';
-import { Button } from '@components/ui';
 import { useStoreUI } from '@stores';
 import { cn } from '@utils/helpers';
-import { useAuthStore } from 'src/stores/auth';
 
 export const Header = () => {
-  const jwtToken = useAuthStore.use.jwtToken();
-  const { logout, authorize } = useAuthStore.use.actions();
-
   const { pathname } = useLocation();
   const isHomePage = pathname === '/';
 
@@ -40,23 +35,7 @@ export const Header = () => {
             { 'ml-5 ': !isHomePage },
             { 'before:content-none': isHomePage },
           )}
-        />
-        {
-          jwtToken
-            ? (
-              <Button onClick={logout}>
-                  Logout
-              </Button>
-            )
-            : (
-              <Button onClick={authorize}>
-                Login
-              </Button>
-            )
-        }
-      </div>
-      <div className="flex">
-        <button type="button" onClick={toggleTheme}>
+        >
           <Icon
             name={theme ? 'icon-lightMode' : 'icon-darkMode'}
             size={[24]}
