@@ -11,7 +11,7 @@ import {
 import { Icon } from '@components/icon';
 import { PDScrollArea } from '@components/scrollArea';
 import { SUPPORTED_CHAIN_GROUPS } from '@constants/chains';
-import { useStoreChain } from '@stores/chain';
+import { useStoreChain } from '@stores';
 import { cn } from '@utils/helpers';
 
 import type {

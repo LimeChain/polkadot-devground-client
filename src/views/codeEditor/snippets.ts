@@ -8,7 +8,6 @@ const snippet1 = {
     import { getPolkadotSigner } from "polkadot-api/signer";
     import { sr25519CreateDerive } from '@polkadot-labs/hdkd';
     import { mnemonicToEntropy, entropyToMiniSecret, DEV_PHRASE } from '@polkadot-labs/hdkd-helpers';
-    import { start } from "polkadot-api/smoldot";
 
     (async () => {
       try {
@@ -147,7 +146,6 @@ const snippet5 = {
     import { WebSocketProvider } from "polkadot-api/ws-provider/web";
     import { getPolkadotSigner } from "polkadot-api/signer";
     import { sr25519CreateDerive } from '@polkadot-labs/hdkd';
-    import { start } from "polkadot-api/smoldot";
     import { getSmProvider } from "polkadot-api/sm-provider";
 
     import {

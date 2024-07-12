@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import {
   Link,
   useLocation,
@@ -6,17 +5,15 @@ import {
 
 import ChainSelectButton from '@components/chainSelectButton';
 import { Icon } from '@components/icon';
+import { useStoreUI } from '@stores';
 import { cn } from '@utils/helpers';
-import { useTheme } from '@utils/hooks/useTheme';
 
 export const Header = () => {
-  const { isDarkTheme, changeTheme } = useTheme();
   const { pathname } = useLocation();
   const isHomePage = pathname === '/';
 
-  const handleChangeTheme = useCallback(async () => {
-    await changeTheme(isDarkTheme ? 'light' : 'dark');
-  }, [isDarkTheme, changeTheme]);
+  const { toggleTheme } = useStoreUI.use.actions();
+  const theme = useStoreUI.use.theme?.();
 
   return (
     <div className="flex items-center justify-between px-6 ">
@@ -32,7 +29,7 @@ export const Header = () => {
         {!isHomePage && <ChainSelectButton/> }
         <button
           type="button"
-          onClick={handleChangeTheme}
+          onClick={toggleTheme}
           className={cn(
             'navSpacer',
             { 'ml-5 ': !isHomePage },
@@ -40,7 +37,7 @@ export const Header = () => {
           )}
         >
           <Icon
-            name={isDarkTheme ? 'icon-lightMode' : 'icon-darkMode'}
+            name={theme ? 'icon-lightMode' : 'icon-darkMode'}
             size={[24]}
             className="text-dev-black-600 dark:text-dev-purple-100"
           />
