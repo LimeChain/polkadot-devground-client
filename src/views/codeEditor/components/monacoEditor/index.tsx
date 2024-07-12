@@ -191,6 +191,11 @@ export const MonacoEditor = () => {
       data: [],
     });
 
+    busDispatch({
+      type: '@@-monaco-editor-types-progress',
+      data: 0,
+    });
+
     let code = 'console.log("Hello, World!");';
     if (!!snippetIndex) {
       const selectedCodeSnippet = snippets.find((f) => f.id === snippetIndex) || snippets[0];
