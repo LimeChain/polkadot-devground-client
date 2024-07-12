@@ -1,10 +1,8 @@
-import {
-  Link,
-  useLocation,
-} from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 import ChainSelectButton from '@components/chainSelectButton';
 import { Icon } from '@components/icon';
+import { Logo } from '@components/logo';
 import { useStoreUI } from '@stores';
 import { cn } from '@utils/helpers';
 
@@ -16,14 +14,9 @@ export const Header = () => {
   const theme = useStoreUI.use.theme?.();
 
   return (
-    <div className="flex items-center justify-between px-6 ">
-      <div className="flex items-center gap-12">
-        <Link
-          to="/"
-          className="-mt-2 text-current hover:text-current"
-        >
-          <Icon name="logo-polkadot" size={[128, 40]} />
-        </Link>
+    <nav className="flex items-center justify-between px-6 ">
+      <div className="flex items-center">
+        <Logo />
       </div>
       <div className="flex gap-5">
         {!isHomePage && <ChainSelectButton/> }
@@ -43,7 +36,7 @@ export const Header = () => {
           />
         </button>
       </div>
-    </div>
+    </nav>
   );
 };
 
