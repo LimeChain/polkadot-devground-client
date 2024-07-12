@@ -56,7 +56,7 @@ export const Header = () => {
         }
       </div>
       <div className="flex">
-        <button type="button" onClick={handleChangeTheme}>
+        <button type="button" onClick={toggleTheme}>
           <Icon
             name={theme ? 'icon-lightMode' : 'icon-darkMode'}
             size={[24]}

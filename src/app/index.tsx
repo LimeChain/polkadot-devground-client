@@ -8,9 +8,7 @@ import {
   RouterProvider,
 } from 'react-router-dom';
 
-import { useStoreUI } from '@stores/';
-
-import { useAuthStore } from '@stores/auth';
+import { useStoreUI } from '@stores';
 
 import { routes } from './routes';
 
