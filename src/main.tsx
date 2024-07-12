@@ -28,7 +28,7 @@ createRoot(document.getElementById('pd-root')!).render(
           duration: 2000,
         }}
       />
+      <ReloadPrompt />
     </ReactPortal>
-    <ReloadPrompt />
   </HelmetProvider>,
 );
