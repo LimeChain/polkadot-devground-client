@@ -1,10 +1,8 @@
-import {
-  useCallback,
-  useEffect,
-} from 'react';
+import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
+import { useEffect } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
-import { Button } from '@components/ui';
+import { ModalReloadPrompt } from './ModalReloadPrompt';
 
 export const ReloadPrompt = () => {
   const {
@@ -12,34 +10,19 @@ export const ReloadPrompt = () => {
     updateServiceWorker,
   } = useRegisterSW();
 
+  const [ReloadPromptModal, toggleVisibility] = useToggleVisibility(ModalReloadPrompt);
+
   useEffect(() => {
     if (needRefresh) {
-      const el = document.getElementById('root');
-      (el as HTMLElement).innerHTML = '';
+      toggleVisibility();
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [needRefresh]);
 
-  const handleReload = useCallback(async () => {
-    await updateServiceWorker(true);
-  }, [updateServiceWorker]);
-
-  const Content = () => {
-    return (
-      <div className="fixed inset-0 z-[9999] bg-gray-600">
-        <h2 className="truncate">
-          <span className="mr-2 text-2xl leading-none">{'\uD83D\uDE80'}</span>
-          New <span className="font-semibold">Polkadot Devground</span> version
-          is available!
-        </h2>
-
-        <Button onClick={handleReload}>Reload</Button>
-      </div>
-    );
-  };
-
-  if (needRefresh) {
-    return <Content />;
-  }
-
-  return null;
+  return (
+    <ReloadPromptModal
+      updateServiceWorker={updateServiceWorker}
+    />
+  );
 };
