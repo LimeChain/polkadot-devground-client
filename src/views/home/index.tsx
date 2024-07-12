@@ -4,12 +4,12 @@ import { cn } from '@utils/helpers';
 
 const Home = () => {
   return (
-    <section className="flex items-center justify-center">
-      <div className="flex flex-col">
+    <section className="flex h-full flex-col items-center justify-center">
+      <div className="flex flex-col items-center">
         <h1
           className={cn(
             'pb-4',
-            'text-h3-bold lg:text-h2-bold',
+            'text-center text-h3-bold lg:text-h2-bold',
             'before:text-dev-pink-500 before:content-["["]',
             'after:text-dev-pink-500 after:content-["]"]',
           )}

@@ -12,8 +12,6 @@ import { useStoreUI } from '@stores';
 
 import { routes } from './routes';
 
-import '../assets/styles/index.css';
-
 export const App = () => {
 
   const refRoutes = useRef(createBrowserRouter(routes()));

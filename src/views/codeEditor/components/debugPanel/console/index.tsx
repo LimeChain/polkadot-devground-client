@@ -15,11 +15,10 @@ import {
   storageRemoveItem,
   storageSetItem,
 } from '@utils/storage';
-
 import {
   STORAGE_CACHE_NAME,
   STORAGE_PREFIX_CONSOLE_OUTPUT,
-} from '../constants';
+} from '@views/codeEditor/constants';
 
 import type {
   IEventBusConsoleMessage,
@@ -106,6 +105,7 @@ export const Console = () => {
     <PDScrollArea
       ref={refScrollArea}
       type="auto"
+      className="flex-1"
       onScroll={handleOnScroll}
     >
       <div
