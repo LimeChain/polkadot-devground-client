@@ -19,7 +19,6 @@ const AUTH_URL = `${SERVER_URL}/auth`;
 const authoriseGitHubApp = () => {
   const githubClientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
   const githubApiUrl = import.meta.env.VITE_GITHUB_API_URL;
-  console.log('first', githubClientId, githubApiUrl);
 
   const { pathname, search } = location;
   window.localStorage.setItem(
