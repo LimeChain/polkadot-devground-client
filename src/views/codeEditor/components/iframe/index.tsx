@@ -8,17 +8,17 @@ import { transform } from 'sucrase';
 
 import { Loader } from '@components/loader';
 import { cn } from '@utils/helpers';
-
-import { defaultImportMap } from './constants';
+import { defaultImportMap } from '@views/codeEditor/constants';
 import {
   getImportMap,
   mergeImportMap,
-} from './helpers';
+} from '@views/codeEditor/helpers';
+
 import iframe from './iframe.html?raw';
 
 import type {
-  IEventBusDemoCode,
   IEventBusIframeDestroy,
+  IEventBusMonacoEditorExecuteSnippet,
 } from '@custom-types/eventBus';
 
 const getIframeContent = (script: string, importMap: string) => {
@@ -85,7 +85,7 @@ export const Iframe = (props: IframeProps) => {
     setBlobUrl(url);
   }, []);
 
-  useEventBus<IEventBusDemoCode>('@@-example-code', ({ data }) => {
+  useEventBus<IEventBusMonacoEditorExecuteSnippet>('@@-monaco-editor-execute-snippet', ({ data }) => {
     clearTimeout(refTimeout.current);
     setShowLoading(true);
     revokeBlobUrl(blobUrl);
@@ -98,6 +98,7 @@ export const Iframe = (props: IframeProps) => {
   }, [blobUrl]);
 
   useEventBus<IEventBusIframeDestroy>('@@-iframe-destroy', () => {
+    setBlobUrl('');
     revokeBlobUrl(blobUrl);
   });
 
@@ -131,3 +132,5 @@ export const Iframe = (props: IframeProps) => {
     </>
   );
 };
+
+Iframe.displayName = 'Iframe';

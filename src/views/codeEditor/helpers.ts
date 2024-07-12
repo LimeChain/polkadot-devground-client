@@ -13,36 +13,22 @@ export const setupAta = (
   onStarted?: () => void,
   onErrorMessage?: (userFacingMessage: string, error: Error) => void,
   onProgress?: (progress: number) => void,
-  throttleMs = 100, // Throttle delay
+  throttleMs = 200,
 ) => {
   const failedDownloads = new Set<string>();
   let lastFetchTime = 0;
 
   const customFetcher = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-    try {
-      const now = Date.now();
-      const timeSinceLastFetch = now - lastFetchTime;
+    const now = Date.now();
+    const timeSinceLastFetch = now - lastFetchTime;
 
-      if (timeSinceLastFetch < throttleMs) {
-        await sleep(throttleMs - timeSinceLastFetch);
-      }
-
-      lastFetchTime = Date.now();
-
-      // Check if fetch is available in the current context
-      if (typeof fetch === 'undefined') {
-        throw new Error('Fetch API is not available in the current environment');
-      }
-
-      return fetch(input, init);
-    } catch (err) {
-      const error = err as Error;
-      if (error.message.includes('Failed to fetch')) {
-        const path = new URL((input as Request).url || input.toString()).pathname;
-        failedDownloads.add(path);
-      }
-      throw err;
+    if (timeSinceLastFetch < throttleMs) {
+      await sleep(throttleMs - timeSinceLastFetch);
     }
+
+    lastFetchTime = Date.now();
+
+    return fetch(input.toString(), init);
   };
 
   const customErrorMessage = (userFacingMessage: string, error: Error) => {
@@ -92,29 +78,6 @@ export const prettyPrintMessage = (message: string): string => {
   }
 };
 
-type ChainClient = 'polkadot' | 'rococo';
-
-const chainsLib : {
-  [key in ChainClient]: {
-    knownChain: string;
-    descriptor:string;
-  }
-} = {
-  polkadot: {
-    knownChain: 'polkadot', descriptor: 'dot',
-  },
-  rococo: { knownChain: 'rococo_v2_2', descriptor: 'rococo' },
-};
-
-export const startChainClient = ({ chain }: { chain: ChainClient }): string => {
-  return `
-    const provider = WebSocketProvider("wss://rococo-rpc.polkadot.io")
-    const client = createClient(provider);
-    const api = client.getTypedApi(papiDescriptors.${chainsLib[chain].descriptor});
-  `;
-};
-
-// @pivanov
 export interface ImportMap {
   imports?: Record<string, string>;
   scopes?: Record<string, string>;

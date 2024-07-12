@@ -10,10 +10,11 @@ import { cn } from '@utils/helpers';
 
 export const Header = () => {
   const { pathname } = useLocation();
-  const isHomePage = pathname === '/';
 
   const { toggleTheme } = useStoreUI.use.actions();
   const theme = useStoreUI.use.theme?.();
+
+  const isHomePage = pathname === '/';
 
   return (
     <div className="flex items-center justify-between px-6 ">

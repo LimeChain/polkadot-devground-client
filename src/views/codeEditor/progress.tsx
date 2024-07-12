@@ -7,7 +7,7 @@ import {
 
 import { cn } from '@utils/helpers';
 
-import type { IEventBusCodeEditorTypesProgress } from '@custom-types/eventBus';
+import type { IEventBusMonacoEditorTypesProgress } from '@custom-types/eventBus';
 
 interface IProgressProps {
   size?: number;
@@ -28,7 +28,7 @@ export const Progress = (props: IProgressProps) => {
   const refStrokeDashoffset = useRef((100) * (size * Math.PI) / 100);
   const [progress, setProgress] = useState(0);
 
-  useEventBus<IEventBusCodeEditorTypesProgress>('@@-code-editor-types-progress', async ({ data }) => {
+  useEventBus<IEventBusMonacoEditorTypesProgress>('@@-monaco-editor-types-progress', async ({ data }) => {
     const timeout = data * getRandomNumber(data / 10, (data / 10) + 4);
     setTimeout(() => {
       refStrokeDashoffset.current = (100 - data) * (size * Math.PI) / 100;

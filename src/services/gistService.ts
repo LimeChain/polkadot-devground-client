@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import { SERVER_URL } from '@constants/auth';
-import { snippets } from '@views/codeEditor/snippets';
+import { snippets } from '@constants/snippets';
 
 import authService from './authService';
 
