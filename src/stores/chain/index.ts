@@ -30,5 +30,4 @@ const chainStore = create<StoreInterface>()((set) => ({
   },
 }));
 
-export const chainStoreUI = chainStore;
 export const useStoreChain = createSelectors(chainStore);

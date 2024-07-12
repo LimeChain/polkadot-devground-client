@@ -13,6 +13,9 @@ import { App } from './app';
 
 import './assets/fonts/fonts.css';
 import './assets/workers/monaco-worker';
+import './assets/styles/index.css';
+import './services/axiosSetup';
+
 import 'virtual:svg-icons-register';
 
 import './assets/styles/index.css';

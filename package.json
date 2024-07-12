@@ -25,6 +25,7 @@
     "@tanstack/react-virtual": "3.8.2",
     "@typescript/ata": "0.9.6",
     "@vitejs/plugin-react-swc": "3.7.0",
+    "axios": "1.7.2",
     "clsx": "2.1.1",
     "date-fns": "^3.6.0",
     "file-saver": "2.0.5",

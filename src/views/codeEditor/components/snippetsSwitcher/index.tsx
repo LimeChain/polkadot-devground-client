@@ -1,6 +1,8 @@
 import { busDispatch } from '@pivanov/event-bus';
 import { useCallback } from 'react';
 
+
+import { GithubButton } from '@components/githubButton';
 import { Button } from '@components/ui';
 import { snippets } from '@constants/snippets';
 
@@ -19,7 +21,7 @@ export const SnippetsSwitcher = () => {
   }, []);
 
   return (
-    <div className="mb-4 flex flex-wrap gap-x-4 self-end">
+    <div className="mb-4 flex flex-wrap gap-x-4 self-end px-4">
       {snippets.map((snippet) => (
         <Button
           key={snippet.id}
@@ -29,6 +31,7 @@ export const SnippetsSwitcher = () => {
           Demo {snippet.id}
         </Button>
       ))}
+      <GithubButton />
     </div>
   );
 };

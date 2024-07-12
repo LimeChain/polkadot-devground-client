@@ -26,4 +26,5 @@ dist-ssr
 *.scale
 *-api.json
 
-.env
+.env*
+!.env.example

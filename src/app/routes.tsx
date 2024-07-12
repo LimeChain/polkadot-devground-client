@@ -2,6 +2,7 @@ import { lazy } from 'react';
 
 import { LayoutBasic } from '@components/layouts/basic';
 import { LayoutCodeEditor } from '@components/layouts/codeEditor';
+import Callback from '@components/login/callback';
 import { NotFound } from '@views/notFound';
 
 const Home = lazy(() => import('../views/home'));
@@ -28,6 +29,16 @@ export const routes = () => ([
           {
             path: '',
             element: <CodeEditor />,
+          },
+        ],
+      },
+      {
+        path: 'login-callback',
+        element: <LayoutBasic hasFooter />,
+        children: [
+          {
+            path: '',
+            element: <Callback />,
           },
         ],
       },
