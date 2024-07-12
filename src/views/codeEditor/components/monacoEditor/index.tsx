@@ -186,6 +186,11 @@ export const MonacoEditor = () => {
       type: '@@-console-message-reset',
     });
 
+    busDispatch({
+      type: '@@-problems-message',
+      data: [],
+    });
+
     let code = 'console.log("Hello, World!");';
     if (!!snippetIndex) {
       const selectedCodeSnippet = snippets.find((f) => f.id === snippetIndex) || snippets[0];
