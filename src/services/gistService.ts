@@ -31,6 +31,7 @@ export const uploadSnippet = async () => {
     files,
     publicGist: true,
   };
+  //send request to the server
   const response = await axios.post(`${SERVER_URL}/gists`, body, { withCredentials: true });
 
   console.log('response', response);
