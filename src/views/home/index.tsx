@@ -8,7 +8,7 @@ const Home = () => {
       <div className="flex flex-col">
         <h1
           className={cn(
-            'pb-4',
+            'pb-4 text-center',
             'text-h3-bold lg:text-h2-bold',
             'before:text-dev-pink-500 before:content-["["]',
             'after:text-dev-pink-500 after:content-["]"]',
