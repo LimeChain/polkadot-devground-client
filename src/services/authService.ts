@@ -4,6 +4,7 @@ import {
   SERVER_URL,
   STORAGE_AUTH_CACHE_NAME,
   STORAGE_AUTH_JWT_TOKEN,
+  STORAGE_AUTH_SUCCESSFUL_REDIRECT_TO,
 } from '@constants/auth';
 import {
   storageGetItem,
@@ -18,7 +19,16 @@ const AUTH_URL = `${SERVER_URL}/auth`;
 const authoriseGitHubApp = () => {
   const githubClientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
   const githubApiUrl = import.meta.env.VITE_GITHUB_API_URL;
-  window.location.assign(githubApiUrl + githubClientId + '&scope=user:email%20gist');
+
+  const { pathname, search } = window.location;
+  window.localStorage.setItem(
+    STORAGE_AUTH_SUCCESSFUL_REDIRECT_TO,
+    `${pathname}${search}`,
+  );
+
+  window.location.assign(
+    githubApiUrl + githubClientId + '&scope=user:email%20gist',
+  );
 };
 
 const login = async (code: string): Promise<IAuthResponse> => {

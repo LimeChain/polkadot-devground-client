@@ -19,6 +19,7 @@ import {
 } from 'react-resizable-panels';
 import { getSingletonHighlighter } from 'shiki/index.mjs';
 
+import { GithubButton } from '@components/githubButton';
 import { Icon } from '@components/icon';
 import { Button } from '@components/ui';
 import { useStoreUI } from '@stores';
@@ -398,16 +399,19 @@ const TypeScriptEditor = () => {
 
   return (
     <div className="max-w-screen flex h-full flex-col overflow-hidden">
-      <div className="mb-4 flex flex-wrap gap-x-4 self-end">
-        {snippets.map((snippet) => (
-          <Button
-            key={snippet.id}
-            onClick={handleClick}
-            data-example={snippet.id}
-          >
+      <div className="flex items-center justify-between p-4">
+        <div className=" flex flex-wrap gap-x-4 self-end">
+          {snippets.map((snippet) => (
+            <Button
+              key={snippet.id}
+              onClick={handleClick}
+              data-example={snippet.id}
+            >
             Demo {snippet.id}
-          </Button>
-        ))}
+            </Button>
+          ))}
+        </div>
+        <GithubButton />
       </div>
       <div className="relative flex flex-1">
         <PanelGroup

@@ -4,6 +4,7 @@ import {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { STORAGE_AUTH_SUCCESSFUL_REDIRECT_TO } from '@constants/auth';
 import { useAuthStore } from '@stores';
 
 const Callback = () => {
@@ -23,14 +24,14 @@ const Callback = () => {
 
       codeUsed.current = true;
       const token = await login(code);
+      const successRedirectTo = window.localStorage.getItem(STORAGE_AUTH_SUCCESSFUL_REDIRECT_TO);
 
-      if (token) {
-        navigate('/');
+      if (token && successRedirectTo) {
+        navigate(successRedirectTo || '/');
       }
     };
 
     void getAccessToken();
-    //get the access token from the code
 
   }, [navigate, login]);
 
