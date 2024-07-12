@@ -2,7 +2,7 @@ import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 
 import { Icon } from '@components/icon';
 import { ModalChainSelect } from '@components/modals/modalChainSelect';
-import { useStoreChain } from 'src/stores/chain';
+import { useStoreChain } from '@stores';
 
 const ChainSelectButton = () => {
   const [

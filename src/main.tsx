@@ -14,11 +14,11 @@ import './assets/workers/monaco-worker';
 import 'virtual:svg-icons-register';
 import './services/axiosSetup';
 createRoot(document.getElementById('pd-root')!).render(
-  <React.StrictMode>
-    <HelmetProvider>
-      <Helmet defaultTitle="Polkadot Devground" titleTemplate="%s - Polkadot Devground" />
-      <App />
-      <ReloadPrompt />
-    </HelmetProvider>
-  </React.StrictMode>,
+  // <React.StrictMode>
+  <HelmetProvider>
+    <Helmet defaultTitle="Polkadot Devground" titleTemplate="%s - Polkadot Devground" />
+    <App />
+    <ReloadPrompt />
+  </HelmetProvider>,
+  // </React.StrictMode>,
 );

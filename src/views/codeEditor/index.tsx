@@ -2,13 +2,10 @@ import {
   busDispatch,
   useEventBus,
 } from '@pivanov/event-bus';
-import * as papiDescriptors from '@polkadot-api/descriptors';
+import * as PAPI_SIGNER from '@polkadot-api/signer';
+import * as PAPI_WS_PROVIDER_WEB from '@polkadot-api/ws-provider/web';
 import { shikiToMonaco } from '@shikijs/monaco/index.mjs';
 import * as monaco from 'monaco-editor';
-import { format } from 'prettier';
-// eslint-disable-next-line import/default
-import prettierPluginEstree from 'prettier/plugins/estree';
-import parserTypeScript from 'prettier/plugins/typescript';
 import {
   useCallback,
   useEffect,
@@ -24,6 +21,7 @@ import { getSingletonHighlighter } from 'shiki/index.mjs';
 
 import { Icon } from '@components/icon';
 import { Button } from '@components/ui';
+import { useStoreUI } from '@stores';
 import {
   cn,
   getSearchParam,
@@ -36,24 +34,28 @@ import {
   storageSetItem,
 } from '@utils/storage';
 
-import { Console } from './console';
 import {
   STORAGE_CACHE_NAME,
   STORAGE_PREFIX,
 } from './constants';
 import {
+  formatCode,
   prettyPrintMessage,
   setupAta,
 } from './helpers';
 import { Iframe } from './iframe';
 import { monacoEditorConfig } from './monaco-editor-config';
+import { PannelDebug } from './pannelDebug';
+import { Progress } from './progress';
 import { snippets } from './snippets';
 
 import type {
+  IEventBusCodeEditorTypesProgress,
   IEventBusConsoleMessage,
   IEventBusConsoleMessageReset,
   IEventBusDemoCode,
   IEventBusDemoCodeIndex,
+  IEventBusErrorItem,
   IEventBusIframeDestroy,
 } from '@custom-types/eventBus';
 import type { IConsoleMessage } from '@custom-types/global';
@@ -62,77 +64,191 @@ const fetchType = setupAta(
   (code, path) => {
     monaco.languages.typescript.typescriptDefaults.addExtraLib(code, `file://${path}`);
   },
+  () => {
+    // console.log('Finished downloading all files', files);
+  },
+  () => {
+    // console.log('Started downloading files');
+  },
+  (userFacingMessage, error) => {
+    console.error('Custom error handling:', userFacingMessage, error);
+  },
+  (progress) => {
+    busDispatch<IEventBusCodeEditorTypesProgress>({
+      type: '@@-code-editor-types-progress',
+      data: progress,
+    });
+  },
 );
+
+monaco.languages.css.cssDefaults.setOptions({ validate: false });
+
+monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+  noSemanticValidation: false,
+  noSyntaxValidation: false,
+});
+
+monaco.languages.typescript.typescriptDefaults.addExtraLib(`
+  declare const papiDescriptors = {
+    dot: unknown,
+    rococo: unknown,
+  };
+`, 'papiDescriptors.d.ts');
+
+monaco.languages.typescript.typescriptDefaults.addExtraLib(`
+  declare module 'polkadot-api/ws-provider/web' {
+    export { ${Object.keys(PAPI_WS_PROVIDER_WEB)} } from 'polkadot-api/ws-provider/web';
+  }
+
+  declare module 'polkadot-api/signer' {
+    export { ${Object.keys(PAPI_SIGNER)} } from 'polkadot-api/signer';
+  }
+`, 'papi.d.ts');
+
+monaco.languages.typescript.typescriptDefaults.addExtraLib(
+  '<<react-definition-file>>',
+  'file:///node_modules/@react/types/index.d.ts',
+);
+
+const compilerOptions: monaco.languages.typescript.CompilerOptions = {
+  experimentalDecorators: true,
+  emitDecoratorMetadata: true,
+  allowSyntheticDefaultImports: true,
+  allowUmdGlobalAccess: true,
+  jsxFactory: 'React.createElement',
+  lib: ['esnext', 'dom'],
+  skipLibCheck: true,
+  isolatedModules: true,
+  resolveJsonModule: true,
+  verbatimModuleSyntax: true,
+  target: monaco.languages.typescript.ScriptTarget.ESNext,
+  allowNonTsExtensions: true,
+  moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+  module: monaco.languages.typescript.ModuleKind.ESNext,
+  noEmit: true,
+  noUnusedLocals: true,
+  noUnusedParameters: true,
+  esModuleInterop: true,
+  jsx: monaco.languages.typescript.JsxEmit.ReactJSX,
+  reactNamespace: 'React',
+  allowJs: true,
+  typeRoots: ['node_modules/@types'],
+};
+
+monaco.languages.typescript.typescriptDefaults.setCompilerOptions(compilerOptions);
 
 const TypeScriptEditor = () => {
   const refTimeout = useRef<NodeJS.Timeout>();
   const refExampleIndex = useRef<number>(1);
   const refEditor = useRef<HTMLDivElement | null>(null);
   const refMonacoEditor = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const refModel = useRef<monaco.editor.ITextModel | null>(null);
   const refCode = useRef<string>('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const theme = useStoreUI.use.theme?.();
+
+  useEffect(() => {
+    const loadHighlighter = async () => {
+      const currentTheme = theme === 'dark' ? 'one-dark-pro' : 'github-light';
+      const highlighter = await getSingletonHighlighter({
+        themes: ['one-dark-pro', 'github-light'],
+        langs: ['tsx', 'typescript', 'json'],
+      });
+
+      shikiToMonaco(highlighter, monaco);
+      monaco.editor.setTheme(currentTheme);
+    };
+
+    const timeoutId = setTimeout(loadHighlighter, 40);
+    return () => clearTimeout(timeoutId);
+  }, [theme]);
+
+  const createNewModel = (value: string) => {
+    refModel.current?.dispose();
+
+    const modelUri = monaco.Uri.parse('file:///main-script.tsx');
+    refModel.current = monaco.editor.createModel(value, 'typescript', modelUri);
+    refMonacoEditor.current?.setModel(refModel.current);
+  };
+
+  const triggerValidation = useCallback(async () => {
+    if (refModel.current) {
+      const worker = await monaco.languages.typescript.getTypeScriptWorker();
+      const client = await worker(refModel.current.uri);
+
+      const [syntacticDiagnostics, semanticDiagnostics] = await Promise.all([
+        client.getSyntacticDiagnostics(refModel.current.uri.toString()),
+        client.getSemanticDiagnostics(refModel.current.uri.toString()),
+      ]);
+
+      const allDiagnostics = [...syntacticDiagnostics, ...semanticDiagnostics];
+
+      const markers = allDiagnostics.map((diag) => {
+        const startPos = refModel.current!.getPositionAt(diag.start || 0);
+        const endPos = refModel.current!.getPositionAt(
+          (diag.start || 0) + (diag.length || 0),
+        );
+
+        return {
+          severity: monaco.MarkerSeverity.Error,
+          startLineNumber: startPos.lineNumber,
+          startColumn: startPos.column,
+          endLineNumber: endPos.lineNumber,
+          endColumn: endPos.column,
+          message:
+            diag.code === 2307
+              ? 'Unable to compile due to a missing module. Please ensure all modules are installed and properly configured.'
+              : typeof diag.messageText === 'string'
+                ? diag.messageText
+                : diag.messageText.messageText,
+        };
+      });
+
+      monaco.editor.setModelMarkers(refModel.current, 'typescript', markers);
+
+      setTimeout(() => {
+        busDispatch<IEventBusErrorItem>({
+          type: '@@-problems-message',
+          data: markers,
+        });
+      }, 40);
+    }
+  }, []);
+
   useEffect(() => {
     if (refEditor.current) {
-      void (async () => {
-        const highlighter = await getSingletonHighlighter({
-          themes: ['one-dark-pro', 'catppuccin-latte'],
-          langs: ['tsx', 'typescript', 'json'],
-        });
-        shikiToMonaco(highlighter, monaco);
-      })();
-
-      // disable CSS validation
-      monaco.languages.css.cssDefaults.setOptions({ validate: false });
-
-      monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-        noSemanticValidation: true,
-        noSyntaxValidation: true,
-      });
+      createNewModel(refCode.current);
 
       refMonacoEditor.current = monaco.editor.create(refEditor.current, {
         ...monacoEditorConfig,
-        value: refCode.current,
-        language: 'typescript',
-        theme: 'one-dark-pro',
+        model: refModel.current,
         automaticLayout: true,
         folding: true,
       });
 
-      const compilerOptions = {
-        experimentalDecorators: true,
-        emitDecoratorMetadata: true,
-        allowSyntheticDefaultImports: true,
-        allowUmdGlobalAccess: true,
-        esModuleInterop: true,
-        jsx: monaco.languages.typescript.JsxEmit.ReactJSX,
-        module: monaco.languages.typescript.ModuleKind.CommonJS,
-        lib: ['esnext', 'dom'],
-        typeRoots: ['node_modules/@types'],
-        skipLibCheck: true,
-        resolveJsonModule: true,
-        target: monaco.languages.typescript.ScriptTarget.Latest,
-        allowNonTsExtensions: true,
-        noEmit: true,
-        strict: true,
-        moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+      refMonacoEditor.current.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, async () => {
+        if (refMonacoEditor.current) {
+          clearTimeout(refTimeout.current);
+          const currentPosition = refMonacoEditor.current.getPosition();
 
-        reactNamespace: 'React',
-        allowJs: true,
-      };
+          const code = refMonacoEditor.current.getValue() || '';
+          refCode.current = await formatCode(code);
+          createNewModel(refCode.current);
 
-      monaco.languages.typescript.typescriptDefaults.setCompilerOptions(compilerOptions);
+          if (currentPosition) {
+            refMonacoEditor.current.setPosition(currentPosition);
+            refMonacoEditor.current.revealPositionInCenter(currentPosition);
+          }
 
-      monaco.languages.typescript.typescriptDefaults.addExtraLib(`
-        declare const papiDescriptors = ${JSON.stringify(papiDescriptors)};
-      `, 'papiDescriptors.d.ts');
-
-      monaco.languages.typescript.typescriptDefaults.addExtraLib(
-        '<<react-definition-file>>',
-        'file:///node_modules/@react/types/index.d.ts',
+          refTimeout.current = setTimeout(() => {
+            void triggerValidation();
+          }, 400);
+        }
+      },
       );
 
-      refMonacoEditor.current?.onDidChangeModelContent(() => {
+      refMonacoEditor.current.onDidChangeModelContent(() => {
         clearTimeout(refTimeout.current);
         refCode.current = refMonacoEditor.current?.getValue() || '';
 
@@ -143,7 +259,16 @@ const TypeScriptEditor = () => {
         );
 
         refTimeout.current = setTimeout(() => {
-          void fetchType(refCode.current);
+          busDispatch<IEventBusCodeEditorTypesProgress>({
+            type: '@@-code-editor-types-progress',
+            data: 0,
+          });
+
+          refTimeout.current = setTimeout(async () => {
+            await fetchType(refCode.current);
+
+            void triggerValidation();
+          }, 40);
         }, 400);
       });
     }
@@ -151,72 +276,58 @@ const TypeScriptEditor = () => {
     return () => {
       clearTimeout(refTimeout.current);
       refMonacoEditor.current?.dispose();
+      refModel.current?.dispose();
     };
+  }, [triggerValidation]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const loadSnippet = useCallback(
+    async (codeSnippetIndex: number) => {
+      clearTimeout(refTimeout.current);
 
-  const loadSnippet = useCallback(async (codeSnippetIndex: number) => {
-    clearTimeout(refTimeout.current);
-    // destroyIframe();
+      setIsLoading(true);
 
-    setIsLoading(true);
+      busDispatch<IEventBusConsoleMessageReset>({
+        type: '@@-console-message-reset',
+      });
 
-    busDispatch<IEventBusConsoleMessageReset>({
-      type: '@@-console-message-reset',
-    });
+      const selectedCodeSnippet =
+        snippets.find((f) => f.id === codeSnippetIndex) || snippets[0];
 
-    const selectedCodeSnippet = snippets.find(f => f.id === codeSnippetIndex) || snippets[0];
+      refExampleIndex.current = selectedCodeSnippet.id;
 
-    refExampleIndex.current = selectedCodeSnippet.id;
-
-    const isTempVersionExist = await storageExists(
-      STORAGE_CACHE_NAME,
-      `${STORAGE_PREFIX}-${codeSnippetIndex}`,
-    );
-    let code = selectedCodeSnippet.code;
-
-    if (isTempVersionExist) {
-      const existingCode = await storageGetItem<string>(
+      const isTempVersionExist = await storageExists(
         STORAGE_CACHE_NAME,
         `${STORAGE_PREFIX}-${codeSnippetIndex}`,
       );
-      code = existingCode || code;
-    }
-    const formattedCodeSnippet = await format(code, {
-      parser: 'typescript',
-      plugins: [parserTypeScript, prettierPluginEstree],
-      semi: true,
-      singleQuote: false,
-      trailingComma: 'all',
-      bracketSpacing: true,
-      arrowParens: 'always',
-    });
+      let code = selectedCodeSnippet.code;
 
-    refCode.current = formattedCodeSnippet;
+      if (isTempVersionExist) {
+        const existingCode = await storageGetItem<string>(
+          STORAGE_CACHE_NAME,
+          `${STORAGE_PREFIX}-${codeSnippetIndex}`,
+        );
+        code = existingCode || code;
+      }
 
-    setSearchParam('s', codeSnippetIndex);
+      refCode.current = await formatCode(code);
 
-    refTimeout.current = setTimeout(async () => {
-      refMonacoEditor.current?.setValue(refCode.current);
-      refMonacoEditor.current?.trigger(null, 'editor.fold', {
-        selectionLines: [2],
-      });
+      setSearchParam('s', codeSnippetIndex);
+
+      createNewModel(refCode.current);
 
       refTimeout.current = setTimeout(async () => {
         setIsLoading(false);
+        await fetchType(refCode.current);
+        void triggerValidation();
       }, 400);
-    }, 200);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    },
+    [triggerValidation],
+  );
 
   useEffect(() => {
     const snippetIndex = getSearchParam('s') || 1;
     void loadSnippet(Number(snippetIndex));
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loadSnippet]);
 
   useEventBus<IEventBusDemoCodeIndex>('@@-example-code-index', ({ data }) => {
     void loadSnippet(data);
@@ -228,8 +339,6 @@ const TypeScriptEditor = () => {
       type: '@@-example-code',
       data: refCode.current,
     });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleClear = useCallback(() => {
@@ -244,21 +353,24 @@ const TypeScriptEditor = () => {
     });
 
     window.location.reload();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleReloadSnipped = useCallback(() => {
-    void storageRemoveItem(STORAGE_CACHE_NAME, `${STORAGE_PREFIX}-${refExampleIndex.current}`);
+  const handleReloadSnippet = useCallback(() => {
+    void storageRemoveItem(
+      STORAGE_CACHE_NAME,
+      `${STORAGE_PREFIX}-${refExampleIndex.current}`,
+    );
     window.location.reload();
   }, []);
 
   const handleMessage = useCallback((event: MessageEvent) => {
     if (event.data.type === 'customLog') {
-      const messages: IConsoleMessage[] = [{
-        ts: new Date().getTime(),
-        message: prettyPrintMessage(event.data.args.join(' ')),
-      }];
+      const messages: IConsoleMessage[] = [
+        {
+          ts: new Date().getTime(),
+          message: prettyPrintMessage(event.data.args.join(' ')),
+        },
+      ];
 
       busDispatch<IEventBusConsoleMessage>({
         type: '@@-console-message',
@@ -282,8 +394,6 @@ const TypeScriptEditor = () => {
       type: '@@-example-code-index',
       data: exampleIndex,
     });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -311,17 +421,15 @@ const TypeScriptEditor = () => {
           )}
         >
           <Panel
+            id="left"
+            order={1}
             defaultSize={50}
             minSize={30}
             className="relative"
           >
-            <div
-              ref={refEditor}
-              className="size-full"
-            />
-            <div
-              className={cn('absolute left-0 top-0', 'flex flex-col gap-y-3')}
-            >
+            <div ref={refEditor} className="size-full" />
+            <Progress classNames="absolute top-2 right-6 z-100" size={18} />
+            <div className={cn('absolute left-0 top-0', 'flex flex-col gap-y-3')}>
               <button
                 type="button"
                 className={cn(
@@ -330,7 +438,7 @@ const TypeScriptEditor = () => {
                   'text-gray-500 hover:text-gray-300',
                   'transition-colors duration-300',
                 )}
-                onClick={handleReloadSnipped}
+                onClick={handleReloadSnippet}
               >
                 <Icon name="icon-reload" size={[16]} />
               </button>
@@ -349,9 +457,14 @@ const TypeScriptEditor = () => {
             />
           </PanelResizeHandle>
 
-          <Panel defaultSize={50} minSize={30}>
+          <Panel
+            id="right"
+            order={2}
+            defaultSize={50}
+            minSize={30}
+          >
             <PanelGroup direction="vertical" autoSaveId="conditional">
-              <div className="flex h-10 w-full items-center justify-start bg-[#151515] px-3">
+              <div className="flex h-10 w-full items-center justify-start bg-white px-3 dark:bg-[#282c34]">
                 <div className="flex items-center justify-start space-x-1.5">
                   <span className="size-3 rounded-full bg-red-400" />
                   <span className="size-3 rounded-full bg-yellow-400" />
@@ -395,48 +508,44 @@ const TypeScriptEditor = () => {
                 </div>
               </div>
 
-              {
-                canPreview && (
-                  <>
-                    <Panel
-                      order={1}
-                      defaultSize={50}
-                      className="flex"
-                    >
-                      <div className="flex-1">
-                        <div className="relative size-full border-t-0 bg-[#151515]">
-                          <Iframe />
-                        </div>
+              {canPreview && (
+                <>
+                  <Panel
+                    id="right-top"
+                    order={1}
+                    defaultSize={50}
+                    className="flex"
+                  >
+                    <div className="flex-1">
+                      <div className="relative size-full border-t-0 bg-white dark:bg-[#282c34]">
+                        <Iframe />
                       </div>
-                    </Panel>
+                    </div>
+                  </Panel>
 
-                    <PanelResizeHandle className="group relative h-4">
-                      <div
-                        className={cn(
-                          'absolute inset-x-0 top-1/2',
-                          'h-[4px]',
-                          'group-hover:bg-purple-500 group-active:bg-purple-500',
-                          'transition-colors duration-300 ease-in-out',
-                          '-translate-y-1/2',
-                        )}
-                      />
-                    </PanelResizeHandle>
-                  </>
-                )
-              }
+                  <PanelResizeHandle className="group relative h-4">
+                    <div
+                      className={cn(
+                        'absolute inset-x-0 top-1/2',
+                        'h-[4px]',
+                        'group-hover:bg-purple-500 group-active:bg-purple-500',
+                        'transition-colors duration-300 ease-in-out',
+                        '-translate-y-1/2',
+                      )}
+                    />
+                  </PanelResizeHandle>
+                </>
+              )}
 
               <Panel
+                id="right-bottom"
                 order={2}
                 defaultSize={50}
                 minSize={30}
-                className="relative bg-[#151515]"
+                className="relative bg-white dark:bg-[#282c34]"
               >
-                {
-                  !canPreview && (
-                    <Iframe classNames="hidden" />
-                  )
-                }
-                <Console />
+                <PannelDebug />
+                {!canPreview && <Iframe classNames="hidden" />}
               </Panel>
             </PanelGroup>
           </Panel>
@@ -444,9 +553,10 @@ const TypeScriptEditor = () => {
 
         <div
           className={cn(
-            `absolute inset-0 z-20 flex items-center justify-center`,
+            'absolute inset-0 flex items-center justify-center',
             'pointer-events-none opacity-0',
             'transition-opacity duration-300 ease-in-out',
+            'z-100',
             {
               'opacity-100': isLoading,
             },

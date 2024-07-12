@@ -3,6 +3,7 @@ import { resolve } from 'path';
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
@@ -38,9 +39,20 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 6 MB limit
       },
     }),
+    viteStaticCopy({
+      targets: [
+        {
+          src: 'node_modules/prism-themes/themes/prism-one-dark.css',
+          dest: 'prismjs/css',
+        },
+        {
+          src: 'node_modules/prism-themes/themes/prism-one-light.css',
+          dest: 'prismjs/css',
+        },
+      ],
+    }),
   ],
   build: {
-    minify: 'terser',
     rollupOptions: {
       output: {
         manualChunks: (id) => {
@@ -91,5 +103,8 @@ export default defineConfig({
         },
       },
     },
+  },
+  optimizeDeps: {
+    include: ['monaco-editor'],
   },
 });
