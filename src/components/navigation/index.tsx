@@ -1,6 +1,9 @@
 import { useLocation } from 'react-router-dom';
 
-import { PDLink } from '@components/ui/PDLink';
+import { NAVIGATION_ITEMS } from '@constants/navigation';
+import { cn } from '@utils/helpers';
+
+import { NavigationItem } from './navigationItem';
 
 export const Navigation = () => {
   const { pathname } = useLocation();
@@ -11,13 +14,21 @@ export const Navigation = () => {
   }
 
   return (
-    <div>
-      <PDLink
-        to="/explorer"
-        className="-mt-2 text-current hover:text-current"
-      >
-        <span> Explore </span>
-      </PDLink>
+    <div className={cn(
+      'flex items-center gap-5',
+      'font-geist text-body2-regular',
+    )}
+    >
+      {
+        NAVIGATION_ITEMS.map((item, index) => {
+          return (
+            <NavigationItem
+              key={`nav-item-${index}`}
+              {...item}
+            />
+          );
+        })
+      }
     </div>
   );
 };
