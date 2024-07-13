@@ -16,7 +16,6 @@ import {
 import { routes } from './routes';
 
 export const App = () => {
-
   const refRoutes = useRef(createBrowserRouter(routes()));
   const initStoreAuth = useStoreAuth.use.init?.();
   const { resetStore: resetStoreAuth } = useStoreAuth.use.actions();
