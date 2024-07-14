@@ -112,7 +112,13 @@ export const Iframe = (props: IframeProps) => {
         ref={refIframe}
         src={blobUrl}
         onLoad={onLoad}
-        className={cn('size-full flex-1 border-0', classNames)}
+        className={cn(
+          'size-full flex-1 border-0',
+          {
+            ['hidden']: blobUrl === '',
+          },
+          classNames,
+        )}
       />
       <div
         className={cn(

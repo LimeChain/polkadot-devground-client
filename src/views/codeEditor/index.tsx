@@ -18,20 +18,23 @@ import { MonacoEditor } from './components/monacoEditor';
 import { EditorActions } from './components/monacoEditor/actions';
 import { SnippetsSwitcher } from './components/snippetsSwitcher';
 
-import type { IEventBusMonacoEditorLoadSnippet } from '@custom-types/eventBus';
+import type {
+  IEventBusMonacoEditorLoadSnippet,
+  IEventBusMonacoEditorShowPreview,
+} from '@custom-types/eventBus';
 
 const TypeScriptEditor = () => {
   const refTimeout = useRef<NodeJS.Timeout>();
   const refCanPreview = useRef(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  useEventBus<IEventBusMonacoEditorLoadSnippet>('@@-monaco-editor-load-snippet', ({ data }) => {
+  useEventBus<IEventBusMonacoEditorShowPreview>('@@-monaco-editor-show-preview', ({ data }) => {
+    refCanPreview.current = data;
+  });
+
+  useEventBus<IEventBusMonacoEditorLoadSnippet>('@@-monaco-editor-load-snippet', () => {
     clearTimeout(refTimeout.current);
     setIsLoaded(false);
-
-    refTimeout.current = setTimeout(() => {
-      refCanPreview.current = data.isTSX;
-    }, 200);
   });
 
   useEventBus('@@-monaco-editor-hide-loading', () => {

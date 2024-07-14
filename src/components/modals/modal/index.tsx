@@ -49,7 +49,7 @@ export const Modal = ({ onClose, children, className }:IModal) => {
       <div
         onTransitionEnd={handleTransitionEnd}
         className={cn(
-          'fixed left-0 top-0 z-[99] size-full cursor-pointer opacity-0 transition-opacity',
+          'fixed left-0 top-0 z-[99] size-full opacity-0 transition-opacity',
           'bg-dev-purple-50 dark:bg-dev-black-1000',
           { 'opacity-70': open },
         )}

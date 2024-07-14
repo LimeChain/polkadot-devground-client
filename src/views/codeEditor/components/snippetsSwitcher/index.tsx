@@ -1,7 +1,6 @@
 import { busDispatch } from '@pivanov/event-bus';
 import { useCallback } from 'react';
 
-
 import { GithubButton } from '@components/githubButton';
 import { Button } from '@components/ui';
 import { snippets } from '@constants/snippets';
@@ -15,7 +14,6 @@ export const SnippetsSwitcher = () => {
       type: '@@-monaco-editor-load-snippet',
       data: {
         snippetIndex,
-        isTSX: !!snippets.find((snippet) => snippet.id === snippetIndex)?.isTSX,
       },
     });
   }, []);

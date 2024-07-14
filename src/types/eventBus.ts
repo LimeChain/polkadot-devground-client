@@ -5,6 +5,11 @@ import type {
 } from './global';
 import type * as monaco from 'monaco-editor';
 
+export interface IEventBusMonacoEditorShowPreview {
+  type: '@@-monaco-editor-show-preview';
+  data: boolean;
+}
+
 export interface IEventBusMonacoEditorUpdateCode {
   type: '@@-monaco-editor-update-code';
   data: string;
@@ -19,7 +24,6 @@ export interface IEventBusMonacoEditorLoadSnippet {
   type: '@@-monaco-editor-load-snippet';
   data: {
     snippetIndex: number;
-    isTSX: boolean;
   };
 }
 
