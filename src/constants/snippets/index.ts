@@ -209,7 +209,6 @@ const snippet5: ICodeSnippet = {
 
 const snippet6: ICodeSnippet = {
   id: 6,
-  isTSX: true,
   code: `
   import { create } from "@shined/reactive";
   import { createRoot } from "react-dom/client";

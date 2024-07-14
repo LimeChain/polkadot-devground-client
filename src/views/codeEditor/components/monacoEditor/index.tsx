@@ -91,6 +91,17 @@ const compilerOptions: monaco.languages.typescript.CompilerOptions = {
 
 monaco.languages.typescript.typescriptDefaults.setCompilerOptions(compilerOptions);
 
+const checkTheme = async (theme: string) => {
+  const currentTheme = theme === 'dark' ? 'github-dark' : 'github-light';
+  const highlighter = await getSingletonHighlighter({
+    themes: ['github-dark', 'github-light'],
+    langs: ['tsx', 'typescript', 'json'],
+  });
+
+  shikiToMonaco(highlighter, monaco);
+  monaco.editor.setTheme(currentTheme);
+};
+
 export const MonacoEditor = () => {
   const refTimeout = useRef<NodeJS.Timeout>();
 
@@ -149,6 +160,7 @@ export const MonacoEditor = () => {
       monaco.languages.typescript.typescriptDefaults.addExtraLib(code, `file://${path}`);
     },
     () => {
+      void checkTheme(theme);
       void triggerValidation();
     },
     () => {},
@@ -170,6 +182,7 @@ export const MonacoEditor = () => {
     refMonacoEditor.current?.setModel(refModel.current);
 
     await fetchType(refSnippet.current);
+
     refMonacoEditor.current?.focus();
     void triggerValidation();
 
@@ -215,6 +228,11 @@ export const MonacoEditor = () => {
     refSnippet.current = await formatCode(code);
     void createNewModel(refSnippet.current);
 
+    busDispatch({
+      type: '@@-monaco-editor-show-preview',
+      data: refSnippet.current.includes('createRoot'),
+    });
+
     refTimeout.current = setTimeout(async () => {
       busDispatch({
         type: '@@-monaco-editor-hide-loading',
@@ -240,16 +258,7 @@ export const MonacoEditor = () => {
   }, []);
 
   useEffect(() => {
-    void (async () => {
-      const currentTheme = theme === 'dark' ? 'github-dark' : 'github-light';
-      const highlighter = await getSingletonHighlighter({
-        themes: ['github-dark', 'github-light'],
-        langs: ['tsx', 'typescript', 'json'],
-      });
-
-      shikiToMonaco(highlighter, monaco);
-      monaco.editor.setTheme(currentTheme);
-    })();
+    void checkTheme(theme);
   }, [theme]);
 
   useEffect(() => {
@@ -276,7 +285,6 @@ export const MonacoEditor = () => {
           await fetchType(refSnippet.current);
 
           refTimeout.current = setTimeout(() => {
-            console.log('@@@ pivanov');
             void triggerValidation();
           }, 400);
         }
@@ -296,6 +304,11 @@ export const MonacoEditor = () => {
           data: refSnippet.current,
         });
 
+        busDispatch({
+          type: '@@-monaco-editor-show-preview',
+          data: refSnippet.current.includes('createRoot'),
+        });
+
         refTimeout.current = setTimeout(() => {
           busDispatch({
             type: '@@-monaco-editor-types-progress',
@@ -305,6 +318,7 @@ export const MonacoEditor = () => {
           updateMonacoCursorPositon(currentPosition!);
 
           refTimeout.current = setTimeout(async () => {
+            await fetchType(refSnippet.current);
             void triggerValidation();
           }, 40);
         }, 0);
