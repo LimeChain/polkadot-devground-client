@@ -1,5 +1,4 @@
-import { Icon } from '@components/icon';
-import { PDLink } from '@components/ui/PDLink';
+import FeatureCard from '@components/featureCard';
 import { cn } from '@utils/helpers';
 
 const Home = () => {
@@ -22,92 +21,27 @@ const Home = () => {
         </p>
 
         <div className="grid w-full max-w-[880px] grid-cols-1 gap-4 md:grid-cols-2">
-          <PDLink
-            to="https://github.com/LimeChain/polkadot-devground-client"
-            target="_blank"
-            className={cn(
-              'group',
-              'relative',
-              'flex flex-1 flex-col',
-              'p-6',
-              'min-h-[320px]',
-              '!text-current',
-              'border border-transparent hover:border-dev-pink-500',
-              'transition-border-colors duration-200 ease-linear',
-              'bg-dev-purple-100 dark:bg-dev-black-900',
-
-              'after:pointer-events-none after:absolute after:opacity-0 after:content-[""]',
-              'after:-right-3/4 after:-top-3/4 after:size-3/4 after:bg-dev-purple-500 after:blur-[150px]',
-              'after:transition-opacity after:duration-200',
-              'hover:after:opacity-100',
-              'overflow-hidden',
-            )}
-          >
-            <Icon
-              name="icon-linkArrow"
-              className={cn(
-                'absolute right-4 top-4',
-                'transition-transform duration-200 ease-linear',
-                'group-hover:-translate-y-1 group-hover:translate-x-1',
-              )}
-            />
-
-            <Icon
-              name="icon-github"
-              className="mb-8 text-dev-pink-500"
-              size={[40]}
-            />
-
-            <h4 className="mb-2 text-h4-bold">
-              Code
-            </h4>
-            <p className="text-body2-regular text-dev-black-300 dark:text-dev-purple-300">
-              Explore our GitHub repository for comprehensive documentation, code examples, and contributions. Join our developer community to enhance your Polkadot projects.
-            </p>
-          </PDLink>
-
-          <PDLink
-            to="/code?s=1"
-            className={cn(
-              'group',
-              'relative',
-              'flex flex-1 flex-col',
-              'p-6',
-              'min-h-[320px]',
-              '!text-current',
-              'border border-transparent hover:border-dev-pink-500',
-              'transition-border-colors duration-200 ease-linear',
-              'bg-dev-purple-100 dark:bg-dev-black-900',
-
-              'after:pointer-events-none after:absolute after:opacity-0 after:content-[""]',
-              'after:-right-3/4 after:-top-3/4 after:size-3/4 after:bg-dev-purple-500 after:blur-[150px]',
-              'after:transition-opacity after:duration-200',
-              'hover:after:opacity-100',
-              'overflow-hidden',
-            )}
-          >
-            <Icon
-              name="icon-linkArrow"
-              className={cn(
-                'absolute right-4 top-4',
-                'transition-transform duration-200 ease-linear',
-                'group-hover:-translate-y-1 group-hover:translate-x-1',
-              )}
-            />
-
-            <Icon
-              name="icon-brackets"
-              className="mb-8 text-dev-pink-500"
-              size={[40]}
-            />
-
-            <h4 className="mb-2 text-h4-bold">
-              Developer Console
-            </h4>
-            <p className="text-body2-regular text-dev-black-300 dark:text-dev-purple-300">
-              Dive into our advanced developer console for seamless on-chain interaction and rapid prototyping. Experience a streamlined, user-friendly environment designed to accelerate your development process and boost productivity.
-            </p>
-          </PDLink>
+          <FeatureCard
+            linkProps={
+              {
+                to: 'https://github.com/LimeChain/polkadot-devground-client',
+                target: '_blank',
+              }
+            }
+            icon="icon-github"
+            title="Code"
+            subTitle="Explore our GitHub repository for comprehensive documentation, code examples, and contributions. Join our developer community to enhance your Polkadot projects."
+          />
+          <FeatureCard
+            linkProps={
+              {
+                to: '/code?s=1',
+              }
+            }
+            icon="icon-brackets"
+            title="Developer Console"
+            subTitle="Dive into our advanced developer console for seamless on-chain interaction and rapid prototyping. Experience a streamlined, user-friendly environment designed to accelerate your development process and boost productivity."
+          />
         </div>
       </div>
     </section>
