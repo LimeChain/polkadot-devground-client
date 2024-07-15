@@ -71,6 +71,7 @@ export const ChainStateBlock = ({ type }: IChainStateBlockProps) => {
     return () => {
       unsubscribe?.();
       setIsLoadingData(true);
+      setValue(0);
     };
   }, [client, type]);
 
