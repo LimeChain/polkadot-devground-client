@@ -1,4 +1,7 @@
 import * as papiDescriptors from '@polkadot-api/descriptors';
+
+// import { createClient } from 'https://esm.sh/polkadot-api@0.10.0';
+import { WebSocketProvider } from 'polkadot-api/ws-provider/web';
 import {
   useEffect,
   useRef,
@@ -10,8 +13,10 @@ import {
 
 import {
   useStoreAuth,
+  useStoreChainClient,
   useStoreUI,
 } from '@stores';
+import { createClient } from 'polkadot-api';
 
 import { routes } from './routes';
 
@@ -21,12 +26,25 @@ export const App = () => {
   const { resetStore: resetStoreAuth } = useStoreAuth.use.actions();
 
   const initStoreUI = useStoreUI.use.init?.();
-  const { resetStore: resetStoreUI } = useStoreUI.use.actions();
+  const initStoreChainClient = useStoreChainClient.use.init();
+  const {
+    resetStore: resetStoreUI,
+  } = useStoreUI.use.actions();
 
   useEffect(() => {
     initStoreAuth();
     initStoreUI();
+    initStoreChainClient();
+
     window.papiDescriptors = papiDescriptors;
+
+    const client = createClient(
+      WebSocketProvider('wss://dot-rpc.stakeworld.io'),
+    );
+
+    client.finalizedBlock$.subscribe((finalizedBlock) =>
+      console.log(finalizedBlock.number, finalizedBlock.hash),
+    );
 
     return () => {
       resetStoreAuth();
