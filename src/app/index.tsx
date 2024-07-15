@@ -26,7 +26,7 @@ export const App = () => {
 
   const initStoreChainClient = useStoreChain.use.init();
   const {
-    resetStore: resetStoreChainClient,
+    resetStore: resetStoreChain,
   } = useStoreChain.use.actions();
 
   const initStoreUI = useStoreUI.use.init?.();
@@ -44,7 +44,7 @@ export const App = () => {
     return () => {
       resetStoreAuth();
       resetStoreUI();
-      resetStoreChainClient();
+      resetStoreChain();
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

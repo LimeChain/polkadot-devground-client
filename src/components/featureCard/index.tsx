@@ -19,16 +19,20 @@ const FeatureCard = ({ icon, linkProps, subTitle, title, className } : IFeatures
     <PDLink
       className={cn(
         'group',
-        'relative overflow-hidden border border-transparent p-6 text-current hover:text-current',
-        'hover:border-dev-pink-500',
-        'flex flex-col',
-        'transition-[border-color] duration-200 ease-linear',
+        'relative',
+        'flex flex-1 flex-col',
+        'p-6',
+        'min-h-[320px]',
+        '!text-current',
+        'border border-transparent hover:border-dev-pink-500',
+        'transition-border-colors duration-200 ease-linear',
         'bg-dev-purple-100 dark:bg-dev-black-900',
 
-        'after:pointer-events-none after:absolute after:z-0 after:opacity-0 after:content-[""]',
+        'after:pointer-events-none after:absolute after:opacity-0 after:content-[""]',
         'after:-right-3/4 after:-top-3/4 after:size-3/4 after:bg-dev-purple-500 after:blur-[150px]',
         'after:transition-opacity after:duration-200',
         'hover:after:opacity-100',
+        'overflow-hidden',
         className,
       )}
       {...linkProps}
