@@ -82,6 +82,8 @@ export const Iframe = (props: IframeProps) => {
     }
 
     const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+    console.log(html);
+
     setBlobUrl(url);
   }, []);
 

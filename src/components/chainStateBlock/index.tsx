@@ -1,33 +1,60 @@
 import {
   useEffect,
-  useRef,
   useState,
 } from 'react';
 
 import { Icon } from '@components/icon';
 import { chainStateBlockData } from '@constants/chainState';
+import { useStoreChainClient } from '@stores';
 import {
   cn,
   formatNumber,
 } from '@utils/helpers';
 
 import type { TChainStateBlock } from '@custom-types/chainState';
+import type { VoidFn } from '@polkadot/api/types';
 
 interface IChainStateBlockProps {
   type: TChainStateBlock;
 }
 
 export const ChainStateBlock = ({ type }: IChainStateBlockProps) => {
+  const api = useStoreChainClient.use.client();
 
   const [value, setValue] = useState(0);
-  const refIsLoading = useRef(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => {
-      setValue(1132312321);
-    }, Math.random() * 1000 + 400);
-    refIsLoading.current = false;
-  }, []);
+    if (!api) {
+      return;
+    }
+
+    let unsubscribe: VoidFn;
+
+    (async () => {
+      if (type === 'finalised-block') {
+        unsubscribe = await api.rpc.chain.subscribeFinalizedHeads((head) => {
+          console.log('finalized head', head.number.toNumber());
+          setValue(head.number.toNumber());
+        });
+      }
+      if (type === 'latest-block') {
+        unsubscribe = await api.rpc.chain.subscribeNewHeads((head) => {
+          console.log('new head', head.number.toNumber());
+
+          setValue(head.number.toNumber());
+        });
+      }
+    })()
+      .finally(() => {
+        setIsLoading(false);
+      })
+      .catch(console.error);
+
+    return () => {
+      unsubscribe?.();
+    };
+  }, [api, type]);
 
   return (
     <div className={cn(
@@ -45,7 +72,7 @@ export const ChainStateBlock = ({ type }: IChainStateBlockProps) => {
         </span>
         <span className="truncate font-geist text-body1-bold">
           {
-            refIsLoading.current
+            isLoading
               ? 'Loading...'
               : formatNumber(value)
           }
