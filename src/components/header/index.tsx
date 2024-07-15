@@ -6,7 +6,7 @@ import { ToggleTheme } from '@components/toggleTheme';
 export const Header = () => {
 
   return (
-    <nav className="flex items-center justify-between px-6 ">
+    <nav className="z-50 flex items-center justify-between px-6">
       <div className="flex items-center gap-12">
         <Logo />
         <Navigation />

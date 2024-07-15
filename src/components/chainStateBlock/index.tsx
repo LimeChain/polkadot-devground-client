@@ -5,56 +5,74 @@ import {
 
 import { Icon } from '@components/icon';
 import { chainStateBlockData } from '@constants/chainState';
-import { useStoreChainClient } from '@stores';
+import {
+  subscribeToCirculatingSupply,
+  subscribeToFinalizedBlocks,
+  subscribeToLatestBlocks,
+} from '@services/chain';
+import { useStoreChain } from '@stores';
 import {
   cn,
   formatNumber,
 } from '@utils/helpers';
 
 import type { TChainStateBlock } from '@custom-types/chainState';
-import type { VoidFn } from '@polkadot/api/types';
 
 interface IChainStateBlockProps {
   type: TChainStateBlock;
 }
 
 export const ChainStateBlock = ({ type }: IChainStateBlockProps) => {
-  const api = useStoreChainClient.use.client();
+  const client = useStoreChain.use.client();
 
   const [value, setValue] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingData, setIsLoadingData] = useState(true);
 
   useEffect(() => {
-    if (!api) {
+    if (!client) {
       return;
     }
 
-    let unsubscribe: VoidFn;
+    let unsubscribe: () => void;
 
     (async () => {
-      if (type === 'finalised-block') {
-        unsubscribe = await api.rpc.chain.subscribeFinalizedHeads((head) => {
-          console.log('finalized head', head.number.toNumber());
-          setValue(head.number.toNumber());
-        });
-      }
-      if (type === 'latest-block') {
-        unsubscribe = await api.rpc.chain.subscribeNewHeads((head) => {
-          console.log('new head', head.number.toNumber());
+      switch (type) {
+        case 'finalised-block':
+          unsubscribe = subscribeToFinalizedBlocks({
+            setData: setValue,
+            setIsLoading: setIsLoadingData,
+          });
+          break;
 
-          setValue(head.number.toNumber());
-        });
+        case 'latest-block':
+          unsubscribe = subscribeToLatestBlocks({
+            setData: setValue,
+            setIsLoading: setIsLoadingData,
+          });
+          break;
+
+        case 'circulating-supply':
+          unsubscribe = subscribeToCirculatingSupply({
+            setData: setValue,
+            setIsLoading: setIsLoadingData,
+          });
+          break;
+
+        default:
+          setIsLoadingData(false);
+          break;
       }
     })()
-      .finally(() => {
-        setIsLoading(false);
-      })
-      .catch(console.error);
+      .catch((error) => {
+        console.error(error);
+        setIsLoadingData(false);
+      });
 
     return () => {
       unsubscribe?.();
+      setIsLoadingData(true);
     };
-  }, [api, type]);
+  }, [client, type]);
 
   return (
     <div className={cn(
@@ -72,7 +90,7 @@ export const ChainStateBlock = ({ type }: IChainStateBlockProps) => {
         </span>
         <span className="truncate font-geist text-body1-bold">
           {
-            isLoading
+            isLoadingData
               ? 'Loading...'
               : formatNumber(value)
           }

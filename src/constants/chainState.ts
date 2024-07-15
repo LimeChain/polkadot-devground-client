@@ -18,7 +18,7 @@ export const chainStateBlockData: {
     icon: 'icon-transfer',
   },
   'circulating-supply': {
-    name: 'Transfers',
+    name: 'Circulating Supply',
     icon: 'icon-transfer',
   },
   'total-accounts': {
@@ -26,7 +26,7 @@ export const chainStateBlockData: {
     icon: 'icon-transfer',
   },
   'transfers': {
-    name: 'Circulating Supply',
+    name: 'Transfers',
     icon: 'icon-transfer',
   },
 };

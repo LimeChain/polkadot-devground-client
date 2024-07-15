@@ -1,7 +1,4 @@
 import * as papiDescriptors from '@polkadot-api/descriptors';
-
-// import { createClient } from 'https://esm.sh/polkadot-api@0.10.0';
-import { WebSocketProvider } from 'polkadot-api/ws-provider/web';
 import {
   useEffect,
   useRef,
@@ -13,7 +10,7 @@ import {
 
 import {
   useStoreAuth,
-  useStoreChainClient,
+  useStoreChain,
   useStoreUI,
 } from '@stores';
 
@@ -21,11 +18,18 @@ import { routes } from './routes';
 
 export const App = () => {
   const refRoutes = useRef(createBrowserRouter(routes()));
+
   const initStoreAuth = useStoreAuth.use.init?.();
-  const { resetStore: resetStoreAuth } = useStoreAuth.use.actions();
+  const {
+    resetStore: resetStoreAuth,
+  } = useStoreAuth.use.actions();
+
+  const initStoreChainClient = useStoreChain.use.init();
+  const {
+    resetStore: resetStoreChainClient,
+  } = useStoreChain.use.actions();
 
   const initStoreUI = useStoreUI.use.init?.();
-  const initStoreChainClient = useStoreChainClient.use.init();
   const {
     resetStore: resetStoreUI,
   } = useStoreUI.use.actions();
@@ -37,17 +41,10 @@ export const App = () => {
 
     window.papiDescriptors = papiDescriptors;
 
-    const client = createClient(
-      WebSocketProvider('wss://dot-rpc.stakeworld.io'),
-    );
-
-    client.finalizedBlock$.subscribe((finalizedBlock) =>
-      console.log(finalizedBlock.number, finalizedBlock.hash),
-    );
-
     return () => {
       resetStoreAuth();
       resetStoreUI();
+      resetStoreChainClient();
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
