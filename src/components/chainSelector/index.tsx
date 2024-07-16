@@ -10,7 +10,7 @@ import {
 
 import { Icon } from '@components/icon';
 import { PDScrollArea } from '@components/scrollArea';
-import { SUPPORTED_CHAIN_GROUPS } from '@constants/chains';
+import { SUPPORTED_CHAIN_GROUPS } from '@constants/chain';
 import { useStoreChain } from '@stores';
 import { cn } from '@utils/helpers';
 
@@ -96,7 +96,7 @@ export const ChainSelector = () => {
                       'transition-colors',
                       ' hover:bg-dev-purple-200 dark:hover:bg-dev-purple-400/20',
                       {
-                        'text-dev-pink-500': chainGroup === selectedChainGroup,
+                        ['text-dev-pink-500']: chainGroup === selectedChainGroup,
                       },
                     )}
                   >

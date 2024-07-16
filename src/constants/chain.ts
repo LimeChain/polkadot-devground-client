@@ -1,3 +1,10 @@
+import {
+  dot,
+  rococo,
+} from '@polkadot-api/descriptors';
+import { chainSpec as polkadotChainSpec } from 'polkadot-api/chains/polkadot';
+import { chainSpec as rococoChainSpec } from 'polkadot-api/chains/rococo_v2_2';
+
 import type { ISupportedChains } from '@custom-types/chain';
 
 export const SUPPORTED_CHAIN_GROUPS: ISupportedChains = {
@@ -25,4 +32,14 @@ export const SUPPORTED_CHAIN_GROUPS: ISupportedChains = {
       },
     ],
   },
+};
+
+export const CHAIN_SPECS = {
+  [SUPPORTED_CHAIN_GROUPS['polkadot'].chains[0].id]: polkadotChainSpec,
+  [SUPPORTED_CHAIN_GROUPS['rococo'].chains[0].id]: rococoChainSpec,
+};
+
+export const CHAIN_DESCRIPTORS = {
+  [SUPPORTED_CHAIN_GROUPS['polkadot'].chains[0].id]: dot,
+  [SUPPORTED_CHAIN_GROUPS['rococo'].chains[0].id]: rococo,
 };

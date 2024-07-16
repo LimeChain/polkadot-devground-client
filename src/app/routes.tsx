@@ -8,6 +8,7 @@ const Home = lazy(() => import('../views/home'));
 const CodeEditor = lazy(() => import('../views/codeEditor'));
 const Callback = lazy(() => import('../components/login/callback'));
 const BlockDetails = lazy(() => import('../views/blockDetails'));
+const Explorer = lazy(() => import('../views/explorer'));
 
 export const routes = () => ([
   {
@@ -50,6 +51,16 @@ export const routes = () => ([
           {
             path: '',
             element: <Callback />,
+          },
+        ],
+      },
+      {
+        path: 'explorer',
+        element: <LayoutBasic hasFooter />,
+        children: [
+          {
+            path: '',
+            element: <Explorer />,
           },
         ],
       },

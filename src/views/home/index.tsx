@@ -23,8 +23,8 @@ const Home = () => {
 
         <div className="grid w-full max-w-[880px] grid-cols-1 gap-4 md:grid-cols-2">
           <PDLink
-            to="https://github.com/LimeChain/polkadot-devground-client"
             target="_blank"
+            to="https://github.com/LimeChain/polkadot-devground-client"
             className={cn(
               'group',
               'relative',
@@ -45,27 +45,25 @@ const Home = () => {
           >
             <Icon
               name="icon-linkArrow"
+              size={[24]}
               className={cn(
                 'absolute right-4 top-4',
                 'transition-transform duration-200 ease-linear',
                 'group-hover:-translate-y-1 group-hover:translate-x-1',
               )}
             />
-
             <Icon
               name="icon-github"
               className="mb-8 text-dev-pink-500"
               size={[40]}
             />
-
             <h4 className="mb-2 text-h4-bold">
               Code
             </h4>
-            <p className="text-body2-regular text-dev-black-300 dark:text-dev-purple-300">
+            <p className="font-geist !text-body2-regular text-dev-black-300 dark:text-dev-purple-300">
               Explore our GitHub repository for comprehensive documentation, code examples, and contributions. Join our developer community to enhance your Polkadot projects.
             </p>
           </PDLink>
-
           <PDLink
             to="/code?s=1"
             className={cn(
@@ -88,23 +86,22 @@ const Home = () => {
           >
             <Icon
               name="icon-linkArrow"
+              size={[24]}
               className={cn(
                 'absolute right-4 top-4',
                 'transition-transform duration-200 ease-linear',
                 'group-hover:-translate-y-1 group-hover:translate-x-1',
               )}
             />
-
             <Icon
               name="icon-brackets"
               className="mb-8 text-dev-pink-500"
               size={[40]}
             />
-
             <h4 className="mb-2 text-h4-bold">
               Developer Console
             </h4>
-            <p className="text-body2-regular text-dev-black-300 dark:text-dev-purple-300">
+            <p className="font-geist !text-body2-regular text-dev-black-300 dark:text-dev-purple-300">
               Dive into our advanced developer console for seamless on-chain interaction and rapid prototyping. Experience a streamlined, user-friendly environment designed to accelerate your development process and boost productivity.
             </p>
           </PDLink>
