@@ -15,7 +15,10 @@ export type TNavItem = {
   linkProps: INavigationDropdown;
 };
 
-export const NavigationItem = ({ linkProps, type }: TNavItem) => {
+export const NavigationItem = ({
+  linkProps,
+  type,
+}: TNavItem) => {
   return (
     <>
       {

@@ -24,7 +24,7 @@ export const App = () => {
     resetStore: resetStoreAuth,
   } = useStoreAuth.use.actions();
 
-  const initStoreChainClient = useStoreChain.use.init();
+  const initStoreChainClient = useStoreChain.use.init?.();
   const {
     resetStore: resetStoreChain,
   } = useStoreChain.use.actions();

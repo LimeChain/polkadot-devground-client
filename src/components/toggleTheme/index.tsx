@@ -18,8 +18,10 @@ export const ToggleTheme = () => {
       onClick={toggleTheme}
       className={cn(
         'navSpacer',
-        { 'ml-5 ': !isHomePage },
-        { 'before:content-none': isHomePage },
+        {
+          ['ml-5']: !isHomePage,
+          ['before:content-none']: isHomePage,
+        },
       )}
     >
       <Icon

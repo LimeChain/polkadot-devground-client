@@ -9,3 +9,11 @@ export interface IChain {
   id: string;
   icon: `icon-chain-${string}`;
 }
+
+export type TChainSubscription =
+  'latest-block' |
+  'finalised-block' |
+  'signed-extrinsics' |
+  'transfers' |
+  'total-accounts' |
+  'circulating-supply';

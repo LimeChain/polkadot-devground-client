@@ -1,7 +1,7 @@
-import type { TChainStateBlock } from '@custom-types/chainState';
+import type { TChainSubscription } from '@custom-types/chain';
 
 export const chainStateBlockData: {
-  [key in TChainStateBlock]: {
+  [key in TChainSubscription]: {
     name: string;
     icon: `icon-${string}`;
   } } = {

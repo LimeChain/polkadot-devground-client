@@ -15,7 +15,13 @@ export interface INavigationDropdownItem extends IPDLink {
   icon: SVGIconProps['name'];
 }
 
-export const NavigationDropdownItem = ({ title, icon, to, className, ...linkProps }: INavigationDropdownItem) => {
+export const NavigationDropdownItem = ({
+  title,
+  icon,
+  to,
+  className,
+  ...linkProps
+}: INavigationDropdownItem) => {
 
   const { pathname } = useLocation();
 

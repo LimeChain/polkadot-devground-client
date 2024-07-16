@@ -11,7 +11,12 @@ export interface INavigationDropdown extends React.ComponentProps<'button'> {
   items: INavigationDropdownItem[];
 }
 
-export const NavigationDropdown = ({ title, items, className, ...props }: INavigationDropdown) => {
+export const NavigationDropdown = ({
+  title,
+  items,
+  className,
+  ...props
+}: INavigationDropdown) => {
 
   return (
     <div className="group relative">

@@ -8,10 +8,10 @@ interface IFeaturesCard {
   linkProps: LinkProps;
 
   icon?: string;
-  title?:string;
-  subTitle?:string;
+  title?: string;
+  subTitle?: string;
 
-  className?:string;
+  className?: string;
 }
 
 const FeatureCard = ({ icon, linkProps, subTitle, title, className } : IFeaturesCard) => {

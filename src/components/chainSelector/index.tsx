@@ -96,7 +96,7 @@ export const ChainSelector = () => {
                       'transition-colors',
                       ' hover:bg-dev-purple-200 dark:hover:bg-dev-purple-400/20',
                       {
-                        'text-dev-pink-500': chainGroup === selectedChainGroup,
+                        ['text-dev-pink-500']: chainGroup === selectedChainGroup,
                       },
                     )}
                   >

@@ -4,10 +4,9 @@ import {
   type rococo,
 } from '@polkadot-api/descriptors';
 import { getSmProvider } from 'polkadot-api/sm-provider';
-import {
-  type Client,
-  start,
-} from 'polkadot-api/smoldot';
+import { type Client } from 'polkadot-api/smoldot';
+import { startFromWorker } from 'polkadot-api/smoldot/from-worker';
+import SmWorker from 'polkadot-api/smoldot/worker?worker';
 import { create } from 'zustand';
 
 import {
@@ -25,7 +24,7 @@ import { createSelectors } from '../createSelectors';
 
 import type { IChain } from '@custom-types/chain';
 
-interface IStore {
+interface StoreInterface {
   chain: IChain;
 
   smoldot: Client;
@@ -47,12 +46,28 @@ const initialState = {
   smoldot: null as unknown as Client,
 };
 
-const baseStore = create<IStore>()((set, get) => ({
+const baseStore = create<StoreInterface>()((set, get) => ({
   ...initialState,
   actions: {
+    async resetStore() {
+      try {
+        const client = get()?.client;
+        client?.destroy?.();
+
+      } catch (error) {
+        console.error(error);
+
+      } finally {
+        set(initialState);
+
+      }
+    },
     async setChain(chain: IChain) {
       try {
         const smoldot = get()?.smoldot;
+        const client = get()?.client;
+
+        client?.destroy?.();
 
         const newChain = smoldot?.addChain({
           chainSpec: CHAIN_SPECS[chain.id],
@@ -64,19 +79,21 @@ const baseStore = create<IStore>()((set, get) => ({
         const api = newClient.getTypedApi(CHAIN_DESCRIPTORS[chain.id]);
 
         set({ chain, client: newClient, api });
+
       } catch (err) {
         console.error(err);
+
       } finally {
         set({ chain });
+
       }
     },
-    resetStore() {
-      set(initialState);
-    },
+
   },
   async init() {
     try {
-      const smoldot = start();
+      const smoldot = startFromWorker(new SmWorker());
+
       const chain = await smoldot.addChain({
         chainSpec: CHAIN_SPECS[get().chain.id],
       });
@@ -88,8 +105,10 @@ const baseStore = create<IStore>()((set, get) => ({
       const api = client.getTypedApi(CHAIN_DESCRIPTORS[get().chain.id]);
 
       set({ client, api, smoldot });
+
     } catch (err) {
       console.error(err);
+
     }
   },
 }));

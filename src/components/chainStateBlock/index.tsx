@@ -1,14 +1,14 @@
 import {
   useEffect,
+  useRef,
   useState,
 } from 'react';
 
 import { Icon } from '@components/icon';
 import { chainStateBlockData } from '@constants/chainState';
 import {
-  subscribeToCirculatingSupply,
-  subscribeToFinalizedBlocks,
-  subscribeToLatestBlocks,
+  type ISubscriptionFn,
+  subscribeToChainData,
 } from '@services/chain';
 import { useStoreChain } from '@stores';
 import {
@@ -16,64 +16,56 @@ import {
   formatNumber,
 } from '@utils/helpers';
 
-import type { TChainStateBlock } from '@custom-types/chainState';
+import type { TChainSubscription } from '@custom-types/chain';
 
 interface IChainStateBlockProps {
-  type: TChainStateBlock;
+  type: TChainSubscription;
 }
 
 export const ChainStateBlock = ({ type }: IChainStateBlockProps) => {
-  const client = useStoreChain.use.client();
+  const client = useStoreChain.use.client?.();
+  const chain = useStoreChain.use.chain?.();
 
   const [value, setValue] = useState(0);
   const [isLoadingData, setIsLoadingData] = useState(true);
+
+  const refUnsubscribe = useRef(() => {});
 
   useEffect(() => {
     if (!client) {
       return;
     }
 
-    let unsubscribe: () => void;
-
     (async () => {
-      switch (type) {
-        case 'finalised-block':
-          unsubscribe = subscribeToFinalizedBlocks({
-            setData: setValue,
-            setIsLoading: setIsLoadingData,
-          });
-          break;
+      const handleOnSubcriptionData: ISubscriptionFn['handleOnSubcriptionData'] = ({
+        data,
+        isLoadingData,
+      }) => {
+        setValue(data);
+        setIsLoadingData(isLoadingData);
+      };
 
-        case 'latest-block':
-          unsubscribe = subscribeToLatestBlocks({
-            setData: setValue,
-            setIsLoading: setIsLoadingData,
-          });
-          break;
+      refUnsubscribe.current = subscribeToChainData({
+        type,
+        handleOnSubcriptionData,
+      });
 
-        case 'circulating-supply':
-          unsubscribe = subscribeToCirculatingSupply({
-            setData: setValue,
-            setIsLoading: setIsLoadingData,
-          });
-          break;
-
-        default:
-          setIsLoadingData(false);
-          break;
-      }
     })()
       .catch((error) => {
         console.error(error);
         setIsLoadingData(false);
+
       });
 
     return () => {
-      unsubscribe?.();
-      setIsLoadingData(true);
-      setValue(0);
+      refUnsubscribe.current?.();
     };
-  }, [client, type]);
+
+  }, [
+    client,
+    chain,
+    type,
+  ]);
 
   return (
     <div className={cn(

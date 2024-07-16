@@ -1,66 +1,67 @@
 import { baseStoreChain } from '@stores';
 
-import type { SetStateAction } from 'react';
-import type React from 'react';
+import type { TChainSubscription } from '@custom-types/chain';
 
-interface ISubscriptionFn {
-  setData: React.Dispatch<SetStateAction<number>>;
-  setIsLoading: React.Dispatch<SetStateAction<boolean>>;
+export interface ISubscriptionFn {
+  type: TChainSubscription;
+  handleOnSubcriptionData: ({
+    data,
+    isLoadingData,
+  }: {
+    data: any;
+    isLoadingData: boolean;
+  }) => void;
 }
 
-export const subscribeToFinalizedBlocks = (
-  { setData, setIsLoading }: ISubscriptionFn,
+export const subscribeToChainData = (
+  {
+    type,
+    handleOnSubcriptionData,
+  }: ISubscriptionFn,
 ): () => void => {
-  const client = baseStoreChain.getState().client;
+  const client = baseStoreChain.getState()?.client;
+  const api = baseStoreChain.getState()?.api;
 
-  if (!client) {
+  if (!client || !api) {
     return () => {};
   }
 
-  const subscription = client.finalizedBlock$.subscribe((finalizedBlock) => {
-    setData(finalizedBlock.number);
-    setIsLoading(false);
-  });
-
-  return () => {
-    subscription?.unsubscribe();
+  let subscription: {
+    unsubscribe: () => void;
   };
-};
 
-export const subscribeToLatestBlocks = (
-  { setData, setIsLoading }: ISubscriptionFn,
-): () => void => {
-  const client = baseStoreChain.getState().client;
+  switch (type) {
+    case 'finalised-block':
+      subscription = client.finalizedBlock$.subscribe((finalizedBlock) => {
+        handleOnSubcriptionData({
+          data: finalizedBlock.number,
+          isLoadingData: false,
+        });
+      });
+      break;
 
-  if (!client) {
-    return () => {};
+    case 'latest-block':
+      subscription = client.bestBlocks$.subscribe((bestBlocks) => {
+        handleOnSubcriptionData({
+          data: bestBlocks[0].number,
+          isLoadingData: false,
+        });
+      });
+      break;
+
+    default:
+      handleOnSubcriptionData({
+        data: 0,
+        isLoadingData: false,
+      });
+      break;
   }
 
-  const subscription = client.bestBlocks$.subscribe((bestBlocks) => {
-    const latestBlock = bestBlocks[0];
-
-    setData(latestBlock.number);
-    setIsLoading(false);
-  });
-
   return () => {
-    subscription?.unsubscribe();
-  };
-};
-
-export const subscribeToCirculatingSupply = (
-  { setData, setIsLoading }: ISubscriptionFn,
-): () => void => {
-  const api = baseStoreChain.getState().api;
-
-  if (!api) {
-    return () => {};
-  }
-
-  const subscription = api.query.System.ExtrinsicCount.getValue();
-  console.log(subscription);
-
-  return () => {
-    // subscription?.unsubscribe();
+    subscription?.unsubscribe?.();
+    handleOnSubcriptionData({
+      data: 0,
+      isLoadingData: true,
+    });
   };
 };
