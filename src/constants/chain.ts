@@ -2,13 +2,10 @@ import {
   dot,
   rococo,
 } from '@polkadot-api/descriptors';
-import { createClient } from 'https://esm.sh/polkadot-api@0.10.0';
 import { chainSpec as polkadotChainSpec } from 'polkadot-api/chains/polkadot';
 import { chainSpec as rococoChainSpec } from 'polkadot-api/chains/rococo_v2_2';
 
 import type { ISupportedChains } from '@custom-types/chain';
-
-export { createClient };
 
 export const SUPPORTED_CHAIN_GROUPS: ISupportedChains = {
   'polkadot': {

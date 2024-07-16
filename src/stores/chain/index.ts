@@ -12,7 +12,6 @@ import { create } from 'zustand';
 import {
   CHAIN_DESCRIPTORS,
   CHAIN_SPECS,
-  createClient,
   SUPPORTED_CHAIN_GROUPS,
 } from '@constants/chain';
 import {
@@ -45,6 +44,8 @@ const initialState = {
   api: null,
   smoldot: null as unknown as Client,
 };
+
+const createClient = window.pdCreateClient;
 
 const baseStore = create<StoreInterface>()((set, get) => ({
   ...initialState,
