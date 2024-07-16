@@ -14,7 +14,6 @@ export const setupAta = (
   onErrorMessage?: (userFacingMessage: string, error: Error) => void,
   onProgress?: (progress: number) => void,
   throttleMs = 200,
-  abortSignal?: AbortSignal,
 ) => {
   const failedDownloads = new Set<string>();
   let lastFetchTime = 0;
@@ -23,21 +22,13 @@ export const setupAta = (
     const now = Date.now();
     const timeSinceLastFetch = now - lastFetchTime;
 
-    if (abortSignal?.aborted) {
-      throw new DOMException('Aborted', 'AbortError');
-    }
-
     if (timeSinceLastFetch < throttleMs) {
       await sleep(throttleMs - timeSinceLastFetch);
     }
 
     lastFetchTime = Date.now();
 
-    const response = await fetch(input.toString(), { ...init, signal: abortSignal });
-
-    if (abortSignal?.aborted) {
-      throw new DOMException('Aborted', 'AbortError');
-    }
+    const response = await fetch(input.toString(), init);
 
     return response;
   };
@@ -71,13 +62,6 @@ export const setupAta = (
       },
     },
   });
-};
-
-// @TODO: @pivanov: This function is not used anywhere in the codebase.
-// but is useful for debugging purposes.
-export const parseImports = (code: string): string[] => {
-  const importRegex = /import\s+(?:\*\s+as\s+\w+|\w+\s*,\s*)?(?:{[^}]+}|\w+)?\s+from\s+['"][^'"]+['"]/g;
-  return code.match(importRegex) || [];
 };
 
 export const prettyPrintMessage = (message: string): string => {

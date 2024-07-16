@@ -4,7 +4,6 @@ import {
 } from '@pivanov/event-bus';
 import {
   useCallback,
-  useEffect,
   useRef,
   useState,
 } from 'react';
@@ -17,13 +16,9 @@ import {
   mergeImportMap,
 } from '@views/codeEditor/helpers';
 
-import type {
-  IEventBusMonacoEditorLoadSnippet,
-  IEventBusMonacoEditorUpdateCode,
-} from '@custom-types/eventBus';
+import type { IEventBusMonacoEditorUpdateCode } from '@custom-types/eventBus';
 
 export const EditorActions = () => {
-  const refTimeout = useRef<NodeJS.Timeout>();
   const refCode = useRef<string>('');
 
   const [isRunning, setIsRunning] = useState(false);
@@ -105,23 +100,6 @@ export const EditorActions = () => {
 
     await downloadFiles(files);
   }, []);
-
-  useEffect(() => {
-    return () => {
-      clearTimeout(refTimeout.current);
-    };
-  }, []);
-
-  useEventBus<IEventBusMonacoEditorLoadSnippet>('@@-monaco-editor-load-snippet', () => {
-    clearTimeout(refTimeout.current);
-    busDispatch({
-      type: '@@-iframe-destroy',
-    });
-
-    refTimeout.current = setTimeout(() => {
-      setIsRunning(false);
-    }, 300);
-  });
 
   useEventBus<IEventBusMonacoEditorUpdateCode>('@@-monaco-editor-update-code', ({ data }) => {
     refCode.current = data;

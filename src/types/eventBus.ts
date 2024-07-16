@@ -20,13 +20,6 @@ export interface IEventBusMonacoEditorUpdateCursorPosition {
   data: monaco.Position;
 }
 
-export interface IEventBusMonacoEditorLoadSnippet {
-  type: '@@-monaco-editor-load-snippet';
-  data: {
-    snippetIndex: number;
-  };
-}
-
 export interface IEventBusMonacoEditorExecuteSnippet {
   type: '@@-monaco-editor-execute-snippet';
   data: string;

@@ -1,21 +1,13 @@
-import { busDispatch } from '@pivanov/event-bus';
 import { useCallback } from 'react';
 
 import { GithubButton } from '@components/githubButton';
 import { Button } from '@components/ui';
 import { snippets } from '@constants/snippets';
 
-import type { IEventBusMonacoEditorLoadSnippet } from '@custom-types/eventBus';
-
 export const SnippetsSwitcher = () => {
   const handleClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     const snippetIndex = Number(e.currentTarget.getAttribute('data-snippet-index'));
-    busDispatch<IEventBusMonacoEditorLoadSnippet>({
-      type: '@@-monaco-editor-load-snippet',
-      data: {
-        snippetIndex,
-      },
-    });
+    window.location.href = `/code?s=${snippetIndex}`;
   }, []);
 
   return (

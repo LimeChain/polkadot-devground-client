@@ -8,7 +8,7 @@ export interface ISubscriptionFn {
     data,
     isLoadingData,
   }: {
-    data: any;
+    data: number;
     isLoadingData: boolean;
   }) => void;
 }

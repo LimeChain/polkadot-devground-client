@@ -18,10 +18,7 @@ import { MonacoEditor } from './components/monacoEditor';
 import { EditorActions } from './components/monacoEditor/actions';
 import { SnippetsSwitcher } from './components/snippetsSwitcher';
 
-import type {
-  IEventBusMonacoEditorLoadSnippet,
-  IEventBusMonacoEditorShowPreview,
-} from '@custom-types/eventBus';
+import type { IEventBusMonacoEditorShowPreview } from '@custom-types/eventBus';
 
 const TypeScriptEditor = () => {
   const refTimeout = useRef<NodeJS.Timeout>();
@@ -30,11 +27,6 @@ const TypeScriptEditor = () => {
 
   useEventBus<IEventBusMonacoEditorShowPreview>('@@-monaco-editor-show-preview', ({ data }) => {
     refCanPreview.current = data;
-  });
-
-  useEventBus<IEventBusMonacoEditorLoadSnippet>('@@-monaco-editor-load-snippet', () => {
-    clearTimeout(refTimeout.current);
-    setIsLoaded(false);
   });
 
   useEventBus('@@-monaco-editor-hide-loading', () => {

@@ -40,7 +40,6 @@ import { Progress } from '@views/codeEditor/progress';
 import type {
   IEventBusIframeDestroy,
   IEventBusMonacoEditorExecuteSnippet,
-  IEventBusMonacoEditorLoadSnippet,
   IEventBusMonacoEditorUpdateCursorPosition,
 } from '@custom-types/eventBus';
 
@@ -339,14 +338,6 @@ export const MonacoEditor = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEventBus<IEventBusMonacoEditorLoadSnippet>('@@-monaco-editor-load-snippet', ({ data }) => {
-    clearTimeout(refTimeout.current);
-
-    refTimeout.current = setTimeout(() => {
-      void loadSnippet(data.snippetIndex);
-    }, 300);
-  });
 
   useEventBus<IEventBusMonacoEditorUpdateCursorPosition>('@@-monaco-editor-update-cursor-position', ({ data }) => {
     updateMonacoCursorPositon(data);
