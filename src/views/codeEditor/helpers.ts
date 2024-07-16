@@ -14,6 +14,7 @@ export const setupAta = (
   onErrorMessage?: (userFacingMessage: string, error: Error) => void,
   onProgress?: (progress: number) => void,
   throttleMs = 200,
+  abortSignal?: AbortSignal,
 ) => {
   const failedDownloads = new Set<string>();
   let lastFetchTime = 0;
@@ -22,13 +23,23 @@ export const setupAta = (
     const now = Date.now();
     const timeSinceLastFetch = now - lastFetchTime;
 
+    if (abortSignal?.aborted) {
+      throw new DOMException('Aborted', 'AbortError');
+    }
+
     if (timeSinceLastFetch < throttleMs) {
       await sleep(throttleMs - timeSinceLastFetch);
     }
 
     lastFetchTime = Date.now();
 
-    return fetch(input.toString(), init);
+    const response = await fetch(input.toString(), { ...init, signal: abortSignal });
+
+    if (abortSignal?.aborted) {
+      throw new DOMException('Aborted', 'AbortError');
+    }
+
+    return response;
   };
 
   const customErrorMessage = (userFacingMessage: string, error: Error) => {

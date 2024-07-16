@@ -10,12 +10,14 @@ import {
   useCallback,
   useEffect,
   useRef,
+  useState,
 } from 'react';
 import { getSingletonHighlighter } from 'shiki/index.mjs';
 
 import { snippets } from '@constants/snippets';
 import { useStoreUI } from '@stores';
 import {
+  cn,
   getSearchParam,
   setSearchParam,
 } from '@utils/helpers';
@@ -36,6 +38,8 @@ import { monacoEditorConfig } from '@views/codeEditor/monaco-editor-config';
 import { Progress } from '@views/codeEditor/progress';
 
 import type {
+  IEventBusIframeDestroy,
+  IEventBusMonacoEditorExecuteSnippet,
   IEventBusMonacoEditorLoadSnippet,
   IEventBusMonacoEditorUpdateCursorPosition,
 } from '@custom-types/eventBus';
@@ -104,17 +108,23 @@ const checkTheme = async (theme: string) => {
 
 export const MonacoEditor = () => {
   const refTimeout = useRef<NodeJS.Timeout>();
-
   const refSnippet = useRef<string>('');
   const refSnippetIndex = useRef<string | undefined>();
   const refMonacoEditorContainer = useRef<HTMLDivElement | null>(null);
   const refMonacoEditor = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const refModel = useRef<monaco.editor.ITextModel | null>(null);
 
+  const [isReadOnly, setIsReadOnly] = useState(false);
+
   const theme = useStoreUI.use.theme?.();
 
   const triggerValidation = useCallback(async () => {
     if (refModel.current) {
+      busDispatch({
+        type: '@@-problems-message',
+        data: [],
+      });
+
       const worker = await monaco.languages.typescript.getTypeScriptWorker();
       const client = await worker(refModel.current.uri);
 
@@ -175,13 +185,11 @@ export const MonacoEditor = () => {
     },
   );
 
-  const createNewModel = async (value: string) => {
+  const createNewModel = (value: string) => {
     refModel.current?.dispose();
     const modelUri = monaco.Uri.parse('file:///main-script.tsx');
     refModel.current = monaco.editor.createModel(value, 'typescript', modelUri);
     refMonacoEditor.current?.setModel(refModel.current);
-
-    await fetchType(refSnippet.current);
 
     refMonacoEditor.current?.focus();
     void triggerValidation();
@@ -190,18 +198,20 @@ export const MonacoEditor = () => {
       type: '@@-monaco-editor-update-code',
       data: value,
     });
+
+    void fetchType(refSnippet.current);
   };
 
   const loadSnippet = useCallback(async (snippetIndex: number | null) => {
     clearTimeout(refTimeout.current);
 
     busDispatch({
-      type: '@@-console-message-reset',
+      type: '@@-problems-message',
+      data: [],
     });
 
     busDispatch({
-      type: '@@-problems-message',
-      data: [],
+      type: '@@-console-message-reset',
     });
 
     busDispatch({
@@ -226,7 +236,7 @@ export const MonacoEditor = () => {
     }
 
     refSnippet.current = await formatCode(code);
-    void createNewModel(refSnippet.current);
+    createNewModel(refSnippet.current);
 
     busDispatch({
       type: '@@-monaco-editor-show-preview',
@@ -292,7 +302,6 @@ export const MonacoEditor = () => {
 
       refMonacoEditor.current.onDidChangeModelContent(() => {
         clearTimeout(refTimeout.current);
-        const currentPosition = refMonacoEditor.current?.getPosition();
         refSnippet.current = refMonacoEditor.current?.getValue() || '';
 
         if (refSnippetIndex.current) {
@@ -314,8 +323,6 @@ export const MonacoEditor = () => {
             type: '@@-monaco-editor-types-progress',
             data: 0,
           });
-
-          updateMonacoCursorPositon(currentPosition!);
 
           refTimeout.current = setTimeout(async () => {
             await fetchType(refSnippet.current);
@@ -345,8 +352,31 @@ export const MonacoEditor = () => {
     updateMonacoCursorPositon(data);
   });
 
+  useEventBus<IEventBusMonacoEditorExecuteSnippet>('@@-monaco-editor-execute-snippet', () => {
+    refMonacoEditor.current?.updateOptions({
+      readOnly: true,
+    });
+    setIsReadOnly(true);
+  });
+
+  useEventBus<IEventBusIframeDestroy>('@@-iframe-destroy', () => {
+    refMonacoEditor.current?.updateOptions({
+      readOnly: false,
+    });
+    setIsReadOnly(false);
+    refMonacoEditor.current?.focus();
+  });
+
   return (
-    <div className="relative flex-1">
+    <div
+      className={cn(
+        'relative flex-1',
+        'transition-opacity duration-300',
+        {
+          ['opacity-50 pointer-events-none']: isReadOnly,
+        },
+      )}
+    >
       <div ref={refMonacoEditorContainer} className="size-full" />
       <Progress classNames="absolute top-2 right-6 z-100" size={18} />
     </div>
