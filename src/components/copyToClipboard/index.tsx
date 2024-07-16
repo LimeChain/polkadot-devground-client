@@ -23,6 +23,7 @@ interface ICopyToClipboardProps {
   onCopy?: (success: boolean, text: string) => void;
   showToast?: boolean;
   className?: string;
+  iconSize?: number;
 }
 
 export const CopyToClipboard = memo((props: ICopyToClipboardProps) => {
@@ -33,6 +34,7 @@ export const CopyToClipboard = memo((props: ICopyToClipboardProps) => {
     children,
     onCopy,
     className,
+    iconSize = 16,
   } = props;
 
   const refTimeout = useRef<NodeJS.Timeout>();
@@ -82,22 +84,22 @@ export const CopyToClipboard = memo((props: ICopyToClipboardProps) => {
           'hover:text-dev-pink-400',
           'transition-colors duration-200 ease-in-out',
           'cursor-pointer',
+          `size-[${iconSize}px]`,
           className,
         )}
       >
         <Icon
           name={`icon-${isCopied ? 'check' : 'clipboard'}`}
           className={cn(
-            'mx-2',
             {
               ['text-green-500']: isCopied,
             },
           )}
-          size={[14]}
+          size={[iconSize]}
         />
       </span>
     );
-  }, [className, copyToClipboard, isCopied]);
+  }, [className, copyToClipboard, iconSize, isCopied]);
 
   return children({
     ClipboardIcon,
