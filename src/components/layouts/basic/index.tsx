@@ -14,11 +14,12 @@ export const LayoutBasic = (props: ILayoutBasic) => {
 
   return (
     <Suspense>
-      <div className="grid min-h-screen w-full grid-rows-layout">
+      <div className="grid max-h-screen min-h-screen w-full grid-rows-layout overflow-hidden">
         <Header />
         <div className={cn(
           'lg:px-14 lg:pb-16 lg:pt-8',
           'px-6 pb-8 pt-4',
+          'overflow-scroll',
         )}
         >
           <Outlet />

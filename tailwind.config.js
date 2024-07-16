@@ -7,12 +7,15 @@ export default {
   darkMode: ["selector" , '[data-color-scheme="dark"]'],
   theme: {
     extend: {
+      spacing: {
+        '18': '4.5rem',
+      },
       gridTemplateRows: {
         'layout': '64px 1fr 60px',
         'code-layout': '64px 1fr',
       },
       gridTemplateColumns: {
-        'chainSelect' : '276fr 708fr'
+        'chainSelect': '276fr 708fr',
       },
       colors: {
         "dev-pink" : {
