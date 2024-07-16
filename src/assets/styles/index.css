@@ -88,13 +88,12 @@ pre {
 }
 
 .ball {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 16px;
-  transform: translate(-50%, -50%);
-  height: 16px;
+  @apply absolute;
+  @apply left-1/2;
+  @apply top-1/2;
+  @apply size-4;
   @apply bg-dev-pink-500;
+  transform: translate(-50%, -50%);
   border-radius: 100%;
   animation: 400ms bounce infinite alternate;
   animation-timing-function: cubic-bezier(0.38, 0.17, 0.11, 1);
