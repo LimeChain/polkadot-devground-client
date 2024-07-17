@@ -50,7 +50,7 @@ export const ModalGithubLogin = ({ onClose }: IModalGithubLogin) => {
         <button
           onClick={onClose}
           className={cn(
-            'p-4 transition',
+            'p-4 transition-colors',
             'font-geist text-body2-bold',
             'hover:text-dev-white-1000',
           )}
