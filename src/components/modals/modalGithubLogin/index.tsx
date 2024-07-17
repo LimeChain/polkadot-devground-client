@@ -39,7 +39,7 @@ export const ModalGithubLogin = ({ onClose }: IModalGithubLogin) => {
         <button
           onClick={authorize}
           className={cn(
-            'mt-6 p-4 transition',
+            'mb-2 mt-6 p-4 transition',
             'font-geist !text-body2-bold text-white',
             'bg-dev-pink-500 ',
             'hover:bg-dev-pink-400',

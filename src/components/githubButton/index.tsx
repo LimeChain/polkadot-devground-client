@@ -23,7 +23,7 @@ export const GithubButton = () => {
         onClick={isAuthenticated ? logout : toggleVisibility}
         className={cn(
           'flex cursor-pointer items-center gap-1',
-          'disabled:cursor-not-allowedx disabled:opacity-50',
+          'disabled:cursor-not-allowed disabled:opacity-50',
           'font-geist text-body1-bold',
         )}
       >
