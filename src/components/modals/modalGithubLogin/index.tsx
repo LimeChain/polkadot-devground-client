@@ -25,11 +25,11 @@ export const ModalGithubLogin = ({ onClose }: IModalGithubLogin) => {
       <h5 className="self-start text-h5-bold">Log in</h5>
       <Icon
         name="icon-github"
+        size={[96]}
         className={cn(
           'self-center text-dev-white-1000',
           'dark:text-dev-purple-50',
         )}
-        size={[96]}
       />
       <div className="flex flex-col" >
         <h4 className="mb-4 self-center text-h4-bold">Please Log in</h4>
@@ -39,12 +39,13 @@ export const ModalGithubLogin = ({ onClose }: IModalGithubLogin) => {
         <button
           onClick={authorize}
           className={cn(
-            'mb-2 mt-6 p-4 transition',
+            'mb-2 mt-6 p-4 transition-colors',
             'font-geist !text-body2-bold text-white',
             'bg-dev-pink-500 ',
             'hover:bg-dev-pink-400',
           )}
-        > Log in
+        >
+          Log in
         </button>
         <button
           onClick={onClose}
