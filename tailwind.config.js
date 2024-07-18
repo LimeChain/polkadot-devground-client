@@ -11,7 +11,7 @@ export default {
         '18': '4.5rem',
       },
       gridTemplateRows: {
-        'layout': '64px 1fr 60px',
+        'layout': '64px 1fr fit-content(100%)',
         'code-layout': '64px 1fr',
       },
       gridTemplateColumns: {

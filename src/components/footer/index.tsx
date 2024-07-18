@@ -8,13 +8,15 @@ import FooterLink from './footerLink';
 
 export const Footer = () => {
   return (
-    <footer className={cn(
-      'flex items-center justify-between gap-4',
-      ' bg-dev-purple-100 dark:bg-dev-black-900',
-      'px-6 py-3 lg:px-14 lg:py-4',
-      'font-geist text-body2-regular',
-      'flex-col-reverse md:flex-row',
-    )}
+    <footer
+      className={cn(
+        'flex items-center',
+        'justify-center lg:justify-between',
+        'flex-col gap-y-4 md:flex-row',
+        'bg-dev-purple-100 dark:bg-dev-black-900',
+        'px-6 py-3 lg:px-14 lg:py-4',
+        'font-geist text-body2-regular',
+      )}
     >
       <PDLink
         target="_blank"
@@ -31,7 +33,10 @@ export const Footer = () => {
         {
           footerLinks.map(link => {
             return (
-              <FooterLink key={`footer-link-${link.linkProps.to}`} {...link} />
+              <FooterLink
+                key={`footer-link-${link.linkProps.to}`}
+                {...link}
+              />
             );
           })
         }

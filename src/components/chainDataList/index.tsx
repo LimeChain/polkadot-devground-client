@@ -1,9 +1,19 @@
+import {
+  formatDistanceToNow,
+  subSeconds,
+} from 'date-fns';
+
 import { PDScrollArea } from '@components/scrollArea';
 import {
   type IPDLink,
   PDLink,
 } from '@components/ui/PDLink';
-import { cn } from '@utils/helpers';
+import {
+  cn,
+  formatNumber,
+} from '@utils/helpers';
+
+import './styles.css';
 
 interface IChainDataList {
   title: string;
@@ -11,9 +21,35 @@ interface IChainDataList {
   linkText: string;
 }
 
-export const ChainDataList = ({ title, link, linkText }: IChainDataList) => {
+interface IRow {
+  index: number;
+}
+const Row = (props: IRow) => {
+  const { index } = props;
+
+  const date = subSeconds(new Date(), index * 50); // fake date
+
+  const timeAgo = formatDistanceToNow(date, { addSuffix: true });
+
   return (
-    <div className="grid grid-rows-[auto_1fr] gap-6">
+    <div className="pd-explorer-list">
+      <div>
+        <p>Block# <strong>{formatNumber(21_382_130 - index)}</strong></p>
+        <p>
+          <span className="text-dev-black-300 dark:text-dev-purple-300">Includes</span>
+          {' '}
+          <span>2 Extrinsics</span> 46 Events
+        </p>
+      </div>
+      <div>{timeAgo}</div>
+    </div>
+  );
+};
+
+export const ChainDataList = ({ title, link, linkText }: IChainDataList) => {
+  const dummyArray = Array.from({ length: 100 });
+  return (
+    <div className="flex flex-1 flex-col gap-y-3 overflow-hidden">
       <div className="flex items-center gap-3">
         <h5 className="text-h5-bold">{title}</h5>
         <PDLink
@@ -26,10 +62,31 @@ export const ChainDataList = ({ title, link, linkText }: IChainDataList) => {
           {linkText}
         </PDLink>
       </div>
-      <PDScrollArea>
-        <div />
-        <div />
-      </PDScrollArea>
+      {
+        link === '/latest-blocks' && (
+          <PDScrollArea
+            className="h-80 lg:h-full"
+            viewportClassNames="py-3"
+            verticalScrollClassNames="py-3"
+          >
+            {
+              dummyArray.map((_, index) => (
+                <Row key={index} index={index} />
+              ))
+            }
+          </PDScrollArea>
+        )
+      }
+      {
+        link === '/signed-extrinsics' && (
+          <PDScrollArea
+            viewportClassNames="py-6"
+            verticalScrollClassNames="py-6"
+          >
+            <>{/* TBD */}</>
+          </PDScrollArea>
+        )
+      }
     </div>
   );
 };

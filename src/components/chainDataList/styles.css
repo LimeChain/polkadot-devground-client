@@ -1,0 +1,20 @@
+.pd-explorer-list {
+  @apply grid grid-cols-[1fr_theme(width.40)] gap-x-2;
+  @apply h-16 px-3 mr-3;
+  @apply font-geist text-dev-black-1000 dark:text-dev-purple-50;
+  @apply hover:bg-dev-purple-100 dark:hover:bg-dev-purple-900;
+  @apply transition-[background] duration-300;
+
+  >div {
+    @apply flex;
+
+    &:first-child {
+      @apply flex-col justify-center;
+    }
+
+    &:last-child {
+      @apply items-center justify-end;
+      @apply text-sm;
+    }
+  }
+}

@@ -35,7 +35,7 @@ export const PDScrollArea = polymorphicComponent<'div', IPDScrollAreaProps>(
       id,
       children,
       className,
-      type = 'hover',
+      type = 'auto',
       scrollHideDelay = 1000,
       onScroll,
       refScrollVertical,
