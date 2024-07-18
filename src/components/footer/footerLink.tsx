@@ -29,7 +29,7 @@ const FooterLink = ({ linkProps, iconProps, className, text }: IFooterLinkProps)
       <Icon size={[24]} {...iconProps} />
       {
         text && (
-          <span> {text} </span>
+          <span>{text}</span>
         )
       }
     </PDLink>

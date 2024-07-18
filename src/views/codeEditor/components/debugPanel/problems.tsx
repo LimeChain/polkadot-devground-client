@@ -41,7 +41,7 @@ export const Problems = (props: IProblemsProps) => {
   }, [messages]);
 
   return (
-    <PDScrollArea type="auto">
+    <PDScrollArea>
       <div
         className={cn(
           'flex flex-col gap-y-2 text-gray-300',

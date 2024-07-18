@@ -12,11 +12,13 @@ export const footerLinks: IFooterLinkProps[] = [
     linkProps: { to: LINK_POLKADOT_GITHUB, target: '_blank' },
     iconProps: { name: 'icon-github' },
     text: 'Polkadot',
+    className: 'text-[0] lg:text-sm',
   },
   {
     linkProps: { to: LINK_POLKADOT_WIKI, target: '_blank' },
     iconProps: { name: 'icon-polkadot' },
     text: 'Polkadot Wiki',
+    className: 'text-[0] lg:text-sm',
   },
   {
     linkProps: { to: LINK_GITHUB_REPO, target: '_blank' },

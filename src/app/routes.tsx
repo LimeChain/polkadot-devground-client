@@ -56,7 +56,7 @@ export const routes = () => ([
       },
       {
         path: 'explorer',
-        element: <LayoutBasic hasFooter />,
+        element: <LayoutBasic hasFooter classNames="lg:pb-8" />,
         children: [
           {
             path: '',

@@ -104,7 +104,6 @@ export const Console = () => {
   return (
     <PDScrollArea
       ref={refScrollArea}
-      type="auto"
       className="flex-1"
       onScroll={handleOnScroll}
     >
