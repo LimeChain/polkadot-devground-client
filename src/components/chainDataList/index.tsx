@@ -13,7 +13,7 @@ import {
   formatNumber,
 } from '@utils/helpers';
 
-import './styles.css';
+import styles from './styles.module.css';
 
 interface IChainDataList {
   title: string;
@@ -32,7 +32,7 @@ const Row = (props: IRow) => {
   const timeAgo = formatDistanceToNow(date, { addSuffix: true });
 
   return (
-    <div className="pd-explorer-list">
+    <div className={styles['pd-explorer-list']}>
       <div>
         <p>Block# <strong>{formatNumber(21_382_130 - index)}</strong></p>
         <p>
