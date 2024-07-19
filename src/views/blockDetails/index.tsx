@@ -8,7 +8,7 @@ import { Icon } from '@components/icon';
 import { ToggleButton } from '@components/toggleButton';
 import { PDLink } from '@components/ui/PDLink';
 
-import './styles.css';
+import styles from './styles.module.css';
 
 const BlockDetails = () => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
@@ -51,7 +51,7 @@ const BlockDetails = () => {
       </div>
 
       {/* Time stamp */}
-      <div className="pd-block-details">
+      <div className={styles['pd-block-details']}>
         <p>Time stamp</p>
 
         <div>
@@ -66,7 +66,7 @@ const BlockDetails = () => {
       </div>
 
       {/* Status */}
-      <div className="pd-block-details">
+      <div className={styles['pd-block-details']}>
         <p>Status</p>
 
         <div >
@@ -80,7 +80,7 @@ const BlockDetails = () => {
       </div>
 
       {/* Block Hash */}
-      <div className="pd-block-details">
+      <div className={styles['pd-block-details']}>
         <p>Block Hash</p>
 
         <div className="gap-x-1">
@@ -102,7 +102,7 @@ const BlockDetails = () => {
       </div>
 
       {/* Parent Hash */}
-      <div className="pd-block-details">
+      <div className={styles['pd-block-details']}>
         <p>Parent Hash</p>
 
         <div>
@@ -124,7 +124,7 @@ const BlockDetails = () => {
       </div >
 
       {/* State Root */}
-      <div className="pd-block-details">
+      <div className={styles['pd-block-details']}>
         <p>State Root</p>
 
         <div>
@@ -146,7 +146,7 @@ const BlockDetails = () => {
       </div>
 
       {/* Extrinsic Root */}
-      <div className="pd-block-details">
+      <div className={styles['pd-block-details']}>
         <p>Extrinsic Root</p>
 
         <div>
@@ -167,7 +167,7 @@ const BlockDetails = () => {
         </div>
       </div>
 
-      <div className="pd-block-details">
+      <div className={styles['pd-block-details']}>
         <p>Validator</p>
 
         <div>
@@ -189,7 +189,7 @@ const BlockDetails = () => {
         </div>
       </div>
 
-      <div className="pd-block-details">
+      <div className={styles['pd-block-details']}>
         <p>Spec Version</p>
 
         <div>1002004</div>
