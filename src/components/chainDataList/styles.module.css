@@ -5,7 +5,7 @@
   @apply hover:bg-dev-purple-100 dark:hover:bg-dev-purple-900;
   @apply transition-[background] duration-300;
 
-  >div {
+  > div {
     @apply flex;
 
     &:first-child {
