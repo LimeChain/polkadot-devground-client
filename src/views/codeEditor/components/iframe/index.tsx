@@ -95,11 +95,11 @@ export const Iframe = (props: IframeProps) => {
       // @
       res.imports = {
         ...res.imports,
-        'polkadot-api/signer': 'https://esm.sh/polkadot-api@0.10.0/signer',
-        'polkadot-api/chains/rococo_v2_2': 'https://esm.sh/polkadot-api@0.10.0/chains/rococo_v2_2',
-        'polkadot-api/sm-provider': 'https://esm.sh/polkadot-api@0.10.0/sm-provider',
-        'polkadot-api/smoldot': 'https://esm.sh/polkadot-api@0.10.0/smoldot',
-        'polkadot-api/pjs-signer': 'https://esm.sh/polkadot-api@0.10.0/pjs-signer',
+        // 'polkadot-api/signer': 'https://esm.sh/polkadot-api@0.10.0/signer',
+        // 'polkadot-api/chains/rococo_v2_2': 'https://esm.sh/polkadot-api@0.10.0/known-chains/rococo_v2_2',
+        // 'polkadot-api/sm-provider': 'https://esm.sh/polkadot-api@0.10.0/sm-provider',
+        // 'polkadot-api/smoldot': 'https://esm.sh/polkadot-api@0.10.0/smoldot',
+        // 'polkadot-api/pjs-signer': 'https://esm.sh/polkadot-api@0.10.0/pjs-signer',
       };
 
       console.log('@@@ res', res);

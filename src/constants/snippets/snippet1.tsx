@@ -5,9 +5,10 @@ import {
   mnemonicToEntropy,
 } from '@polkadot-labs/hdkd-helpers';
 import { chainSpec } from 'polkadot-api/chains/rococo_v2_2';
-import { getPolkadotSigner } from 'polkadot-api/signer';
+// import { getPolkadotSigner } from 'polkadot-api/signer';
 import { getSmProvider } from 'polkadot-api/sm-provider';
 import { start } from 'polkadot-api/smoldot';
+// import { createClient } from "polkadot-api";
 import {
   useCallback,
   useEffect,
@@ -16,7 +17,7 @@ import {
 } from 'react';
 import { createRoot } from 'react-dom/client';
 
-const App = () => {
+export const App = () => {
 
   const inputRef = useRef('5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7');
   const signerRef = useRef(null);
@@ -36,13 +37,14 @@ const App = () => {
       const chain = await smoldot.addChain({ chainSpec });
       const provider = getSmProvider(chain);
       const client = window.parent.pdCreateClient(provider);
+      // const client = createClient(provider);
 
-      const api = client.getTypedApi(window.parent.papiDescriptors.rococo);
+      const api = client.getTypedApi(papiDescriptors.rococo);
 
       const entropy = mnemonicToEntropy(DEV_PHRASE);
       const miniSecret = entropyToMiniSecret(entropy);
       const hdkdKeyPair = sr25519CreateDerive(miniSecret)('//Bob');
-      const signer = getPolkadotSigner(hdkdKeyPair.publicKey, 'Sr25519', (input) =>
+      const signer = window.parent.getPolkadotSigner(hdkdKeyPair.publicKey, 'Sr25519', (input) =>
         hdkdKeyPair.sign(input),
       );
 
@@ -61,18 +63,17 @@ const App = () => {
     setTxSent(true)
     try {
       const tx = apiRef?.current?.tx.Balances.transfer_allow_death({
-        dest: window.parent.papiDescriptors.MultiAddress.Id(inputRef.current),
+        dest: papiDescriptors.MultiAddress.Id(inputRef.current),
         value: 100n,
-      })
-        .signSubmitAndWatch(signerRef?.current)
+      }).signSubmitAndWatch(signerRef?.current)
         .subscribe(({ txHash, type }) => {
           console.log(`Tx Stasus: ${type} / Tx Hash: ${txHash}`);
 
-          setTxStatus({
-            text: `Tx Stasus: ${type} / Tx Hash: ${txHash.slice(0, 4)}...${txHash.slice(-4)}`,
-            link: `https://rococo.subscan.io/extrinsic/${txHash}`,
-          });
-        })
+        setTxStatus({
+          text: `Tx Stasus: ${type} / Tx Hash: ${txHash.slice(0, 4)}...${txHash.slice(-4)}`,
+          link: `https://rococo.subscan.io/extrinsic/${txHash}`,
+        });
+      })
         .add(() => {
           console.log('END');
           setTxSent(false)
@@ -80,9 +81,11 @@ const App = () => {
         });
     } catch (err) {
       console.log('click error');
-      setTxSent(false)
 
       console.log(err);
+    } finally {
+      setTxSent(false)
+
     }
   }, []);
 

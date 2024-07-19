@@ -1,12 +1,5 @@
-import { sr25519CreateDerive } from '@polkadot-labs/hdkd';
-import {
-  DEV_PHRASE,
-  entropyToMiniSecret,
-  mnemonicToEntropy,
-} from '@polkadot-labs/hdkd-helpers';
 import { connectInjectedExtension, getInjectedExtensions } from "polkadot-api/pjs-signer"
 import { chainSpec } from 'polkadot-api/chains/rococo_v2_2';
-import { getPolkadotSigner } from 'polkadot-api/signer';
 import { getSmProvider } from 'polkadot-api/sm-provider';
 import { start } from 'polkadot-api/smoldot';
 import {

@@ -1,4 +1,5 @@
 import * as papiDescriptors from '@polkadot-api/descriptors';
+import { getPolkadotSigner } from 'polkadot-api/signer';
 import {
   useEffect,
   useRef,
@@ -40,6 +41,7 @@ export const App = () => {
     initStoreChainClient();
 
     window.papiDescriptors = papiDescriptors;
+    window.getPolkadotSigner = getPolkadotSigner;
 
     return () => {
       resetStoreAuth();

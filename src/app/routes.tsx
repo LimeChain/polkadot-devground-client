@@ -2,7 +2,7 @@ import { lazy } from 'react';
 
 import { LayoutBasic } from '@components/layouts/basic';
 import { LayoutCodeEditor } from '@components/layouts/codeEditor';
-// import App from '@constants/snippets/snippet2';
+// import { App } from '@constants/snippets/snippet1';
 import { NotFound } from '@views/notFound';
 
 const Home = lazy(() => import('../views/home'));
