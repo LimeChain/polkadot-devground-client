@@ -14,7 +14,8 @@
     "coverage/**",
     "dist",
     "**/*.js",
-    "**/*.json"
+    "**/*.json",
+    "src/constants/snippets/*.tsx"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
