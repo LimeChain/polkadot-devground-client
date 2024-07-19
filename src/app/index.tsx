@@ -1,4 +1,8 @@
 import * as papiDescriptors from '@polkadot-api/descriptors';
+import {
+  connectInjectedExtension,
+  getInjectedExtensions,
+} from 'polkadot-api/pjs-signer';
 import { getPolkadotSigner } from 'polkadot-api/signer';
 import {
   useEffect,
@@ -42,6 +46,8 @@ export const App = () => {
 
     window.papiDescriptors = papiDescriptors;
     window.getPolkadotSigner = getPolkadotSigner;
+    window.connectInjectedExtension = connectInjectedExtension;
+    window.getInjectedExtensions = getInjectedExtensions;
 
     return () => {
       resetStoreAuth();

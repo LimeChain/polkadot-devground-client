@@ -11,7 +11,6 @@ import {
 import { createRoot } from 'react-dom/client';
 
 const App = () => {
-
   const inputRef = useRef('5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7');
   const signerRef = useRef(null);
   const clientRef = useRef(null);
@@ -30,12 +29,13 @@ const App = () => {
       const provider = getSmProvider(chain);
       const client = window.parent.pdCreateClient(provider);
 
-      const api = client.getTypedApi(window.parent.papiDescriptors.rococo);
+      const api = client.getTypedApi(papiDescriptors.rococo);
 
-      const extensions = getInjectedExtensions() || []
-      const selectedExtension = await connectInjectedExtension(
+      const extensions = window.parent.getInjectedExtensions() || []
+      const selectedExtension = await window.parent.connectInjectedExtension(
         extensions[0]
       )
+
       const accounts = selectedExtension.getAccounts()
       const signer = accounts[0].polkadotSigner
 
@@ -55,7 +55,7 @@ const App = () => {
     setTxSent(true)
     try {
       const tx = apiRef?.current?.tx.Balances.transfer_allow_death({
-        dest: window.parent.papiDescriptors.MultiAddress.Id(inputRef.current),
+        dest: papiDescriptors.MultiAddress.Id(inputRef.current),
         value: 100n,
       })
         .signSubmitAndWatch(signerRef?.current)
