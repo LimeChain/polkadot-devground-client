@@ -5,67 +5,37 @@ import {
   mnemonicToEntropy,
 } from '@polkadot-labs/hdkd-helpers';
 import { chainSpec } from 'polkadot-api/chains/rococo_v2_2';
-// import { getPolkadotSigner } from 'polkadot-api/signer';
 import { getSmProvider } from 'polkadot-api/sm-provider';
 import { start } from 'polkadot-api/smoldot';
-// import { createClient } from "polkadot-api";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { getPolkadotSigner, type PolkadotSigner } from 'polkadot-api/signer';
+import { createClient, type PolkadotClient } from "polkadot-api";
+import { MultiAddress, rococo } from '@polkadot-api/descriptors';
+import { useRef, useState, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 
-export const App = () => {
+interface AppProps {
+  api: any;
+  client: PolkadotClient;
+  signer: PolkadotSigner;
+}
 
+const App = (props: AppProps) => {
+  const { api, client, signer } = props;
   const inputRef = useRef('5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7');
-  const signerRef = useRef(null);
-  const clientRef = useRef(null);
-  const apiRef = useRef(null);
   const [txStatus, setTxStatus] = useState({
     text: '',
     link: '',
   });
   const [txSent, setTxSent] = useState(false)
 
-
-  useEffect(() => {
-    (async () => {
-
-      const smoldot = start();
-      const chain = await smoldot.addChain({ chainSpec });
-      const provider = getSmProvider(chain);
-      const client = window.parent.pdCreateClient(provider);
-      // const client = createClient(provider);
-
-      const api = client.getTypedApi(papiDescriptors.rococo);
-
-      const entropy = mnemonicToEntropy(DEV_PHRASE);
-      const miniSecret = entropyToMiniSecret(entropy);
-      const hdkdKeyPair = sr25519CreateDerive(miniSecret)('//Bob');
-      const signer = window.parent.getPolkadotSigner(hdkdKeyPair.publicKey, 'Sr25519', (input) =>
-        hdkdKeyPair.sign(input),
-      );
-
-      signerRef.current = signer;
-      clientRef.current = client;
-      apiRef.current = api;
-    })()
-      .catch(err => {
-        console.log('useEffect error');
-        console.log(err);
-      });
-  }, []);
-
   const handleOnClick = useCallback(() => {
     console.log('clicl');
     setTxSent(true)
     try {
-      const tx = apiRef?.current?.tx.Balances.transfer_allow_death({
-        dest: papiDescriptors.MultiAddress.Id(inputRef.current),
+      api.tx.Balances.transfer_allow_death({
+        dest: MultiAddress.Id(inputRef.current),
         value: 100n,
-      }).signSubmitAndWatch(signerRef?.current)
+      }).signSubmitAndWatch(signer)
         .subscribe(({ txHash, type }) => {
           console.log(`Tx Stasus: ${type} / Tx Hash: ${txHash}`);
 
@@ -77,7 +47,7 @@ export const App = () => {
         .add(() => {
           console.log('END');
           setTxSent(false)
-          // clientRef?.current?.destroy();
+          client.destroy();
         });
     } catch (err) {
       console.log('click error');
@@ -123,4 +93,26 @@ export const App = () => {
   );
 };
 
-createRoot(document.getElementById('root')!).render(<App />);
+(async () => {
+  const smoldot = start();
+  const chain = await smoldot.addChain({ chainSpec });
+  const provider = getSmProvider(chain);
+  const client = createClient(provider);
+
+  const api = client.getTypedApi(rococo);
+
+  const entropy = mnemonicToEntropy(DEV_PHRASE);
+  const miniSecret = entropyToMiniSecret(entropy);
+  const hdkdKeyPair = sr25519CreateDerive(miniSecret)('//Bob');
+  const signer = getPolkadotSigner(hdkdKeyPair.publicKey, 'Sr25519', (input) =>
+    hdkdKeyPair.sign(input),
+  );
+
+  createRoot(document.getElementById('root')!).render(
+    <App
+      api={api}
+      client={client}
+      signer={signer}
+    />
+  );
+})();

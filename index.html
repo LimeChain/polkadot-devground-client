@@ -11,9 +11,8 @@
     <div id="pd-root"></div>
     <div id="pd-extras"></div>
     <script type="module" defer>
-      // @todo
-      import { createClient } from 'https://esm.sh/polkadot-api@0.11.1';
-      window.pdCreateClient = createClient;
+      import * as pdApi from 'https://esm.sh/polkadot-api@0.11.1';
+      window.customPackages = { ...pdApi };
     </script>
     <script type="module" defer src="/src/main.tsx"></script>
     <svg id="svg-sprite" xmlns="http://www.w3.org/2000/svg" />

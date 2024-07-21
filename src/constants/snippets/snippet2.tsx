@@ -1,64 +1,41 @@
-import { connectInjectedExtension, getInjectedExtensions } from "polkadot-api/pjs-signer"
-import { chainSpec } from 'polkadot-api/chains/rococo_v2_2';
-import { getSmProvider } from 'polkadot-api/sm-provider';
-import { start } from 'polkadot-api/smoldot';
 import {
   useCallback,
-  useEffect,
   useRef,
   useState,
 } from 'react';
 import { createRoot } from 'react-dom/client';
+import { chainSpec } from 'polkadot-api/chains/rococo_v2_2';
+import { getSmProvider } from 'polkadot-api/sm-provider';
+import { start } from 'polkadot-api/smoldot';
+import { createClient, type PolkadotClient } from "polkadot-api";
+import { MultiAddress, rococo } from '@polkadot-api/descriptors';
 
-const App = () => {
+import { connectInjectedExtension, getInjectedExtensions, type PolkadotSigner } from "polkadot-api/pjs-signer"
+
+interface AppProps {
+  api: any;
+  client: PolkadotClient;
+  signer: PolkadotSigner;
+}
+
+const App = (props: AppProps) => {
+  const { api, client, signer } = props;
   const inputRef = useRef('5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7');
-  const signerRef = useRef(null);
-  const clientRef = useRef(null);
-  const apiRef = useRef(null);
   const [txStatus, setTxStatus] = useState({
     text: '',
     link: '',
   });
-  const [txSent, setTxSent] = useState(false)
-
-  useEffect(() => {
-    (async () => {
-
-      const smoldot = start();
-      const chain = await smoldot.addChain({ chainSpec });
-      const provider = getSmProvider(chain);
-      const client = window.parent.pdCreateClient(provider);
-
-      const api = client.getTypedApi(papiDescriptors.rococo);
-
-      const extensions = window.parent.getInjectedExtensions() || []
-      const selectedExtension = await window.parent.connectInjectedExtension(
-        extensions[0]
-      )
-
-      const accounts = selectedExtension.getAccounts()
-      const signer = accounts[0].polkadotSigner
-
-
-      signerRef.current = signer;
-      clientRef.current = client;
-      apiRef.current = api;
-    })()
-      .catch(err => {
-        console.log('useEffect error');
-        console.log(err);
-      });
-  }, []);
+  const [txSent, setTxSent] = useState(false);
 
   const handleOnClick = useCallback(() => {
-    console.log('clicl');
-    setTxSent(true)
+    console.log('click');
+    setTxSent(true);
     try {
-      const tx = apiRef?.current?.tx.Balances.transfer_allow_death({
-        dest: papiDescriptors.MultiAddress.Id(inputRef.current),
+      api.tx.Balances.transfer_allow_death({
+        dest: MultiAddress.Id(inputRef.current),
         value: 100n,
       })
-        .signSubmitAndWatch(signerRef?.current)
+        .signSubmitAndWatch(signer)
         .subscribe(({ txHash, type }) => {
           console.log(`Tx Stasus: ${type} / Tx Hash: ${txHash}`);
 
@@ -70,7 +47,7 @@ const App = () => {
         .add(() => {
           console.log('END');
           setTxSent(false)
-          // clientRef?.current?.destroy();
+          client.destroy();
         });
     } catch (err) {
       console.log('click error');
@@ -114,4 +91,27 @@ const App = () => {
   );
 };
 
-createRoot(document.getElementById('root')!).render(<App />);
+(async () => {
+  const smoldot = start();
+  const chain = await smoldot.addChain({ chainSpec });
+  const provider = getSmProvider(chain);
+  const client = createClient(provider);
+
+  const api = client.getTypedApi(rococo);
+
+  const extensions = getInjectedExtensions() || [];
+  const selectedExtension = await connectInjectedExtension(
+    extensions[0]
+  );
+
+  const accounts = selectedExtension.getAccounts();
+  const signer = accounts[0].polkadotSigner;
+
+  createRoot(document.getElementById('root')!).render(
+    <App
+      api={api}
+      client={client}
+      signer={signer}
+    />
+  );
+})();

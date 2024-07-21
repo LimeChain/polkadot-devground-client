@@ -3,7 +3,7 @@ import {
   connectInjectedExtension,
   getInjectedExtensions,
 } from 'polkadot-api/pjs-signer';
-import { getPolkadotSigner } from 'polkadot-api/signer';
+import * as getPolkadotSigner from 'polkadot-api/signer';
 import {
   useEffect,
   useRef,
@@ -44,10 +44,12 @@ export const App = () => {
     initStoreUI();
     initStoreChainClient();
 
-    window.papiDescriptors = papiDescriptors;
-    window.getPolkadotSigner = getPolkadotSigner;
-    window.connectInjectedExtension = connectInjectedExtension;
-    window.getInjectedExtensions = getInjectedExtensions;
+    Object.assign(window.customPackages, {
+      ...papiDescriptors,
+      ...getPolkadotSigner,
+      connectInjectedExtension,
+      getInjectedExtensions,
+    });
 
     return () => {
       resetStoreAuth();

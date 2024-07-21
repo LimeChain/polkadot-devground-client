@@ -12,6 +12,7 @@ import { defaultImportMap } from '@views/codeEditor/constants';
 import {
   getImportMap,
   mergeImportMap,
+  removeNamedImports,
 } from '@views/codeEditor/helpers';
 
 import iframe from './iframe.html?raw';
@@ -22,9 +23,7 @@ import type {
 } from '@custom-types/eventBus';
 
 const getIframeContent = (script: string, importMap: string) => {
-  return iframe.replace('<!-- IMPORT_MAP -->', importMap).replace('<!-- SCRIPT -->', `
-    ${script}
-  `);
+  return iframe.replace('<!-- IMPORT_MAP -->', importMap).replace('<!-- SCRIPT -->', script);
 };
 
 const revokeBlobUrl = (url: string) => {
@@ -61,7 +60,9 @@ export const Iframe = (props: IframeProps) => {
         },
       });
 
-      html = getIframeContent(output.code, refImportMap.current);
+      const o = removeNamedImports(output.code, Object.keys(window.customPackages));
+
+      html = getIframeContent(o, refImportMap.current);
     } catch (e) {
       html = `
         <style>
@@ -91,18 +92,7 @@ export const Iframe = (props: IframeProps) => {
     setShowLoading(true);
     revokeBlobUrl(blobUrl);
     refTimeout.current = setTimeout(() => {
-      const res = mergeImportMap(defaultImportMap, getImportMap(data));
-      // @
-      res.imports = {
-        ...res.imports,
-        // 'polkadot-api/signer': 'https://esm.sh/polkadot-api@0.10.0/signer',
-        // 'polkadot-api/chains/rococo_v2_2': 'https://esm.sh/polkadot-api@0.10.0/known-chains/rococo_v2_2',
-        // 'polkadot-api/sm-provider': 'https://esm.sh/polkadot-api@0.10.0/sm-provider',
-        // 'polkadot-api/smoldot': 'https://esm.sh/polkadot-api@0.10.0/smoldot',
-        // 'polkadot-api/pjs-signer': 'https://esm.sh/polkadot-api@0.10.0/pjs-signer',
-      };
-
-      console.log('@@@ res', res);
+      const res = mergeImportMap(getImportMap(data), defaultImportMap);
       refImportMap.current = JSON.stringify(res, null, 2);
 
       generateBlobUrl(data);
