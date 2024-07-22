@@ -7,6 +7,7 @@ import { NotFound } from '@views/notFound';
 
 const Home = lazy(() => import('../views/home'));
 const CodeEditor = lazy(() => import('../views/codeEditor'));
+const CodePreview = lazy(() => import('../views/codePreview'));
 const Callback = lazy(() => import('../components/login/callback'));
 const BlockDetails = lazy(() => import('../views/blockDetails'));
 const Explorer = lazy(() => import('../views/explorer'));
@@ -52,6 +53,10 @@ export const routes = () => ([
           {
             path: '',
             element: <CodeEditor />,
+          },
+          {
+            path: ':previewId',
+            element: <CodePreview />,
           },
         ],
       },
