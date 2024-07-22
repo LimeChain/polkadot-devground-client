@@ -71,37 +71,6 @@ export const setupAta = (
   });
 };
 
-export const removeNamedImports = (code: string, namedImportsToRemove: string[]): string => {
-  // Regular expression to find import statements
-  const importRegex = /^import\s*{([^}]*)}\s*from\s*['"]([^'"]*)['"]\s*;?$/gm;
-
-  // Replace function for imports
-  const replaceImport = (match: string, imports: string, moduleName: string): string => {
-    // Split the imports by comma and trim whitespace
-    let importNames = imports.split(',').map(name => name.trim());
-
-    // Filter out the named imports that should be removed
-    importNames = importNames.filter(name => !namedImportsToRemove.includes(name));
-
-    // If no named imports remain, remove the entire import statement
-    if (importNames.length === 0) {
-      return '';
-    }
-
-    // Join the remaining imports back into a string
-    const newImports = importNames.join(', ');
-
-    // Return the modified import statement
-    return `import { ${newImports} } from '${moduleName}';`;
-  };
-
-  // Replace the import statements in the code
-  const newCode = code.replace(importRegex, replaceImport);
-
-  // Remove empty lines that might have been left behind
-  return newCode.replace(/^\s*[\r\n]/gm, '');
-};
-
 export const prettyPrintMessage = (message: string): string => {
   try {
     const parsedMessage = JSON.parse(message);
@@ -110,59 +79,6 @@ export const prettyPrintMessage = (message: string): string => {
     return message;
   }
 };
-
-export interface ImportMap {
-  imports?: Record<string, string>;
-  scopes?: Record<string, string>;
-}
-
-export function getImportMap(code: string) {
-  const importRegex = /import\s+(?:type\s+)?(?:\{[^}]*\}|[^'"]*)\s+from\s+['"]([^'"]+)['"]|import\s+['"]([^'"]+)['"]/g;
-
-  const importSet = new Set<string>();
-
-  let match: RegExpExecArray | null = importRegex.exec(code);
-
-  while (match !== null) {
-    const importPath = match[1] || match[2];
-    const isRelative = ['.', '/'].some((e) => importPath.startsWith(e));
-    if (!isRelative) {
-      importSet.add(importPath);
-    }
-    match = importRegex.exec(code);
-  }
-
-  const importMap: ImportMap = { imports: {}, scopes: {} };
-
-  importMap.imports ??= {};
-
-  for (const pkg of importSet) {
-    importMap.imports[pkg] = `https://esm.sh/${pkg}`;
-  }
-
-  return importMap;
-}
-
-export function mergeImportMap(...maps: ImportMap[]): ImportMap {
-  const importMap: ImportMap = {
-    imports: {},
-    scopes: {},
-  };
-
-  for (const map of maps) {
-    importMap.imports = {
-      ...importMap.imports,
-      ...(map.imports ?? {}),
-    };
-
-    importMap.scopes = {
-      ...importMap.scopes,
-      ...(map.scopes ?? {}),
-    };
-  }
-
-  return importMap;
-}
 
 export const formatCode = async (code: string) => {
   try {

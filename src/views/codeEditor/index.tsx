@@ -1,8 +1,10 @@
 import { useEventBus } from '@pivanov/event-bus';
 import {
+  useCallback,
   useRef,
   useState,
 } from 'react';
+import { toast } from 'react-hot-toast';
 import {
   Panel,
   PanelGroup,
@@ -11,16 +13,27 @@ import {
 
 import { ErrorBoundary } from '@components/errorBoundary';
 import { cn } from '@utils/helpers';
+import {
+  encodeCodeToBase64,
+  generateHTML,
+  getImportMap,
+  mergeImportMap,
+} from '@utils/iframe';
 
 import { DebugPanel } from './components/debugPanel';
 import { Iframe } from './components/iframe';
 import { MonacoEditor } from './components/monacoEditor';
 import { EditorActions } from './components/monacoEditor/actions';
 import { SnippetsSwitcher } from './components/snippetsSwitcher';
+import { defaultImportMap } from './constants';
 
-import type { IEventBusMonacoEditorShowPreview } from '@custom-types/eventBus';
+import type {
+  IEventBusMonacoEditorShowPreview,
+  IEventBusMonacoEditorUpdateCode,
+} from '@custom-types/eventBus';
 
 const TypeScriptEditor = () => {
+  const refCode = useRef<string>('');
   const refTimeout = useRef<NodeJS.Timeout>();
   const refCanPreview = useRef(false);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -40,6 +53,30 @@ const TypeScriptEditor = () => {
     clearTimeout(refTimeout.current);
     setIsLoaded(false);
   });
+
+  useEventBus<IEventBusMonacoEditorUpdateCode>('@@-monaco-editor-update-code', ({ data }) => {
+    refCode.current = data;
+  });
+
+  const shareCode = useCallback(async () => {
+    const toastId = 'copy-to-clipboard';
+    toast.dismiss(toastId);
+
+    const res = mergeImportMap(getImportMap(refCode.current), defaultImportMap);
+    const importMap = JSON.stringify(res, null, 2);
+
+    const html = generateHTML(refCode.current, importMap);
+
+    const encodedCode = encodeCodeToBase64(html);
+    const sharedUrl = `${window.location.origin}${window.location.pathname}/${encodedCode}`;
+
+    try {
+      await navigator.clipboard.writeText(sharedUrl);
+      toast.success(<span>Copied <strong>URL</strong> to clipboard</span>, { id: toastId });
+    } catch (err) {
+      toast.error('Oops. Something went wrong', { id: toastId });
+    }
+  }, []);
 
   return (
     <div className="max-w-screen flex h-full flex-col overflow-hidden">
@@ -93,6 +130,13 @@ const TypeScriptEditor = () => {
                         <span className="size-3 rounded-full bg-yellow-400" />
                         <span className="size-3 rounded-full bg-green-400" />
                       </div>
+                      <button
+                        type="button"
+                        className="ml-auto text-xs"
+                        onClick={shareCode}
+                      >
+                        Share Url
+                      </button>
                     </div>
                     <Panel
                       id="right-top"

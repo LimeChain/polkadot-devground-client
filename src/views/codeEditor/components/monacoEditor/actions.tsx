@@ -10,11 +10,11 @@ import {
 
 import { downloadZip } from '@utils/downloadZip';
 import { cn } from '@utils/helpers';
-import { defaultImportMap } from '@views/codeEditor/constants';
 import {
   getImportMap,
   mergeImportMap,
-} from '@views/codeEditor/helpers';
+} from '@utils/iframe';
+import { defaultImportMap } from '@views/codeEditor/constants';
 
 import type { IEventBusMonacoEditorUpdateCode } from '@custom-types/eventBus';
 

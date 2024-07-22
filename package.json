@@ -32,6 +32,7 @@
     "lodash.debounce": "4.0.8",
     "monaco-editor": "0.50.0",
     "nanoid": "5.0.7",
+    "pako": "2.1.0",
     "polkadot-api": "0.11.1",
     "prettier": "3.3.2",
     "prism-themes": "1.9.0",
@@ -53,6 +54,7 @@
   "devDependencies": {
     "@types/file-saver": "2.0.7",
     "@types/lodash.debounce": "4.0.9",
+    "@types/pako": "2.0.3",
     "@types/prismjs": "1.26.4",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
