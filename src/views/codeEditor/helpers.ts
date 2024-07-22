@@ -7,6 +7,8 @@ import typescript from 'typescript';
 
 import { sleep } from '@utils/helpers';
 
+const loadedFilesCache = new Set<string>();
+
 export const setupAta = (
   onDownloadFile?: (code: string, path: string) => void,
   onFinished?: (files: Map<string, string>) => void,
@@ -49,7 +51,12 @@ export const setupAta = (
     projectName: 'react-playground',
     fetcher: customFetcher,
     delegate: {
-      receivedFile: onDownloadFile,
+      receivedFile: (code, path) => {
+        if (!loadedFilesCache.has(path)) {
+          loadedFilesCache.add(path);
+          onDownloadFile?.(code, path);
+        }
+      },
       started: onStarted,
       finished: (files) => {
         onProgress?.(100);
@@ -62,6 +69,37 @@ export const setupAta = (
       },
     },
   });
+};
+
+export const removeNamedImports = (code: string, namedImportsToRemove: string[]): string => {
+  // Regular expression to find import statements
+  const importRegex = /^import\s*{([^}]*)}\s*from\s*['"]([^'"]*)['"]\s*;?$/gm;
+
+  // Replace function for imports
+  const replaceImport = (match: string, imports: string, moduleName: string): string => {
+    // Split the imports by comma and trim whitespace
+    let importNames = imports.split(',').map(name => name.trim());
+
+    // Filter out the named imports that should be removed
+    importNames = importNames.filter(name => !namedImportsToRemove.includes(name));
+
+    // If no named imports remain, remove the entire import statement
+    if (importNames.length === 0) {
+      return '';
+    }
+
+    // Join the remaining imports back into a string
+    const newImports = importNames.join(', ');
+
+    // Return the modified import statement
+    return `import { ${newImports} } from '${moduleName}';`;
+  };
+
+  // Replace the import statements in the code
+  const newCode = code.replace(importRegex, replaceImport);
+
+  // Remove empty lines that might have been left behind
+  return newCode.replace(/^\s*[\r\n]/gm, '');
 };
 
 export const prettyPrintMessage = (message: string): string => {

@@ -45,7 +45,7 @@ const initialState = {
   smoldot: null as unknown as Client,
 };
 
-const createClient = window.pdCreateClient;
+const { createClient } = window.customPackages;
 
 const baseStore = create<StoreInterface>()((set, get) => ({
   ...initialState,

@@ -4,6 +4,22 @@
     <meta charset="UTF-8" />
     <script async src="https://unpkg.com/es-module-shims/dist/es-module-shims.wasm.js"></script>
     <script>
+      window.injectedWeb3 = window.parent.injectedWeb3;
+
+      const customPackages = window.parent.customPackages;
+      for (const key in customPackages) {
+        if (customPackages.hasOwnProperty(key)) {
+          Object.defineProperty(globalThis, key, {
+            value: customPackages[key],
+            writable: false,
+            configurable: false,
+            enumerable: true,
+          });
+        }
+      }
+
+    </script>
+    <script>
       class CustomLogger {
         constructor() {
           this.webSockets = new Set();
@@ -65,9 +81,6 @@
       console.error = (...args) => {
         logger.error(...args);
       };
-
-      const papiDescriptors = window.parent.papiDescriptors;
-      window.injectedWeb3 = window.parent.injectedWeb3;
     </script>
     <script type="importmap">
       <!-- IMPORT_MAP -->

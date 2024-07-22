@@ -21,11 +21,7 @@ import {
   getSearchParam,
   setSearchParam,
 } from '@utils/helpers';
-import {
-  storageExists,
-  storageGetItem,
-  storageSetItem,
-} from '@utils/storage';
+import { storageSetItem } from '@utils/storage';
 import {
   STORAGE_CACHE_NAME,
   STORAGE_PREFIX,
@@ -223,13 +219,13 @@ export const MonacoEditor = () => {
       const selectedCodeSnippet = snippets.find((f) => f.id === snippetIndex) || snippets[0];
       refSnippetIndex.current = String(selectedCodeSnippet.id);
 
-      const isTempVersionExist = await storageExists(STORAGE_CACHE_NAME, `${STORAGE_PREFIX}-${snippetIndex}`);
+      // const isTempVersionExist = await storageExists(STORAGE_CACHE_NAME, `${STORAGE_PREFIX}-${snippetIndex}`);
       code = selectedCodeSnippet.code;
 
-      if (isTempVersionExist) {
-        const existingCode = await storageGetItem<string>(STORAGE_CACHE_NAME, `${STORAGE_PREFIX}-${snippetIndex}`);
-        code = existingCode || code;
-      }
+      // if (isTempVersionExist) {
+      //   const existingCode = await storageGetItem<string>(STORAGE_CACHE_NAME, `${STORAGE_PREFIX}-${snippetIndex}`);
+      //   code = existingCode || code;
+      // }
 
       setSearchParam('s', snippetIndex);
     }
