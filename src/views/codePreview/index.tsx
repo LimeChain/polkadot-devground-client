@@ -5,7 +5,13 @@ import {
 import { useParams } from 'react-router-dom';
 
 import { cn } from '@utils/helpers';
-import { decodeCodeFromBase64 } from '@utils/iframe';
+import {
+  decodeCodeFromBase64,
+  generateHTML,
+  getImportMap,
+  mergeImportMap,
+} from '@utils/iframe';
+import { defaultImportMap } from '@views/codeEditor/constants';
 
 const CodePreview = () => {
   const { previewId } = useParams();
@@ -15,7 +21,12 @@ const CodePreview = () => {
     if (previewId) {
       const decodedCode = decodeCodeFromBase64(previewId);
       if (decodedCode) {
-        const blobUrl = URL.createObjectURL(new Blob([decodedCode], { type: 'text/html' }));
+        const res = mergeImportMap(getImportMap(decodedCode), defaultImportMap);
+        const importMap = JSON.stringify(res, null, 2);
+
+        const html = generateHTML(decodedCode, importMap);
+
+        const blobUrl = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
         setBlobUrl(blobUrl);
       }
     }
