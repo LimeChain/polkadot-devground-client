@@ -59,19 +59,9 @@ export function mergeImportMap(...maps: ImportMap[]): ImportMap {
   return importMap;
 }
 
-export const getIframeContent = (script: string, importMap: string) => {
-  return iframe.replace('<!-- IMPORT_MAP -->', importMap).replace('<!-- SCRIPT -->', script);
-};
-
 export const compressCode = (code: string): string => {
   const compressed = deflate(new TextEncoder().encode(code));
   return window.btoa(String.fromCharCode(...compressed));
-};
-
-export const decompressCode = (compressed: string): string => {
-  const decoded = Uint8Array.from(atob(compressed), c => c.charCodeAt(0));
-  const decompressed = inflate(decoded, { to: 'string' });
-  return decompressed;
 };
 
 export const encodeCodeToBase64 = (code: string): string => {
@@ -79,6 +69,16 @@ export const encodeCodeToBase64 = (code: string): string => {
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=+$/, '');
+};
+
+export const getIframeContent = (script: string, importMap: string) => {
+  return iframe.replace('<!-- IMPORT_MAP -->', importMap).replace('<!-- SCRIPT -->', script);
+};
+
+export const decompressCode = (compressed: string): string => {
+  const decoded = Uint8Array.from(atob(compressed), c => c.charCodeAt(0));
+  const decompressed = inflate(decoded, { to: 'string' });
+  return decompressed;
 };
 
 export const decodeCodeFromBase64 = (base64: string): string | undefined => {

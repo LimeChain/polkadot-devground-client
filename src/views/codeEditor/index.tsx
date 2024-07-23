@@ -13,19 +13,13 @@ import {
 
 import { ErrorBoundary } from '@components/errorBoundary';
 import { cn } from '@utils/helpers';
-import {
-  encodeCodeToBase64,
-  generateHTML,
-  getImportMap,
-  mergeImportMap,
-} from '@utils/iframe';
+import { encodeCodeToBase64 } from '@utils/iframe';
 
 import { DebugPanel } from './components/debugPanel';
 import { Iframe } from './components/iframe';
 import { MonacoEditor } from './components/monacoEditor';
 import { EditorActions } from './components/monacoEditor/actions';
 import { SnippetsSwitcher } from './components/snippetsSwitcher';
-import { defaultImportMap } from './constants';
 
 import type {
   IEventBusMonacoEditorShowPreview,
@@ -62,12 +56,7 @@ const TypeScriptEditor = () => {
     const toastId = 'copy-to-clipboard';
     toast.dismiss(toastId);
 
-    const res = mergeImportMap(getImportMap(refCode.current), defaultImportMap);
-    const importMap = JSON.stringify(res, null, 2);
-
-    const html = generateHTML(refCode.current, importMap);
-
-    const encodedCode = encodeCodeToBase64(html);
+    const encodedCode = encodeCodeToBase64(refCode.current);
     const sharedUrl = `${window.location.origin}${window.location.pathname}/${encodedCode}`;
 
     try {
