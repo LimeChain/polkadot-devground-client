@@ -1,8 +1,12 @@
-// eslint-disable-next-line import/no-unresolved
 import {
   type dot,
   type rococo,
 } from '@polkadot-api/descriptors';
+import {
+  type PolkadotClient,
+  type TypedApi,
+} from 'polkadot-api';
+import { createClient } from 'polkadot-api';
 import { getSmProvider } from 'polkadot-api/sm-provider';
 import { type Client } from 'polkadot-api/smoldot';
 import { startFromWorker } from 'polkadot-api/smoldot/from-worker';
@@ -14,10 +18,6 @@ import {
   CHAIN_SPECS,
   SUPPORTED_CHAIN_GROUPS,
 } from '@constants/chain';
-import {
-  type PolkadotClient,
-  type TypedApi,
-} from 'polkadot-api';
 
 import { createSelectors } from '../createSelectors';
 
@@ -44,8 +44,6 @@ const initialState = {
   api: null,
   smoldot: null as unknown as Client,
 };
-
-const { createClient } = window.customPackages;
 
 const baseStore = create<StoreInterface>()((set, get) => ({
   ...initialState,

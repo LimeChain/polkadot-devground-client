@@ -1,4 +1,5 @@
 import * as papiDescriptors from '@polkadot-api/descriptors';
+import { createClient } from 'polkadot-api';
 import {
   connectInjectedExtension,
   getInjectedExtensions,
@@ -43,8 +44,9 @@ export const App = () => {
     initStoreAuth();
     initStoreUI();
     initStoreChainClient();
-
+    window.customPackages = {};
     Object.assign(window.customPackages, {
+      ...createClient,
       ...papiDescriptors,
       ...getPolkadotSigner,
       connectInjectedExtension,
@@ -60,11 +62,7 @@ export const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return (
-    <>
-      <RouterProvider router={refRoutes.current} />
-    </>
-  );
+  return <RouterProvider router={refRoutes.current} />;
 };
 
 App.displayName = 'App';
