@@ -2,6 +2,7 @@ import {
   useCallback,
   useState,
 } from 'react';
+import { useParams } from 'react-router-dom';
 
 import { CopyToClipboard } from '@components/copyToClipboard';
 import { Icon } from '@components/icon';
@@ -11,6 +12,7 @@ import { PDLink } from '@components/ui/PDLink';
 import styles from './styles.module.css';
 
 const BlockDetails = () => {
+  const { blockId } = useParams();
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [timeStamp] = useState<string>('2024-06-26 14:21:42');
 
@@ -22,14 +24,14 @@ const BlockDetails = () => {
     <>
       <div className="mb-12  flex items-center  justify-between">
         <div className="flex items-center">
-          <PDLink to="blank" className="mr-8 bg-dev-purple-700 p-2 dark:bg-white">
+          <PDLink to="/explorer" className="mr-8 bg-dev-purple-700 p-2 dark:bg-white">
             <Icon
               name="icon-arrowLeft"
               className=" text-dev-white-200 dark:text-dev-purple-700"
             />
           </PDLink>
           <h4 className="mr-2 text-h4-light">Block</h4>
-          <h4 className="text-h4-bold">21,382,130</h4>
+          <h4 className="text-h4-bold">{blockId}</h4>
         </div>
 
         <div className="flex gap-6">

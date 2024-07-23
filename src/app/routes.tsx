@@ -37,16 +37,6 @@ export const routes = () => ([
       //   ],
       // },
       {
-        path: 'block/:blockNumber',
-        element: <LayoutBasic hasFooter />,
-        children: [
-          {
-            path: '',
-            element: <BlockDetails />,
-          },
-        ],
-      },
-      {
         path: 'code',
         element: <LayoutCodeEditor />,
         children: [
@@ -78,8 +68,13 @@ export const routes = () => ([
             path: '',
             element: <Explorer />,
           },
+          {
+            path: ':blockId',
+            element: <BlockDetails />,
+          },
         ],
       },
+
       {
         path: '*',
         element: <NotFound />,
