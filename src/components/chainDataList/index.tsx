@@ -32,7 +32,7 @@ const Row = (props: IRow) => {
   const timeAgo = formatDistanceToNow(date, { addSuffix: true });
 
   return (
-    <PDLink to={`block-details/${formatNumber(21_382_130 - index)}`} className={styles['pd-explorer-list']}>
+    <PDLink to={`${formatNumber(21_382_130 - index)}`} className={styles['pd-explorer-list']}>
       <div>
         <p>Block# <strong>{formatNumber(21_382_130 - index)}</strong></p>
         <p>
