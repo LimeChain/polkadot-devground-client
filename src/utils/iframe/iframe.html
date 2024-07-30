@@ -87,10 +87,10 @@
     </script>
     <script>
       window.onerror = function (msg, url, lineNo, columnNo, error) {
-        var title = 'Error ocurred, check your code.'
+        var title = 'Error ocurred.'
         var content = `<h3>${title}</h3><pre>${error.toString()}</pre>`
         document.getElementById('root').innerHTML = content
-        return true
+        return true;
       }
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -105,6 +105,11 @@
     <div id="root" class="size-full"></div>
     <script type="module">
       <!-- SCRIPT -->
+    </script>
+    <script>
+      if (!window.injectedWeb3) {
+        throw new Error('Injected Web3 not found');
+      }
     </script>
   </body>
 </html>
