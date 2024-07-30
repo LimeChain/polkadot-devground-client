@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useEffect,
   useState,
 } from 'react';
 import { useParams } from 'react-router-dom';
@@ -8,17 +9,87 @@ import { CopyToClipboard } from '@components/copyToClipboard';
 import { Icon } from '@components/icon';
 import { ToggleButton } from '@components/toggleButton';
 import { PDLink } from '@components/ui/PDLink';
+import { useStoreChain } from '@stores';
+import { getValidatorId } from '@utils/rpc/getValidatorId';
 
 import styles from './styles.module.css';
+
+import type { IBlock } from '@custom-types/block';
+
+interface IRuntimeVersion {
+  specVersion: number;
+  transactionVersion: number;
+}
+
+interface IBlockData {
+  number: number;
+  blockHash: string;
+  extrinsicsRoot: string;
+  parentHash: string;
+  stateRoot: string;
+  specVersion: number;
+  validatorId: string | null;
+}
 
 const BlockDetails = () => {
   const { blockId } = useParams();
   const [isChecked, setIsChecked] = useState<boolean>(false);
+  const [blockData, setBlockData] = useState<IBlockData | undefined>();
+
   const [timeStamp] = useState<string>('2024-06-26 14:21:42');
+
+  const rawClient = useStoreChain.use.rawClient?.();
+  const latestFinalizedBlock = useStoreChain.use.latestFinalizedBlock?.();
 
   const handleSetCheck = useCallback((): void => {
     setIsChecked(state => !state);
   }, []);
+
+  const init = useCallback(async (blockId: number) => {
+    if (!rawClient || !blockId) {
+      return;
+    }
+    try {
+      // Fetch the block hash using the block number
+      const blockHash: string = await rawClient.request('chain_getBlockHash', [blockId]);
+
+      // Fetch the latest block details using the block hash
+      const latestBlock: { block: IBlock } = await rawClient.request('chain_getBlock', [blockHash]);
+
+      // Fetch the runtime version
+      const runTimeVersion: IRuntimeVersion = await rawClient.request('state_getRuntimeVersion', []);
+
+      // Get the validator ID
+      const validatorId: string | null = await getValidatorId(latestBlock.block);
+
+      // Set the block data
+      setBlockData({
+        number: blockId,
+        blockHash,
+        extrinsicsRoot: latestBlock.block.header.extrinsicsRoot,
+        parentHash: latestBlock.block.header.parentHash,
+        stateRoot: latestBlock.block.header.stateRoot,
+        specVersion: runTimeVersion.specVersion,
+        validatorId,
+      });
+
+    } catch (error) {
+      console.error('Error fetching block data:', error);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (rawClient && blockId) {
+      void init(Number(blockId));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rawClient, blockId]);
+
+  if (!blockData) {
+    return <>loading</>;
+  }
 
   return (
     <>
@@ -71,14 +142,18 @@ const BlockDetails = () => {
       <div className={styles['pd-block-details']}>
         <p>Status</p>
 
-        <div >
-          <Icon
-            name="icon-checked"
-            className=" text-dev-white-200 dark:text-dev-purple-700"
-            size={[16]}
-          />
-          <p>Finalized</p>
-        </div>
+        {
+          latestFinalizedBlock?.number !== blockData.number && (
+            <div>
+              <Icon
+                name="icon-checked"
+                className=" text-dev-white-200 dark:text-dev-purple-700"
+                size={[16]}
+              />
+              <p>Finalized</p>
+            </div>
+          )
+        }
       </div>
 
       {/* Block Hash */}
@@ -86,7 +161,7 @@ const BlockDetails = () => {
         <p>Block Hash</p>
 
         <div className="gap-x-1">
-          <p>0x7d6af371a0c713ec38b8a95dca3ba8b5a7f3eda2b3c81697b585a0facddcff77</p>
+          <p>{blockData.blockHash}</p>
 
           <CopyToClipboard
             text="0x7d6af371a0c713ec38b8a95dca3ba8b5a7f3eda2b3c81697b585a0facddcff77"
@@ -108,10 +183,10 @@ const BlockDetails = () => {
         <p>Parent Hash</p>
 
         <div>
-          0x7d6af371a0c713ec38b8a95dca3ba8b5a7f3eda2b3c81697b585a0facddcff77
+          {blockData.parentHash}
 
           <CopyToClipboard
-            text="0x7d6af371a0c713ec38b8a95dca3ba8b5a7f3eda2b3c81697b585a0facddcff77"
+            text={blockData.parentHash}
             toastMessage="Parent Hash"
           >
             {
@@ -130,10 +205,10 @@ const BlockDetails = () => {
         <p>State Root</p>
 
         <div>
-          0x7d6af371a0c713ec38b8a95dca3ba8b5a7f3eda2b3c81697b585a0facddcff77
+          {blockData.stateRoot}
 
           <CopyToClipboard
-            text="0x7d6af371a0c713ec38b8a95dca3ba8b5a7f3eda2b3c81697b585a0facddcff77"
+            text={blockData.stateRoot}
             toastMessage="State Root"
           >
             {
@@ -152,11 +227,11 @@ const BlockDetails = () => {
         <p>Extrinsic Root</p>
 
         <div>
-          0x7d6af371a0c713ec38b8a95dca3ba8b5a7f3eda2b3c81697b585a0facddcff77
+          {blockData.extrinsicsRoot}
 
           <CopyToClipboard
-            text="0x7d6af371a0c713ec38b8a95dca3ba8b5a7f3eda2b3c81697b585a0facddcff77"
-            toastMessage="State Root"
+            text={blockData.extrinsicsRoot}
+            toastMessage="Extrinsic Root"
           >
             {
               ({ ClipboardIcon }) => (
@@ -169,32 +244,36 @@ const BlockDetails = () => {
         </div>
       </div>
 
-      <div className={styles['pd-block-details']}>
-        <p>Validator</p>
+      {
+        blockData.validatorId && (
+          <div className={styles['pd-block-details']}>
+            <p>Validator</p>
 
-        <div>
-          <Icon name="logo-polkadotBlockDetails" />
-          14Y626iStBUWcNtnmH97163BBJJ2f7jc1piGMZwEQfK3t8zw
+            <div>
+              <Icon name="logo-polkadotBlockDetails" />
+              {blockData.validatorId}
 
-          <CopyToClipboard
-            text="14Y626iStBUWcNtnmH97163BBJJ2f7jc1piGMZwEQfK3t8zw"
-            toastMessage="Validator"
-          >
-            {
-              ({ ClipboardIcon }) => (
-                <>
-                  {ClipboardIcon}
-                </>
-              )
-            }
-          </CopyToClipboard>
-        </div>
-      </div>
+              <CopyToClipboard
+                text={blockData.validatorId}
+                toastMessage="Validator"
+              >
+                {
+                  ({ ClipboardIcon }) => (
+                    <>
+                      {ClipboardIcon}
+                    </>
+                  )
+                }
+              </CopyToClipboard>
+            </div>
+          </div>
+        )
+      }
 
       <div className={styles['pd-block-details']}>
         <p>Spec Version</p>
 
-        <div>1002004</div>
+        <div>{blockData.specVersion}</div>
       </div>
     </>
   );
