@@ -43,3 +43,8 @@ export const CHAIN_DESCRIPTORS = {
   [SUPPORTED_CHAIN_GROUPS['polkadot'].chains[0].id]: dot,
   [SUPPORTED_CHAIN_GROUPS['rococo'].chains[0].id]: rococo,
 };
+
+export const CHAIN_WEBSOCKET_URLS: { [key: string]: string } = {
+  polkadot: 'wss://polkadot-rpc.publicnode.com',
+  rococo: 'wss://rococo-rpc.polkadot.io',
+};
