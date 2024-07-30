@@ -1,19 +1,19 @@
-import {
-  formatDistanceToNow,
-  subSeconds,
-} from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 
 import { PDScrollArea } from '@components/scrollArea';
 import {
   type IPDLink,
   PDLink,
 } from '@components/ui/PDLink';
+import { useStoreExplorer } from '@stores';
 import {
   cn,
   formatNumber,
 } from '@utils/helpers';
 
 import styles from './styles.module.css';
+
+import type { IBlock } from '@custom-types/block';
 
 interface IChainDataList {
   title: string;
@@ -22,23 +22,26 @@ interface IChainDataList {
 }
 
 interface IRow {
-  index: number;
+  block: IBlock;
 }
+
 const Row = (props: IRow) => {
-  const { index } = props;
+  const { block } = props;
 
-  const date = subSeconds(new Date(), index * 50); // fake date
+  const timeAgo = block.timestamp && formatDistanceToNow(block.timestamp, { addSuffix: true });
 
-  const timeAgo = formatDistanceToNow(date, { addSuffix: true });
+  const blockNumber = parseInt(block.header.number, 16);
 
   return (
-    <PDLink to={`${21_382_130 - index}`} className={styles['pd-explorer-list']}>
+    <PDLink to={`${blockNumber}`} className={styles['pd-explorer-list']}>
       <div>
-        <p>Block# <strong>{formatNumber(21_382_130 - index)}</strong></p>
+        <p>Block# <strong>{formatNumber(blockNumber)}</strong></p>
         <p>
           <span className="text-dev-black-300 dark:text-dev-purple-300">Includes</span>
           {' '}
-          <span>2 Extrinsics</span> 46 Events
+          <span>{block.extrinsics.length} Extrinsics</span>
+          {' '}
+          (46 Events - fake)
         </p>
       </div>
       <div>{timeAgo}</div>
@@ -47,7 +50,8 @@ const Row = (props: IRow) => {
 };
 
 export const ChainDataList = ({ title, link, linkText }: IChainDataList) => {
-  const dummyArray = Array.from({ length: 100 });
+  const latestBlocks = useStoreExplorer.use.latestBlocks?.();
+
   return (
     <div className="flex flex-1 flex-col gap-y-3 overflow-hidden">
       <div className="flex items-center gap-3">
@@ -70,8 +74,8 @@ export const ChainDataList = ({ title, link, linkText }: IChainDataList) => {
             verticalScrollClassNames="py-3"
           >
             {
-              dummyArray.map((_, index) => (
-                <Row key={index} index={index} />
+              latestBlocks?.map((block) => (
+                <Row key={block.hash} block={block} />
               ))
             }
           </PDScrollArea>
