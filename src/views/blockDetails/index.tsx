@@ -10,11 +10,11 @@ import { Icon } from '@components/icon';
 import { ToggleButton } from '@components/toggleButton';
 import { PDLink } from '@components/ui/PDLink';
 import { useStoreChain } from '@stores';
+import { formatNumber } from '@utils/helpers';
+import { getBlockDetails } from '@utils/rpc/getBlockDetails';
 import { getValidatorId } from '@utils/rpc/getValidatorId';
 
 import styles from './styles.module.css';
-
-import type { IBlock } from '@custom-types/block';
 
 interface IRuntimeVersion {
   specVersion: number;
@@ -50,29 +50,24 @@ const BlockDetails = () => {
       return;
     }
     try {
-      // Fetch the block hash using the block number
-      const blockHash: string = await rawClient.request('chain_getBlockHash', [blockId]);
-
-      // Fetch the latest block details using the block hash
-      const latestBlock: { block: IBlock } = await rawClient.request('chain_getBlock', [blockHash]);
+      const latestBlock = await getBlockDetails(rawClient, blockId);
 
       // Fetch the runtime version
       const runTimeVersion: IRuntimeVersion = await rawClient.request('state_getRuntimeVersion', []);
 
       // Get the validator ID
-      const validatorId: string | null = await getValidatorId(latestBlock.block);
+      const validatorId: string | null = await getValidatorId(latestBlock);
 
       // Set the block data
       setBlockData({
         number: blockId,
-        blockHash,
-        extrinsicsRoot: latestBlock.block.header.extrinsicsRoot,
-        parentHash: latestBlock.block.header.parentHash,
-        stateRoot: latestBlock.block.header.stateRoot,
+        blockHash: latestBlock.hash,
+        extrinsicsRoot: latestBlock.header.extrinsicsRoot,
+        parentHash: latestBlock.header.parentHash,
+        stateRoot: latestBlock.header.stateRoot,
         specVersion: runTimeVersion.specVersion,
         validatorId,
       });
-
     } catch (error) {
       console.error('Error fetching block data:', error);
     }
@@ -102,7 +97,7 @@ const BlockDetails = () => {
             />
           </PDLink>
           <h4 className="mr-2 text-h4-light">Block</h4>
-          <h4 className="text-h4-bold">{blockId}</h4>
+          <h4 className="text-h4-bold">{formatNumber(blockData.number)}</h4>
         </div>
 
         <div className="flex gap-6">
