@@ -68,9 +68,9 @@ const TypeScriptEditor = () => {
   }, []);
 
   return (
-    <div className="max-w-screen flex h-full flex-col overflow-hidden">
+    <div className="max-w-screen flex h-full flex-col overflow-hidden px-8 pt-8">
       <SnippetsSwitcher />
-      <div className="relative flex flex-1 px-4 pb-4">
+      <div className="relative flex flex-1 pb-4">
         <PanelGroup
           autoSaveId="persistence"
           direction="horizontal"
