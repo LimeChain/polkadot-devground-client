@@ -44,7 +44,7 @@ export const routes = () => ([
       // },
       {
         path: 'code',
-        element: <LayoutCodeEditor />,
+        element: <LayoutCodeEditor/>,
         children: [
           {
             path: '',
