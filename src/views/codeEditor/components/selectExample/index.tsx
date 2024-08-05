@@ -24,13 +24,13 @@ export const SelectExample = () => {
   }, []);
 
   return (
-    <div className="group relative box-border w-6/12 overflow-hidden">
+    <div className="group relative w-6/12	">
    
       <button
         className={cn(
-          'box-border flex  items-center justify-between ',
-          '',
-          ' bg-dev-purple-200 group-focus-within:border-2 group-hover:bg-dev-purple-300',
+          'flex w-full items-center justify-between px-4 py-[18px]',
+          'relative px-2 py-5',
+          'border-dev-pink-500 bg-dev-purple-200 group-focus-within:border-2 group-hover:bg-dev-purple-300',
           'flex items-center gap-1',
         )}
       >
@@ -44,48 +44,105 @@ export const SelectExample = () => {
       </button>
 
       <div className={cn(
-        'absolute top-20 z-50 box-border w-full',
+        'absolute top-20 z-50 w-full',
         'bg-dev-black-1000 dark:bg-dev-purple-50',
         'hidden group-focus-within:block',
       )}
       >
         <div className={cn(
-          'mb-4 box-border px-2 font-geist text-body2-regular',
+          'mb-4 px-2 font-geist text-body2-regular',
           'border-b border-dev-purple-700 dark:border-dev-purple-300',
           'text-dev-white-200 dark:text-dev-black-800',
         )}
         >
-          <button className="box-border border-b-4 border-dev-pink-500 px-2 py-2.5">Custom</button>
-          <button className="box-border px-2 py-2.5">Default</button>
+          <button className="border-b-4 border-dev-pink-500 px-2 py-2.5">Custom</button>
+          <button className="px-2 py-2.5">Default</button>
         </div>
           
         {snippets.map((snippet) => (
-          <button
-            key={snippet.id}
-            className={cn(
-              'box-border flex w-full items-center justify-between px-4 py-3.5',
-              'transition-[background] duration-300',
-              'hover:bg-dev-black-800 hover:dark:bg-dev-purple-300',
-            )}
-            onClick={handleChangeExample}
-            data-snippet-index={snippet.id}
-          >
-            <p className={cn(
-              'font-geist text-body2-regular text-dev-white-200',
-              'dark:text-dev-black-1000',
-            )}
+          <>
+            <button
+              key={snippet.id}
+              className={cn(
+                'flex w-full items-center justify-between px-4 py-3.5',
+                'transition-[background] duration-300',
+                'hover:bg-dev-black-800 hover:dark:bg-dev-purple-300',
+              
+              )}
+              onClick={handleChangeExample}
+              data-snippet-index={snippet.id}
             >
-              Example: {snippet.id}
-            </p> 
-
-            <p className={cn(
-              'font-geist text-body3-regular text-dev-white-1000',
-              'dark:text-dev-black-300',
-            )}
-            >
+              <p className={cn(
+                'font-geist text-body2-regular text-dev-white-200',
+                'dark:text-dev-black-1000',
+              )}
+              >
+               Example: {snippet.id}
+              </p> 
+  
+              <p className={cn(
+                'font-geist text-body3-regular text-dev-white-1000',
+                'dark:text-dev-black-300',
+              )}
+              >
               CUSTOM          
-            </p> 
-          </button>
+              </p> 
+            </button>
+            <button
+              key={snippet.id}
+              className={cn(
+                'flex w-full items-center justify-between px-4 py-3.5',
+                'transition-[background] duration-300',
+                'hover:bg-dev-black-800 hover:dark:bg-dev-purple-300',
+              
+              )}
+              onClick={handleChangeExample}
+              data-snippet-index={snippet.id}
+            >
+              <p className={cn(
+                'font-geist text-body2-regular text-dev-white-200',
+                'dark:text-dev-black-1000',
+              )}
+              >
+               Example: {snippet.id}
+              </p> 
+  
+              <p className={cn(
+                'font-geist text-body3-regular text-dev-white-1000',
+                'dark:text-dev-black-300',
+              )}
+              >
+              CUSTOM          
+              </p> 
+            </button>
+            <button
+              key={snippet.id}
+              className={cn(
+                'flex w-full items-center justify-between px-4 py-3.5',
+                'transition-[background] duration-300',
+                'hover:bg-dev-black-800 hover:dark:bg-dev-purple-300',
+              
+              )}
+              onClick={handleChangeExample}
+              data-snippet-index={snippet.id}
+            >
+              <p className={cn(
+                'font-geist text-body2-regular text-dev-white-200',
+                'dark:text-dev-black-1000',
+              )}
+              >
+               Example: {snippet.id}
+              </p> 
+  
+              <p className={cn(
+                'font-geist text-body3-regular text-dev-white-1000',
+                'dark:text-dev-black-300',
+              )}
+              >
+              CUSTOM          
+              </p> 
+            </button>
+          </>
         ))}
       </div>
       
