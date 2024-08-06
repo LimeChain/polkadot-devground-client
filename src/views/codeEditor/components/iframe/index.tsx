@@ -79,7 +79,7 @@ export const Iframe = (props: IframeProps) => {
           'absolute inset-0 items-center justify-center',
           'pointer-events-none',
           'opacity-0',
-          'bg-white dark:bg-[#282c34]',
+          'bg-dev-purple-200 dark:bg-dev-black-800',
           'delay-400 transition-opacity duration-500 ease-in-out',
           'z-100',
           {

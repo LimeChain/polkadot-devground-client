@@ -88,7 +88,7 @@ const TypeScriptEditor = () => {
             order={1}
             defaultSize={50}
             minSize={30}
-            className="flex flex-col"
+            className="flex flex-col border border-dev-purple-300 dark:border-dev-black-800"
           >
             <EditorActions />
             <MonacoEditor />
@@ -114,7 +114,11 @@ const TypeScriptEditor = () => {
               {
                 refCanPreview.current && (
                   <>
-                    <div className="flex w-full items-center justify-end gap-2 bg-dev-purple-200 p-4 dark:bg-dev-black-800">
+                    <div className={cn(
+                      'flex w-full items-center justify-end gap-2 bg-dev-purple-200 p-4  dark:bg-dev-black-800',
+                      'border border-b-0 border-dev-purple-300 dark:border-dev-black-800',
+                    )}
+                    >
                       <button
                         type="button"
                         className="p-2  hover:bg-dev-purple-700"
@@ -135,10 +139,10 @@ const TypeScriptEditor = () => {
                       order={1}
                       defaultSize={50}
                       minSize={30}
-                      className="flex"
+                      className="flex border border-t-0 border-dev-purple-300 dark:border-dev-black-800"
                     >
                       <div className="flex-1">
-                        <div className="relative size-full border-t-0 bg-dev-purple-200 dark:bg-dev-black-800">
+                        <div className="relative size-full bg-dev-purple-200 dark:bg-dev-black-800">
                           <Iframe />
                         </div>
                       </div>
@@ -162,7 +166,10 @@ const TypeScriptEditor = () => {
                 order={2}
                 defaultSize={50}
                 minSize={30}
-                className="relative bg-dev-purple-200 dark:bg-dev-black-800"
+                className={cn(
+                  'relative bg-dev-purple-200 dark:bg-dev-black-800',
+                  'border border-dev-purple-300 dark:border-dev-black-800',
+                )}
               >
                 <DebugPanel canPreview={refCanPreview.current} />
               </Panel>

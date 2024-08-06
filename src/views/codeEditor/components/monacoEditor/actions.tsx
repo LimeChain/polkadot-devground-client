@@ -124,7 +124,7 @@ export const EditorActions = () => {
         </button>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 pr-2">
         <button className="p-2 hover:bg-dev-purple-700">
           <Icon name="icon-share" />
         </button>
