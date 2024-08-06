@@ -8,6 +8,7 @@ import {
   useState,
 } from 'react';
 
+import { Icon } from '@components/icon';
 import { downloadZip } from '@utils/downloadZip';
 import { cn } from '@utils/helpers';
 import {
@@ -109,43 +110,58 @@ export const EditorActions = () => {
     <div
       className={cn(
         'ml-auto',
-        'flex items-center gap-x-3', 'z-10',
+        'flex items-center justify-between',
+        'z-10 w-full pb-5 pt-6',
+        'dark:bg-dev-black-700',
       )}
     >
-      <button
-        type="button"
-        className={cn(
-          'rounded bg-indigo-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
-        )}
-        onClick={handleDownload}
-      >
-        ZIP
-      </button>
-      {
-        isRunning
-          ? (
-            <button
-              type="button"
-              className={cn(
-                'rounded bg-indigo-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
-              )}
-              onClick={handleStop}
-            >
+      <div>
+        <button className="border-b-2 border-dev-pink-500 px-8 py-2.5 font-geist text-body2-regular">
+          Editor
+        </button>
+        <button className="px-8 py-2.5 font-geist text-body2-regular">
+          Read me
+        </button>
+      </div>
+
+      <div className="flex gap-2">
+        <button className="p-2 hover:bg-dev-purple-700">
+          <Icon name="icon-share" />
+        </button>
+        <button className="p-2 hover:bg-dev-purple-700">
+          <Icon name="icon-save" />
+        </button>
+        <button
+          className="p-2 hover:bg-dev-purple-700"
+          onClick={handleDownload}
+        >
+          <Icon name="icon-download" />
+        </button>
+
+        {
+          isRunning
+            ? (
+              <button
+                type="button"
+                className={cn(
+                  'rounded bg-indigo-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
+                )}
+                onClick={handleStop}
+              >
               Stop
-            </button>
-          )
-          : (
-            <button
-              type="button"
-              className={cn(
-                'rounded bg-indigo-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
-              )}
-              onClick={handleRun}
-            >
-              Run
-            </button>
-          )
-      }
+              </button>
+            )
+            : (
+              <button
+                className="p-2 hover:bg-dev-purple-700"
+                onClick={handleRun}
+              >
+                <Icon name="icon-play" fill="red" />
+              </button>
+            )
+        }
+      </div>
+
     </div>
   );
 };

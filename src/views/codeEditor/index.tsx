@@ -12,6 +12,7 @@ import {
 } from 'react-resizable-panels';
 
 import { ErrorBoundary } from '@components/errorBoundary';
+import { Icon } from '@components/icon';
 import { cn } from '@utils/helpers';
 import { encodeCodeToBase64 } from '@utils/iframe';
 
@@ -87,7 +88,7 @@ const TypeScriptEditor = () => {
             order={1}
             defaultSize={50}
             minSize={30}
-            className="flex flex-col gap-y-4"
+            className="flex flex-col"
           >
             <EditorActions />
             <MonacoEditor />
@@ -113,18 +114,20 @@ const TypeScriptEditor = () => {
               {
                 refCanPreview.current && (
                   <>
-                    <div className="flex h-10 w-full items-center justify-start bg-white px-3 dark:bg-[#282c34]">
-                      <div className="flex items-center justify-start space-x-1.5">
-                        <span className="size-3 rounded-full bg-red-400" />
-                        <span className="size-3 rounded-full bg-yellow-400" />
-                        <span className="size-3 rounded-full bg-green-400" />
-                      </div>
+                    <div className="flex w-full items-center justify-end gap-2 bg-dev-purple-200 p-4 dark:bg-dev-black-800">
                       <button
                         type="button"
-                        className="ml-auto text-xs"
+                        className="p-2  hover:bg-dev-purple-700"
                         onClick={shareCode}
                       >
-                        Share Url
+                        <Icon name="icon-externalLink" />
+                      </button>
+                      <button
+                        type="button"
+                        className="p-2 hover:bg-dev-purple-700"
+                        onClick={shareCode}
+                      >
+                        <Icon name="icon-export" />
                       </button>
                     </div>
                     <Panel
@@ -135,7 +138,7 @@ const TypeScriptEditor = () => {
                       className="flex"
                     >
                       <div className="flex-1">
-                        <div className="relative size-full border-t-0 bg-white dark:bg-[#282c34]">
+                        <div className="relative size-full border-t-0 bg-dev-purple-200 dark:bg-dev-black-800">
                           <Iframe />
                         </div>
                       </div>
@@ -159,7 +162,7 @@ const TypeScriptEditor = () => {
                 order={2}
                 defaultSize={50}
                 minSize={30}
-                className="relative bg-white dark:bg-[#282c34]"
+                className="relative bg-dev-purple-200 dark:bg-dev-black-800"
               >
                 <DebugPanel canPreview={refCanPreview.current} />
               </Panel>
