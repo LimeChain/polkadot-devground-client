@@ -19,7 +19,12 @@ import { defaultImportMap } from '@views/codeEditor/constants';
 
 import type { IEventBusMonacoEditorUpdateCode } from '@custom-types/eventBus';
 
-export const EditorActions = () => {
+interface EditorActionsProps {
+  onChangeView: (event: React.MouseEvent) => void;
+  tabView: string;
+}
+
+export const EditorActions: React.FC<EditorActionsProps> = ({ onChangeView, tabView }) => {
   const refCode = useRef<string>('');
 
   const [isRunning, setIsRunning] = useState(false);
@@ -111,17 +116,42 @@ export const EditorActions = () => {
       className={cn(
         'ml-auto',
         'flex items-center justify-between',
-        'z-10 w-full pb-5 pt-6',
-        'dark:bg-dev-black-700',
+        'z-10 w-full pb-4 pl-14 pt-6',
+        'dark:bg-dev-black-800',
       )}
     >
-      <div>
-        <button className="border-b-2 border-dev-pink-500 px-8 py-2.5 font-geist text-body2-regular">
+      <div className="flex gap-4">
+        <button
+          className={cn(
+            'px-10 py-2.5',
+            'font-geist text-body2-regular text-dev-black-300 hover:text-dev-black-1000',
+            'dark:text-dev-purple-300 dark:hover:text-dev-purple-50',
+            'border-b-2 border-b-transparent hover:border-b-dev-pink-500',
+            'transform transition-colors duration-300 ease-in-out',
+            {
+              ['border-b-2 border-dev-pink-500']: tabView === 'editor',
+            },
+          )}
+          onClick={onChangeView}
+        >
           Editor
         </button>
-        <button className="px-8 py-2.5 font-geist text-body2-regular">
+        <button
+          className={cn(
+            'px-8 py-2.5',
+            'font-geist text-body2-regular text-dev-black-300 hover:text-dev-black-1000',
+            ' dark:text-dev-purple-300 dark:hover:text-dev-purple-50 ',
+            'border-b-2 border-b-transparent hover:border-b-dev-pink-500',
+            'transform transition-colors duration-300 ease-in-out',
+            {
+              ['border-b-2 border-dev-pink-500']: tabView === 'readme',
+            },
+          )}
+          onClick={onChangeView}
+        >
           Read me
         </button>
+
       </div>
 
       <div className="flex gap-2 pr-2">
@@ -143,12 +173,10 @@ export const EditorActions = () => {
             ? (
               <button
                 type="button"
-                className={cn(
-                  'rounded bg-indigo-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
-                )}
+                className="p-2 hover:bg-dev-purple-700"
                 onClick={handleStop}
               >
-              Stop
+                <Icon name="icon-pause" />
               </button>
             )
             : (

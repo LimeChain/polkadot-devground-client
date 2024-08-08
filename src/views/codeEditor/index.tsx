@@ -32,6 +32,7 @@ const TypeScriptEditor = () => {
   const refTimeout = useRef<NodeJS.Timeout>();
   const refCanPreview = useRef(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [tabView, setTabView] = useState('editor');
 
   useEventBus<IEventBusMonacoEditorShowPreview>('@@-monaco-editor-show-preview', ({ data }) => {
     refCanPreview.current = data;
@@ -68,6 +69,10 @@ const TypeScriptEditor = () => {
     }
   }, []);
 
+  const handleSetTabContent = useCallback((e: React.MouseEvent): void => {
+    setTabView(e.currentTarget.textContent?.toLowerCase().split(' ').join('') || '');
+  }, []);
+
   return (
     <div className="max-w-screen flex h-full flex-col overflow-hidden px-8 pt-8">
       <SnippetsSwitcher />
@@ -90,8 +95,10 @@ const TypeScriptEditor = () => {
             minSize={30}
             className="flex flex-col border border-dev-purple-300 dark:border-dev-black-800"
           >
-            <EditorActions />
-            <MonacoEditor />
+            <EditorActions onChangeView={handleSetTabContent} tabView={tabView} />
+
+            {tabView === 'editor' && <MonacoEditor />}
+            {tabView === 'preview' && <Iframe />}
           </Panel>
           <PanelResizeHandle className="group relative w-4">
             <div
@@ -121,7 +128,7 @@ const TypeScriptEditor = () => {
                     >
                       <button
                         type="button"
-                        className="p-2  hover:bg-dev-purple-700"
+                        className="p-2 hover:bg-dev-purple-700"
                         onClick={shareCode}
                       >
                         <Icon name="icon-externalLink" />
