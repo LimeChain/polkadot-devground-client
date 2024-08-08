@@ -138,7 +138,6 @@ export const PDScrollArea = polymorphicComponent<'div', IPDScrollAreaProps>(
                 'before:bg-dev-purple-300',
                 'dark:before:bg-dev-purple-700',
                 'before:transition-all before:duration-300',
-                verticalScrollThumbClassNames,
               )}
             >
               <div className="absolute inset-0">

@@ -73,12 +73,14 @@ export const SelectExample = () => {
         },
       )}
       >
-        <div className="border-b border-dev-purple-700 px-2 font-geist dark:border-dev-purple-300 dark:text-dev-black-800">
+        <div className="flex gap-2 border-b border-dev-purple-700 px-2 font-geist dark:border-dev-purple-300 dark:text-dev-black-800">
           <button
             className={cn(
               'px-2 py-2.5 hover:border-dev-pink-500',
               'text-dev-white-400 hover:text-dev-white-200 dark:text-dev-black-800 dark:hover:text-dev-black-1000',
-              { 'border-b-2 border-dev-pink-500': type === 'custom' },
+              'border-b-2 border-b-transparent hover:border-b-dev-pink-500',
+              'transform transition-colors duration-300 ease-in-out',
+              { ' border-dev-pink-500': type === 'custom' },
             )}
             onClick={handleSetType}
           >Custom
