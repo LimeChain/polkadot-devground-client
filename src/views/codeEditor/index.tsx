@@ -69,8 +69,9 @@ const TypeScriptEditor = () => {
     }
   }, []);
 
-  const handleSetTabContent = useCallback((e: React.MouseEvent): void => {
-    setTabView(e.currentTarget.textContent?.toLowerCase().split(' ').join('') || '');
+  const handleSetTabContent = useCallback((e: React.MouseEvent<HTMLButtonElement>): void => {
+    const item = String(e.currentTarget.dataset.item);
+    setTabView(item);
   }, []);
 
   return (
@@ -95,7 +96,10 @@ const TypeScriptEditor = () => {
             minSize={30}
             className="flex flex-col border border-dev-purple-300 dark:border-dev-black-800"
           >
-            <EditorActions onChangeView={handleSetTabContent} tabView={tabView} />
+            <EditorActions
+              onChangeView={handleSetTabContent}
+              tabView={tabView}
+            />
 
             {tabView === 'editor' && <MonacoEditor />}
             {tabView === 'preview' && <Iframe />}

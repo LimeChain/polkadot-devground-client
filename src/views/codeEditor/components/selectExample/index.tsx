@@ -45,31 +45,45 @@ export const SelectExample = () => {
   }, []);
 
   return (
-    <div className="group relative w-6/12" ref={containerRef}>
+    <div
+      ref={containerRef}
+      className="relative w-6/12"
+    >
       <button
         className={cn(
-          'relative flex w-full items-center justify-between border-2 px-4 py-[18px]',
+          'relative flex w-full items-center justify-between',
+          'px-4 py-[18px]',
           'font-geist text-body2-regular',
           'bg-dev-purple-200 hover:bg-dev-purple-300',
           'dark:bg-dev-black-700 hover:dark:bg-dev-black-600',
+          'border-2',
           'dark:border-dev-black-700 dark:hover:border-dev-black-600',
-          { 'border-dev-pink-500': isOpened },
+          {
+            ['border-dev-pink-500']: isOpened,
+          },
         )}
         onClick={handleSetOpen}
       >
         Select Example
         <Icon
           name="icon-dropdownArrow"
-          className={cn('transition-transform', { 'rotate-180': isOpened })}
+          className={cn(
+            'transition-transform',
+            {
+              ['rotate-180']: isOpened,
+            },
+          )}
         />
       </button>
 
       <div className={cn(
-        'absolute top-20 z-50 w-full p-2 transition-all',
+        'absolute top-20 z-50 w-full p-2',
         'bg-dev-black-1000 dark:bg-dev-purple-50',
+        'pointer-events-none -translate-y-2',
+        'transition-all',
+        'opacity-0',
         {
-          'opacity-0 transform -translate-y-2 pointer-events-none': !isOpened,
-          'opacity-100 transform translate-y-0 pointer-events-auto': isOpened,
+          ['opacity-100 translate-y-0 pointer-events-auto']: isOpened,
         },
       )}
       >
@@ -80,10 +94,13 @@ export const SelectExample = () => {
               'text-dev-white-400 hover:text-dev-white-200 dark:text-dev-black-800 dark:hover:text-dev-black-1000',
               'border-b-2 border-b-transparent hover:border-b-dev-pink-500',
               'transform transition-colors duration-300 ease-in-out',
-              { ' border-dev-pink-500': type === 'custom' },
+              {
+                ['border-dev-pink-500']: type === 'custom',
+              },
             )}
             onClick={handleSetType}
-          >Custom
+          >
+            Custom
           </button>
           <button
             className={cn(
@@ -94,7 +111,8 @@ export const SelectExample = () => {
               { ' border-dev-pink-500': type === 'default' },
             )}
             onClick={handleSetType}
-          >Default
+          >
+            Default
           </button>
         </div>
 
@@ -104,37 +122,42 @@ export const SelectExample = () => {
           verticalScrollClassNames="py-4"
           verticalScrollThumbClassNames="before:bg-dev-purple-700 dark:before:bg-dev-purple-300"
         >
-          {type === 'default' ? (
-            <ul>
-              {snippets.map((snippet) => (
-                <li key={snippet.id}>
-                  <button
-                    className={cn(
-                      'flex w-full items-center justify-between px-4 py-3.5',
-                      'transition-[background] duration-300',
-                      'hover:bg-dev-black-900 hover:dark:bg-dev-purple-200',
-                      {
-                        'bg-dev-black-800 dark:bg-dev-purple-300': selectSnipped === snippet.id.toString(),
-                      },
-                    )}
-                    onClick={handleChangeExample}
-                    data-snippet-index={snippet.id}
-                  >
-                    <p className="font-geist text-body2-regular text-dev-white-200 dark:text-dev-black-1000">
-                    Example: {snippet.id}
-                    </p>
-                    <p className="font-geist text-body3-regular text-dev-white-1000 dark:text-dev-black-300">
-                    CUSTOM
-                    </p>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <ul>
-              <li className="font-geist text-body1-regular text-dev-white-1000 dark:text-dev-black-300">No examples found</li>
-            </ul>
-          )}
+          <ul>
+            {
+              type === 'default'
+                ? (
+                  snippets.map((snippet) => (
+                    <li key={snippet.id}>
+                      <button
+                        className={cn(
+                          'flex w-full items-center justify-between',
+                          'px-4 py-3.5',
+                          'transition-[background] duration-300',
+                          'hover:bg-dev-black-900 hover:dark:bg-dev-purple-200',
+                          {
+                            ['bg-dev-black-800 dark:bg-dev-purple-300']: selectSnipped === snippet.id.toString(),
+                          },
+                        )}
+                        onClick={handleChangeExample}
+                        data-snippet-index={snippet.id}
+                      >
+                        <p className="font-geist text-body2-regular text-dev-white-200 dark:text-dev-black-1000">
+                          Example: {snippet.id}
+                        </p>
+                        <p className="font-geist text-body3-regular text-dev-white-1000 dark:text-dev-black-300">
+                          CUSTOM
+                        </p>
+                      </button>
+                    </li>
+                  ))
+                )
+                : (
+                  <li className="font-geist text-body1-regular text-dev-white-1000 dark:text-dev-black-300">
+                    No examples found
+                  </li>
+                )
+            }
+          </ul>
         </PDScrollArea>
       </div>
     </div>
