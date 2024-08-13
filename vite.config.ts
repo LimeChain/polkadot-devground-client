@@ -104,8 +104,11 @@ export default defineConfig(({ mode }) => {
               return 'prettier';
             }
 
-            if (id.includes('/node_modules/typescript') || id.includes('/node_modules/sucrase')) {
-              return 'typescript-sucrase';
+            if (id.includes('/node_modules/typescript')) {
+              return 'typescript';
+            }
+            if (id.includes('/node_modules/sucrase')) {
+              return 'sucrase';
             }
 
             if (
