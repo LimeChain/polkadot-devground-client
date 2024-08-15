@@ -19,7 +19,7 @@ const initialState = {
   latestBlocks: undefined,
 };
 
-const LATEST_BLOCKS_COUNT = 30;
+const LATEST_BLOCKS_COUNT = 5;
 
 const baseStore = create<StoreInterface>()((set) => ({
   ...initialState,

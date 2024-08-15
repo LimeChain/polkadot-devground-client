@@ -1,4 +1,8 @@
 import {
+  Metadata,
+  TypeRegistry,
+} from '@polkadot/types';
+import {
   type dot,
   type rococo,
 } from '@polkadot-api/descriptors';
@@ -22,6 +26,7 @@ import {
   CHAIN_WEBSOCKET_URLS,
   SUPPORTED_CHAIN_GROUPS,
 } from '@constants/chain';
+import { getBlockDetailsWithPAPI } from '@utils/rpc/getBlockDetails';
 
 import { createSelectors } from '../createSelectors';
 
@@ -32,7 +37,15 @@ interface ISubscription {
   unsubscribe: () => void;
 }
 
-interface StoreInterface {
+interface IChainSpecs extends Awaited<ReturnType<PolkadotClient['getChainSpecData']>> {
+  properties: {
+    ss58Format: number;
+    tokenDecimals: number;
+    tokenSymbol: string;
+  };
+}
+
+export interface StoreInterface {
   chain: IChain;
 
   smoldot: Client;
@@ -42,11 +55,13 @@ interface StoreInterface {
   api: TypedApi<typeof dot | typeof rococo> | null;
   _subscription?: ISubscription;
 
-  latestFinalizedBlock?: {
-    hash: string;
-    number: number;
-    parent: string;
-  };
+  blocksData: Map<number, Awaited<ReturnType<typeof getBlockDetailsWithPAPI>>>;
+  bestBlock: number | undefined;
+  finalizedBlock: number | undefined;
+
+  chainSpecs: IChainSpecs | null;
+
+  registry: TypeRegistry;
 
   actions: {
     resetStore: () => void;
@@ -64,7 +79,11 @@ const initialState = {
   api: null,
   smoldot: null as unknown as Client,
   _subscription: undefined,
-  latestFinalizedBlock: undefined,
+  blocksData: new Map(),
+  bestBlock: undefined,
+  finalizedBlock: undefined,
+  registry: new TypeRegistry(),
+  chainSpecs: null,
 };
 
 const baseStore = create<StoreInterface>()((set, get) => ({
@@ -86,28 +105,71 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
       }
     },
-    setChain: (chain: IChain) => {
+    setChain: async (chain: IChain) => {
       try {
+        set({ chain });
+
         const smoldot = get()?.smoldot;
         const client = get()?.client;
+        const rawClient = get()?.rawClient;
         const _subscription = get()?._subscription;
+        const blocksData = get()?.blocksData;
 
+        // clean up old chain data
         client?.destroy?.();
-        _subscription?.unsubscribe();
+        rawClient?.destroy?.();
+        _subscription?.unsubscribe?.();
+        blocksData?.clear();
 
+        // reset data
+        set({ finalizedBlock: undefined, bestBlock: undefined });
+
+        // init chain
         const newChain = smoldot?.addChain({
           chainSpec: CHAIN_SPECS[chain.id],
         });
 
-        const newClient = createClient(
-          getSmProvider(newChain),
-        );
+        const newClient = createClient(getSmProvider(newChain));
+        set({ client: newClient });
+
+        const chainSpecs = await newClient.getChainSpecData();
+        set({ chainSpecs });
 
         const api = newClient.getTypedApi(CHAIN_DESCRIPTORS[chain.id]);
+        set({ api });
 
-        const subscription = newClient.finalizedBlock$.subscribe((finalizedBlock) => {
-          set({ latestFinalizedBlock: finalizedBlock });
+        // build metadata registry for decoding
+        const metadataBytes = (await api.apis.Metadata.metadata()).asBytes();
+        const registry = get().registry;
+        const metadata = new Metadata(registry, metadataBytes);
+        registry.setMetadata(metadata);
+
+        const subscription = newClient.bestBlocks$.subscribe(async (bestBlocks) => {
+          const bestBlock = bestBlocks.at(0);
+          const finalizedBlock = bestBlocks.at(-1);
+
+          // get block data starting from latest known finalized block
+          for (let i = bestBlocks.length - 1; i >= 0; i--) {
+            const block = bestBlocks[i];
+
+            const blockData = await getBlockDetailsWithPAPI({
+              api,
+              blockHash: block.hash,
+              blockNumber: block.number,
+              client: newClient,
+              registry,
+            });
+
+            blocksData.set(block?.number, blockData);
+          }
+
+          set({
+            finalizedBlock: finalizedBlock?.number,
+            bestBlock: bestBlock?.number,
+          });
         });
+
+        set({ _subscription: subscription });
 
         const wsUrl = CHAIN_WEBSOCKET_URLS[chain.id];
         if (wsUrl) {
@@ -116,12 +178,6 @@ const baseStore = create<StoreInterface>()((set, get) => ({
           set({ rawClient, rawObservableClient: client });
         }
 
-        set({
-          chain,
-          client: newClient,
-          api,
-          _subscription: subscription,
-        });
       } catch (err) {
         console.error(err);
       } finally {
@@ -138,7 +194,6 @@ const baseStore = create<StoreInterface>()((set, get) => ({
       get().actions.setChain(get().chain);
     } catch (err) {
       console.error(err);
-
     }
   },
 }));
