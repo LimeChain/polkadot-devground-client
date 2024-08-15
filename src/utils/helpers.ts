@@ -102,3 +102,7 @@ export const formatNumber = (num: number) => {
 
   return formater.format(num);
 };
+
+export const formatPrettyNumberString = (value: string = '') => {
+  return Number(value?.replaceAll(',', ''));
+};

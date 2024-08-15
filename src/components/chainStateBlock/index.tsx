@@ -1,15 +1,7 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useEffect } from 'react';
 
 import { Icon } from '@components/icon';
 import { chainStateBlockData } from '@constants/chainState';
-import {
-  type ISubscriptionFn,
-  subscribeToChainData,
-} from '@services/chain';
 import { useStoreChain } from '@stores';
 import {
   cn,
@@ -22,49 +14,60 @@ interface IChainStateBlockProps {
   type: TChainSubscription;
 }
 
+const typeLib: Record<TChainSubscription, string> = {
+  'latest-block': 'bestBlock',
+  'finalised-block': 'finalizedBlock',
+  'circulating-supply': '',
+  'signed-extrinsics': '',
+  'total-accounts': '',
+  transfers: '',
+};
+
 export const ChainStateBlock = ({ type }: IChainStateBlockProps) => {
-  const client = useStoreChain.use.client?.();
-  const chain = useStoreChain.use.chain?.();
+  // const client = useStoreChain.use.client?.();
+  // const chain = useStoreChain.use.chain?.();
+  const chainData = useStoreChain?.use?.[typeLib[type]]?.();
+  // const finalizedBlock = useStoreChain?.use?.finalizedBlock?.();
 
-  const [value, setValue] = useState(0);
-  const [isLoadingData, setIsLoadingData] = useState(true);
+  // const [value, setValue] = useState(0);
 
-  const refUnsubscribe = useRef(() => {});
+  // const refUnsubscribe = useRef(() => {});
 
   useEffect(() => {
-    if (!client) {
-      return;
-    }
+    // if (!client) {
+    //   return;
+    // }
 
-    (async () => {
-      const handleOnSubcriptionData: ISubscriptionFn['handleOnSubcriptionData'] = ({
-        data,
-        isLoadingData,
-      }) => {
-        setValue(data);
-        setIsLoadingData(isLoadingData);
-      };
+    // (async () => {
+    //   const handleOnSubcriptionData: ISubscriptionFn['handleOnSubcriptionData'] = ({
+    //     data,
+    //     isLoadingData,
+    //   }) => {
+    //     setValue(data);
+    //     setIsLoadingData(isLoadingData);
+    //   };
 
-      refUnsubscribe.current = subscribeToChainData({
-        type,
-        handleOnSubcriptionData,
-      });
+    //   refUnsubscribe.current = subscribeToChainData({
+    //     type,
+    //     handleOnSubcriptionData,
+    //   });
 
-    })()
-      .catch((error) => {
-        console.error(error);
-        setIsLoadingData(false);
+    // })()
+    //   .catch((error) => {
+    //     console.error(error);
+    //     setIsLoadingData(false);
 
-      });
+    //   });
 
-    return () => {
-      refUnsubscribe.current?.();
-    };
+    // return () => {
+    //   refUnsubscribe.current?.();
+    // };
 
   }, [
-    client,
-    chain,
-    type,
+    // client,
+    // chainData,
+    // chain,
+    // type,
   ]);
 
   return (
@@ -83,9 +86,9 @@ export const ChainStateBlock = ({ type }: IChainStateBlockProps) => {
         </span>
         <span className="truncate font-geist text-body1-bold">
           {
-            isLoadingData
+            !chainData
               ? 'Loading...'
-              : formatNumber(value)
+              : formatNumber(chainData)
           }
         </span>
       </div>

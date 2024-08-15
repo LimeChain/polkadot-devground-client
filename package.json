@@ -43,6 +43,7 @@
     "react-hot-toast": "2.4.1",
     "react-resizable-panels": "2.0.19",
     "react-router-dom": "6.24.0",
+    "scale-ts": "1.6.0",
     "shiki": "1.10.0",
     "sucrase": "3.35.0",
     "tailwind-merge": "2.3.0",
