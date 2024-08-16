@@ -1,3 +1,4 @@
+import { format } from 'date-fns';
 import {
   useCallback,
   useEffect,
@@ -11,15 +12,8 @@ import { ToggleButton } from '@components/toggleButton';
 import { PDLink } from '@components/ui/PDLink';
 import { useStoreChain } from '@stores';
 import { formatNumber } from '@utils/helpers';
-import { getBlockDetails } from '@utils/rpc/getBlockDetails';
-import { getValidatorId } from '@utils/rpc/getValidatorId';
 
 import styles from './styles.module.css';
-
-interface IRuntimeVersion {
-  specVersion: number;
-  transactionVersion: number;
-}
 
 interface IBlockData {
   number: number;
@@ -29,58 +23,40 @@ interface IBlockData {
   stateRoot: string;
   specVersion: number;
   validatorId: string | null;
+  timeStamp: string;
 }
 
 const BlockDetails = () => {
   const { blockId } = useParams();
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [blockData, setBlockData] = useState<IBlockData | undefined>();
+  const blocksData = useStoreChain?.use?.blocksData?.();
 
-  const [timeStamp] = useState<string>('2024-06-26 14:21:42');
+  useEffect(() => {
 
-  const rawClient = useStoreChain.use.rawClient?.();
-  const latestFinalizedBlock = useStoreChain.use.latestFinalizedBlock?.();
+    if (blockId && blocksData.size > 0) {
+      const block = blocksData.get(Number(blockId));
+      if (!block) {
+        return;
+      }
+      setBlockData({
+        number: block.header.number,
+        blockHash: block.header.hash,
+        extrinsicsRoot: block.header.extrinsicRoot,
+        parentHash: block.header.parentHash,
+        stateRoot: block.header.stateRoot,
+        specVersion: block.header.runtime?.spec_version || 0,
+        validatorId: block.header.identity,
+        timeStamp: format(new Date(block.header.timestamp), 'yyyy-MM-dd HH:mm:ss'),
+      });
+    }
+  }, [blockId, blocksData]);
+
+  const latestFinalizedBlock = useStoreChain.use.finalizedBlock?.();
 
   const handleSetCheck = useCallback((): void => {
     setIsChecked(state => !state);
   }, []);
-
-  const init = useCallback(async (blockId: number) => {
-    if (!rawClient || !blockId) {
-      return;
-    }
-    try {
-      const latestBlock = await getBlockDetails(rawClient, blockId);
-
-      // Fetch the runtime version
-      const runTimeVersion: IRuntimeVersion = await rawClient.request('state_getRuntimeVersion', []);
-
-      // Get the validator ID
-      const validatorId: string | null = await getValidatorId(latestBlock);
-
-      // Set the block data
-      setBlockData({
-        number: blockId,
-        blockHash: latestBlock.hash,
-        extrinsicsRoot: latestBlock.header.extrinsicsRoot,
-        parentHash: latestBlock.header.parentHash,
-        stateRoot: latestBlock.header.stateRoot,
-        specVersion: runTimeVersion.specVersion,
-        validatorId,
-      });
-    } catch (error) {
-      console.error('Error fetching block data:', error);
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (rawClient && blockId) {
-      void init(Number(blockId));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rawClient, blockId]);
 
   if (!blockData) {
     return <>loading</>;
@@ -123,7 +99,7 @@ const BlockDetails = () => {
         <p>Time stamp</p>
 
         <div>
-          {isChecked ? new Date(timeStamp).toUTCString() : timeStamp}
+          {isChecked ? new Date(blockData.timeStamp).toUTCString() : blockData.timeStamp}
           <ToggleButton
             isChecked={isChecked}
             handleSetCheck={handleSetCheck}
@@ -138,7 +114,7 @@ const BlockDetails = () => {
         <p>Status</p>
 
         {
-          latestFinalizedBlock?.number !== blockData.number && (
+          latestFinalizedBlock !== blockData.number && (
             <div>
               <Icon
                 name="icon-checked"
