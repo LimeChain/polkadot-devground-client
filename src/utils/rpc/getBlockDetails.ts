@@ -5,6 +5,10 @@ import {
 } from '@polkadot-api/utils';
 import { u32 } from 'scale-ts';
 
+import {
+  baseStoreChain,
+  type StoreInterface,
+} from '@stores';
 import { formatPrettyNumberString } from '@utils/helpers';
 
 import type {
@@ -12,7 +16,6 @@ import type {
   IBlockExtrinsic,
   IMappedBlockExtrinsic,
 } from '@custom-types/block';
-import type { StoreInterface } from '@stores';
 
 const textEncoder = new TextEncoder();
 export const getBlockDetails = async ({
@@ -108,17 +111,18 @@ export const getBlockDetailsWithPAPI = async ({
   if (!blockNumber) {
     throw new Error('Block Number is not defined');
   }
-
   if (!blockHash) {
     throw new Error('Block Hash was not found');
   }
 
-  const eventsCount = await api.query.System.EventCount.getValue({ at: blockHash });
+  const runtime = baseStoreChain.getState().runtime as StoreInterface['runtime'];
+
+  const blockHeader = await client.getBlockHeader(blockHash);
 
   // Initialize timestamp variable
   let timestamp: number = 0;
 
-  const blockHeader = await client.getBlockHeader(blockHash);
+  const eventsCount = await api.query.System.EventCount.getValue({ at: blockHash });
 
   const extrinsicsRaw = await client.getBlockBody(blockHash);
   const extrinsics: IMappedBlockExtrinsic[] = [];
@@ -156,6 +160,7 @@ export const getBlockDetailsWithPAPI = async ({
     header: {
       hash: blockHash,
       timestamp,
+      runtime,
       ...blockHeader,
     },
     body: {
