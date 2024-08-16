@@ -45,6 +45,11 @@ interface IChainSpecs extends Awaited<ReturnType<PolkadotClient['getChainSpecDat
   };
 }
 
+interface IRuntime {
+  spec_version: number;
+  spec_name: string;
+}
+
 export interface StoreInterface {
   chain: IChain;
 
@@ -60,6 +65,7 @@ export interface StoreInterface {
   finalizedBlock: number | undefined;
 
   chainSpecs: IChainSpecs | null;
+  runtime: IRuntime | undefined;
 
   registry: TypeRegistry;
 
@@ -84,6 +90,7 @@ const initialState = {
   finalizedBlock: undefined,
   registry: new TypeRegistry(),
   chainSpecs: null,
+  runtime: undefined,
 };
 
 const baseStore = create<StoreInterface>()((set, get) => ({
@@ -116,14 +123,14 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         const blocksData = get()?.blocksData;
         const registry = get().registry;
 
-        // clean up old chain data
+        // clean up subscrptions / destroy clients
         client?.destroy?.();
         rawClient?.destroy?.();
         _subscription?.unsubscribe?.();
-        blocksData?.clear();
-        registry.clearCache();
 
         // reset data
+        blocksData?.clear();
+        registry.clearCache();
         set({ finalizedBlock: undefined, bestBlock: undefined });
 
         // init chain
@@ -140,12 +147,24 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         const api = newClient.getTypedApi(CHAIN_DESCRIPTORS[chain.id]);
         set({ api });
 
-        // api.event.System.ExtrinsicSuccess.watch().subscribe(console.log);
-
         // build metadata registry for decoding
         const metadataBytes = (await api.apis.Metadata.metadata()).asBytes();
         const metadata = new Metadata(registry, metadataBytes);
         registry.setMetadata(metadata);
+
+        // get spec_version from runtime
+        const runtime = await api.query.System.LastRuntimeUpgrade.getValue({ at: 'finalized' }); // finalized because we show data from finalized onwards
+        set({ runtime });
+
+        // update spec_version on runtime update
+        api.query.System.LastRuntimeUpgrade.watchValue('finalized').subscribe(runtime => {
+          set({ runtime });
+        });
+
+        // check for failed extrinsics
+        api.event.System.ExtrinsicSuccess.watch().subscribe(events => {
+          console.log(events);
+        });
 
         const subscription = newClient.bestBlocks$.subscribe(async (bestBlocks) => {
           const bestBlock = bestBlocks.at(0);
