@@ -2,11 +2,6 @@ import {
   Metadata,
   TypeRegistry,
 } from '@polkadot/types';
-import {
-  type dot,
-  type rococo,
-} from '@polkadot-api/descriptors';
-import { getObservableClient } from '@polkadot-api/observable-client';
 import { createClient as createSubstrateClient } from '@polkadot-api/substrate-client';
 import {
   type PolkadotClient,
@@ -17,7 +12,7 @@ import { getSmProvider } from 'polkadot-api/sm-provider';
 import { type Client } from 'polkadot-api/smoldot';
 import { startFromWorker } from 'polkadot-api/smoldot/from-worker';
 import SmWorker from 'polkadot-api/smoldot/worker?worker';
-import { WebSocketProvider } from 'polkadot-api/ws-provider/web';
+import { getWsProvider } from 'polkadot-api/ws-provider/web';
 import { create } from 'zustand';
 
 import {
@@ -26,6 +21,11 @@ import {
   CHAIN_WEBSOCKET_URLS,
   SUPPORTED_CHAIN_GROUPS,
 } from '@constants/chain';
+import {
+  type dot,
+  type dotpeople,
+  type rococo,
+} from '@polkadot-api/descriptors';
 import { getBlockDetailsWithPAPI } from '@utils/rpc/getBlockDetails';
 
 import { createSelectors } from '../createSelectors';
@@ -56,8 +56,7 @@ export interface StoreInterface {
   smoldot: Client;
   client: PolkadotClient | null;
   rawClient: SubstrateClient | null;
-  rawObservableClient: ReturnType<typeof getObservableClient> | null;
-  api: TypedApi<typeof dot | typeof rococo> | null;
+  api: TypedApi<typeof dot | typeof rococo | typeof dotpeople> | null;
   _subscription?: ISubscription;
 
   blocksData: Map<number, Awaited<ReturnType<typeof getBlockDetailsWithPAPI>>>;
@@ -123,7 +122,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         const blocksData = get()?.blocksData;
         const registry = get().registry;
 
-        // clean up subscrptions / destroy clients
+        // clean up subscrptions / destroy old clients
         client?.destroy?.();
         rawClient?.destroy?.();
         _subscription?.unsubscribe?.();
@@ -134,8 +133,12 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         set({ finalizedBlock: undefined, bestBlock: undefined });
 
         // init chain
-        const newChain = smoldot?.addChain({
+        const relayChain = await smoldot?.addChain({
+          chainSpec: CHAIN_SPECS['polkadot'],
+        });
+        const newChain = await smoldot?.addChain({
           chainSpec: CHAIN_SPECS[chain.id],
+          potentialRelayChains: [relayChain],
         });
 
         const newClient = createClient(getSmProvider(newChain));
@@ -195,9 +198,8 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
         const wsUrl = CHAIN_WEBSOCKET_URLS[chain.id];
         if (wsUrl) {
-          const rawClient = createSubstrateClient(WebSocketProvider(wsUrl));
-          const client = getObservableClient(rawClient);
-          set({ rawClient, rawObservableClient: client });
+          const rawClient = createSubstrateClient(getWsProvider(wsUrl));
+          set({ rawClient });
         }
 
       } catch (err) {
