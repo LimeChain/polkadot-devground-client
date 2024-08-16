@@ -118,6 +118,8 @@ export const getBlockDetailsWithPAPI = async ({
   // Initialize timestamp variable
   let timestamp: number = 0;
 
+  const blockHeader = await client.getBlockHeader(blockHash);
+
   const extrinsicsRaw = await client.getBlockBody(blockHash);
   const extrinsics: IMappedBlockExtrinsic[] = [];
 
@@ -151,9 +153,14 @@ export const getBlockDetailsWithPAPI = async ({
   });
 
   return {
-    extrinsics,
-    hash: blockHash,
-    timestamp,
-    eventsCount,
+    header: {
+      hash: blockHash,
+      timestamp,
+      ...blockHeader,
+    },
+    body: {
+      extrinsics,
+      eventsCount,
+    },
   };
 };

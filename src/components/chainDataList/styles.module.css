@@ -1,7 +1,7 @@
 .pd-explorer-list {
   @apply grid grid-cols-[1fr_theme(width.28)] gap-x-2;
   @apply h-16 px-3 mr-3;
-  @apply font-geist text-dev-black-1000 dark:text-dev-purple-50;
+  @apply font-geist text-body2-regular text-dev-black-1000 dark:text-dev-purple-50;
   @apply hover:bg-dev-purple-100 dark:hover:bg-dev-purple-900;
   @apply transition-[background] duration-300;
 
@@ -15,6 +15,25 @@
     &:last-child {
       @apply items-center justify-end;
       @apply text-sm;
+    }
+  }
+}
+
+.pd-explorer-list-extrinsic {
+  @apply grid grid-cols-[1fr_theme(width.28)] gap-x-2;
+  @apply h-16 px-3 mr-3;
+  @apply font-geist text-body2-regular text-dev-black-1000 dark:text-dev-purple-50;
+  @apply hover:bg-dev-purple-100 dark:hover:bg-dev-purple-900;
+  @apply transition-[background] duration-300;
+
+  >div {
+    @apply flex flex-col;
+    @apply justify-center;
+
+    &:first-child {}
+
+    &:last-child {
+      @apply text-sm text-right;
     }
   }
 }

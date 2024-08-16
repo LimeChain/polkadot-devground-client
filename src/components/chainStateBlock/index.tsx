@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-
 import { Icon } from '@components/icon';
 import { chainStateBlockData } from '@constants/chainState';
 import { useStoreChain } from '@stores';
@@ -24,51 +22,8 @@ const typeLib: Record<TChainSubscription, string> = {
 };
 
 export const ChainStateBlock = ({ type }: IChainStateBlockProps) => {
-  // const client = useStoreChain.use.client?.();
-  // const chain = useStoreChain.use.chain?.();
+
   const chainData = useStoreChain?.use?.[typeLib[type]]?.();
-  // const finalizedBlock = useStoreChain?.use?.finalizedBlock?.();
-
-  // const [value, setValue] = useState(0);
-
-  // const refUnsubscribe = useRef(() => {});
-
-  useEffect(() => {
-    // if (!client) {
-    //   return;
-    // }
-
-    // (async () => {
-    //   const handleOnSubcriptionData: ISubscriptionFn['handleOnSubcriptionData'] = ({
-    //     data,
-    //     isLoadingData,
-    //   }) => {
-    //     setValue(data);
-    //     setIsLoadingData(isLoadingData);
-    //   };
-
-    //   refUnsubscribe.current = subscribeToChainData({
-    //     type,
-    //     handleOnSubcriptionData,
-    //   });
-
-    // })()
-    //   .catch((error) => {
-    //     console.error(error);
-    //     setIsLoadingData(false);
-
-    //   });
-
-    // return () => {
-    //   refUnsubscribe.current?.();
-    // };
-
-  }, [
-    // client,
-    // chainData,
-    // chain,
-    // type,
-  ]);
 
   return (
     <div className={cn(
