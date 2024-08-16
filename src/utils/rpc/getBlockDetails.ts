@@ -33,7 +33,7 @@ export const getBlockDetails = async ({
     throw new Error('Block Number is not defined');
   }
 
-// Fetch block hash via blockNumbe
+  // Fetch block hash via blockNumbe
   const blockHash: string = await rawClient.request('chain_getBlockHash', [blockNumber]);
 
   // Fetch the block details using the block hash
@@ -118,6 +118,8 @@ export const getBlockDetailsWithPAPI = async ({
   // Initialize timestamp variable
   let timestamp: number = 0;
 
+  const blockHeader = await client.getBlockHeader(blockHash);
+
   const extrinsicsRaw = await client.getBlockBody(blockHash);
   const extrinsics: IMappedBlockExtrinsic[] = [];
 
@@ -151,9 +153,14 @@ export const getBlockDetailsWithPAPI = async ({
   });
 
   return {
-    extrinsics,
-    hash: blockHash,
-    timestamp,
-    eventsCount,
+    header: {
+      hash: blockHash,
+      timestamp,
+      ...blockHeader,
+    },
+    body: {
+      extrinsics,
+      eventsCount,
+    },
   };
 };

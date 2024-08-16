@@ -111,12 +111,14 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         const rawClient = get()?.rawClient;
         const _subscription = get()?._subscription;
         const blocksData = get()?.blocksData;
+        const registry = get().registry;
 
         // clean up old chain data
         client?.destroy?.();
         rawClient?.destroy?.();
         _subscription?.unsubscribe?.();
         blocksData?.clear();
+        registry.clearCache();
 
         // reset data
         set({ finalizedBlock: undefined, bestBlock: undefined });
@@ -135,9 +137,10 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         const api = newClient.getTypedApi(CHAIN_DESCRIPTORS[chain.id]);
         set({ api });
 
+        // api.event.System.ExtrinsicSuccess.watch().subscribe(console.log);
+
         // build metadata registry for decoding
         const metadataBytes = (await api.apis.Metadata.metadata()).asBytes();
-        const registry = get().registry;
         const metadata = new Metadata(registry, metadataBytes);
         registry.setMetadata(metadata);
 
