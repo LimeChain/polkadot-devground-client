@@ -57,6 +57,7 @@ export interface StoreInterface {
   client: PolkadotClient | null;
   rawClient: SubstrateClient | null;
   api: TypedApi<typeof dot | typeof rococo | typeof dotpeople> | null;
+  peopleApi: TypedApi<typeof dotpeople> | null;
   _subscription?: ISubscription;
 
   blocksData: Map<number, Awaited<ReturnType<typeof getBlockDetailsWithPAPI>>>;
@@ -82,6 +83,7 @@ const initialState = {
   rawClient: null,
   rawObservableClient: null,
   api: null,
+  peopleApi: null,
   smoldot: null as unknown as Client,
   _subscription: undefined,
   blocksData: new Map(),
@@ -141,14 +143,25 @@ const baseStore = create<StoreInterface>()((set, get) => ({
           potentialRelayChains: [relayChain],
         });
 
+        const peopleChain = await smoldot?.addChain({
+          chainSpec: CHAIN_SPECS['polkadot-people'],
+          potentialRelayChains: [relayChain],
+        });
+
         const newClient = createClient(getSmProvider(newChain));
         set({ client: newClient });
+
+        const peopleClient = createClient(getSmProvider(peopleChain));
+        // set({ peopleClient });
 
         const chainSpecs = await newClient.getChainSpecData();
         set({ chainSpecs });
 
         const api = newClient.getTypedApi(CHAIN_DESCRIPTORS[chain.id]);
         set({ api });
+
+        const peopleApi = peopleClient.getTypedApi(CHAIN_DESCRIPTORS['polkadot-people']);
+        set({ peopleApi });
 
         // build metadata registry for decoding
         const metadataBytes = (await api.apis.Metadata.metadata()).asBytes();

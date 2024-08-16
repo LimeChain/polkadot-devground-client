@@ -1,4 +1,7 @@
-import { Twox128 } from '@polkadot-api/substrate-bindings';
+import {
+  ScaleEnum,
+  Twox128,
+} from '@polkadot-api/substrate-bindings';
 import {
   mergeUint8,
   toHex,
@@ -127,6 +130,42 @@ export const getBlockDetailsWithPAPI = async ({
   const extrinsicsRaw = await client.getBlockBody(blockHash);
   const extrinsics: IMappedBlockExtrinsic[] = [];
 
+  //Get validator
+
+  const babeDigestCodec = ScaleEnum({
+    authority_index: u32,
+    one: u32,
+    two: u32,
+    three: u32,
+  });
+
+  const peopleApi = baseStoreChain.getState().peopleApi as StoreInterface['peopleApi'];
+  const digest = await api.query.System.Digest.getValue({ at: blockHash });
+  const digestData = digest[0].value[1].asBytes();
+  const authorIndex = babeDigestCodec.dec(digestData).value;
+
+  const validators = await api.query.Session.Validators.getValue({ at: blockHash });
+
+  const address = validators[authorIndex];
+  let identity;
+  identity = await peopleApi?.query.Identity.IdentityOf.getValue(address);
+  if (identity) {
+    identity = identity[0].info.display.value?.asText();
+  }
+
+  const superIdentity = await peopleApi?.query.Identity.SuperOf.getValue(address);
+  if (superIdentity?.[0] && !identity) {
+
+    identity = await peopleApi?.query.Identity.IdentityOf.getValue(superIdentity[0]);
+    if (identity) {
+      identity = identity[0].info.display.value?.asText();
+    }
+  }
+  if (!identity) {
+    identity = address.toString();
+  }
+  //Get validator
+  
   extrinsicsRaw.forEach((e, i) => {
     const extrinsic = registry.createType('Extrinsic', e).toHuman() as unknown as IBlockExtrinsic;
     const {
@@ -161,6 +200,7 @@ export const getBlockDetailsWithPAPI = async ({
       hash: blockHash,
       timestamp,
       runtime,
+      identity,
       ...blockHeader,
     },
     body: {
