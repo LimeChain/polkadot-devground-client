@@ -2,6 +2,7 @@ import {
   type dot,
   type rococo,
 } from '@polkadot-api/descriptors';
+import { getObservableClient } from '@polkadot-api/observable-client';
 import { createClient as createSubstrateClient } from '@polkadot-api/substrate-client';
 import {
   type PolkadotClient,
@@ -37,6 +38,7 @@ interface StoreInterface {
   smoldot: Client;
   client: PolkadotClient | null;
   rawClient: SubstrateClient | null;
+  rawObservableClient: ReturnType<typeof getObservableClient> | null;
   api: TypedApi<typeof dot | typeof rococo> | null;
   _subscription?: ISubscription;
 
@@ -58,6 +60,7 @@ const initialState = {
   chain: SUPPORTED_CHAIN_GROUPS['polkadot'].chains[0],
   client: null,
   rawClient: null,
+  rawObservableClient: null,
   api: null,
   smoldot: null as unknown as Client,
   _subscription: undefined,
@@ -109,7 +112,8 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         const wsUrl = CHAIN_WEBSOCKET_URLS[chain.id];
         if (wsUrl) {
           const rawClient = createSubstrateClient(WebSocketProvider(wsUrl));
-          set({ rawClient });
+          const client = getObservableClient(rawClient);
+          set({ rawClient, rawObservableClient: client });
         }
 
         set({

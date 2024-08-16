@@ -75,13 +75,13 @@ export const ChainStateBlock = ({ type }: IChainStateBlockProps) => {
       <Icon name={chainStateBlockData[type].icon} size={[16]} />
       <div className="flex flex-col overflow-hidden">
         <span className={cn(
-          'truncate font-geist !text-body2-regular',
+          'truncate font-geist font-body2-regular',
           'text-dev-black-300 dark:text-dev-purple-300',
         )}
         >
           {chainStateBlockData[type].name}
         </span>
-        <span className="truncate font-geist text-body1-bold">
+        <span className="truncate font-geist font-body1-bold">
           {
             isLoadingData
               ? 'Loading...'

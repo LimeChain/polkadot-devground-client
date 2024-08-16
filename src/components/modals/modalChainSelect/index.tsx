@@ -20,7 +20,7 @@ export const ModalChainSelect = ({ onClose }: IModalChainSelect) => {
         'border-b-dev-purple-300 dark:border-b-dev-black-600',
       )}
       >
-        <h4 className="flex items-center text-h4-bold">
+        <h4 className="flex items-center font-h4-bold">
           Select Parachain
         </h4>
         <div className="pl-4">

@@ -1,6 +1,11 @@
 import {
+  addMinutes,
+  format,
+} from 'date-fns';
+import {
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import { useParams } from 'react-router-dom';
@@ -29,19 +34,28 @@ interface IBlockData {
   stateRoot: string;
   specVersion: number;
   validatorId: string | null;
+  timestamp: number | null;
 }
 
 const BlockDetails = () => {
   const { blockId } = useParams();
+
+  const refDates = useRef<{
+    local?: string;
+    utc?: string;
+  } | undefined>();
+
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [blockData, setBlockData] = useState<IBlockData | undefined>();
-
-  const [timeStamp] = useState<string>('2024-06-26 14:21:42');
 
   const rawClient = useStoreChain.use.rawClient?.();
   const latestFinalizedBlock = useStoreChain.use.latestFinalizedBlock?.();
 
-  const handleSetCheck = useCallback((): void => {
+  const handleSetCheck = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const target = e.currentTarget.parentNode as HTMLDivElement;
+    const format = target.getAttribute('data-format');
+    target.setAttribute('data-format', format === 'utc' ? 'local' : 'utc');
+
     setIsChecked(state => !state);
   }, []);
 
@@ -58,6 +72,13 @@ const BlockDetails = () => {
       // Get the validator ID
       const validatorId: string | null = await getValidatorId(latestBlock);
 
+      if (latestBlock.timestamp) {
+        refDates.current = {
+          local: format(latestBlock.timestamp, 'yyyy-MM-dd HH:mm:ss'),
+          utc: format(addMinutes(latestBlock.timestamp, new Date().getTimezoneOffset()), 'yyyy-MM-dd HH:mm:ss'),
+        };
+      }
+
       // Set the block data
       setBlockData({
         number: blockId,
@@ -67,6 +88,7 @@ const BlockDetails = () => {
         stateRoot: latestBlock.header.stateRoot,
         specVersion: runTimeVersion.specVersion,
         validatorId,
+        timestamp: latestBlock.timestamp,
       });
     } catch (error) {
       console.error('Error fetching block data:', error);
@@ -96,8 +118,8 @@ const BlockDetails = () => {
               className=" text-dev-white-200 dark:text-dev-purple-700"
             />
           </PDLink>
-          <h4 className="mr-2 text-h4-light">Block</h4>
-          <h4 className="text-h4-bold">{formatNumber(blockData.number)}</h4>
+          <h4 className="mr-2 font-h4-light">Block</h4>
+          <h4 className="font-h4-bold">{formatNumber(blockData.number)}</h4>
         </div>
 
         <div className="flex gap-6">
@@ -105,33 +127,40 @@ const BlockDetails = () => {
             to={`https://polkadot.subscan.io/block/${''}`}
             className="flex items-center gap-1"
           >
-            <p className="font-geist text-body2-bold">Polkadot Statescan</p>
+            <p className="font-geist font-body2-bold">Polkadot Statescan</p>
             <Icon name="icon-openLink" size={[16]} />
           </PDLink>
           <PDLink
             to={`https://polkadot.statescan.io/#/blocks/${''}`}
             className="flex items-center gap-1"
           >
-            <p className="font-geist text-body2-bold">Polkadot Statescan</p>
+            <p className="font-geist font-body2-bold">Polkadot Statescan</p>
             <Icon name="icon-openLink" size={[16]} />
           </PDLink>
         </div>
       </div>
 
       {/* Time stamp */}
-      <div className={styles['pd-block-details']}>
-        <p>Time stamp</p>
+      {
+        refDates.current?.local && (
+          <div className={styles['pd-block-details']}>
+            <p>Time stamp</p>
 
-        <div>
-          {isChecked ? new Date(timeStamp).toUTCString() : timeStamp}
-          <ToggleButton
-            isChecked={isChecked}
-            handleSetCheck={handleSetCheck}
-            classNames="ml-2"
-          />
-          UTC
-        </div>
-      </div>
+            <div
+              data-local={refDates.current.local}
+              data-utc={refDates.current.utc}
+              data-format="local"
+            >
+              <ToggleButton
+                isChecked={isChecked}
+                handleSetCheck={handleSetCheck}
+                classNames="ml-2"
+              />
+              UTC
+            </div>
+          </div>
+        )
+      }
 
       {/* Status */}
       <div className={styles['pd-block-details']}>
@@ -141,9 +170,9 @@ const BlockDetails = () => {
           latestFinalizedBlock?.number !== blockData.number && (
             <div>
               <Icon
-                name="icon-checked"
-                className=" text-dev-white-200 dark:text-dev-purple-700"
                 size={[16]}
+                name="icon-checked"
+                className="text-dev-green-600"
               />
               <p>Finalized</p>
             </div>

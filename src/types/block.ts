@@ -10,5 +10,5 @@ export interface IBlock {
       logs: string[];
     };
   };
-  timestamp: Date | null;
+  timestamp: number | null;
 }

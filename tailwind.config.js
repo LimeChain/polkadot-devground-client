@@ -10,6 +10,19 @@ export default {
       spacing: {
         '18': '4.5rem',
       },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+      },
+      animation: {
+        'fade-in': 'fadeIn .5s ease-in-out forwards',
+      },
+      transitionProperty: {
+        'height': 'height',
+        'width': 'width',
+      },
       gridTemplateRows: {
         'layout': '64px 1fr fit-content(100%)',
         'code-layout': '64px 1fr',
@@ -88,101 +101,172 @@ export default {
         popins: ['"Poppins"',  ...defaultTheme.fontFamily.sans],
         geist: ['"Geist"', ...defaultTheme.fontFamily.sans],
       },
-      fontSize : {
-        "h1-extraLight" : ["4rem" , {
-          lineHeight: '5rem',
-          fontWeight: '275',
-        }],
-        "h1-regular" : ["4rem" , {
-          lineHeight: '5rem',
-          fontWeight: '400',
-        }],
-        "h1-bold" : ["4rem" , {
-          lineHeight: '5rem',
-          fontWeight: '600',
-        }],
-        "h2-extraLight" : ["3rem" , {
-          lineHeight: '4rem',
-          fontWeight: '275',
-        }],
-        "h2-regular" : ["3rem" , {
-          lineHeight: '4rem',
-          fontWeight: '400',
-        }],
-        "h2-bold" : ["3rem" , {
-          lineHeight: '4rem',
-          fontWeight: '600',
-        }],
-        "h3-extraLight" : ["2rem" , {
-          lineHeight: '3rem',
-          fontWeight: '300',
-        }],
-        "h3-regular" : ["2rem" , {
-          lineHeight: '3rem',
-          fontWeight: '400',
-        }],
-        "h3-bold" : ["2rem" , {
-          lineHeight: '3rem',
-          fontWeight: '600',
-        }],
-        "h4-light" : ["1.5rem" , {
-          lineHeight: '1.98rem',
-          fontWeight: '300',
-        }],
-        "h4-regular" : ["1.5rem" , {
-          lineHeight: '1.98rem',
-          fontWeight: '400',
-        }],
-        "h4-bold" : ["1.5rem" , {
-          lineHeight: '1.98rem',
-          fontWeight: '600',
-        }],
-        "h5-light" : ["1.125rem" , {
-          lineHeight: '1.53rem',
-          fontWeight: '300',
-        }],
-        "h5-regular" : ["1.125rem" , {
-          lineHeight: '1.53rem',
-          fontWeight: '400',
-        }],
-        "h5-bold" : ["1.125rem" , {
-          lineHeight: '1.53rem',
-          fontWeight: '600',
-        }],
-        "body1-regular" : ["1rem" , {
-          lineHeight: '1.5rem',
-          fontWeight: '400',
-        }],
-        "body1-bold" : ["1rem" , {
-          lineHeight: '1.5rem',
-          fontWeight: '700',
-        }],
-        "body2-regular" : ["0.875rem" , {
-          lineHeight: '1.278rem',
-          fontWeight: '400',
-        }],
-        "body2-bold" : ["0.875rem" , {
-          lineHeight: '1.278rem',
-          fontWeight: '700',
-        }],
-        "body3-regular" : ["0.75rem" , {
-          lineHeight: '1.02rem',
-          fontWeight: '400',
-        }],
-        "body3-bold" : ["0.75rem" , {
-          lineHeight: '1.02rem',
-          fontWeight: '700',
-        }],
-        "body4-regular" : ["0.625rem" , {
-          lineHeight: '0.9rem',
-          fontWeight: '400',
-        }],
-        "body4-bold" : ["0.625rem" , {
-          lineHeight: '0.9rem',
-          fontWeight: '700',
-        }],
-      }
     },
   },
-  plugins: [],
+  plugins: [
+    ({ addUtilities }) => {
+      const newUtilities = {
+        '.font-h1-extraLight': {
+          fontSize: '4rem',
+          lineHeight: '5rem',
+          fontWeight: '275',
+        },
+        '.font-h1-regular': {
+          fontSize: '4rem',
+          lineHeight: '5rem',
+          fontWeight: '400',
+        },
+        '.font-h1-bold': {
+          fontSize: '4rem',
+          lineHeight: '5rem',
+          fontWeight: '600',
+        },
+        '.font-h2-extraLight': {
+          fontSize: '3rem',
+          lineHeight: '4rem',
+          fontWeight: '275',
+        },
+        '.font-h2-regular': {
+          fontSize: '3rem',
+          lineHeight: '4rem',
+          fontWeight: '400',
+        },
+        '.font-h2-bold': {
+          fontSize: '3rem',
+          lineHeight: '4rem',
+          fontWeight: '600',
+        },
+        '.font-h3-extraLight': {
+          fontSize: '2rem',
+          lineHeight: '3rem',
+          fontWeight: '300',
+        },
+        '.font-h3-regular': {
+          fontSize: '2rem',
+          lineHeight: '3rem',
+          fontWeight: '400',
+        },
+        '.font-h3-bold': {
+          fontSize: '2rem',
+          lineHeight: '3rem',
+          fontWeight: '600',
+        },
+        '.font-h4-light': {
+          fontSize: '1.5rem',
+          lineHeight: '1.98rem',
+          fontWeight: '300',
+        },
+        '.font-h4-regular': {
+          fontSize: '1.5rem',
+          lineHeight: '1.98rem',
+          fontWeight: '400',
+        },
+        '.font-h4-bold': {
+          fontSize: '1.5rem',
+          lineHeight: '1.98rem',
+          fontWeight: '600',
+        },
+        '.font-h5-light': {
+          fontSize: '1.125rem',
+          lineHeight: '1.53rem',
+          fontWeight: '300',
+        },
+        '.font-h5-regular': {
+          fontSize: '1.125rem',
+          lineHeight: '1.53rem',
+          fontWeight: '400',
+        },
+        '.font-h5-bold': {
+          fontSize: '1.125rem',
+          lineHeight: '1.53rem',
+          fontWeight: '600',
+        },
+        '.font-body1-regular': {
+          fontSize: '1rem',
+          lineHeight: '1.5rem',
+          fontWeight: '400',
+        },
+        '.font-body1-bold': {
+          fontSize: '1rem',
+          lineHeight: '1.5rem',
+          fontWeight: '700',
+        },
+        '.font-body2-regular': {
+          fontSize: '0.875rem',
+          lineHeight: '1.278rem',
+          fontWeight: '400',
+        },
+        '.font-body2-bold': {
+          fontSize: '0.875rem',
+          lineHeight: '1.278rem',
+          fontWeight: '700',
+        },
+        '.font-body3-regular': {
+          fontSize: '0.75rem',
+          lineHeight: '1.02rem',
+          fontWeight: '400',
+        },
+        '.font-body3-bold': {
+          fontSize: '0.75rem',
+          lineHeight: '1.02rem',
+          fontWeight: '700',
+        },
+        '.font-body4-regular': {
+          fontSize: '0.625rem',
+          lineHeight: '0.9rem',
+          fontWeight: '400',
+        },
+        '.font-body4-bold': {
+          fontSize: '0.625rem',
+          lineHeight: '0.9rem',
+          fontWeight: '700',
+        },
+      };
+
+      addUtilities(newUtilities, ['responsive', 'hover']);
+    },
+    ({ addUtilities }) => {
+      const newUtilities = {
+        '.animation-duration-100': {
+          'animation-duration': '150ms',
+        },
+        '.animation-delay-100': {
+          'animation-delay': '150ms',
+        },
+        '.animation-duration-200': {
+          'animation-duration': '200ms',
+        },
+        '.animation-delay-200': {
+          'animation-delay': '200ms',
+        },
+        '.animation-duration-300': {
+          'animation-duration': '300ms',
+        },
+        '.animation-delay-300': {
+          'animation-delay': '300ms',
+        },
+        '.animation-duration-500': {
+          'animation-duration': '500ms',
+        },
+        '.animation-delay-500': {
+          'animation-delay': '500ms',
+        },
+        '.animation-duration-700': {
+          'animation-duration': '700ms',
+        },
+        '.animation-delay-700': {
+          'animation-delay': '700ms',
+        },
+        '.animation-duration-1000': {
+          'animation-duration': '1000ms',
+        },
+        '.animation-delay-1000': {
+          'animation-delay': '1000ms',
+        },
+      };
+
+
+      addUtilities(newUtilities, ['responsive', 'hover']);
+    },
+  ],
 };

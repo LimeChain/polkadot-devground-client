@@ -15,7 +15,7 @@ export const Footer = () => {
         'flex-col gap-y-4 md:flex-row',
         'bg-dev-purple-100 dark:bg-dev-black-900',
         'px-6 py-3 lg:px-14 lg:py-4',
-        'font-geist text-body2-regular',
+        'font-geist font-body2-regular',
       )}
     >
       <PDLink
@@ -23,7 +23,7 @@ export const Footer = () => {
         to={LINK_LIMECHAIN}
         className="flex items-center gap-2"
       >
-        <span className="text-body2-regular">Made by</span>
+        <span className="font-body2-regular">Made by</span>
         <Icon
           name="icon-limeChain"
           size={[94, 28]}
