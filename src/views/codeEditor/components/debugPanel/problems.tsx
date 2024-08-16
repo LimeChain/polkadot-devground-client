@@ -8,7 +8,7 @@ import {
   useState,
 } from 'react';
 
-import { PDScrollArea } from '@components/scrollArea';
+import { PDScrollArea } from '@components/pdScrollArea';
 import { cn } from '@utils/helpers';
 
 import type { IEventBusErrorItem } from '@custom-types/eventBus';

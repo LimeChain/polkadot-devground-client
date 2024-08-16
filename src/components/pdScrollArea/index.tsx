@@ -107,6 +107,7 @@ export const PDScrollArea = polymorphicComponent<'div', IPDScrollAreaProps>(
                   'bg-dev-purple-400',
                   'active:bg-dev-purple-500',
                   'active:cursor-ew-resize',
+                  'transition-width duration-300',
                   horizontalScrollThumbClassNames,
                 )}
               />
@@ -147,6 +148,7 @@ export const PDScrollArea = polymorphicComponent<'div', IPDScrollAreaProps>(
                     'bg-dev-purple-400',
                     'active:bg-dev-purple-500',
                     'active:cursor-ns-resize',
+                    'transition-height duration-300',
                     verticalScrollThumbClassNames,
                   )}
                 />

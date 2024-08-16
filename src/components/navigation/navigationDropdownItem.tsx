@@ -31,7 +31,7 @@ export const NavigationDropdownItem = ({
       {...linkProps}
       className={cn(
         'flex w-full items-center gap-3 px-4 py-[14px]',
-        'font-geist text-body2-regular',
+        'font-geist font-body2-regular',
         'transition-colors',
         '!text-dev-white-200 dark:!text-dev-black-1000',
         'hover:bg-dev-black-800 dark:hover:bg-dev-purple-300',

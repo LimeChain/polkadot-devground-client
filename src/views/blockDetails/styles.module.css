@@ -1,5 +1,5 @@
 .pd-block-details {
-  @apply font-geist grid grid-cols-[theme(width.56)_1fr] text-body1-bold;
+  @apply font-geist grid grid-cols-[theme(width.56)_1fr] font-body1-bold;
   @apply border-b border-dev-white-600 dark:border-dev-black-900;
   @apply hover:bg-dev-purple-100 dark:hover:bg-dev-purple-900;
   @apply transition-[background] duration-300;
@@ -10,10 +10,10 @@
   }
 
   > p {
-    @apply text-body1-regular;
+    @apply font-body1-regular;
   }
 
   > div {
-    @apply gap-2 text-body1-bold font-geist;
+    @apply gap-2 font-body1-bold font-geist;
   }
 }

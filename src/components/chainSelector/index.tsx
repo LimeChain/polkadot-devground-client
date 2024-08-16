@@ -9,7 +9,7 @@ import {
 } from 'react';
 
 import { Icon } from '@components/icon';
-import { PDScrollArea } from '@components/scrollArea';
+import { PDScrollArea } from '@components/pdScrollArea';
 import { SUPPORTED_CHAIN_GROUPS } from '@constants/chain';
 import { useStoreChain } from '@stores';
 import { cn } from '@utils/helpers';
@@ -92,7 +92,7 @@ export const ChainSelector = () => {
                     onClick={handleSelectGroup}
                     className={cn(
                       'w-full p-4 text-left',
-                      'font-geist !text-body2-regular',
+                      'font-geist font-body2-regular',
                       'transition-colors',
                       ' hover:bg-dev-purple-200 dark:hover:bg-dev-purple-400/20',
                       {
@@ -110,7 +110,13 @@ export const ChainSelector = () => {
       </PDScrollArea>
       <PDScrollArea>
         <div className="flex flex-col gap-2 self-stretch p-2">
-          {query && <span className="font-geist text-body2-regular">Search Results for "{query}"</span>}
+          {
+            query && (
+              <span className="font-geist font-body2-regular">
+                Search Results for "{query}"
+              </span>
+            )
+          }
           {
             filteredChains.length > 0
               ? (

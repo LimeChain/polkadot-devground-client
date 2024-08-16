@@ -22,7 +22,7 @@ export const ModalGithubLogin = ({ onClose }: IModalGithubLogin) => {
         'dark:border-dev-purple-700',
       )}
     >
-      <h5 className="self-start text-h5-bold">Log in</h5>
+      <h5 className="self-start font-h5-bold">Log in</h5>
       <Icon
         name="icon-github"
         size={[96]}
@@ -32,15 +32,15 @@ export const ModalGithubLogin = ({ onClose }: IModalGithubLogin) => {
         )}
       />
       <div className="flex flex-col" >
-        <h4 className="mb-4 self-center text-h4-bold">Please Log in</h4>
-        <p className="text-center font-geist text-body1-regular">
+        <h4 className="mb-4 self-center font-h4-bold">Please Log in</h4>
+        <p className="text-center font-geist font-body1-regular">
           To access your custom examples, please log in using your GitHub account.
         </p>
         <button
           onClick={authorize}
           className={cn(
             'mb-2 mt-6 p-4 transition-colors',
-            'font-geist !text-body2-bold text-white',
+            'font-geist text-white font-body2-bold',
             'bg-dev-pink-500 ',
             'hover:bg-dev-pink-400',
           )}
@@ -51,7 +51,7 @@ export const ModalGithubLogin = ({ onClose }: IModalGithubLogin) => {
           onClick={onClose}
           className={cn(
             'p-4 transition-colors',
-            'font-geist text-body2-bold',
+            'font-geist font-body2-bold',
             'hover:text-dev-white-1000',
           )}
         >

@@ -31,7 +31,7 @@ export const SearchChain = () => {
       className={cn(
         'w-full max-w-[calc(100%-2.5rem)] bg-transparent p-3',
         'border-y border-t-transparent transition-colors',
-        'font-geist text-body2-regular focus:outline-none',
+        'font-geist font-body2-regular focus:outline-none',
         'border-b-dev-white-900 focus:border-b-dev-pink-500 dark:border-b-dev-purple-400/40',
       )}
     />

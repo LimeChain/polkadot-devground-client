@@ -16,7 +16,7 @@ export const Navigation = () => {
   return (
     <div className={cn(
       'flex items-center gap-5',
-      'font-geist text-body2-regular',
+      'font-geist font-body2-regular',
     )}
     >
       {

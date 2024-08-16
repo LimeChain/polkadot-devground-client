@@ -30,10 +30,9 @@ export const getBlockDetails = async (rawClient: SubstrateClient, blockNumber: n
     const extrinsic = new GenericExtrinsic(registry, hexToU8a(extrinsicHex));
     const { method } = extrinsic;
 
-    console.log('@@@ extrinsic', extrinsic);
-
     // Check if the method is 'timestamp.set'
     if (method.section === 'timestamp' && method.method === 'set') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       blockTimestamp = (method.args[0] as Compact<any>).toNumber(); // Cast to Compact for toNumber()
       break; // Exit loop after finding the timestamp
     }
@@ -46,6 +45,6 @@ export const getBlockDetails = async (rawClient: SubstrateClient, blockNumber: n
   return {
     ...latestBlock.block,
     hash: blockHash,
-    timestamp: blockTimestamp ? new Date(blockTimestamp) : null,
+    timestamp: blockTimestamp ? blockTimestamp : null,
   };
 };

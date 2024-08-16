@@ -24,7 +24,7 @@ export const GithubButton = () => {
         className={cn(
           'flex cursor-pointer items-center gap-1',
           'disabled:cursor-not-allowed disabled:opacity-50',
-          'font-geist text-body1-bold',
+          'font-geist font-body1-bold',
         )}
       >
         <Icon name="icon-github" />
