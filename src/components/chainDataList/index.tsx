@@ -1,6 +1,6 @@
 import { formatDistanceToNow } from 'date-fns';
 
-import { PDScrollArea } from '@components/scrollArea';
+import { PDScrollArea } from '@components/pdScrollArea';
 import {
   type IPDLink,
   PDLink,
@@ -40,8 +40,8 @@ const Row = (props: IRow) => {
           <span className="text-dev-black-300 dark:text-dev-purple-300">Includes</span>
           {' '}
           <span>{block.extrinsics.length} Extrinsics</span>
-          {' '}
-          (46 Events - fake)
+          {/* @TODO: should be implemented */}
+          {/* (46 Events - fake) */}
         </p>
       </div>
       <div>{timeAgo}</div>
@@ -55,11 +55,11 @@ export const ChainDataList = ({ title, link, linkText }: IChainDataList) => {
   return (
     <div className="flex flex-1 flex-col gap-y-3 overflow-hidden">
       <div className="flex items-center gap-3">
-        <h5 className="text-h5-bold">{title}</h5>
+        <h5 className="font-h5-bold">{title}</h5>
         <PDLink
           to={link}
           className={cn(
-            'font-geist !text-body2-regular',
+            'font-geist font-body2-regular',
             'text-dev-pink-500 transition-colors hover:text-dev-pink-400',
           )}
         >
@@ -70,7 +70,7 @@ export const ChainDataList = ({ title, link, linkText }: IChainDataList) => {
         link === '/latest-blocks' && (
           <PDScrollArea
             className="h-80 lg:h-full"
-            viewportClassNames="py-3"
+            viewportClassNames="py-3 mask-vertical"
             verticalScrollClassNames="py-3"
           >
             {

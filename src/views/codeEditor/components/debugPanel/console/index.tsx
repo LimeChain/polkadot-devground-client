@@ -9,7 +9,7 @@ import {
   useState,
 } from 'react';
 
-import { PDScrollArea } from '@components/scrollArea';
+import { PDScrollArea } from '@components/pdScrollArea';
 import { cn } from '@utils/helpers';
 import {
   storageRemoveItem,
@@ -105,6 +105,7 @@ export const Console = () => {
     <PDScrollArea
       ref={refScrollArea}
       className="flex-1"
+      viewportClassNames="mask-vertical"
       onScroll={handleOnScroll}
     >
       <div

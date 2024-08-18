@@ -9,7 +9,7 @@ const Home = () => {
         <h1
           className={cn(
             'pb-4',
-            'text-center text-h3-bold lg:text-h2-bold',
+            'text-center font-h3-bold lg:font-h2-bold',
             'before:text-dev-pink-500 before:content-["["]',
             'after:text-dev-pink-500 after:content-["]"]',
           )}
@@ -17,7 +17,7 @@ const Home = () => {
           Empower Your Polkadot Development
         </h1>
 
-        <p className="pb-14 text-center text-body1-regular lg:pb-20 lg:text-h5-regular">
+        <p className="pb-14 text-center font-body1-regular lg:pb-20 lg:font-h5-regular">
           Elevate your development experience with our next-gen platform for Polkadot developers
         </p>
 
@@ -57,10 +57,10 @@ const Home = () => {
               className="mb-8 text-dev-pink-500"
               size={[40]}
             />
-            <h4 className="mb-2 text-h4-bold">
+            <h4 className="mb-2 font-h4-bold">
               Code
             </h4>
-            <p className="font-geist !text-body2-regular text-dev-black-300 dark:text-dev-purple-300">
+            <p className="font-geist text-dev-black-300 font-body2-regular dark:text-dev-purple-300">
               Explore our GitHub repository for comprehensive documentation, code examples, and contributions. Join our developer community to enhance your Polkadot projects.
             </p>
           </PDLink>
@@ -98,10 +98,10 @@ const Home = () => {
               className="mb-8 text-dev-pink-500"
               size={[40]}
             />
-            <h4 className="mb-2 text-h4-bold">
+            <h4 className="mb-2 font-h4-bold">
               Developer Console
             </h4>
-            <p className="font-geist !text-body2-regular text-dev-black-300 dark:text-dev-purple-300">
+            <p className="font-geist text-dev-black-300 font-body2-regular dark:text-dev-purple-300">
               Dive into our advanced developer console for seamless on-chain interaction and rapid prototyping. Experience a streamlined, user-friendly environment designed to accelerate your development process and boost productivity.
             </p>
           </PDLink>

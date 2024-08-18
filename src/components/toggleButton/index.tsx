@@ -4,12 +4,13 @@ import { cn } from '@utils/helpers';
 
 interface ToggleButtonProps {
   isChecked: boolean;
-  handleSetCheck: () => void;
+  handleSetCheck: (e: React.ChangeEvent<HTMLInputElement>) => void;
   classNames?: string;
 }
 
 export const ToggleButton = (props: ToggleButtonProps) => {
   const _id = useId();
+
   const {
     isChecked,
     handleSetCheck,

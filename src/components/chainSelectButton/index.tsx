@@ -28,7 +28,7 @@ const ChainSelectButton = () => {
         className="flex items-center"
       >
         <Icon name={currentChain.icon} size={[28]}/>
-        <h5 className="ml-[6px] mr-3 text-h5-bold">
+        <h5 className="ml-[6px] mr-3 font-h5-bold">
           {currentChain.name}
         </h5>
         <Icon name="icon-dropdownArrow" size={[16]}/>
