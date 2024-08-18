@@ -92,6 +92,59 @@ export const getBlockDetails = async ({
   };
 };
 
+export const getBlockValidator = async ({
+  blockHash,
+}: {
+  blockHash: string;
+}) => {
+
+  const babeDigestCodec = ScaleEnum({
+    authority_index: u32,
+    one: u32,
+    two: u32,
+    three: u32,
+  });
+
+  const peopleApi = baseStoreChain.getState().peopleApi as StoreInterface['peopleApi'];
+  const api = baseStoreChain.getState().api as StoreInterface['api'];
+
+  if (!api) {
+    throw new Error('Api is not defined');
+  }
+  if (!blockHash) {
+    throw new Error('Block Hash was not found');
+  }
+  if (!peopleApi) {
+    throw new Error('People Api is not defined');
+  }
+
+  const digest = await api.query.System.Digest.getValue({ at: blockHash });
+  const digestData = digest[0].value[1].asBytes();
+  const authorIndex = babeDigestCodec.dec(digestData).value;
+
+  const validators = await api.query.Session.Validators.getValue({ at: blockHash });
+
+  const address = validators[authorIndex];
+  let identity;
+  identity = await peopleApi?.query.Identity.IdentityOf.getValue(address);
+  if (identity) {
+    identity = identity[0].info.display.value?.asText();
+  }
+
+  const superIdentity = await peopleApi?.query.Identity.SuperOf.getValue(address);
+  if (superIdentity?.[0] && !identity) {
+
+    identity = await peopleApi?.query.Identity.IdentityOf.getValue(superIdentity[0]);
+    if (identity) {
+      identity = identity[0].info.display.value?.asText();
+    }
+  }
+  if (!identity) {
+    identity = address.toString();
+  }
+  return identity;
+};
+
 export const getBlockDetailsWithPAPI = async ({
   api,
   client,
@@ -130,42 +183,6 @@ export const getBlockDetailsWithPAPI = async ({
   const extrinsicsRaw = await client.getBlockBody(blockHash);
   const extrinsics: IMappedBlockExtrinsic[] = [];
 
-  //Get validator
-
-  const babeDigestCodec = ScaleEnum({
-    authority_index: u32,
-    one: u32,
-    two: u32,
-    three: u32,
-  });
-
-  const peopleApi = baseStoreChain.getState().peopleApi as StoreInterface['peopleApi'];
-  const digest = await api.query.System.Digest.getValue({ at: blockHash });
-  const digestData = digest[0].value[1].asBytes();
-  const authorIndex = babeDigestCodec.dec(digestData).value;
-
-  const validators = await api.query.Session.Validators.getValue({ at: blockHash });
-
-  const address = validators[authorIndex];
-  let identity;
-  identity = await peopleApi?.query.Identity.IdentityOf.getValue(address);
-  if (identity) {
-    identity = identity[0].info.display.value?.asText();
-  }
-
-  const superIdentity = await peopleApi?.query.Identity.SuperOf.getValue(address);
-  if (superIdentity?.[0] && !identity) {
-
-    identity = await peopleApi?.query.Identity.IdentityOf.getValue(superIdentity[0]);
-    if (identity) {
-      identity = identity[0].info.display.value?.asText();
-    }
-  }
-  if (!identity) {
-    identity = address.toString();
-  }
-  //Get validator
-  
   extrinsicsRaw.forEach((e, i) => {
     const extrinsic = registry.createType('Extrinsic', e).toHuman() as unknown as IBlockExtrinsic;
     const {
@@ -194,6 +211,9 @@ export const getBlockDetailsWithPAPI = async ({
       timestamp,
     });
   });
+  
+  //Get the block validator
+  const identity = await getBlockValidator({ blockHash });
 
   return {
     header: {
