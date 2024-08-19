@@ -133,10 +133,8 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         registry.clearCache();
         set({ finalizedBlock: undefined, bestBlock: undefined });
 
-        // init chain
-
-        const isParachain = chain.isParachain;
-
+        // init relay chain / people chain
+        const isParachain = chain.isParaChain;
         let newChain, peopleChain;
 
         if (!isParachain) {
@@ -148,8 +146,8 @@ const baseStore = create<StoreInterface>()((set, get) => ({
             chainSpec: CHAIN_SPECS[chain.peopleChainId],
             potentialRelayChains: [newChain],
           });
-        } else {
 
+        } else {
           const relayChain = await smoldot?.addChain({
             chainSpec: CHAIN_SPECS[chain.relayChainId],
           });
@@ -160,7 +158,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
           });
 
           peopleChain = await smoldot?.addChain({
-            chainSpec: CHAIN_SPECS[chain.id],
+            chainSpec: CHAIN_SPECS[chain.peopleChainId],
             potentialRelayChains: [relayChain],
           });
 

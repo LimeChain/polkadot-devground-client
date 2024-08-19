@@ -202,9 +202,6 @@ export const getBlockDetailsWithPAPI = async ({
 
   const blockHeader = await client.getBlockHeader(blockHash);
 
-  console.log(blockNumber);
-
-
   // if (blockData && blockData.header.hash === blockHash) {
   //   return;
   // }

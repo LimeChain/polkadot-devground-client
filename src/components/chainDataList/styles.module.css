@@ -20,7 +20,7 @@
 }
 
 .pd-explorer-list-extrinsic {
-  @apply grid grid-cols-[1fr_theme(width.28)] gap-x-2;
+  @apply grid grid-cols-[1fr_theme(width.32)] gap-x-2;
   @apply h-16 px-3 mr-3;
   @apply font-geist text-body2-regular text-dev-black-1000 dark:text-dev-purple-50;
   @apply hover:bg-dev-purple-100 dark:hover:bg-dev-purple-900;
