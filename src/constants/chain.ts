@@ -28,8 +28,9 @@ export const SUPPORTED_CHAINS: TSupportedChains = {
     name: 'Polkadot People',
     id: 'polkadot-people',
     icon: 'icon-chain-polkadot',
-    isPeopleChain: true,
+    isParaChain: true,
     relayChainId: 'polkadot',
+    peopleChainId: 'polkadot-people',
   },
   rococo: {
     name: 'Rococo',
@@ -42,8 +43,9 @@ export const SUPPORTED_CHAINS: TSupportedChains = {
     name: 'Rococo People',
     id: 'rococo-people',
     icon: 'icon-chain-rococo',
-    isPeopleChain: true,
+    isParaChain: true,
     relayChainId: 'rococo',
+    peopleChainId: 'rococo-people',
   },
 };
 

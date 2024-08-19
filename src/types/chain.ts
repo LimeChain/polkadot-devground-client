@@ -10,26 +10,22 @@ export type TSupportedChains = {
 };
 
 export type TSupportedRelayChain = 'polkadot' | 'rococo';
-export type TSupportedPeopleChain = 'polkadot-people' | 'rococo-people';
-// Use after supporting at least one parachain
-// export type TSupportedParaChain = '';
-// export type TSupportedChain = TSupportedRelayChain | TSupportedPeopleChain | TSupportedParaChain;
-export type TSupportedChain = TSupportedRelayChain | TSupportedPeopleChain;
+export type TSupportedParaChain = 'polkadot-people' | 'rococo-people';
+export type TSupportedChain = TSupportedRelayChain | TSupportedParaChain;
 
-export type TChain = TRelayChain | TParaChain | TPeopleChain;
+export type TChain = TRelayChain | TParaChain;
 export type TRelayChain = TChainBase & {
   isRelayChain: true;
-  peopleChainId: TSupportedPeopleChain;
+  isParaChain?: false;
+  peopleChainId: TSupportedParaChain;
 };
 export type TParaChain = TChainBase & {
+  isRelayChain?: false;
   isParaChain: true;
   relayChainId: TSupportedRelayChain;
-  peopleChainId: TSupportedPeopleChain;
+  peopleChainId: TSupportedParaChain;
 };
-export type TPeopleChain = TChainBase & {
-  isPeopleChain: true;
-  relayChainId: TSupportedRelayChain;
-};
+
 type TChainBase = {
   name: string;
   id: TSupportedChain;
