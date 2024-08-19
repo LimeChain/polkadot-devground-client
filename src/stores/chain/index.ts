@@ -168,7 +168,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         registry.setMetadata(metadata);
 
         // get spec_version from runtime
-        const runtime = await api.query.System.LastRuntimeUpgrade.getValue({ at: 'finalized' }); // finalized because we show data from finalized onwards
+        const runtime = await api.query.System.LastRuntimeUpgrade.getValue({ at: 'finalized' }); // finalized because the first block we show from is finalized
         set({ runtime });
 
         // update spec_version on runtime update
@@ -177,9 +177,11 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         });
 
         // check for failed extrinsics
-        api.event.System.ExtrinsicSuccess.watch().subscribe(events => {
-          console.log(events);
-        });
+        // api.event.System.ExtrinsicSuccess.pull().then(console.log);
+
+        // api.event.System.
+
+        // api.query.System.Events.watchValue('best').subscribe(console.log);
 
         const subscription = newClient.bestBlocks$.subscribe(async (bestBlocks) => {
           const bestBlock = bestBlocks.at(0);
@@ -189,6 +191,8 @@ const baseStore = create<StoreInterface>()((set, get) => ({
           for (let i = bestBlocks.length - 1; i >= 0; i--) {
             const block = bestBlocks[i];
 
+            // blocksData.set(block?.number, undefined);
+
             const blockData = await getBlockDetailsWithPAPI({
               api,
               blockHash: block.hash,
@@ -197,7 +201,9 @@ const baseStore = create<StoreInterface>()((set, get) => ({
               registry,
             });
 
-            blocksData.set(block?.number, blockData);
+            if (blockData) {
+              blocksData.set(block?.number, blockData);
+            }
           }
 
           set({

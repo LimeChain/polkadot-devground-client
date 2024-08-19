@@ -6,7 +6,11 @@ import {
   mergeUint8,
   toHex,
 } from '@polkadot-api/utils';
-import { u32 } from 'scale-ts';
+import {
+  Struct,
+  u32,
+  u64,
+} from 'scale-ts';
 
 import {
   baseStoreChain,
@@ -92,21 +96,26 @@ export const getBlockDetails = async ({
   };
 };
 
+const babeDigestCodec = ScaleEnum({
+  authority_index: u32,
+  one: u32,
+  two: u32,
+  three: u32,
+});
+
+const auraDigestCodec = Struct({ slotNumber: u64 });
+
 export const getBlockValidator = async ({
   blockHash,
 }: {
   blockHash: string;
 }) => {
 
-  const babeDigestCodec = ScaleEnum({
-    authority_index: u32,
-    one: u32,
-    two: u32,
-    three: u32,
-  });
-
   const peopleApi = baseStoreChain.getState().peopleApi as StoreInterface['peopleApi'];
   const api = baseStoreChain.getState().api as StoreInterface['api'];
+  const chain = baseStoreChain.getState().chain as StoreInterface['chain'];
+
+  const isPeopleChain = chain.id.includes('people');
 
   if (!api) {
     throw new Error('Api is not defined');
@@ -120,11 +129,27 @@ export const getBlockValidator = async ({
 
   const digest = await api.query.System.Digest.getValue({ at: blockHash });
   const digestData = digest[0].value[1].asBytes();
-  const authorIndex = babeDigestCodec.dec(digestData).value;
 
-  const validators = await api.query.Session.Validators.getValue({ at: blockHash });
+  let authorIndex = 0;
 
-  const address = validators[authorIndex];
+  if (isPeopleChain) {
+    authorIndex = Number(auraDigestCodec.dec(digestData).slotNumber);
+  } else {
+    authorIndex = babeDigestCodec.dec(digestData).value;
+  }
+
+  let authors = [];
+
+  if (isPeopleChain) {
+    authors = await peopleApi.query.CollatorSelection.Invulnerables.getValue({ at: blockHash });
+  } else {
+    authors = await api.query.Session.Validators.getValue({ at: blockHash });
+  }
+  // console.log(authorIndex);
+  // console.log(collators);
+
+  const address = !isPeopleChain ? authors[authorIndex] : authors[authorIndex % authors.length];
+
   let identity;
   identity = await peopleApi?.query.Identity.IdentityOf.getValue(address);
   if (identity) {
@@ -172,13 +197,21 @@ export const getBlockDetailsWithPAPI = async ({
   }
 
   const runtime = baseStoreChain.getState().runtime as StoreInterface['runtime'];
+  // const blocksData = baseStoreChain.getState().blocksData as StoreInterface['blocksData'];
+  // const blockData = blocksData.get(blockNumber);
 
   const blockHeader = await client.getBlockHeader(blockHash);
+
+  // if (blockData && blockData.header.hash === blockHash) {
+  //   return;
+  // }
+
+  // console.log(blockNumber, blockHash);
 
   // Initialize timestamp variable
   let timestamp: number = 0;
 
-  const eventsCount = await api.query.System.EventCount.getValue({ at: blockHash });
+  // const eventsCount = await api.query.System.EventCount.getValue({ at: blockHash });
 
   const extrinsicsRaw = await client.getBlockBody(blockHash);
   const extrinsics: IMappedBlockExtrinsic[] = [];
@@ -205,13 +238,24 @@ export const getBlockDetailsWithPAPI = async ({
       ...extrinsic,
       id: `${blockNumber}-${i}`,
       blockNumber,
+      isSuccess: true,
       // the timestamp is always the first extrinsic
       // so we can assume the timestamp will be populated
       // after the if statement above
       timestamp,
     });
   });
-  
+
+  const events = await api.query.System.Events.getValue({ at: blockHash });
+  events.forEach(ev => {
+    if (ev.event.type === 'System') {
+      const extrinsicIsSuccess = ev.event.value.type === 'ExtrinsicSuccess';
+      const extrinsicIndex = ev.phase.value || 0;
+      extrinsics[extrinsicIndex].isSuccess = extrinsicIsSuccess;
+    }
+  });
+  // console.log(blockNumber, blockHash, events);
+
   //Get the block validator
   const identity = await getBlockValidator({ blockHash });
 
@@ -225,7 +269,8 @@ export const getBlockDetailsWithPAPI = async ({
     },
     body: {
       extrinsics,
-      eventsCount,
+      // eventsCount: events.length,
+      events,
     },
   };
 };
