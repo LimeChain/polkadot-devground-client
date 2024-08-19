@@ -19,7 +19,7 @@ import {
   CHAIN_DESCRIPTORS,
   CHAIN_SPECS,
   CHAIN_WEBSOCKET_URLS,
-  SUPPORTED_CHAIN_GROUPS,
+  SUPPORTED_CHAINS,
 } from '@constants/chain';
 import {
   type dot,
@@ -30,14 +30,14 @@ import { getBlockDetailsWithPAPI } from '@utils/rpc/getBlockDetails';
 
 import { createSelectors } from '../createSelectors';
 
-import type { IChain } from '@custom-types/chain';
+import type { TChain } from '@custom-types/chain';
 import type { SubstrateClient } from '@polkadot-api/substrate-client';
 
 interface ISubscription {
   unsubscribe: () => void;
 }
 
-interface IChainSpecs extends Awaited<ReturnType<PolkadotClient['getChainSpecData']>> {
+interface TChainSpecs extends Awaited<ReturnType<PolkadotClient['getChainSpecData']>> {
   properties: {
     ss58Format: number;
     tokenDecimals: number;
@@ -51,7 +51,7 @@ interface IRuntime {
 }
 
 export interface StoreInterface {
-  chain: IChain;
+  chain: TChain;
 
   smoldot: Client;
   client: PolkadotClient | null;
@@ -64,21 +64,21 @@ export interface StoreInterface {
   bestBlock: number | undefined;
   finalizedBlock: number | undefined;
 
-  chainSpecs: IChainSpecs | null;
+  chainSpecs: TChainSpecs | null;
   runtime: IRuntime | undefined;
 
   registry: TypeRegistry;
 
   actions: {
     resetStore: () => void;
-    setChain: (chain: IChain) => void;
+    setChain: (chain: TChain) => void;
   };
 
   init: () => void;
 }
 
 const initialState = {
-  chain: SUPPORTED_CHAIN_GROUPS['polkadot'].chains[0],
+  chain: SUPPORTED_CHAINS['polkadot-people'],
   client: null,
   rawClient: null,
   api: null,
@@ -112,7 +112,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
       }
     },
-    setChain: async (chain: IChain) => {
+    setChain: async (chain: TChain) => {
       try {
         set({ chain });
 
@@ -134,32 +134,61 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         set({ finalizedBlock: undefined, bestBlock: undefined });
 
         // init chain
-        const relayChain = await smoldot?.addChain({
-          chainSpec: CHAIN_SPECS['polkadot'],
-        });
-        const newChain = await smoldot?.addChain({
-          chainSpec: CHAIN_SPECS[chain.id],
-          potentialRelayChains: [relayChain],
-        });
 
-        const peopleChain = await smoldot?.addChain({
-          chainSpec: CHAIN_SPECS['polkadot-people'],
-          potentialRelayChains: [relayChain],
-        });
+        const isParachain = chain.isParachain;
 
+        let newChain, peopleChain;
+
+        if (!isParachain) {
+          newChain = await smoldot?.addChain({
+            chainSpec: CHAIN_SPECS[chain.id],
+          });
+
+          peopleChain = await smoldot?.addChain({
+            chainSpec: CHAIN_SPECS[chain.peopleChainId],
+            potentialRelayChains: [newChain],
+          });
+        } else {
+
+          const relayChain = await smoldot?.addChain({
+            chainSpec: CHAIN_SPECS[chain.relayChainId],
+          });
+
+          newChain = await smoldot?.addChain({
+            chainSpec: CHAIN_SPECS[chain.id],
+            potentialRelayChains: [relayChain],
+          });
+
+          peopleChain = await smoldot?.addChain({
+            chainSpec: CHAIN_SPECS[chain.id],
+            potentialRelayChains: [relayChain],
+          });
+
+        }
+
+        // if (chain.id === chain.peopleChainId) {
+        //   peopleChain = newChain;
+        // } else {
+        // }
+
+        // let newClient, peopleClient;
         const newClient = createClient(getSmProvider(newChain));
         set({ client: newClient });
 
+        // if (chain.relayChainId === chain.id) {
+        //   peopleClient = newClient;
+        // } else {
         const peopleClient = createClient(getSmProvider(peopleChain));
+        // }
         // set({ peopleClient });
 
         const chainSpecs = await newClient.getChainSpecData();
         set({ chainSpecs });
 
-        const api = newClient.getTypedApi(CHAIN_DESCRIPTORS[chain.id]);
+        const api = newClient.getTypedApi(CHAIN_DESCRIPTORS[isParachain ? chain.relayChainId : chain.id]);
         set({ api });
 
-        const peopleApi = peopleClient.getTypedApi(CHAIN_DESCRIPTORS['polkadot-people']);
+        const peopleApi = peopleClient.getTypedApi(CHAIN_DESCRIPTORS[isParachain ? chain.id : chain.peopleChainId]);
         set({ peopleApi });
 
         // build metadata registry for decoding

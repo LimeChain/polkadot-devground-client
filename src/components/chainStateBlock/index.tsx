@@ -8,7 +8,7 @@ import {
 
 import type { TChainSubscription } from '@custom-types/chain';
 
-interface IChainStateBlockProps {
+interface TChainStateBlockProps {
   type: TChainSubscription;
 }
 
@@ -21,7 +21,7 @@ const typeLib: Record<TChainSubscription, string> = {
   transfers: '',
 };
 
-export const ChainStateBlock = ({ type }: IChainStateBlockProps) => {
+export const ChainStateBlock = ({ type }: TChainStateBlockProps) => {
 
   const chainData = useStoreChain?.use?.[typeLib[type]]?.();
 

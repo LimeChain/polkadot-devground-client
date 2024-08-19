@@ -32,7 +32,7 @@ import type {
 
 // import type { IBlock } from '@custom-types/block';
 
-interface IChainDataList {
+interface TChainDataList {
   title: string;
   link: IPDLink['to'];
   linkText: string;
@@ -327,7 +327,7 @@ export const SignedExtrinsics = () => {
   );
 };
 
-export const ChainDataList = ({ title, link, linkText }: IChainDataList) => {
+export const ChainDataList = ({ title, link, linkText }: TChainDataList) => {
   const isLatestBlocks = link === '/latest-blocks';
   return (
     <div className="flex flex-1 flex-col gap-y-3 overflow-hidden">
