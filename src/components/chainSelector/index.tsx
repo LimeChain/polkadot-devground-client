@@ -15,8 +15,8 @@ import { useStoreChain } from '@stores';
 import { cn } from '@utils/helpers';
 
 import type {
-  IChain,
-  ISupportedChains,
+  ISupportedChainGroups,
+  TChain,
 } from '@custom-types/chain';
 import type {
   IEventBusSearchChain,
@@ -24,7 +24,7 @@ import type {
 } from '@custom-types/eventBus';
 
 const CHAIN_GROUPS = Object.keys(SUPPORTED_CHAIN_GROUPS);
-const ALL_CHAINS = CHAIN_GROUPS.reduce((acc: ISupportedChains['<chain_name>']['chains'], curr) => {
+const ALL_CHAINS = CHAIN_GROUPS.reduce((acc: ISupportedChainGroups['<chain_name>']['chains'], curr) => {
   SUPPORTED_CHAIN_GROUPS[curr].chains.forEach(chain => {
     acc.push(chain);
   });
@@ -35,7 +35,7 @@ export const ChainSelector = () => {
   const { setChain } = useStoreChain.use.actions();
 
   const [selectedChainGroup, setSelectedChainGroup] = useState('');
-  const [filteredChains, setFilteredChains] = useState<ISupportedChains['<chain_name>']['chains']>(ALL_CHAINS);
+  const [filteredChains, setFilteredChains] = useState<ISupportedChainGroups['<chain_name>']['chains']>(ALL_CHAINS);
   const [query, setQuery] = useState('');
 
   useEventBus<IEventBusSearchChain>('@@-search-chain', ({ data }) => {
@@ -67,7 +67,7 @@ export const ChainSelector = () => {
     }
   }, [setChain]);
 
-  const filterChainsByQuery = useCallback((chain: IChain) => {
+  const filterChainsByQuery = useCallback((chain: TChain) => {
     return chain.id.toLowerCase().startsWith(query.toLowerCase());
   }, [query]);
 

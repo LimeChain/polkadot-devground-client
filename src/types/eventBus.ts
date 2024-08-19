@@ -1,4 +1,4 @@
-import type { IChain } from './chain';
+import type { TChain } from './chain';
 import type {
   IConsoleMessage,
   IErrorItem,
@@ -50,7 +50,7 @@ export interface IEventBusIframeDestroy {
 
 export interface IEventBusSetChain {
   type: '@@-set-chain';
-  data: IChain;
+  data: TChain;
 }
 export interface IEventBusSearchChain {
   type: '@@-search-chain';
