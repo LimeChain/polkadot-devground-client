@@ -7,7 +7,7 @@ import {
 import { useSearchParams } from 'react-router-dom';
 
 import { Icon } from '@components/icon';
-import { PDScrollArea } from '@components/scrollArea';
+import { PDScrollArea } from '@components/pdScrollArea';
 import { snippets } from '@constants/snippets';
 import { cn } from '@utils/helpers';
 
@@ -53,7 +53,7 @@ export const SelectExample = () => {
         className={cn(
           'relative flex w-full items-center justify-between',
           'px-4 py-[18px]',
-          'font-geist text-body2-regular',
+          'text-body2-regular font-geist',
           'bg-dev-purple-200 hover:bg-dev-purple-300',
           'dark:bg-dev-black-700 hover:dark:bg-dev-black-600',
           'border-2',
@@ -141,10 +141,10 @@ export const SelectExample = () => {
                         onClick={handleChangeExample}
                         data-snippet-index={snippet.id}
                       >
-                        <p className="font-geist text-body2-regular text-dev-white-200 dark:text-dev-black-1000">
+                        <p className="text-body2-regular font-geist text-dev-white-200 dark:text-dev-black-1000">
                           Example: {snippet.id}
                         </p>
-                        <p className="font-geist text-body3-regular text-dev-white-1000 dark:text-dev-black-300">
+                        <p className="text-body3-regular font-geist text-dev-white-1000 dark:text-dev-black-300">
                           CUSTOM
                         </p>
                       </button>
@@ -152,7 +152,7 @@ export const SelectExample = () => {
                   ))
                 )
                 : (
-                  <li className="font-geist text-body1-regular text-dev-white-1000 dark:text-dev-black-300">
+                  <li className="text-body1-regular font-geist text-dev-white-1000 dark:text-dev-black-300">
                     No examples found
                   </li>
                 )
