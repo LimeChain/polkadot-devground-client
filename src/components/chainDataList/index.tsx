@@ -48,7 +48,7 @@ const RowLatestBlock = (props: IRowLatestBlock) => {
 
   const timestamp = blockData?.header?.timestamp || 0;
   const extrinsics = blockData?.body?.extrinsics;
-  const eventsCount = blockData?.body?.eventsCount;
+  const eventsCount = blockData?.body?.events.length;
 
   const timeAgo = timestamp
     && formatDistanceToNowStrict(
@@ -89,6 +89,7 @@ const RowSignedExtrinsic = ({
   signature,
   signer,
   timestamp,
+  isSuccess,
 }: IMappedTransferExtrinsic) => {
   const chainSpecs = useStoreChain?.use?.chainSpecs?.();
   const {
@@ -132,6 +133,8 @@ const RowSignedExtrinsic = ({
           {formatedExtrinsicValue}
           {' '}
           {tokenSymbol}
+          {' '}
+          {isSuccess ? '√' : 'x'}
         </span>
         <span>{timeAgo}</span>
       </div>
@@ -221,6 +224,7 @@ export const LatestBlocks = () => {
 
 export const SignedExtrinsics = () => {
   const blocksData = useStoreChain?.use?.blocksData?.();
+
   const chain = useStoreChain?.use?.chain?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
 
@@ -244,9 +248,14 @@ export const SignedExtrinsics = () => {
   }, [chain]);
 
   const loadInitialData = useCallback(() => {
+    // console.log(blocksData);
+
     blocksData.entries().forEach(entry => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [blockNumber, block] = entry;
+      if (!block) {
+        return;
+      }
       const extrinsics = block.body.extrinsics;
 
       const signedExtrinsics = filterTransferExtrinsics(extrinsics);

@@ -28,6 +28,7 @@ export interface IMappedBlockExtrinsic extends IBlockExtrinsic {
   id: string;
   blockNumber: number;
   timestamp: number;
+  isSuccess: boolean;
 }
 
 // TODO use correct types for signature / account ids (ss58 strings)
