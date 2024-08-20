@@ -12,7 +12,10 @@ import { Icon } from '@components/icon';
 import { PDLink } from '@components/pdLink';
 import { ToggleButton } from '@components/toggleButton';
 import { useStoreChain } from '@stores';
-import { formatNumber } from '@utils/helpers';
+import {
+  cn,
+  formatNumber,
+} from '@utils/helpers';
 
 import styles from './styles.module.css';
 
@@ -46,6 +49,7 @@ const BlockDetails = () => {
       if (!block) {
         return;
       }
+      console.log(block);
       setBlockData({
         number: block.header.number,
         blockHash: block.header.hash,
@@ -77,10 +81,20 @@ const BlockDetails = () => {
     <>
       <div className="mb-12 flex items-center justify-between">
         <div className="flex items-center">
-          <PDLink to="/explorer" className="mr-8 bg-dev-purple-700 p-2 dark:bg-white">
+          <PDLink
+            to="/explorer"
+            className={cn(
+              'mr-8 duration-300 ease-out',
+              'bg-dev-purple-700 p-2 dark:bg-white',
+              'hover:bg-dev-purple-900 hover:dark:bg-dev-purple-200',
+            )}
+          >
             <Icon
               name="icon-arrowLeft"
-              className=" text-dev-white-200 dark:text-dev-purple-700"
+              className={cn(
+                'text-dev-white-200 dark:text-dev-purple-700',
+              )
+              }
             />
           </PDLink>
           <h4 className="mr-2 font-h4-light">Block</h4>
@@ -89,17 +103,21 @@ const BlockDetails = () => {
 
         <div className="flex gap-6">
           <PDLink
-            to={`https://polkadot.subscan.io/block/${''}`}
-            className="flex items-center gap-1"
+            to={`https://polkadot.subscan.io/block/${blockData.number}`}
+            className={styles['pd-link-btn']}
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            <p className="font-geist font-body2-bold">Polkadot Statescan</p>
+            Polkadot Subscan
             <Icon name="icon-openLink" size={[16]} />
           </PDLink>
           <PDLink
-            to={`https://polkadot.statescan.io/#/blocks/${''}`}
-            className="flex items-center gap-1"
+            to={`https://polkadot.statescan.io/#/blocks/${blockData.number}`}
+            className={styles['pd-link-btn']}
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            <p className="font-geist font-body2-bold">Polkadot Statescan</p>
+            Polkadot Statescan
             <Icon name="icon-openLink" size={[16]} />
           </PDLink>
         </div>
