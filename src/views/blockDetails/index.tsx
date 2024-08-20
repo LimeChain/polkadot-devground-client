@@ -2,7 +2,6 @@ import { format } from 'date-fns';
 import {
   useCallback,
   useEffect,
-  useRef,
   useState,
 } from 'react';
 import { useParams } from 'react-router-dom';
@@ -31,19 +30,23 @@ interface IBlockData {
 }
 
 const BlockDetails = () => {
+  const latestFinalizedBlock = useStoreChain.use.finalizedBlock?.();
   const { blockId } = useParams();
-
-  const refDates = useRef<{
-    local?: string;
-    utc?: string;
-  } | undefined>();
 
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [blockData, setBlockData] = useState<IBlockData | undefined>();
+  const [isFinalized, setIsFinalized] = useState<boolean>(false);
   const blocksData = useStoreChain?.use?.blocksData?.();
 
-  useEffect(() => {
+  const handleSetCheck = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const target = e.currentTarget.parentNode as HTMLDivElement;
+    const format = target.getAttribute('data-format');
+    target.setAttribute('data-format', format === 'utc' ? 'local' : 'utc');
 
+    setIsChecked(state => !state);
+  }, []);
+
+  useEffect(() => {
     if (blockId && blocksData.size > 0) {
       const block = blocksData.get(Number(blockId));
       if (!block) {
@@ -63,15 +66,12 @@ const BlockDetails = () => {
     }
   }, [blockId, blocksData]);
 
-  const latestFinalizedBlock = useStoreChain.use.finalizedBlock?.();
-
-  const handleSetCheck = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const target = e.currentTarget.parentNode as HTMLDivElement;
-    const format = target.getAttribute('data-format');
-    target.setAttribute('data-format', format === 'utc' ? 'local' : 'utc');
-
-    setIsChecked(state => !state);
-  }, []);
+  useEffect(() => {
+    if (latestFinalizedBlock && blockData) {
+      console.log(latestFinalizedBlock);
+      latestFinalizedBlock >= blockData?.number ? setIsFinalized(true) : setIsFinalized(false);
+    }
+  }, [latestFinalizedBlock, blockData]);
 
   if (!blockData) {
     return <>loading</>;
@@ -124,38 +124,46 @@ const BlockDetails = () => {
       </div>
 
       {/* Time stamp */}
-      {
-        refDates.current?.local && (
-          <div className={styles['pd-block-details']}>
-            <p>Time stamp</p>
 
-            <div>
-              {isChecked ? new Date(blockData.timeStamp).toUTCString() : blockData.timeStamp}
-              <ToggleButton
-                isChecked={isChecked}
-                handleSetCheck={handleSetCheck}
-                classNames="ml-2"
-              />
+      <div className={styles['pd-block-details']}>
+        <p>Time stamp</p>
+
+        <div>
+          {isChecked ? new Date(blockData.timeStamp).toUTCString() : blockData.timeStamp}
+          <ToggleButton
+            isChecked={isChecked}
+            handleSetCheck={handleSetCheck}
+            classNames="ml-2"
+          />
           UTC
-            </div>
-          </div>
-        )}
+        </div>
+      </div>
 
       {/* Status */}
       <div className={styles['pd-block-details']}>
         <p>Status</p>
 
         {
-          latestFinalizedBlock !== blockData.number && (
-            <div>
-              <Icon
-                size={[16]}
-                name="icon-checked"
-                className="text-dev-green-600"
-              />
-              <p>Finalized</p>
-            </div>
-          )
+          isFinalized
+            ? (
+              <div>
+                <Icon
+                  size={[16]}
+                  name="icon-checked"
+                  className="text-dev-green-600"
+                />
+                <p>Finalized</p>
+              </div>
+            )
+            : (
+              <div>
+                <Icon
+                  size={[16]}
+                  name="icon-unfinalized"
+                />
+                <p>Unfinalized</p>
+              </div>
+            )
         }
       </div>
 
