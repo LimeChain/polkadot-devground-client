@@ -123,7 +123,7 @@ export const EditorActions = (props: IEditorActionsProps) => {
       <div
         className={cn(
           'flex gap-4',
-          'font-body2-regular font-geist text-dev-black-300 dark:text-dev-purple-300',
+          'font-geist text-dev-black-300 font-body2-regular dark:text-dev-purple-300',
           'hover:text-dev-black-1000',
           'dark:hover:text-dev-purple-50',
         )}

@@ -1,3 +1,4 @@
+/* eslint-disable import/export */
 export interface IBlock {
   hash: string;
   extrinsics: string[];

@@ -176,7 +176,7 @@ export const getBlockDetailsWithPAPI = async ({
   blockHash,
 }: {
   blockNumber: StoreInterface['bestBlock'];
-    blockHash: string;
+  blockHash: string;
 }) => {
 
   if (!blockNumber) {

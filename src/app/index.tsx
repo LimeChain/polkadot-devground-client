@@ -1,4 +1,3 @@
-import * as papiDescriptors from '@polkadot-api/descriptors';
 import { createClient } from 'polkadot-api';
 import {
   connectInjectedExtension,
@@ -14,6 +13,7 @@ import {
   RouterProvider,
 } from 'react-router-dom';
 
+import * as papiDescriptors from '@polkadot-api/descriptors';
 import {
   useStoreAuth,
   useStoreChain,
