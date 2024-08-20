@@ -11,8 +11,8 @@ import {
   PanelResizeHandle,
 } from 'react-resizable-panels';
 
+import { ActionButton } from '@components/actionButton';
 import { ErrorBoundary } from '@components/errorBoundary';
-import { Icon } from '@components/icon';
 import { cn } from '@utils/helpers';
 import { encodeCodeToBase64 } from '@utils/iframe';
 
@@ -100,9 +100,20 @@ const TypeScriptEditor = () => {
               onChangeView={handleSetTabContent}
               tabView={tabView}
             />
-
-            {tabView === 'editor' && <MonacoEditor />}
-            {tabView === 'preview' && <Iframe />}
+            <MonacoEditor
+              classNames={cn(
+                {
+                  ['hidden']: tabView !== 'editor',
+                },
+              )}
+            />
+            {/* <Iframe
+              classNames={cn(
+                {
+                  ['hidden']: tabView !== 'preview',
+                },
+              )}
+            /> */}
           </Panel>
           <PanelResizeHandle className="group relative w-4">
             <div
@@ -130,20 +141,9 @@ const TypeScriptEditor = () => {
                       'border border-b-0 border-dev-purple-300 dark:border-dev-black-800',
                     )}
                     >
-                      <button
-                        type="button"
-                        className="p-2 hover:bg-dev-purple-700"
-                        onClick={shareCode}
-                      >
-                        <Icon name="icon-externalLink" />
-                      </button>
-                      <button
-                        type="button"
-                        className="p-2 hover:bg-dev-purple-700"
-                        onClick={shareCode}
-                      >
-                        <Icon name="icon-export" />
-                      </button>
+
+                      <ActionButton iconName="icon-externalLink" onClick={shareCode} />
+                      <ActionButton iconName="icon-export" onClick={shareCode} />
                     </div>
                     <Panel
                       id="right-top"

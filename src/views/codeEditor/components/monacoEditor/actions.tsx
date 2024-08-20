@@ -8,7 +8,7 @@ import {
   useState,
 } from 'react';
 
-import { Icon } from '@components/icon';
+import { ActionButton } from '@components/actionButton';
 import { downloadZip } from '@utils/downloadZip';
 import { cn } from '@utils/helpers';
 import {
@@ -123,7 +123,9 @@ export const EditorActions = (props: IEditorActionsProps) => {
       <div
         className={cn(
           'flex gap-4',
-          'font-geist text-body2-regular text-dev-black-300 dark:text-dev-purple-300',
+          'text-body2-regular font-geist text-dev-black-300 dark:text-dev-purple-300',
+          'hover:text-dev-black-1000',
+          'dark:hover:text-dev-purple-50',
         )}
       >
         <button
@@ -131,8 +133,6 @@ export const EditorActions = (props: IEditorActionsProps) => {
           onClick={onChangeView}
           className={cn(
             'px-10 py-2.5',
-            'hover:text-dev-black-1000',
-            'dark:hover:text-dev-purple-50',
             'border-b-2 border-b-transparent hover:border-b-dev-pink-500',
             'transform transition-colors duration-300 ease-in-out',
             {
@@ -147,12 +147,10 @@ export const EditorActions = (props: IEditorActionsProps) => {
           onClick={onChangeView}
           className={cn(
             'px-8 py-2.5',
-            'hover:text-dev-black-1000',
-            'dark:hover:text-dev-purple-50 ',
             'border-b-2 border-b-transparent hover:border-b-dev-pink-500',
             'transform transition-colors duration-300 ease-in-out',
             {
-              ['border-dev-pink-500']: tabView === 'readme',
+              ['border-dev-pink-500']: tabView === 'preview',
             },
           )}
         >
@@ -161,39 +159,20 @@ export const EditorActions = (props: IEditorActionsProps) => {
       </div>
 
       <div className="flex gap-2 pr-2">
-        <button className="p-2 transition-colors hover:bg-dev-purple-700">
-          <Icon name="icon-share" />
-        </button>
-        <button className="p-2 transition-colors hover:bg-dev-purple-700">
-          <Icon name="icon-save" />
-        </button>
-        <button
-          className="p-2 transition-colors hover:bg-dev-purple-700"
-          onClick={handleDownload}
-        >
-          <Icon name="icon-download" />
-        </button>
-
-        {
-          isRunning
-            ? (
-              <button
-                type="button"
-                className="p-2 hover:bg-dev-purple-700"
-                onClick={handleStop}
-              >
-                <Icon name="icon-pause" />
-              </button>
-            )
-            : (
-              <button
-                className="p-2 hover:bg-dev-purple-700"
-                onClick={handleRun}
-              >
-                <Icon name="icon-play" fill="red" />
-              </button>
-            )
-        }
+        <ActionButton iconName="icon-share" />
+        <ActionButton iconName="icon-save" />
+        <ActionButton iconName="icon-download" onClick={handleDownload} />
+        {isRunning
+          ? (
+            <ActionButton iconName="icon-pause" onClick={handleStop} />
+          )
+          : (
+            <ActionButton
+              iconName="icon-play"
+              onClick={handleRun}
+              fill="red"
+            />
+          )}
       </div>
 
     </div>
