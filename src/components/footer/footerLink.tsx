@@ -5,7 +5,7 @@ import {
 import {
   type IPDLink,
   PDLink,
-} from '@components/ui/PDLink';
+} from '@components/pdLink';
 import { cn } from '@utils/helpers';
 
 export interface IFooterLinkProps {

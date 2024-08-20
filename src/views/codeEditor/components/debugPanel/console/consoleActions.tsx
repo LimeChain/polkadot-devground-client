@@ -8,6 +8,7 @@ import {
 } from 'react';
 
 import { CopyToClipboard } from '@components/copyToClipboard';
+import { Icon } from '@components/icon';
 import { cn } from '@utils/helpers';
 
 import type {
@@ -39,7 +40,7 @@ export const ConsoleActions = () => {
   return (
     <div
       className={cn(
-        'absolute bottom-2 right-2 flex',
+        'absolute right-6 top-2 flex gap-x-2',
         'opacity-0',
         'pointer-events-none',
         'transition-opacity duration-300',
@@ -51,11 +52,15 @@ export const ConsoleActions = () => {
       <button
         type="button"
         className={cn(
-          'rounded bg-indigo-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
+          'size-4',
         )}
         onClick={handleClear}
       >
-        Clear Console
+        <Icon
+          name="icon-circle-slash"
+          size={[16]}
+          className="text-dev-black-1000 dark:text-white"
+        />
       </button>
       <CopyToClipboard
         text={messages.map(({ message }) => message).join('\n')}

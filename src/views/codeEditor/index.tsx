@@ -11,11 +11,12 @@ import {
   PanelResizeHandle,
 } from 'react-resizable-panels';
 
-import { ActionButton } from '@components/actionButton';
 import { ErrorBoundary } from '@components/errorBoundary';
+import { Tabs } from '@components/tabs';
 import { cn } from '@utils/helpers';
 import { encodeCodeToBase64 } from '@utils/iframe';
 
+import { ActionButton } from './components/actionButton';
 import { DebugPanel } from './components/debugPanel';
 import { Iframe } from './components/iframe';
 import { MonacoEditor } from './components/monacoEditor';
@@ -32,7 +33,6 @@ const TypeScriptEditor = () => {
   const refTimeout = useRef<NodeJS.Timeout>();
   const refCanPreview = useRef(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [tabView, setTabView] = useState('editor');
 
   useEventBus<IEventBusMonacoEditorShowPreview>('@@-monaco-editor-show-preview', ({ data }) => {
     refCanPreview.current = data;
@@ -69,11 +69,6 @@ const TypeScriptEditor = () => {
     }
   }, []);
 
-  const handleSetTabContent = useCallback((e: React.MouseEvent<HTMLButtonElement>): void => {
-    const item = String(e.currentTarget.dataset.item);
-    setTabView(item);
-  }, []);
-
   return (
     <div className="max-w-screen flex h-full flex-col overflow-hidden px-8 pt-8">
       <SnippetsSwitcher />
@@ -94,26 +89,34 @@ const TypeScriptEditor = () => {
             order={1}
             defaultSize={50}
             minSize={30}
-            className="flex flex-col border border-dev-purple-300 dark:border-dev-black-800"
+            className="relative flex flex-col border border-dev-purple-300 dark:border-dev-black-800"
           >
-            <EditorActions
-              onChangeView={handleSetTabContent}
-              tabView={tabView}
-            />
-            <MonacoEditor
-              classNames={cn(
-                {
-                  ['hidden']: tabView !== 'editor',
-                },
+            <EditorActions />
+
+            <Tabs
+              unmountOnHide={false}
+              tabsClassName={cn(
+                'z-10 w-full py-4 pl-16',
+                'dark:bg-dev-black-800',
               )}
-            />
-            {/* <Iframe
-              classNames={cn(
-                {
-                  ['hidden']: tabView !== 'preview',
-                },
+              tabClassName={cn(
+                'px-10 py-2.5',
               )}
-            /> */}
+            >
+              <div
+                data-title="Editor"
+                className="flex h-full"
+
+              >
+                <MonacoEditor />
+              </div>
+              <div
+                data-title="Read me"
+                className="flex h-full p-4 dark:bg-dev-black-800"
+              >
+                <>Readme.md</>
+              </div>
+            </Tabs>
           </Panel>
           <PanelResizeHandle className="group relative w-4">
             <div

@@ -9,8 +9,8 @@ import { useParams } from 'react-router-dom';
 
 import { CopyToClipboard } from '@components/copyToClipboard';
 import { Icon } from '@components/icon';
+import { PDLink } from '@components/pdLink';
 import { ToggleButton } from '@components/toggleButton';
-import { PDLink } from '@components/ui/PDLink';
 import { useStoreChain } from '@stores';
 import { formatNumber } from '@utils/helpers';
 

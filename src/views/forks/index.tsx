@@ -15,6 +15,7 @@ import type { BlockItem } from './forks';
 const Forks = () => {
   const chain = useStoreChain?.use?.chain?.();
   const client = useStoreChain?.use?.client?.();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const refSubscription = useRef<any>();
 
   const [items, setItems] = useState<Record<string, BlockItem[]>>({});

@@ -53,14 +53,15 @@ export const subscribeToRuntime = async (api: TypedApi<TChainDescriptor>, callba
   });
 };
 
-export const getSystemDigestData = async (api: TypedApi<TChainDescriptor>, at: 'best' | 'finalized' | string) => {
-  checkForProp(api, 'Api');
-  checkForProp(at, 'At');
-  checkIfCompatable(
-    api?.query?.System?.Digest,
-    'api.query.System.Digest',
-  );
+// @TODO: check if we need this function
+// export const getSystemDigestData = async (api: TypedApi<TChainDescriptor>, at: 'best' | 'finalized' | string) => {
+//   checkForProp(api, 'Api');
+//   checkForProp(at, 'At');
+//   checkIfCompatable(
+//     api?.query?.System?.Digest,
+//     'api.query.System.Digest',
+//   );
 
-  const digest = await api.query.System.Digest.getValue({ at });
-  const digestData = digest[0].value[1].asBytes();
-};
+//   const digest = await api.query.System.Digest.getValue({ at });
+//   const digestData = digest[0].value[1].asBytes();
+// };

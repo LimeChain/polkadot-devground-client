@@ -19,6 +19,7 @@ type TabsProps = {
   initialTab?: number;
   className?: string;
   tabsClassName?: string;
+  tabClassName?: string;
   contentClassName?: string;
   onChange?: (index: number) => void;
   unmountOnHide?: boolean;
@@ -31,6 +32,7 @@ export const Tabs = (props: TabsProps) => {
     initialTab = 0,
     className,
     tabsClassName,
+    tabClassName,
     contentClassName,
     onChange,
     unmountOnHide = true,
@@ -63,6 +65,7 @@ export const Tabs = (props: TabsProps) => {
         className={cn(
           'relative',
           'flex items-center gap-x-4 overflow-hidden',
+          'font-body2-regular',
           tabsClassName,
         )}
       >
@@ -86,19 +89,21 @@ export const Tabs = (props: TabsProps) => {
                 className={cn(
                   'group',
                   'cursor-pointer',
-                  'relative flex items-center px-0.5 py-1',
-                  'whitespace-nowrap text-[11px] uppercase text-gray-400',
-                  'tracking-widest',
-                  'hover:text-white',
-                  'hover:before:bg-white',
+                  'relative flex items-center',
+                  'px-0.5 py-1',
+                  'whitespace-nowrap font-geist',
+                  'transition-colors duration-300 ease-in-out',
+                  'before:content[""] before:absolute before:inset-0 before:top-full',
+                  'before:h-[2px] before:w-full',
+                  'before:transition-colors before:duration-300 before:ease-in-out',
+                  'hover:before:bg-dev-pink-500',
+                  'hover:text-dev-black-1000',
+                  'dark:hover:text-dev-purple-50',
                   {
-                    [`
-                      before:content[""] before:absolute before:inset-0 before:top-full
-                      before:h-[2px] before:bg-gray-400 before:w-full
-                      before:translate-y-[-1px]
-                    `]: isActive,
+                    ['dark:text-white text-dev-black-1000 before:bg-dev-pink-500']: isActive,
                     ['pointer-events-none opacity-60']: isDisabled,
                   },
+                  tabClassName,
                 )}
               >
                 {title}

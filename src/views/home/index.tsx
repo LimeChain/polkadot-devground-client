@@ -1,5 +1,5 @@
 import { Icon } from '@components/icon';
-import { PDLink } from '@components/ui/PDLink';
+import { PDLink } from '@components/pdLink';
 import { cn } from '@utils/helpers';
 
 const Home = () => {

@@ -363,7 +363,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
   return (
     <div
       className={cn(
-        'relative flex-1',
+        'relative size-full',
         'transition-opacity duration-300',
         {
           ['opacity-50 pointer-events-none']: isReadOnly,
