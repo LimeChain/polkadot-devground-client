@@ -6,7 +6,11 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "add-descriptors": "npx papi add dot -n polkadot && npx papi add rococo -n rococo_v2_2 && npx papi add dotpeople -n polkadot_people && npx papi",
+    "add-polkadot": "npx papi add dot -n polkadot",
+    "add-polkadot-people": "npx papi add dotpeople -n polkadot_people",
+    "add-rococo": "npx papi add rococo -n rococo_v2_2",
+    "add-rococo-people": "npx papi add rococo_people -n rococo_v2_2_people",
+    "add-descriptors": "npm run add-polkadot && npm run add-polkadot-people && npm run add-rococo && npm run add-rococo-people",
     "remove-descriptors": "rm -rf node_modules .papi",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
@@ -82,16 +86,6 @@
     "vite-plugin-pwa": "0.20.0",
     "vite-plugin-static-copy": "1.0.6",
     "vite-tsconfig-paths": "4.3.2"
-  },
-  "polkadot-api": {
-    "dot": {
-      "chain": "polkadot",
-      "metadata": "dot.scale"
-    },
-    "rococo": {
-      "chain": "rococo_v2_2",
-      "metadata": "rococo.scale"
-    }
   },
   "engines": {
     "node": ">=18.0.0"
