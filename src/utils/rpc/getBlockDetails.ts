@@ -16,6 +16,7 @@ import {
   baseStoreChain,
   type StoreInterface,
 } from '@stores';
+import { decodeExtrinsic } from '@utils/codec';
 import { formatPrettyNumberString } from '@utils/helpers';
 
 import type {
@@ -115,7 +116,7 @@ export const getBlockValidator = async ({
   const api = baseStoreChain.getState().api as StoreInterface['api'];
   const chain = baseStoreChain.getState().chain as StoreInterface['chain'];
 
-  const isPeopleChain = chain.id.includes('people');
+  const isParaChain = chain.isParaChain;
 
   if (!api) {
     throw new Error('Api is not defined');
@@ -132,7 +133,7 @@ export const getBlockValidator = async ({
 
   let authorIndex = 0;
 
-  if (isPeopleChain) {
+  if (isParaChain) {
     authorIndex = Number(auraDigestCodec.dec(digestData).slotNumber);
   } else {
     authorIndex = babeDigestCodec.dec(digestData).value;
@@ -140,7 +141,7 @@ export const getBlockValidator = async ({
 
   let authors = [];
 
-  if (isPeopleChain) {
+  if (isParaChain) {
     authors = await peopleApi.query.CollatorSelection.Invulnerables.getValue({ at: blockHash });
   } else {
     authors = await api.query.Session.Validators.getValue({ at: blockHash });
@@ -148,7 +149,7 @@ export const getBlockValidator = async ({
   // console.log(authorIndex);
   // console.log(collators);
 
-  const address = !isPeopleChain ? authors[authorIndex] : authors[authorIndex % authors.length];
+  const address = !isParaChain ? authors[authorIndex] : authors[authorIndex % authors.length];
 
   let identity;
   identity = await peopleApi?.query.Identity.IdentityOf.getValue(address);
@@ -171,53 +172,49 @@ export const getBlockValidator = async ({
 };
 
 export const getBlockDetailsWithPAPI = async ({
-  api,
-  client,
   blockNumber,
-  registry,
   blockHash,
 }: {
-  api: StoreInterface['api'];
-  client: StoreInterface['client'];
   blockNumber: StoreInterface['bestBlock'];
-  blockHash: string;
-  registry: StoreInterface['registry'];
+    blockHash: string;
 }) => {
+
+  if (!blockNumber) {
+    throw new Error('Block Number is not defined');
+  }
+  if (!blockHash) {
+    throw new Error('Block Hash is not defined');
+  }
+
+  const api = baseStoreChain.getState().api as StoreInterface['api'];
+  const client = baseStoreChain.getState().client as StoreInterface['client'];
+  const runtime = baseStoreChain.getState().runtime as StoreInterface['runtime'];
+
   if (!api) {
     throw new Error('Api is not defined');
   }
   if (!client) {
     throw new Error('Client is not defined');
   }
-  if (!blockNumber) {
-    throw new Error('Block Number is not defined');
-  }
-  if (!blockHash) {
-    throw new Error('Block Hash was not found');
-  }
 
-  const runtime = baseStoreChain.getState().runtime as StoreInterface['runtime'];
-  // const blocksData = baseStoreChain.getState().blocksData as StoreInterface['blocksData'];
-  // const blockData = blocksData.get(blockNumber);
-
-  const blockHeader = await client.getBlockHeader(blockHash);
-
-  // if (blockData && blockData.header.hash === blockHash) {
-  //   return;
-  // }
-
-  // console.log(blockNumber, blockHash);
+  const [
+    blockHeader,
+    extrinsicsRaw,
+    events,
+    identity,
+  ] = await Promise.all([
+    client.getBlockHeader(blockHash),
+    client.getBlockBody(blockHash),
+    api.query.System.Events.getValue({ at: blockHash }),
+    getBlockValidator({ blockHash }),
+  ]);
 
   // Initialize timestamp variable
   let timestamp: number = 0;
 
-  // const eventsCount = await api.query.System.EventCount.getValue({ at: blockHash });
-
-  const extrinsicsRaw = await client.getBlockBody(blockHash);
   const extrinsics: IMappedBlockExtrinsic[] = [];
-
   extrinsicsRaw.forEach((e, i) => {
-    const extrinsic = registry.createType('Extrinsic', e).toHuman() as unknown as IBlockExtrinsic;
+    const extrinsic = decodeExtrinsic(e);
     const {
       method: {
         method,
@@ -238,6 +235,7 @@ export const getBlockDetailsWithPAPI = async ({
       ...extrinsic,
       id: `${blockNumber}-${i}`,
       blockNumber,
+      // assume a success by defaul (updated later)
       isSuccess: true,
       // the timestamp is always the first extrinsic
       // so we can assume the timestamp will be populated
@@ -246,7 +244,6 @@ export const getBlockDetailsWithPAPI = async ({
     });
   });
 
-  const events = await api.query.System.Events.getValue({ at: blockHash });
   events.forEach(ev => {
     if (ev.event.type === 'System') {
       const extrinsicIsSuccess = ev.event.value.type === 'ExtrinsicSuccess';
@@ -254,10 +251,6 @@ export const getBlockDetailsWithPAPI = async ({
       extrinsics[extrinsicIndex].isSuccess = extrinsicIsSuccess;
     }
   });
-  // console.log(blockNumber, blockHash, events);
-
-  //Get the block validator
-  const identity = await getBlockValidator({ blockHash });
 
   return {
     header: {
