@@ -1,107 +1,109 @@
 import {
+  useCallback,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 
 import { useStoreChain } from '@stores';
 
-import { type BlockItem } from './forks';
 import { groupData } from './helpers';
 import { VirtualizedList } from './virtualizedList';
 
-const Forks = () => {
-  // static data
-  const [items, setItems] = useState<Record<string, BlockItem[]>>({});
-  // dynamic data
-  // const [items, setItems] = useState({});
-  const rawClient = useStoreChain?.use?.rawClient?.();
-  const rawObservableClient = useStoreChain?.use?.rawObservableClient?.();
-  const chain = useStoreChain?.use?.chain?.();
+import type { BlockItem } from './forks';
 
-  // Dynamic data fetching
+const Forks = () => {
+  const chain = useStoreChain?.use?.chain?.();
+  const client = useStoreChain?.use?.client?.();
+  const refSubscription = useRef<any>();
+
+  const [items, setItems] = useState<Record<string, BlockItem[]>>({});
+
+  const resetState = useCallback(() => {
+    refSubscription.current?.unsubscribe?.();
+    setItems({});
+  }, []);
+
   useEffect(() => {
-    if (!rawObservableClient || !rawClient) {
+    if (!client) {
       return;
     }
 
-    const head = rawObservableClient.chainHead$();
-    const subscription = head.follow$.subscribe(async event => {
-      switch (event.type) {
-        case 'newBlock': {
-          const header: {
-            number: string;
-            parentHash: string;
-          } = await rawClient.request('chain_getHeader', [event.blockHash]);
+    resetState();
 
-          if (!header) {
-            return;
+    refSubscription.current = client.bestBlocks$.subscribe(bestBlocks => {
+      const bestBlock = bestBlocks.at(0);
+      const finalizedBlock = bestBlocks.at(-1);
+
+      if (bestBlock) {
+        const blockNumber = bestBlock.number;
+        const blockHash = bestBlock.hash;
+        const parentBlockHash = bestBlock.parent;
+
+        setItems(forks => {
+          const isFirstFork = typeof forks?.[blockNumber] === 'undefined';
+          const forkIndex = isFirstFork ? 0 : forks[blockNumber].length;
+
+          const isRepeatFork = forks?.[blockNumber]?.[forkIndex - 1]?.blockHash === blockHash;
+          if (isRepeatFork) {
+            return forks;
           }
 
-          // @TODO: add types
-          // es
-          const blockNumber = parseInt(header.number, 16);
-          const blockHash = event.blockHash;
-          const parentBlockHash = header.parentHash;
+          const newFork = {
+            blockHash,
+            parentBlockHash,
+            isFinalized: false,
+            index: forkIndex,
+            blockNumber,
+          };
 
-          setItems(forks => {
-            const isFirstFork = typeof forks?.[blockNumber] === 'undefined';
-            const forkIndex = isFirstFork ? 0 : forks[blockNumber].length;
-
-            const newFork = {
-              blockHash,
-              parentBlockHash,
-              isFinalized: false,
-              index: forkIndex,
-              blockNumber,
-            };
-
-            if (isFirstFork) {
-              return groupData({ ...forks, [blockNumber]: [newFork] });
-            } else {
-              return groupData({ ...forks, [blockNumber]: [...forks[blockNumber], newFork] });
-            }
-          });
-
-          break;
-        }
-        case 'finalized': {
-          event.finalizedBlockHashes.forEach(async hash => {
-            const header: {
-              number: string;
-            } = await rawClient.request('chain_getHeader', [hash]);
-
-            if (!header) {
-              return;
-            }
-            const blockNumber = parseInt(header.number, 16);
-            const blockHash = hash;
-
-            setItems(forks => {
-              return {
-                ...forks, [blockNumber]: forks[blockNumber].map(block => {
-                  if (block.blockHash === blockHash) {
-                    block.isFinalized = true;
-                    return block;
-                  }
-                  return block;
-                }),
-              };
-            });
-          });
-          break;
-        }
-        default:
-          break;
+          if (isFirstFork) {
+            return groupData({ ...forks, [blockNumber]: [newFork] });
+          } else {
+            return groupData({ ...forks, [blockNumber]: [...forks[blockNumber], newFork] });
+          }
+        });
       }
+
+      if (finalizedBlock) {
+        const blockNumber = finalizedBlock.number;
+        const blockHash = finalizedBlock.hash;
+
+        setItems(forks => {
+          const blockForks = forks[blockNumber];
+          if (!blockForks) {
+            return forks;
+          }
+
+          const forkIndex = blockForks.find(fork => fork.blockHash === blockHash)?.index || 0;
+          if (blockForks[forkIndex].isFinalized) {
+            return forks;
+          }
+
+          return {
+            ...forks,
+            [blockNumber]: forks[blockNumber].map(block => {
+              if (block.blockHash === blockHash) {
+                block.isFinalized = true;
+                return block;
+              }
+              return block;
+            }),
+          };
+        });
+      }
+
     });
 
     return () => {
-      subscription?.unsubscribe();
-      head?.unfollow();
-      setItems({});
+      resetState();
     };
 
-  }, [rawObservableClient, rawClient, chain]);
+  }, [
+    client,
+    chain,
+    resetState,
+  ]);
 
   return (
     <section className="relative flex h-full flex-col items-center justify-center">

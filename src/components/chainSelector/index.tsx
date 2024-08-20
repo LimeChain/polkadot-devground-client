@@ -53,7 +53,6 @@ export const ChainSelector = () => {
 
   const handleSetChain = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     const chainId = e.currentTarget.getAttribute('data-chain-id') || '';
-    console.log(chainId);
 
     // const chain = SUPPORTED_CHAIN_GROUPS[chainId].chains.find(c => c.id === chainId);
     const chain = ALL_CHAINS.find(c => c.id === chainId);
