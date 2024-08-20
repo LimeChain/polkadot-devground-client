@@ -11,6 +11,7 @@ import {
   PanelResizeHandle,
 } from 'react-resizable-panels';
 
+import { ActionButton } from '@components/actionButton';
 import { ErrorBoundary } from '@components/errorBoundary';
 import { cn } from '@utils/helpers';
 import { encodeCodeToBase64 } from '@utils/iframe';
@@ -31,6 +32,7 @@ const TypeScriptEditor = () => {
   const refTimeout = useRef<NodeJS.Timeout>();
   const refCanPreview = useRef(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [tabView, setTabView] = useState('editor');
 
   useEventBus<IEventBusMonacoEditorShowPreview>('@@-monaco-editor-show-preview', ({ data }) => {
     refCanPreview.current = data;
@@ -67,10 +69,15 @@ const TypeScriptEditor = () => {
     }
   }, []);
 
+  const handleSetTabContent = useCallback((e: React.MouseEvent<HTMLButtonElement>): void => {
+    const item = String(e.currentTarget.dataset.item);
+    setTabView(item);
+  }, []);
+
   return (
-    <div className="max-w-screen flex h-full flex-col overflow-hidden">
+    <div className="max-w-screen flex h-full flex-col overflow-hidden px-8 pt-8">
       <SnippetsSwitcher />
-      <div className="relative flex flex-1 px-4 pb-4">
+      <div className="relative flex flex-1 pb-4">
         <PanelGroup
           autoSaveId="persistence"
           direction="horizontal"
@@ -87,10 +94,26 @@ const TypeScriptEditor = () => {
             order={1}
             defaultSize={50}
             minSize={30}
-            className="flex flex-col gap-y-4"
+            className="flex flex-col border border-dev-purple-300 dark:border-dev-black-800"
           >
-            <EditorActions />
-            <MonacoEditor />
+            <EditorActions
+              onChangeView={handleSetTabContent}
+              tabView={tabView}
+            />
+            <MonacoEditor
+              classNames={cn(
+                {
+                  ['hidden']: tabView !== 'editor',
+                },
+              )}
+            />
+            {/* <Iframe
+              classNames={cn(
+                {
+                  ['hidden']: tabView !== 'preview',
+                },
+              )}
+            /> */}
           </Panel>
           <PanelResizeHandle className="group relative w-4">
             <div
@@ -113,29 +136,24 @@ const TypeScriptEditor = () => {
               {
                 refCanPreview.current && (
                   <>
-                    <div className="flex h-10 w-full items-center justify-start bg-white px-3 dark:bg-[#282c34]">
-                      <div className="flex items-center justify-start space-x-1.5">
-                        <span className="size-3 rounded-full bg-red-400" />
-                        <span className="size-3 rounded-full bg-yellow-400" />
-                        <span className="size-3 rounded-full bg-green-400" />
-                      </div>
-                      <button
-                        type="button"
-                        className="ml-auto text-xs"
-                        onClick={shareCode}
-                      >
-                        Share Url
-                      </button>
+                    <div className={cn(
+                      'flex w-full items-center justify-end gap-2 bg-dev-purple-200 p-4  dark:bg-dev-black-800',
+                      'border border-b-0 border-dev-purple-300 dark:border-dev-black-800',
+                    )}
+                    >
+
+                      <ActionButton iconName="icon-externalLink" onClick={shareCode} />
+                      <ActionButton iconName="icon-export" onClick={shareCode} />
                     </div>
                     <Panel
                       id="right-top"
                       order={1}
                       defaultSize={50}
                       minSize={30}
-                      className="flex"
+                      className="flex border border-t-0 border-dev-purple-300 dark:border-dev-black-800"
                     >
                       <div className="flex-1">
-                        <div className="relative size-full border-t-0 bg-white dark:bg-[#282c34]">
+                        <div className="relative size-full bg-dev-purple-200 dark:bg-dev-black-800">
                           <Iframe />
                         </div>
                       </div>
@@ -159,7 +177,10 @@ const TypeScriptEditor = () => {
                 order={2}
                 defaultSize={50}
                 minSize={30}
-                className="relative bg-white dark:bg-[#282c34]"
+                className={cn(
+                  'relative bg-dev-purple-200 dark:bg-dev-black-800',
+                  'border border-dev-purple-300 dark:border-dev-black-800',
+                )}
               >
                 <DebugPanel canPreview={refCanPreview.current} />
               </Panel>
