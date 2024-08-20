@@ -1,6 +1,6 @@
 export function assert(prop: unknown, message: string): asserts prop {
   if (prop === null || typeof prop === 'undefined') {
-    throw new Error(`${message} is not defined`);
+    throw new Error(message);
   }
 }
 
