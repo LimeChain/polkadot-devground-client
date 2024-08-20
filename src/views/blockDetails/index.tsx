@@ -111,16 +111,17 @@ const BlockDetails = () => {
           <div className={styles['pd-block-details']}>
             <p>Time stamp</p>
 
-        <div>
-          {isChecked ? new Date(blockData.timeStamp).toUTCString() : blockData.timeStamp}
-          <ToggleButton
-            isChecked={isChecked}
-            handleSetCheck={handleSetCheck}
-            classNames="ml-2"
-          />
+            <div>
+              {isChecked ? new Date(blockData.timeStamp).toUTCString() : blockData.timeStamp}
+              <ToggleButton
+                isChecked={isChecked}
+                handleSetCheck={handleSetCheck}
+                classNames="ml-2"
+              />
           UTC
-        </div>
-      </div>
+            </div>
+          </div>
+        )}
 
       {/* Status */}
       <div className={styles['pd-block-details']}>

@@ -64,7 +64,7 @@ const RowLatestBlock = (props: IRowLatestBlock) => {
             Block#
           </span>
           {' '}
-          <strong className="text-body1-bold">{formatNumber(blockNumber)}</strong>
+          <strong className="font-body1-bold">{formatNumber(blockNumber)}</strong>
         </p>
         <p>
           <span className="text-dev-black-300 dark:text-dev-purple-300">Includes</span>
@@ -118,7 +118,7 @@ const RowSignedExtrinsic = ({
             Extrinsic#
           </span>
           {' '}
-          <strong className="text-body1-bold">{id}</strong>
+          <strong className="font-body1-bold">{id}</strong>
         </p>
         <p>
           <span className="text-dev-black-300 dark:text-dev-purple-300">Includes</span>
@@ -129,7 +129,7 @@ const RowSignedExtrinsic = ({
         </p>
       </div>
       <div>
-        <span className="text-body1-bold">
+        <span className="font-body1-bold">
           {formatedExtrinsicValue}
           {' '}
           {tokenSymbol}

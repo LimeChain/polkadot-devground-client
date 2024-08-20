@@ -1,14 +1,13 @@
-import { chainSpec as polkadotChainSpec } from 'polkadot-api/chains/polkadot';
-import { chainSpec as polkadotPeopleChainSpec } from 'polkadot-api/chains/polkadot_people';
-import { chainSpec as rococoChainSpec } from 'polkadot-api/chains/rococo_v2_2';
-import { chainSpec as rococoPeopleChainSpec } from 'polkadot-api/chains/rococo_v2_2_people';
-
 import {
   dot,
   dotpeople,
   rococo,
   rococo_people,
 } from '@polkadot-api/descriptors';
+import { chainSpec as polkadotChainSpec } from 'polkadot-api/chains/polkadot';
+import { chainSpec as polkadotPeopleChainSpec } from 'polkadot-api/chains/polkadot_people';
+import { chainSpec as rococoChainSpec } from 'polkadot-api/chains/rococo_v2_2';
+import { chainSpec as rococoPeopleChainSpec } from 'polkadot-api/chains/rococo_v2_2_people';
 
 import type {
   ISupportedChainGroups,
