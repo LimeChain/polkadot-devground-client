@@ -1,5 +1,5 @@
 import { Icon } from '@components/icon';
-import { PDLink } from '@components/ui/PDLink';
+import { PDLink } from '@components/pdLink';
 import { footerLinks } from '@constants/footer';
 import { LINK_LIMECHAIN } from '@constants/links';
 import { cn } from '@utils/helpers';

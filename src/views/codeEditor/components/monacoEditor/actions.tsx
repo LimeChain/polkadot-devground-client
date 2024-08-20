@@ -8,7 +8,6 @@ import {
   useState,
 } from 'react';
 
-import { ActionButton } from '@components/actionButton';
 import { downloadZip } from '@utils/downloadZip';
 import { cn } from '@utils/helpers';
 import {
@@ -17,19 +16,11 @@ import {
 } from '@utils/iframe';
 import { defaultImportMap } from '@views/codeEditor/constants';
 
+import { ActionButton } from '../actionButton';
+
 import type { IEventBusMonacoEditorUpdateCode } from '@custom-types/eventBus';
 
-interface IEditorActionsProps {
-  tabView: string;
-  onChangeView: (event: React.MouseEvent<HTMLButtonElement>) => void;
-}
-
-export const EditorActions = (props: IEditorActionsProps) => {
-  const {
-    onChangeView,
-    tabView,
-  } = props;
-
+export const EditorActions = () => {
   const refCode = useRef<string>('');
   const [isRunning, setIsRunning] = useState(false);
 
@@ -114,50 +105,12 @@ export const EditorActions = (props: IEditorActionsProps) => {
   return (
     <div
       className={cn(
-        'ml-auto',
+        'absolute right-2 top-0',
         'flex items-center justify-between',
-        'z-10 w-full pb-4 pl-14 pt-6',
+        'z-20 py-4 pl-14',
         'dark:bg-dev-black-800',
       )}
     >
-      <div
-        className={cn(
-          'flex gap-4',
-          'font-geist text-dev-black-300 font-body2-regular dark:text-dev-purple-300',
-          'hover:text-dev-black-1000',
-          'dark:hover:text-dev-purple-50',
-        )}
-      >
-        <button
-          data-item="editor"
-          onClick={onChangeView}
-          className={cn(
-            'px-10 py-2.5',
-            'border-b-2 border-b-transparent hover:border-b-dev-pink-500',
-            'transform transition-colors duration-300 ease-in-out',
-            {
-              ['border-dev-pink-500']: tabView === 'editor',
-            },
-          )}
-        >
-          Editor
-        </button>
-        <button
-          data-item="preview"
-          onClick={onChangeView}
-          className={cn(
-            'px-8 py-2.5',
-            'border-b-2 border-b-transparent hover:border-b-dev-pink-500',
-            'transform transition-colors duration-300 ease-in-out',
-            {
-              ['border-dev-pink-500']: tabView === 'preview',
-            },
-          )}
-        >
-          Read me
-        </button>
-      </div>
-
       <div className="flex gap-2 pr-2">
         <ActionButton iconName="icon-share" />
         <ActionButton iconName="icon-save" />

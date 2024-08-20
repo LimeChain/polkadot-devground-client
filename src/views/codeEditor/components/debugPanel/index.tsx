@@ -9,7 +9,7 @@ import {
   useState,
 } from 'react';
 
-import { Tabs } from '@components/ui/tabs';
+import { Tabs } from '@components/tabs';
 import { useStoreUI } from '@stores';
 import { useResizeObserver } from '@utils/hooks/useResizeObserver';
 import { prettyPrintMessage } from '@views/codeEditor/helpers';
@@ -94,6 +94,7 @@ export const DebugPanel = (props: IframeProps) => {
       onChange={setInitialTab}
       unmountOnHide={false}
       tabsClassName="px-2 py-0.5"
+      tabClassName="text-[11px] uppercase tracking-widest"
       contentClassName="relative"
     >
       <div

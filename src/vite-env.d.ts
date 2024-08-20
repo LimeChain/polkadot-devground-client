@@ -10,7 +10,6 @@ declare global {
     pivanov?: unknown; // for testing purposes
     papiDescriptors: typeof papiDescriptors;
     pdCreateClient: (provider: JsonRpcProvider) => PolkadotClient;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    customPackages: Record<string, any>;
+    customPackages: Record<string, unknown>;
   }
 }

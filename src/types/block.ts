@@ -17,7 +17,7 @@ export interface IBlock {
 export interface IGenericExtrinsicMethod {
   method: string;
   section: string;
-  args: any;
+  args: unknown;
 }
 
 export interface IBlockExtrinsic {
@@ -54,7 +54,7 @@ export interface IMappedTransferExtrinsic extends IMappedBlockExtrinsic {
 export interface IGenericExtrinsicMethod {
   method: string;
   section: string;
-  args: any;
+  args: unknown;
 }
 
 export interface IBlockExtrinsic {

@@ -6,11 +6,11 @@ import {
   useState,
 } from 'react';
 
-import { PDScrollArea } from '@components/pdScrollArea';
 import {
   type IPDLink,
   PDLink,
-} from '@components/ui/PDLink';
+} from '@components/pdLink';
+import { PDScrollArea } from '@components/pdScrollArea';
 import {
   type StoreInterface,
   useStoreChain,
@@ -29,8 +29,6 @@ import type {
   IMappedBlockExtrinsic,
   IMappedTransferExtrinsic,
 } from '@custom-types/block';
-
-// import type { IBlock } from '@custom-types/block';
 
 interface TChainDataList {
   title: string;
@@ -248,11 +246,8 @@ export const SignedExtrinsics = () => {
   }, [chain]);
 
   const loadInitialData = useCallback(() => {
-    // console.log(blocksData);
-
     blocksData.entries().forEach(entry => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [blockNumber, block] = entry;
+      const [, block] = entry;
       if (!block) {
         return;
       }
