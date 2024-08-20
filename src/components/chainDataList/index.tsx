@@ -83,10 +83,10 @@ const RowLatestBlock = (props: IRowLatestBlock) => {
 
 const RowSignedExtrinsic = ({
   id,
-  blockNumber,
-  isSigned,
+  // blockNumber,
+  // isSigned,
+  // signature,
   method,
-  signature,
   signer,
   timestamp,
   isSuccess,

@@ -12,8 +12,12 @@ import {
 
 import type {
   ISupportedChainGroups,
+  TParaChainDecsriptor,
+  TRelayChainDecsriptor,
   TSupportedChain,
   TSupportedChains,
+  TSupportedParaChain,
+  TSupportedRelayChain,
 } from '@custom-types/chain';
 
 export const SUPPORTED_CHAINS: TSupportedChains = {
@@ -75,17 +79,23 @@ export const CHAIN_SPECS: {
   'rococo-people': rococoPeopleChainSpec,
 };
 
-export const CHAIN_DESCRIPTORS: {
-  [key in TSupportedChain]:
-  typeof dotpeople |
-  typeof dot |
-  typeof rococo |
-  typeof rococo_people
+export const RELAY_CHAIN_DESCRIPTORS: {
+  [key in TSupportedRelayChain]: TRelayChainDecsriptor
 } = {
   polkadot: dot,
-  'polkadot-people': dotpeople,
   rococo,
+};
+
+export const PARA_CHAIN_DESCRIPTORS: {
+  [key in TSupportedParaChain]: TParaChainDecsriptor
+} = {
+  'polkadot-people': dotpeople,
   'rococo-people': rococo_people,
+};
+
+export const CHAIN_DESCRIPTORS = {
+  ...RELAY_CHAIN_DESCRIPTORS,
+  ...PARA_CHAIN_DESCRIPTORS,
 };
 
 export const CHAIN_WEBSOCKET_URLS: { [key in TSupportedChain]: string } = {

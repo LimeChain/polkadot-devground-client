@@ -3,13 +3,13 @@ import {
   TypeRegistry,
 } from '@polkadot/types';
 import { createClient as createSubstrateClient } from '@polkadot-api/substrate-client';
-import {
-  type PolkadotClient,
-  type TypedApi,
-} from 'polkadot-api';
+import { type PolkadotClient } from 'polkadot-api';
 import { createClient } from 'polkadot-api';
 import { getSmProvider } from 'polkadot-api/sm-provider';
-import { type Client } from 'polkadot-api/smoldot';
+import {
+  type Chain,
+  type Client,
+} from 'polkadot-api/smoldot';
 import { startFromWorker } from 'polkadot-api/smoldot/from-worker';
 import SmWorker from 'polkadot-api/smoldot/worker?worker';
 import { getWsProvider } from 'polkadot-api/ws-provider/web';
@@ -22,50 +22,44 @@ import {
   SUPPORTED_CHAINS,
 } from '@constants/chain';
 import {
-  type dot,
-  type dotpeople,
-  type rococo,
-} from '@polkadot-api/descriptors';
+  getMetadata,
+  getRuntime,
+  subscribeToRuntime,
+} from '@utils/papi';
 import { getBlockDetailsWithPAPI } from '@utils/rpc/getBlockDetails';
 
 import { createSelectors } from '../createSelectors';
 
-import type { TChain } from '@custom-types/chain';
+import type {
+  IRuntime,
+  TApi,
+  TChain,
+  TChainSpecs,
+  TPeopleApi,
+} from '@custom-types/chain';
 import type { SubstrateClient } from '@polkadot-api/substrate-client';
 
 interface ISubscription {
   unsubscribe: () => void;
 }
 
-interface TChainSpecs extends Awaited<ReturnType<PolkadotClient['getChainSpecData']>> {
-  properties: {
-    ss58Format: number;
-    tokenDecimals: number;
-    tokenSymbol: string;
-  };
-}
-
-interface IRuntime {
-  spec_version: number;
-  spec_name: string;
-}
-
 export interface StoreInterface {
   chain: TChain;
 
-  smoldot: Client;
+  smoldot: Client | null;
   client: PolkadotClient | null;
+  peopleClient: PolkadotClient | null;
   rawClient: SubstrateClient | null;
-  api: TypedApi<typeof dot | typeof rococo | typeof dotpeople> | null;
-  peopleApi: TypedApi<typeof dotpeople> | null;
-  _subscription?: ISubscription;
+  api: TApi | null;
+  peopleApi: TPeopleApi | null;
+  _subscription: ISubscription | null;
 
   blocksData: Map<number, Awaited<ReturnType<typeof getBlockDetailsWithPAPI>>>;
-  bestBlock: number | undefined;
-  finalizedBlock: number | undefined;
+  bestBlock: number | null;
+  finalizedBlock: number | null;
 
   chainSpecs: TChainSpecs | null;
-  runtime: IRuntime | undefined;
+  runtime: IRuntime | null;
 
   registry: TypeRegistry;
 
@@ -78,20 +72,21 @@ export interface StoreInterface {
 }
 
 const initialState = {
-  chain: SUPPORTED_CHAINS['polkadot-people'],
+  chain: SUPPORTED_CHAINS['polkadot'],
   client: null,
+  peopleClient: null,
   rawClient: null,
   rawObservableClient: null,
   api: null,
   peopleApi: null,
-  smoldot: null as unknown as Client,
-  _subscription: undefined,
+  smoldot: null,
+  _subscription: null,
   blocksData: new Map(),
-  bestBlock: undefined,
-  finalizedBlock: undefined,
+  bestBlock: null,
+  finalizedBlock: null,
   registry: new TypeRegistry(),
   chainSpecs: null,
-  runtime: undefined,
+  runtime: null,
 };
 
 const baseStore = create<StoreInterface>()((set, get) => ({
@@ -100,10 +95,23 @@ const baseStore = create<StoreInterface>()((set, get) => ({
     resetStore: async () => {
       try {
         const client = get()?.client;
-        const _subscription = get()?._subscription;
+        const peopleClient = get()?.peopleClient;
+        const rawClient = get()?.rawClient;
+        // const smoldot = get()?.smoldot;
 
+        // clean up subscrptions / destroy old clients
         client?.destroy?.();
-        _subscription?.unsubscribe();
+        peopleClient?.destroy?.();
+        rawClient?.destroy?.();
+        // dont think there is a need to terminate smoldot
+        // await smoldot?.terminate?.();
+
+        const blocksData = get()?.blocksData;
+        const registry = get().registry;
+
+        // reset data
+        blocksData?.clear();
+        registry.clearCache();
 
       } catch (error) {
         console.error(error);
@@ -118,16 +126,21 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         set({ chain });
 
         const smoldot = get()?.smoldot;
+        if (!smoldot) {
+          return;
+        }
+
         const client = get()?.client;
+        const peopleClient = get()?.peopleClient;
         const rawClient = get()?.rawClient;
-        const _subscription = get()?._subscription;
-        const blocksData = get()?.blocksData;
-        const registry = get().registry;
 
         // clean up subscrptions / destroy old clients
         client?.destroy?.();
+        peopleClient?.destroy?.();
         rawClient?.destroy?.();
-        _subscription?.unsubscribe?.();
+
+        const blocksData = get()?.blocksData;
+        const registry = get().registry;
 
         // reset data
         blocksData?.clear();
@@ -136,19 +149,9 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
         // init relay chain / people chain
         const isParachain = chain.isParaChain;
-        let newChain, peopleChain;
+        let newChain: Chain, peopleChain: Chain;
 
-        if (!isParachain) {
-          newChain = await smoldot?.addChain({
-            chainSpec: CHAIN_SPECS[chain.id],
-          });
-
-          peopleChain = await smoldot?.addChain({
-            chainSpec: CHAIN_SPECS[chain.peopleChainId],
-            potentialRelayChains: [newChain],
-          });
-
-        } else {
+        if (isParachain) {
           const relayChain = await smoldot?.addChain({
             chainSpec: CHAIN_SPECS[chain.relayChainId],
           });
@@ -163,84 +166,101 @@ const baseStore = create<StoreInterface>()((set, get) => ({
             potentialRelayChains: [relayChain],
           });
 
+        } else {
+          newChain = await smoldot?.addChain({
+            chainSpec: CHAIN_SPECS[chain.id],
+          });
+
+          peopleChain = await smoldot?.addChain({
+            chainSpec: CHAIN_SPECS[chain.peopleChainId],
+            potentialRelayChains: [newChain],
+          });
+
         }
 
-        // if (chain.id === chain.peopleChainId) {
-        //   peopleChain = newChain;
-        // } else {
-        // }
-
-        // let newClient, peopleClient;
         const newClient = createClient(getSmProvider(newChain));
         set({ client: newClient });
 
-        // if (chain.relayChainId === chain.id) {
-        //   peopleClient = newClient;
-        // } else {
-        const peopleClient = createClient(getSmProvider(peopleChain));
-        // }
-        // set({ peopleClient });
+        const isPeopleParaChain = chain.id === chain.peopleChainId;
+        let newPeopleClient: PolkadotClient;
 
-        const chainSpecs = await newClient.getChainSpecData();
-        set({ chainSpecs });
+        if (isPeopleParaChain) {
+          // if its a people para chain then the two clients are identical
+          newPeopleClient = newClient;
 
-        const api = newClient.getTypedApi(CHAIN_DESCRIPTORS[isParachain ? chain.relayChainId : chain.id]);
+        } else {
+          newPeopleClient = createClient(getSmProvider(peopleChain));
+
+        }
+        set({ peopleClient: newPeopleClient });
+
+        newClient.getChainSpecData()
+          .then(chainSpecs => {
+            set({ chainSpecs });
+          })
+          .catch(console.error);
+
+        const api = newClient.getTypedApi(CHAIN_DESCRIPTORS[chain.id]);
         set({ api });
 
-        const peopleApi = peopleClient.getTypedApi(CHAIN_DESCRIPTORS[isParachain ? chain.id : chain.peopleChainId]);
+        const peopleApi = newPeopleClient.getTypedApi(CHAIN_DESCRIPTORS[chain.peopleChainId]);
         set({ peopleApi });
 
         // build metadata registry for decoding
-        const metadataBytes = (await api.apis.Metadata.metadata()).asBytes();
-        const metadata = new Metadata(registry, metadataBytes);
-        registry.setMetadata(metadata);
+        await getMetadata(api)
+          .then(metadataRaw => {
+            const metadata = new Metadata(registry, metadataRaw.asBytes());
+            registry.setMetadata(metadata);
+          })
+          .catch(console.error);
 
         // get spec_version from runtime
-        const runtime = await api.query.System.LastRuntimeUpgrade.getValue({ at: 'finalized' }); // finalized because the first block we show from is finalized
-        set({ runtime });
+        await getRuntime(api)
+          .then(runtime => {
+            set({ runtime });
+          })
+          .catch(console.error);
 
         // update spec_version on runtime update
-        api.query.System.LastRuntimeUpgrade.watchValue('finalized').subscribe(runtime => {
-          set({ runtime });
-        });
+        subscribeToRuntime(api, (runtime) => set({ runtime }))
+          .catch(console.error);
 
-        // check for failed extrinsics
-        // api.event.System.ExtrinsicSuccess.pull().then(console.log);
-
-        // api.event.System.
-
-        // api.query.System.Events.watchValue('best').subscribe(console.log);
-
-        const subscription = newClient.bestBlocks$.subscribe(async (bestBlocks) => {
+        // subscribe to chain head
+        newClient.bestBlocks$.subscribe(async (bestBlocks) => {
           const bestBlock = bestBlocks.at(0);
           const finalizedBlock = bestBlocks.at(-1);
 
+          const promises = [];
           // get block data starting from latest known finalized block
           for (let i = bestBlocks.length - 1; i >= 0; i--) {
             const block = bestBlocks[i];
 
-            // blocksData.set(block?.number, undefined);
+            // skip allready fetched blocks
+            if (blocksData.get(block.number)?.header?.hash === block.hash) {
+              continue;
+            }
 
-            const blockData = await getBlockDetailsWithPAPI({
-              api,
+            promises.push(getBlockDetailsWithPAPI({
               blockHash: block.hash,
               blockNumber: block.number,
-              client: newClient,
-              registry,
-            });
+            }));
 
-            if (blockData) {
-              blocksData.set(block?.number, blockData);
-            }
           }
 
-          set({
-            finalizedBlock: finalizedBlock?.number,
-            bestBlock: bestBlock?.number,
-          });
-        });
+          await Promise.all(promises).then(results => {
+            results.forEach(blockData => {
+              blocksData.set(blockData.header.number, blockData);
+            });
+            set({ bestBlock: bestBlock?.number, finalizedBlock: finalizedBlock?.number });
 
-        set({ _subscription: subscription });
+          })
+            // prevent state crash on random smoldot error
+            .catch(err => {
+              console.error(err);
+            },
+            );
+
+        });
 
         const wsUrl = CHAIN_WEBSOCKET_URLS[chain.id];
         if (wsUrl) {
@@ -250,8 +270,6 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
       } catch (err) {
         console.error(err);
-      } finally {
-        set({ chain });
       }
     },
   },

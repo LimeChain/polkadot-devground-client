@@ -1,3 +1,14 @@
+import type {
+  dot,
+  dotpeople,
+  rococo,
+  rococo_people,
+} from '.papi/descriptors/dist';
+import type {
+  PolkadotClient,
+  TypedApi,
+} from 'polkadot-api';
+
 export interface ISupportedChainGroups {
   [key: string]: {
     name: string;
@@ -13,6 +24,13 @@ export type TSupportedRelayChain = 'polkadot' | 'rococo';
 export type TSupportedParaChain = 'polkadot-people' | 'rococo-people';
 export type TSupportedChain = TSupportedRelayChain | TSupportedParaChain;
 
+export type TRelayChainDecsriptor = typeof dot | typeof rococo;
+export type TParaChainDecsriptor = typeof dotpeople | typeof rococo_people;
+export type TChainDescriptor = TRelayChainDecsriptor | TParaChainDecsriptor;
+
+export type TApi = TypedApi<TChainDescriptor>;
+export type TPeopleApi = TypedApi<TParaChainDecsriptor>;
+
 export type TChain = TRelayChain | TParaChain;
 export type TRelayChain = TChainBase & {
   isRelayChain: true;
@@ -20,10 +38,10 @@ export type TRelayChain = TChainBase & {
   peopleChainId: TSupportedParaChain;
 };
 export type TParaChain = TChainBase & {
-  isRelayChain?: false;
   isParaChain: true;
   relayChainId: TSupportedRelayChain;
   peopleChainId: TSupportedParaChain;
+  isRelayChain?: false;
 };
 
 type TChainBase = {
@@ -39,3 +57,16 @@ export type TChainSubscription =
   'transfers' |
   'total-accounts' |
   'circulating-supply';
+
+export interface TChainSpecs extends Awaited<ReturnType<PolkadotClient['getChainSpecData']>> {
+  properties: {
+    ss58Format: number;
+    tokenDecimals: number;
+    tokenSymbol: string;
+  };
+}
+
+export interface IRuntime {
+  spec_version: number;
+  spec_name: string;
+}
