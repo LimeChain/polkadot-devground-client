@@ -231,7 +231,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
           const finalizedBlock = bestBlocks.at(-1);
 
           const promises = [];
-          // get block data starting from latest known finalized block
+          // get block data starting from finalized to best block
           for (let i = bestBlocks.length - 1; i >= 0; i--) {
             const block = bestBlocks[i];
 
