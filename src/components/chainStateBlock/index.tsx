@@ -1,15 +1,5 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-
 import { Icon } from '@components/icon';
 import { chainStateBlockData } from '@constants/chainState';
-import {
-  type ISubscriptionFn,
-  subscribeToChainData,
-} from '@services/chain';
 import { useStoreChain } from '@stores';
 import {
   cn,
@@ -18,54 +8,22 @@ import {
 
 import type { TChainSubscription } from '@custom-types/chain';
 
-interface IChainStateBlockProps {
+interface TChainStateBlockProps {
   type: TChainSubscription;
 }
 
-export const ChainStateBlock = ({ type }: IChainStateBlockProps) => {
-  const client = useStoreChain.use.client?.();
-  const chain = useStoreChain.use.chain?.();
+const typeLib: Record<TChainSubscription, string> = {
+  'latest-block': 'bestBlock',
+  'finalised-block': 'finalizedBlock',
+  'circulating-supply': '',
+  'signed-extrinsics': '',
+  'total-accounts': '',
+  transfers: '',
+};
 
-  const [value, setValue] = useState(0);
-  const [isLoadingData, setIsLoadingData] = useState(true);
+export const ChainStateBlock = ({ type }: TChainStateBlockProps) => {
 
-  const refUnsubscribe = useRef(() => {});
-
-  useEffect(() => {
-    if (!client) {
-      return;
-    }
-
-    (async () => {
-      const handleOnSubcriptionData: ISubscriptionFn['handleOnSubcriptionData'] = ({
-        data,
-        isLoadingData,
-      }) => {
-        setValue(data);
-        setIsLoadingData(isLoadingData);
-      };
-
-      refUnsubscribe.current = subscribeToChainData({
-        type,
-        handleOnSubcriptionData,
-      });
-
-    })()
-      .catch((error) => {
-        console.error(error);
-        setIsLoadingData(false);
-
-      });
-
-    return () => {
-      refUnsubscribe.current?.();
-    };
-
-  }, [
-    client,
-    chain,
-    type,
-  ]);
+  const chainData = useStoreChain?.use?.[typeLib[type]]?.();
 
   return (
     <div className={cn(
@@ -83,9 +41,9 @@ export const ChainStateBlock = ({ type }: IChainStateBlockProps) => {
         </span>
         <span className="truncate font-geist font-body1-bold">
           {
-            isLoadingData
+            !chainData
               ? 'Loading...'
-              : formatNumber(value)
+              : formatNumber(chainData)
           }
         </span>
       </div>

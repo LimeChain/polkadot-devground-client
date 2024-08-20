@@ -53,7 +53,7 @@ export const SelectExample = () => {
         className={cn(
           'relative flex w-full items-center justify-between',
           'px-4 py-[18px]',
-          'text-body2-regular font-geist',
+          'font-geist font-body2-regular',
           'bg-dev-purple-200 hover:bg-dev-purple-300',
           'dark:bg-dev-black-700 hover:dark:bg-dev-black-600',
           'border-2',
@@ -141,10 +141,10 @@ export const SelectExample = () => {
                         onClick={handleChangeExample}
                         data-snippet-index={snippet.id}
                       >
-                        <p className="text-body2-regular font-geist text-dev-white-200 dark:text-dev-black-1000">
+                        <p className="font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000">
                           Example: {snippet.id}
                         </p>
-                        <p className="text-body3-regular font-geist text-dev-white-1000 dark:text-dev-black-300">
+                        <p className="font-geist text-dev-white-1000 font-body3-regular dark:text-dev-black-300">
                           CUSTOM
                         </p>
                       </button>
@@ -152,7 +152,7 @@ export const SelectExample = () => {
                   ))
                 )
                 : (
-                  <li className="text-body1-regular font-geist text-dev-white-1000 dark:text-dev-black-300">
+                  <li className="font-geist text-dev-white-1000 font-body1-regular dark:text-dev-black-300">
                     No examples found
                   </li>
                 )

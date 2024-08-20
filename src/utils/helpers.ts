@@ -102,3 +102,23 @@ export const formatNumber = (num: number) => {
 
   return formater.format(num);
 };
+
+export const formatPrettyNumberString = (value: string = '') => {
+  return Number(value?.replaceAll(',', ''));
+};
+
+export const truncateAddress = (address: string = '', chars: number = 3) => {
+  return `${address.slice(0, chars)}...${address.slice(-chars)}`;
+};
+
+export const formatTokenValue = (
+  { value = 0,
+    tokenDecimals = 10,
+    precision = 2,
+  }: {
+    value: number;
+    tokenDecimals?: number;
+    precision?: number;
+  }) => {
+  return (value / 10 ** tokenDecimals).toFixed(precision);
+};

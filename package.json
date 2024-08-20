@@ -6,8 +6,12 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "add-descriptors": "papi add dot -n polkadot && papi add rococo -n rococo_v2_2 && papi",
-    "remove-descriptors": "rm -rf node_modules dot.scale rococo.scale polkadot-api.json",
+    "add-polkadot": "npx papi add dot -n polkadot",
+    "add-polkadot-people": "npx papi add dotpeople -n polkadot_people",
+    "add-rococo": "npx papi add rococo -n rococo_v2_2",
+    "add-rococo-people": "npx papi add rococo_people -n rococo_v2_2_people",
+    "add-descriptors": "npm run add-polkadot && npm run add-polkadot-people && npm run add-rococo && npm run add-rococo-people",
+    "remove-descriptors": "rm -rf node_modules .papi",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "preview": "vite preview",
@@ -16,7 +20,7 @@
   "dependencies": {
     "@pivanov/event-bus": "1.0.0",
     "@pivanov/use-toggle-visibility": "0.0.1",
-    "@polkadot-api/descriptors": "0.0.1",
+    "@polkadot-api/descriptors": "file:.papi/descriptors",
     "@polkadot/types": "12.2.3",
     "@polkadot/util": "13.0.2",
     "@radix-ui/react-scroll-area": "1.1.0",
@@ -33,7 +37,7 @@
     "monaco-editor": "0.50.0",
     "nanoid": "5.0.7",
     "pako": "2.1.0",
-    "polkadot-api": "0.11.1",
+    "polkadot-api": "0.13.2",
     "prettier": "3.3.2",
     "prism-themes": "1.9.0",
     "prismjs": "1.29.0",
@@ -43,6 +47,7 @@
     "react-hot-toast": "2.4.1",
     "react-resizable-panels": "2.0.19",
     "react-router-dom": "6.24.0",
+    "scale-ts": "1.6.0",
     "shiki": "1.10.0",
     "styled-components": "6.1.12",
     "sucrase": "3.35.0",
@@ -81,16 +86,6 @@
     "vite-plugin-pwa": "0.20.0",
     "vite-plugin-static-copy": "1.0.6",
     "vite-tsconfig-paths": "4.3.2"
-  },
-  "polkadot-api": {
-    "dot": {
-      "chain": "polkadot",
-      "metadata": "dot.scale"
-    },
-    "rococo": {
-      "chain": "rococo_v2_2",
-      "metadata": "rococo.scale"
-    }
   },
   "engines": {
     "node": ">=18.0.0"
