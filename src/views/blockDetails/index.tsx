@@ -110,7 +110,7 @@ const BlockDetails = () => {
 
   return (
     <>
-      <div className="mb-12  flex items-center  justify-between">
+      <div className="mb-12 flex items-center justify-between">
         <div className="flex items-center">
           <PDLink to="/explorer" className="mr-8 bg-dev-purple-700 p-2 dark:bg-white">
             <Icon

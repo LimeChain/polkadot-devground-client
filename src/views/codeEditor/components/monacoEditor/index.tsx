@@ -101,7 +101,13 @@ const checkTheme = async (theme: string) => {
   monaco.editor.setTheme(currentTheme);
 };
 
-export const MonacoEditor = () => {
+interface IMonacoEditorProps {
+  classNames?: string;
+}
+
+export const MonacoEditor = (props: IMonacoEditorProps) => {
+  const { classNames } = props;
+
   const refTimeout = useRef<NodeJS.Timeout>();
   const refSnippet = useRef<string>('');
   const refSnippetIndex = useRef<string | undefined>();
@@ -362,6 +368,7 @@ export const MonacoEditor = () => {
         {
           ['opacity-50 pointer-events-none']: isReadOnly,
         },
+        classNames,
       )}
     >
       <div ref={refMonacoEditorContainer} className="size-full" />
