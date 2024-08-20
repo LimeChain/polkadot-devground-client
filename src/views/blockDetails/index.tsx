@@ -52,6 +52,7 @@ const BlockDetails = () => {
       if (!block) {
         return;
       }
+      console.log(block);
       setBlockData({
         number: block.header.number,
         blockHash: block.header.hash,
