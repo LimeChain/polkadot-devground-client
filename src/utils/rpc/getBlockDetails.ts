@@ -71,8 +71,9 @@ export const getBlockDetails = async ({
 
     const isTimeStampExtrinsic = method === 'set' && section === 'timestamp';
     if (isTimeStampExtrinsic) {
+      const _args = args as { now: string };
       // turn the time string of type "1,451,313,413,21" into a number
-      blockTimestamp = formatPrettyNumberString(args?.now);
+      blockTimestamp = formatPrettyNumberString(_args?.now);
       // only the timestamp is needed so we break the loop
       break;
     }
@@ -209,8 +210,9 @@ export const getBlockDetailsWithPAPI = async ({
 
     const isTimeStampExtrinsic = method === 'set' && section === 'timestamp';
     if (isTimeStampExtrinsic) {
+      const _args = args as { now: string };
       // turn the time string of type "1,451,313,413,21" into a number
-      timestamp = formatPrettyNumberString(args?.now);
+      timestamp = formatPrettyNumberString(_args?.now);
       // only the timestamp is needed so we break the loop
       // break;
     }
