@@ -1,3 +1,10 @@
+import { ScaleEnum } from '@polkadot-api/substrate-bindings';
+import {
+  Struct,
+  u32,
+  u64,
+} from 'scale-ts';
+
 import {
   baseStoreChain,
   type StoreInterface,
@@ -9,3 +16,12 @@ export const decodeExtrinsic = (extrinsic: string): IBlockExtrinsic => {
   const registry = baseStoreChain.getState().registry as StoreInterface['registry'];
   return registry.createType('Extrinsic', extrinsic).toHuman() as unknown as IBlockExtrinsic;
 };
+
+export const babeDigestCodec = ScaleEnum({
+  authority_index: u32,
+  one: u32,
+  two: u32,
+  three: u32,
+});
+
+export const auraDigestCodec = Struct({ slotNumber: u64 });
