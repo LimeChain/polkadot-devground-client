@@ -6,6 +6,7 @@ import {
 
 import { Icon } from '@components/icon';
 import { PDLink } from '@components/pdLink';
+import SearchBar from '@components/searchBar';
 import { useStoreChain } from '@stores';
 
 import Pagination from './pagination'; // Import the new Pagination component
@@ -14,7 +15,8 @@ import styles from './styles.module.css';
 const LatestBlocks = () => {
   const blocksData = useStoreChain?.use?.blocksData?.();
   const [currentPage, setCurrentPage] = useState(1);
-  const blocksPerPage = 10;
+  const [searchQuery, setSearchQuery] = useState('');
+  const blocksPerPage = 11;
 
   const formatString = (hash: string) => {
     if (hash.length <= 8) {
@@ -29,14 +31,27 @@ const LatestBlocks = () => {
     });
   }, [blocksData]);
 
+  const filteredBlocks = useMemo(() => {
+    return sortedBlocks.filter(block =>
+      block.header.number.toString().includes(searchQuery)
+      || block.header.hash.includes(searchQuery)
+      || block.header.identity.includes(searchQuery),
+    );
+  }, [sortedBlocks, searchQuery]);
+
   const indexOfLastBlock = currentPage * blocksPerPage;
   const indexOfFirstBlock = indexOfLastBlock - blocksPerPage;
-  const currentBlocks = sortedBlocks.slice(indexOfFirstBlock, indexOfLastBlock);
+  const currentBlocks = filteredBlocks.slice(indexOfFirstBlock, indexOfLastBlock);
 
-  const totalPages = Math.ceil(sortedBlocks.length / blocksPerPage);
+  const totalPages = Math.ceil(filteredBlocks.length / blocksPerPage);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1); // Reset to first page on search
   };
 
   return (
@@ -50,6 +65,11 @@ const LatestBlocks = () => {
         </PDLink>
         <h4 className="mr-2 font-h4-light">Latest Blocks</h4>
       </div>
+      <SearchBar
+        label="Search by Block"
+        classNames="mt-6"
+        onSearch={handleSearch}
+      />
       <table className={styles['latest-blocks-table']}>
         <thead>
           <tr>
