@@ -1,18 +1,21 @@
 import { formatDistanceToNowStrict } from 'date-fns';
 import {
+  useCallback,
   useMemo,
   useState,
 } from 'react';
 
 import { Icon } from '@components/icon';
+import Pagination from '@components/pagination';
 import { PDLink } from '@components/pdLink';
 import SearchBar from '@components/searchBar';
 import { useStoreChain } from '@stores';
+import { cn } from '@utils/helpers';
 
-import Pagination from './pagination'; // Import the new Pagination component
 import styles from './styles.module.css';
 
 const LatestBlocks = () => {
+  const latestFinalizedBlock = useStoreChain.use.finalizedBlock?.();
   const blocksData = useStoreChain?.use?.blocksData?.();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
@@ -45,19 +48,27 @@ const LatestBlocks = () => {
 
   const totalPages = Math.ceil(filteredBlocks.length / blocksPerPage);
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
-  };
+  }, []);
 
-  const handleSearch = (query: string) => {
+  const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
-    setCurrentPage(1); // Reset to first page on search
-  };
+    setCurrentPage(1);
+  }, []);
 
+  console.log('latestFinalizedBlock', latestFinalizedBlock);
   return (
     <div className="mb-12 items-center justify-between">
       <div className="flex items-center">
-        <PDLink to="/explorer" className="mr-8 bg-dev-purple-700 p-2 dark:bg-white">
+        <PDLink
+          to="/explorer"
+          className={cn(
+            'mr-8 duration-300 ease-out',
+            'bg-dev-purple-700 p-2 dark:bg-dev-purple-50',
+            'hover:bg-dev-purple-900 hover:dark:bg-dev-purple-200',
+          )}
+        >
           <Icon
             name="icon-arrowLeft"
             className=" text-dev-white-200 dark:text-dev-purple-700"
@@ -93,11 +104,23 @@ const LatestBlocks = () => {
               <tr key={block.header.number}>
                 <td>{block.header.number}</td>
                 <td>
-                  <Icon
-                    size={[16]}
-                    name="icon-checked"
-                    className="text-dev-green-600"
-                  />
+                  {latestFinalizedBlock && latestFinalizedBlock >= block.header.number
+                    ? (
+                      <Icon
+                        size={[16]}
+                        name="icon-checked"
+                        className="text-dev-green-600"
+                      />
+
+                    )
+                    : (
+                      <Icon
+                        size={[16]}
+                        name="icon-clock"
+                        className="text-dev-yellow-700"
+                      />
+                    )
+                  }
                 </td>
                 <td>{timeAgo}</td>
                 <td>{block.body.extrinsics.length}</td>

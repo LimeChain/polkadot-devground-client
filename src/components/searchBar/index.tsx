@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import {
+  useCallback,
+  useState,
+} from 'react';
 
 import { Icon } from '@components/icon';
 import { cn } from '@utils/helpers';
@@ -13,14 +16,14 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
   const { label, classNames, onSearch } = props;
   const [searchInput, setSearchInput] = useState('');
 
-  const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(event.target.value);
-  };
+  }, []);
 
-  const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSearchSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     onSearch(searchInput);
-  };
+  }, [onSearch, searchInput]);
 
   return (
     <form
@@ -31,7 +34,7 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
       )}
     >
       <div className="relative w-96">
-        <Icon name="icon-search" className="absolute left-3 top-1/2 -translate-y-1/2" />
+        <Icon name="icon-search" className="absolute left-3 top-1/2 -translate-y-1/2 " />
         <input
           type="text"
           placeholder={label}
@@ -41,6 +44,8 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
             'w-full p-2 pl-10',
             'font-geist font-body2-regular',
             'rounded border-b border-gray-300',
+            'dark:border-dev-purple-700 dark:bg-transparent',
+            'focus-visible:border-none',
           )}
         />
       </div>
@@ -48,11 +53,14 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
         type="submit"
         className={cn(
           'ml-4 px-6 py-2',
-          'bg-dev-purple-700 text-white',
+          'bg-dev-purple-700 text-dev-purple-300',
           'transition-all duration-300 hover:bg-dev-purple-900',
-        )
-        }
-      >Search
+          'dark:bg-dev-purple-50 dark:text-dev-black-1000 dark:hover:bg-dev-purple-200',
+        )}
+      >
+        <span className="font-geist font-body2-bold">
+          Search
+        </span>
       </button>
     </form>
   );

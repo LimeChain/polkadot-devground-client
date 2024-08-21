@@ -1,0 +1,5 @@
+.pg-btn {
+  @apply font-geist font-body2-regular;
+  @apply border-dev-black-300 border hover:border-dev-pink-500;
+  @apply disabled:text-dev-black-1000 dark:disabled:text-purple-50;
+}

@@ -18,7 +18,7 @@ export const LayoutBasic = (props: ILayoutBasic) => {
 
   return (
     <Suspense>
-      <div className="grid max-h-screen min-h-screen grid-rows-layout overflow-hidden">
+      <div className="grid min-h-screen grid-rows-layout ">
         <Header />
         <div className={cn(
           'lg:px-14 lg:pb-16 lg:pt-8',

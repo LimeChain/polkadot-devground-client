@@ -80,7 +80,7 @@ export const routes = () => ([
             element: <LatestBlocks />,
           },
           {
-            path: ':blockId',
+            path: ':blockNumber',
             element: <BlockDetails />,
           },
         ],
