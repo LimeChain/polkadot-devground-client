@@ -252,7 +252,8 @@ const baseStore = create<StoreInterface>()((set, get) => ({
             const block = bestBlocks[i];
 
             // skip allready fetched blocks
-            if (blocksData.get(block.number)?.header?.hash === block.hash) {
+            const blockHashHasBeenFetched = blocksData.get(block.number)?.header?.hash === block.hash;
+            if (blockHashHasBeenFetched) {
               continue;
             }
 
@@ -265,9 +266,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
           await Promise.all(promises).then(results => {
             results.forEach(blockData => {
-              if (blocksData.get(blockData.header.number)?.header?.hash !== blockData.header.hash) {
-                blocksData.set(blockData.header.number, blockData);
-              }
+              blocksData.set(blockData.header.number, blockData);
             });
             set({ bestBlock: bestBlock?.number, finalizedBlock: finalizedBlock?.number });
 
