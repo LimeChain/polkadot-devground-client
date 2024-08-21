@@ -41,11 +41,11 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
           value={searchInput}
           onChange={handleSearchInputChange}
           className={cn(
-            'w-full p-2 pl-10',
+            'w-full p-2 pl-10 ',
             'font-geist font-body2-regular',
             'rounded border-b border-gray-300',
             'dark:border-dev-purple-700 dark:bg-transparent',
-            'focus-visible:border-none',
+            'placeholder:font-geist placeholder:font-body2-regular dark:placeholder-dev-purple-300 ',
           )}
         />
       </div>
