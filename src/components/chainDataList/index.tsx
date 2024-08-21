@@ -332,7 +332,7 @@ export const SignedExtrinsics = () => {
 };
 
 export const ChainDataList = ({ title, link, linkText }: TChainDataList) => {
-  const isLatestBlocks = link === '/latest-blocks';
+  const isLatestBlocks = link === 'latest-blocks';
   return (
     <div className="flex flex-1 flex-col gap-y-3 overflow-hidden">
       <div className="flex items-center gap-3">

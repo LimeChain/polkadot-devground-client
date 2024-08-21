@@ -1,0 +1,21 @@
+.latest-blocks-table {
+  @apply w-full mt-10;
+
+  > thead {
+    @apply bg-dev-purple-100 text-left;
+
+    > tr th {
+      @apply py-2 pl-1 font-body3-regular;
+
+    }
+  }
+
+  > tbody
+   > tr {
+    @apply border-b border-dev-purple-100;
+
+    > td {
+      @apply pb-2 pt-4 pl-1 font-body2-regular font-geist;
+    }
+  }
+}

@@ -3,6 +3,7 @@ import { lazy } from 'react';
 import { LayoutBasic } from '@components/layouts/basic';
 import { LayoutCodeEditor } from '@components/layouts/codeEditor';
 // import { App } from '@constants/snippets/snippet1';
+import LatestBlocks from '@views/latestBlocks';
 import { NotFound } from '@views/notFound';
 
 const Home = lazy(() => import('../views/home'));
@@ -75,7 +76,11 @@ export const routes = () => ([
             element: <Explorer />,
           },
           {
-            path: ':blockNumber',
+            path: 'latest-blocks',
+            element: <LatestBlocks />,
+          },
+          {
+            path: ':blockId',
             element: <BlockDetails />,
           },
         ],
