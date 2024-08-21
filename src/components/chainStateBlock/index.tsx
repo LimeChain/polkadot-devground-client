@@ -1,49 +1,60 @@
 import { Icon } from '@components/icon';
 import { chainStateBlockData } from '@constants/chainState';
-import { useStoreChain } from '@stores';
+import {
+  type StoreInterface,
+  useStoreChain,
+} from '@stores';
 import {
   cn,
   formatNumber,
+  formatTokenValue,
 } from '@utils/helpers';
 
-import type { TChainSubscription } from '@custom-types/chain';
-
+export type TChainSubscription = keyof Pick<StoreInterface, 'bestBlock' | 'finalizedBlock' | 'totalIssuance'>;
 interface TChainStateBlockProps {
   type: TChainSubscription;
 }
 
-const typeLib: Record<TChainSubscription, string> = {
-  'latest-block': 'bestBlock',
-  'finalised-block': 'finalizedBlock',
-  'circulating-supply': '',
-  'signed-extrinsics': '',
-  'total-accounts': '',
-  transfers: '',
-};
-
 export const ChainStateBlock = ({ type }: TChainStateBlockProps) => {
 
-  const chainData = useStoreChain?.use?.[typeLib[type]]?.();
+  const chainData = useStoreChain?.use?.[type]?.();
+  const chainSpecs = useStoreChain?.use?.chainSpecs?.();
+
+  let data;
+
+  switch (type) {
+    case 'totalIssuance':
+      data = formatTokenValue({
+        value: Number(chainData),
+        precision: 2,
+        tokenDecimals: chainSpecs?.properties.tokenDecimals,
+      });
+      break;
+
+    default:
+      data = chainData;
+      break;
+  }
 
   return (
     <div className={cn(
       'grid grid-cols-[16px_1fr] items-center gap-4',
     )}
     >
-      <Icon name={chainStateBlockData[type].icon} size={[16]} />
+      <Icon name={chainStateBlockData?.[type]?.icon} size={[16]} />
       <div className="flex flex-col overflow-hidden">
         <span className={cn(
           'truncate font-geist font-body2-regular',
           'text-dev-black-300 dark:text-dev-purple-300',
         )}
         >
-          {chainStateBlockData[type].name}
+          {chainStateBlockData?.[type]?.name}
         </span>
         <span className="truncate font-geist font-body1-bold">
           {
-            !chainData
+            !chainData || !chainSpecs
               ? 'Loading...'
-              : formatNumber(chainData)
+              : formatNumber(data as number)
           }
         </span>
       </div>

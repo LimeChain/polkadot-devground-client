@@ -10,12 +10,9 @@ export const ChainState = () => {
       'grid-cols-2 md:grid-cols-4 lg:grid-cols-6',
     )}
     >
-      <ChainStateBlock type="latest-block" />
-      <ChainStateBlock type="finalised-block" />
-      <ChainStateBlock type="signed-extrinsics" />
-      <ChainStateBlock type="transfers" />
-      <ChainStateBlock type="total-accounts" />
-      <ChainStateBlock type="circulating-supply" />
+      <ChainStateBlock type="bestBlock" />
+      <ChainStateBlock type="finalizedBlock" />
+      <ChainStateBlock type="totalIssuance" />
     </div>
   );
 };

@@ -190,3 +190,15 @@ export const getValidators = async (api: TypedApi<TChainDescriptor>, at: string)
 
   return await api.query.Session.Validators.getValue({ at });
 };
+
+export const subscribeToTotalIssuance = async (api: TypedApi<TChainDescriptor>, callback: (issuance: bigint) => void) => {
+  assert(api, 'Api prop is not defined');
+  checkIfCompatable(
+    await api?.query?.Balances?.TotalIssuance?.isCompatible(CompatibilityLevel.Partial),
+    'api.query.Balances.TotalIssuance is not compatable',
+  );
+
+  api.query.Balances.TotalIssuance.watchValue('best').subscribe(issuance => {
+    callback(issuance);
+  });
+};
