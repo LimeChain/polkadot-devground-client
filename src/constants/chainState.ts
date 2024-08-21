@@ -1,32 +1,20 @@
-import type { TChainSubscription } from '@custom-types/chain';
+import type { TChainSubscription } from '@components/chainStateBlock';
 
 export const chainStateBlockData: {
   [key in TChainSubscription]: {
     name: string;
     icon: `icon-${string}`;
   } } = {
-  'latest-block': {
+  'bestBlock': {
     name: 'Latest Block',
     icon: 'icon-newBlock',
   },
-  'finalised-block': {
+  'finalizedBlock': {
     name: 'Finalised Block',
     icon: 'icon-blocks',
   },
-  'signed-extrinsics': {
-    name: 'Signed Extrinsics',
-    icon: 'icon-transfer',
-  },
-  'circulating-supply': {
-    name: 'Circulating Supply',
-    icon: 'icon-transfer',
-  },
-  'total-accounts': {
-    name: 'Total Accounts',
-    icon: 'icon-transfer',
-  },
-  'transfers': {
-    name: 'Transfers',
+  'totalIssuance': {
+    name: 'Total Issuance',
     icon: 'icon-transfer',
   },
 };

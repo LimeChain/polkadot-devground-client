@@ -22,6 +22,7 @@ import {
   getRuntime,
   initSmoldotChains,
   subscribeToRuntime,
+  subscribeToTotalIssuance,
 } from '@utils/papi';
 import { assert } from '@utils/papi/helpers';
 import { getBlockDetailsWithPAPI } from '@utils/rpc/getBlockDetails';
@@ -45,6 +46,7 @@ export interface StoreInterface {
 
   client: PolkadotClient | null;
   peopleClient: PolkadotClient | null;
+  stakingClient: PolkadotClient | null;
   rawClient: SubstrateClient | null;
 
   api: TApi | null;
@@ -54,6 +56,7 @@ export interface StoreInterface {
   blocksData: Map<number, Awaited<ReturnType<typeof getBlockDetailsWithPAPI>>>;
   bestBlock: number | null;
   finalizedBlock: number | null;
+  totalIssuance: bigint | null;
 
   chainSpecs: TChainSpecs | null;
   runtime: IRuntime | null;
@@ -73,6 +76,7 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   client: null,
   peopleClient: null,
   rawClient: null,
+  stakingClient: null,
   api: null,
   peopleApi: null,
   stakingApi: null,
@@ -80,6 +84,7 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   blocksData: new Map(),
   bestBlock: null,
   finalizedBlock: null,
+  totalIssuance: null,
   registry: new TypeRegistry(),
   chainSpecs: null,
   runtime: null,
@@ -93,11 +98,13 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         const client = get()?.client;
         const peopleClient = get()?.peopleClient;
         const rawClient = get()?.rawClient;
+        const stakingClient = get()?.stakingClient;
 
         // clean up subscrptions / destroy old clients
         client?.destroy?.();
         peopleClient?.destroy?.();
         rawClient?.destroy?.();
+        stakingClient?.destroy?.();
         // dont think there is a need to terminate smoldot
         // await smoldot?.terminate?.();
 
@@ -155,11 +162,12 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         // check if chain has staking pallet (rococo doesn't have)
         if (chain.hasStaking && stakingChain) {
           const stakingClient = createClient(getSmProvider(stakingChain));
+          set({ stakingClient });
           const stakingApi = stakingClient.getTypedApi(CHAIN_DESCRIPTORS[chain.stakingChainId] as TStakingChainDecsriptor);
           set({ stakingApi });
         }
 
-        newClient.getChainSpecData()
+        await newClient.getChainSpecData()
           .then(chainSpecs => {
             set({ chainSpecs });
           })
@@ -182,6 +190,9 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
         // update spec_version on runtime update
         subscribeToRuntime(api, (runtime) => set({ runtime }))
+          .catch(console.error);
+
+        subscribeToTotalIssuance(api, (issuance) => set({ totalIssuance: issuance }))
           .catch(console.error);
 
         // subscribe to chain head

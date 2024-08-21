@@ -62,14 +62,6 @@ type TChainBase = {
   icon: `icon-chain-${TSupportedChain}`;
 };
 
-export type TChainSubscription =
-  'latest-block' |
-  'finalised-block' |
-  'signed-extrinsics' |
-  'transfers' |
-  'total-accounts' |
-  'circulating-supply';
-
 export interface TChainSpecs extends Awaited<ReturnType<PolkadotClient['getChainSpecData']>> {
   properties: {
     ss58Format: number;
