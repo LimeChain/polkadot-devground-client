@@ -17,3 +17,9 @@
     @apply gap-2 font-body1-bold font-geist;
   }
 }
+
+.pd-link-btn {
+  @apply flex font-body2-bold items-center gap-1 font-geist;
+  @apply font-body2-bold font-geist ;
+  @apply hover:text-dev-black-500 hover:dark:text-dev-purple-200 ease-out duration-300;
+}

@@ -2,7 +2,6 @@ import { format } from 'date-fns';
 import {
   useCallback,
   useEffect,
-  useRef,
   useState,
 } from 'react';
 import { useParams } from 'react-router-dom';
@@ -12,7 +11,10 @@ import { Icon } from '@components/icon';
 import { PDLink } from '@components/pdLink';
 import { ToggleButton } from '@components/toggleButton';
 import { useStoreChain } from '@stores';
-import { formatNumber } from '@utils/helpers';
+import {
+  cn,
+  formatNumber,
+} from '@utils/helpers';
 
 import styles from './styles.module.css';
 
@@ -28,21 +30,25 @@ interface IBlockData {
 }
 
 const BlockDetails = () => {
-  const { blockId } = useParams();
-
-  const refDates = useRef<{
-    local?: string;
-    utc?: string;
-  } | undefined>();
+  const latestFinalizedBlock = useStoreChain.use.finalizedBlock?.();
+  const { blockNumber } = useParams();
 
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [blockData, setBlockData] = useState<IBlockData | undefined>();
+  const [isFinalized, setIsFinalized] = useState<boolean>(false);
   const blocksData = useStoreChain?.use?.blocksData?.();
 
-  useEffect(() => {
+  const handleSetCheck = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const target = e.currentTarget.parentNode as HTMLDivElement;
+    const format = target.getAttribute('data-format');
+    target.setAttribute('data-format', format === 'utc' ? 'local' : 'utc');
 
-    if (blockId && blocksData.size > 0) {
-      const block = blocksData.get(Number(blockId));
+    setIsChecked(state => !state);
+  }, []);
+
+  useEffect(() => {
+    if (blockNumber && blocksData.size > 0) {
+      const block = blocksData.get(Number(blockNumber));
       if (!block) {
         return;
       }
@@ -57,17 +63,16 @@ const BlockDetails = () => {
         timeStamp: format(new Date(block.header.timestamp), 'yyyy-MM-dd HH:mm:ss'),
       });
     }
-  }, [blockId, blocksData]);
+  }, [blockNumber, blocksData]);
 
-  const latestFinalizedBlock = useStoreChain.use.finalizedBlock?.();
+  useEffect(() => {
+    if (latestFinalizedBlock && blockData) {
+      const blockNumber = blockData.number || 0;
+      const isBlockFinalized = blockNumber <= latestFinalizedBlock;
 
-  const handleSetCheck = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const target = e.currentTarget.parentNode as HTMLDivElement;
-    const format = target.getAttribute('data-format');
-    target.setAttribute('data-format', format === 'utc' ? 'local' : 'utc');
-
-    setIsChecked(state => !state);
-  }, []);
+      setIsFinalized(isBlockFinalized);
+    }
+  }, [latestFinalizedBlock, blockData]);
 
   if (!blockData) {
     return <>loading</>;
@@ -77,10 +82,19 @@ const BlockDetails = () => {
     <>
       <div className="mb-12 flex items-center justify-between">
         <div className="flex items-center">
-          <PDLink to="/explorer" className="mr-8 bg-dev-purple-700 p-2 dark:bg-white">
+          <PDLink
+            to="/explorer"
+            className={cn(
+              'mr-8 duration-300 ease-out',
+              'bg-dev-purple-700 p-2 dark:bg-white',
+              'hover:bg-dev-purple-900 hover:dark:bg-dev-purple-200',
+            )}
+          >
             <Icon
               name="icon-arrowLeft"
-              className=" text-dev-white-200 dark:text-dev-purple-700"
+              className={cn(
+                'text-dev-white-200 dark:text-dev-purple-700',
+              )}
             />
           </PDLink>
           <h4 className="mr-2 font-h4-light">Block</h4>
@@ -89,55 +103,68 @@ const BlockDetails = () => {
 
         <div className="flex gap-6">
           <PDLink
-            to={`https://polkadot.subscan.io/block/${''}`}
-            className="flex items-center gap-1"
+            to={`https://polkadot.subscan.io/block/${blockData.number}`}
+            className={styles['pd-link-btn']}
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            <p className="font-geist font-body2-bold">Polkadot Statescan</p>
+            Polkadot Subscan
             <Icon name="icon-openLink" size={[16]} />
           </PDLink>
           <PDLink
-            to={`https://polkadot.statescan.io/#/blocks/${''}`}
-            className="flex items-center gap-1"
+            to={`https://polkadot.statescan.io/#/blocks/${blockData.number}`}
+            className={styles['pd-link-btn']}
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            <p className="font-geist font-body2-bold">Polkadot Statescan</p>
+            Polkadot Statescan
             <Icon name="icon-openLink" size={[16]} />
           </PDLink>
         </div>
       </div>
 
       {/* Time stamp */}
-      {
-        refDates.current?.local && (
-          <div className={styles['pd-block-details']}>
-            <p>Time stamp</p>
 
-            <div>
-              {isChecked ? new Date(blockData.timeStamp).toUTCString() : blockData.timeStamp}
-              <ToggleButton
-                isChecked={isChecked}
-                handleSetCheck={handleSetCheck}
-                classNames="ml-2"
-              />
+      <div className={styles['pd-block-details']}>
+        <p>Time stamp</p>
+
+        <div>
+          {isChecked ? new Date(blockData.timeStamp).toUTCString() : blockData.timeStamp}
+          <ToggleButton
+            isChecked={isChecked}
+            handleSetCheck={handleSetCheck}
+            classNames="ml-2"
+          />
           UTC
-            </div>
-          </div>
-        )}
+        </div>
+      </div>
 
       {/* Status */}
       <div className={styles['pd-block-details']}>
         <p>Status</p>
 
         {
-          latestFinalizedBlock !== blockData.number && (
-            <div>
-              <Icon
-                size={[16]}
-                name="icon-checked"
-                className="text-dev-green-600"
-              />
-              <p>Finalized</p>
-            </div>
-          )
+          isFinalized
+            ? (
+              <div>
+                <Icon
+                  size={[16]}
+                  name="icon-checked"
+                  className="text-dev-green-600"
+                />
+                <p>Finalized</p>
+              </div>
+            )
+            : (
+              <div>
+                <Icon
+                  size={[16]}
+                  name="icon-clock"
+                  className="text-dev-yellow-700"
+                />
+                <p>Unfinalized</p>
+              </div>
+            )
         }
       </div>
 
