@@ -31,7 +31,7 @@ interface IBlockData {
 
 const BlockDetails = () => {
   const latestFinalizedBlock = useStoreChain.use.finalizedBlock?.();
-  const { blockId } = useParams();
+  const { blockNumber } = useParams();
 
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [blockData, setBlockData] = useState<IBlockData | undefined>();
@@ -47,8 +47,8 @@ const BlockDetails = () => {
   }, []);
 
   useEffect(() => {
-    if (blockId && blocksData.size > 0) {
-      const block = blocksData.get(Number(blockId));
+    if (blockNumber && blocksData.size > 0) {
+      const block = blocksData.get(Number(blockNumber));
       if (!block) {
         return;
       }
@@ -63,12 +63,14 @@ const BlockDetails = () => {
         timeStamp: format(new Date(block.header.timestamp), 'yyyy-MM-dd HH:mm:ss'),
       });
     }
-  }, [blockId, blocksData]);
+  }, [blockNumber, blocksData]);
 
   useEffect(() => {
     if (latestFinalizedBlock && blockData) {
-      console.log(latestFinalizedBlock);
-      latestFinalizedBlock >= blockData?.number ? setIsFinalized(true) : setIsFinalized(false);
+      const blockNumber = blockData.number || 0;
+      const isBlockFinalized = blockNumber <= latestFinalizedBlock;
+
+      setIsFinalized(isBlockFinalized);
     }
   }, [latestFinalizedBlock, blockData]);
 
@@ -92,8 +94,7 @@ const BlockDetails = () => {
               name="icon-arrowLeft"
               className={cn(
                 'text-dev-white-200 dark:text-dev-purple-700',
-              )
-              }
+              )}
             />
           </PDLink>
           <h4 className="mr-2 font-h4-light">Block</h4>
@@ -158,7 +159,8 @@ const BlockDetails = () => {
               <div>
                 <Icon
                   size={[16]}
-                  name="icon-unfinalized"
+                  name="icon-clock"
+                  className="text-dev-yellow-700"
                 />
                 <p>Unfinalized</p>
               </div>

@@ -31,6 +31,9 @@ export default {
         'chainSelect': '276fr 708fr',
       },
       colors: {
+        "dev-yellow": {
+          700: '#FFB800',
+        },
         "dev-pink" : {
           600: '#A80059',
           500: '#E6007A',

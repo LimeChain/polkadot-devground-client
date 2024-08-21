@@ -75,7 +75,7 @@ export const routes = () => ([
             element: <Explorer />,
           },
           {
-            path: ':blockId',
+            path: ':blockNumber',
             element: <BlockDetails />,
           },
         ],
