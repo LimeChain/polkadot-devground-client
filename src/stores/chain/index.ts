@@ -26,6 +26,7 @@ import {
   getRuntime,
   subscribeToRuntime,
 } from '@utils/papi';
+import { assert } from '@utils/papi/helpers';
 import { getBlockDetailsWithPAPI } from '@utils/rpc/getBlockDetails';
 
 import { createSelectors } from '../createSelectors';
@@ -149,32 +150,47 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
         // init relay chain / people chain
         const isParachain = chain.isParaChain;
-        let newChain: Chain, peopleChain: Chain;
+        let newChain: Chain | void, peopleChain: Chain | void;
 
         if (isParachain) {
           const relayChain = await smoldot?.addChain({
             chainSpec: CHAIN_SPECS[chain.relayChainId],
-          });
+          })
+            .catch(console.error);
+
+          assert(relayChain, `RelayChain is not defined for ${chain.name}`);
 
           newChain = await smoldot?.addChain({
             chainSpec: CHAIN_SPECS[chain.id],
             potentialRelayChains: [relayChain],
-          });
+          })
+            .catch(console.error);
+
+          assert(newChain, `newChain is not defined for ${chain.name}`);
 
           peopleChain = await smoldot?.addChain({
             chainSpec: CHAIN_SPECS[chain.peopleChainId],
             potentialRelayChains: [relayChain],
-          });
+          })
+            .catch(console.error);
+
+          assert(peopleChain, `peopleChain is not defined for ${chain.name}`);
 
         } else {
           newChain = await smoldot?.addChain({
             chainSpec: CHAIN_SPECS[chain.id],
-          });
+          })
+            .catch(console.error);
+
+          assert(newChain, `newChain is not defined for ${chain.name}`);
 
           peopleChain = await smoldot?.addChain({
             chainSpec: CHAIN_SPECS[chain.peopleChainId],
             potentialRelayChains: [newChain],
-          });
+          })
+            .catch(console.error);
+
+          assert(peopleChain, `peopleChain is not defined for ${chain.name}`);
 
         }
 
@@ -249,7 +265,9 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
           await Promise.all(promises).then(results => {
             results.forEach(blockData => {
-              blocksData.set(blockData.header.number, blockData);
+              if (blocksData.get(blockData.header.number)?.header?.hash !== blockData.header.hash) {
+                blocksData.set(blockData.header.number, blockData);
+              }
             });
             set({ bestBlock: bestBlock?.number, finalizedBlock: finalizedBlock?.number });
 
