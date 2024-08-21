@@ -5,8 +5,12 @@ import {
   type PolkadotClient,
   type TypedApi,
 } from 'polkadot-api';
+import { type Client } from 'polkadot-api/smoldot';
 
-import { CHAIN_DESCRIPTORS } from '@constants/chain';
+import {
+  CHAIN_DESCRIPTORS,
+  CHAIN_SPECS,
+} from '@constants/chain';
 
 import {
   assert,
@@ -15,11 +19,93 @@ import {
 
 import type {
   IRuntime,
+  TChain,
   TChainDescriptor,
   TParaChainDecsriptor,
+  TSmoldotChain,
   TSupportedParaChain,
   TSupportedRelayChain,
 } from '@custom-types/chain';
+
+export const initSmoldotChains = async ({
+  smoldot,
+  chain,
+}: {
+  smoldot: Client;
+  chain: TChain;
+}) => {
+  const isParachain = chain.isParaChain;
+  let newChain: TSmoldotChain, peopleChain: TSmoldotChain;
+  let stakingChain: TSmoldotChain = null as unknown as TSmoldotChain;
+
+  if (isParachain) {
+    const relayChain = await smoldot.addChain({
+      chainSpec: CHAIN_SPECS[chain.relayChainId],
+    })
+      .catch(console.error);
+
+    assert(relayChain, `RelayChain is not defined for ${chain.name}`);
+
+    newChain = await smoldot.addChain({
+      chainSpec: CHAIN_SPECS[chain.id],
+      potentialRelayChains: [relayChain],
+    })
+      .catch(console.error);
+
+    assert(newChain, `newChain is not defined for ${chain.name}`);
+
+    peopleChain = await smoldot.addChain({
+      chainSpec: CHAIN_SPECS[chain.peopleChainId],
+      potentialRelayChains: [relayChain],
+    })
+      .catch(console.error);
+
+    assert(peopleChain, `peopleChain is not defined for ${chain.name}`);
+
+    if (chain.hasStaking) {
+      stakingChain = await smoldot.addChain({
+        chainSpec: CHAIN_SPECS[chain.stakingChainId],
+        potentialRelayChains: [relayChain],
+      })
+        .catch(console.error);
+
+      assert(stakingChain, `stakingChain is not defined for ${chain.name}`);
+    }
+
+  } else {
+    newChain = await smoldot.addChain({
+      chainSpec: CHAIN_SPECS[chain.id],
+    })
+      .catch(console.error);
+
+    assert(newChain, `newChain is not defined for ${chain.name}`);
+
+    peopleChain = await smoldot.addChain({
+      chainSpec: CHAIN_SPECS[chain.peopleChainId],
+      potentialRelayChains: [newChain],
+    })
+      .catch(console.error);
+
+    assert(peopleChain, `peopleChain is not defined for ${chain.name}`);
+
+    if (chain.hasStaking) {
+      stakingChain = await smoldot?.addChain({
+        chainSpec: CHAIN_SPECS[chain.stakingChainId],
+        potentialRelayChains: [newChain],
+      })
+        .catch(console.error);
+
+      assert(stakingChain, `stakingChain is not defined for ${chain.name}`);
+    }
+
+  }
+
+  return {
+    newChain,
+    peopleChain,
+    stakingChain,
+  };
+};
 
 export const getChainSpecData = (client: PolkadotClient, chainId: TSupportedParaChain | TSupportedRelayChain) => {
   return client.getTypedApi(CHAIN_DESCRIPTORS[chainId]);

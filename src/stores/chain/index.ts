@@ -6,10 +6,7 @@ import { createClient as createSubstrateClient } from '@polkadot-api/substrate-c
 import { type PolkadotClient } from 'polkadot-api';
 import { createClient } from 'polkadot-api';
 import { getSmProvider } from 'polkadot-api/sm-provider';
-import {
-  type Chain,
-  type Client,
-} from 'polkadot-api/smoldot';
+import { type Client } from 'polkadot-api/smoldot';
 import { startFromWorker } from 'polkadot-api/smoldot/from-worker';
 import SmWorker from 'polkadot-api/smoldot/worker?worker';
 import { getWsProvider } from 'polkadot-api/ws-provider/web';
@@ -17,13 +14,13 @@ import { create } from 'zustand';
 
 import {
   CHAIN_DESCRIPTORS,
-  CHAIN_SPECS,
   CHAIN_WEBSOCKET_URLS,
   SUPPORTED_CHAINS,
 } from '@constants/chain';
 import {
   getMetadata,
   getRuntime,
+  initSmoldotChains,
   subscribeToRuntime,
 } from '@utils/papi';
 import { assert } from '@utils/papi/helpers';
@@ -37,23 +34,22 @@ import type {
   TChain,
   TChainSpecs,
   TPeopleApi,
+  TStakingApi,
+  TStakingChainDecsriptor,
 } from '@custom-types/chain';
 import type { SubstrateClient } from '@polkadot-api/substrate-client';
 
-interface ISubscription {
-  unsubscribe: () => void;
-}
-
 export interface StoreInterface {
   chain: TChain;
-
   smoldot: Client | null;
+
   client: PolkadotClient | null;
   peopleClient: PolkadotClient | null;
   rawClient: SubstrateClient | null;
+
   api: TApi | null;
   peopleApi: TPeopleApi | null;
-  _subscription: ISubscription | null;
+  stakingApi: TStakingApi | null;
 
   blocksData: Map<number, Awaited<ReturnType<typeof getBlockDetailsWithPAPI>>>;
   bestBlock: number | null;
@@ -72,16 +68,15 @@ export interface StoreInterface {
   init: () => void;
 }
 
-const initialState = {
+const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   chain: SUPPORTED_CHAINS['polkadot'],
   client: null,
   peopleClient: null,
   rawClient: null,
-  rawObservableClient: null,
   api: null,
   peopleApi: null,
+  stakingApi: null,
   smoldot: null,
-  _subscription: null,
   blocksData: new Map(),
   bestBlock: null,
   finalizedBlock: null,
@@ -98,7 +93,6 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         const client = get()?.client;
         const peopleClient = get()?.peopleClient;
         const rawClient = get()?.rawClient;
-        // const smoldot = get()?.smoldot;
 
         // clean up subscrptions / destroy old clients
         client?.destroy?.();
@@ -113,114 +107,63 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         // reset data
         blocksData?.clear();
         registry.clearCache();
+        set({ finalizedBlock: undefined, bestBlock: undefined });
 
       } catch (error) {
         console.error(error);
 
       } finally {
-        set(initialState);
+        const smoldot = get()?.smoldot;
+        set({ ...initialState, smoldot });
 
       }
     },
     setChain: async (chain: TChain) => {
       try {
-        set({ chain });
-
-        const smoldot = get()?.smoldot;
-        if (!smoldot) {
-          return;
-        }
-
-        const client = get()?.client;
-        const peopleClient = get()?.peopleClient;
-        const rawClient = get()?.rawClient;
-
-        // clean up subscrptions / destroy old clients
-        client?.destroy?.();
-        peopleClient?.destroy?.();
-        rawClient?.destroy?.();
+        get()?.actions?.resetStore?.();
 
         const blocksData = get()?.blocksData;
         const registry = get().registry;
 
-        // reset data
-        blocksData?.clear();
-        registry.clearCache();
-        set({ finalizedBlock: undefined, bestBlock: undefined });
+        set({ chain });
+
+        const smoldot = get()?.smoldot;
+        assert(smoldot, 'Smoldot is not defined');
 
         // init relay chain / people chain
-        const isParachain = chain.isParaChain;
-        let newChain: Chain | void, peopleChain: Chain | void;
+        const {
+          newChain,
+          peopleChain,
+          stakingChain,
+        } = await initSmoldotChains({
+          smoldot,
+          chain,
+        });
 
-        if (isParachain) {
-          const relayChain = await smoldot?.addChain({
-            chainSpec: CHAIN_SPECS[chain.relayChainId],
-          })
-            .catch(console.error);
-
-          assert(relayChain, `RelayChain is not defined for ${chain.name}`);
-
-          newChain = await smoldot?.addChain({
-            chainSpec: CHAIN_SPECS[chain.id],
-            potentialRelayChains: [relayChain],
-          })
-            .catch(console.error);
-
-          assert(newChain, `newChain is not defined for ${chain.name}`);
-
-          peopleChain = await smoldot?.addChain({
-            chainSpec: CHAIN_SPECS[chain.peopleChainId],
-            potentialRelayChains: [relayChain],
-          })
-            .catch(console.error);
-
-          assert(peopleChain, `peopleChain is not defined for ${chain.name}`);
-
-        } else {
-          newChain = await smoldot?.addChain({
-            chainSpec: CHAIN_SPECS[chain.id],
-          })
-            .catch(console.error);
-
-          assert(newChain, `newChain is not defined for ${chain.name}`);
-
-          peopleChain = await smoldot?.addChain({
-            chainSpec: CHAIN_SPECS[chain.peopleChainId],
-            potentialRelayChains: [newChain],
-          })
-            .catch(console.error);
-
-          assert(peopleChain, `peopleChain is not defined for ${chain.name}`);
-
-        }
-
+        // init clients and typed apis
         const newClient = createClient(getSmProvider(newChain));
         set({ client: newClient });
+        const api = newClient.getTypedApi(CHAIN_DESCRIPTORS[chain.id]);
+        set({ api });
 
         const isPeopleParaChain = chain.id === chain.peopleChainId;
-        let newPeopleClient: PolkadotClient;
-
-        if (isPeopleParaChain) {
-          // if its a people para chain then the two clients are identical
-          newPeopleClient = newClient;
-
-        } else {
-          newPeopleClient = createClient(getSmProvider(peopleChain));
-
-        }
+        const newPeopleClient = isPeopleParaChain ? newClient : createClient(getSmProvider(peopleChain));
         set({ peopleClient: newPeopleClient });
+        const peopleApi = newPeopleClient.getTypedApi(CHAIN_DESCRIPTORS[chain.peopleChainId]);
+        set({ peopleApi });
+
+        // check if chain has staking pallet (rococo doesn't have)
+        if (chain.hasStaking && stakingChain) {
+          const stakingClient = createClient(getSmProvider(stakingChain));
+          const stakingApi = stakingClient.getTypedApi(CHAIN_DESCRIPTORS[chain.stakingChainId] as TStakingChainDecsriptor);
+          set({ stakingApi });
+        }
 
         newClient.getChainSpecData()
           .then(chainSpecs => {
             set({ chainSpecs });
           })
           .catch(console.error);
-
-        const api = newClient.getTypedApi(CHAIN_DESCRIPTORS[chain.id]);
-        set({ api });
-
-        const peopleApi = newPeopleClient.getTypedApi(CHAIN_DESCRIPTORS[chain.peopleChainId]);
-        set({ peopleApi });
 
         // build metadata registry for decoding
         await getMetadata(api)
