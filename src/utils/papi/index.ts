@@ -22,6 +22,7 @@ import type {
   TApi,
   TChain,
   TParaChainDecsriptor,
+  TRelayChainDecsriptor,
   TSmoldotChain,
   TStakingApi,
   TSupportedParaChain,
@@ -227,4 +228,31 @@ export const subscribeToStakedTokens = async (api: TStakingApi, callback: (total
       });
     }
   });
+};
+
+export const getExpectedBlockTime = async (_api: TApi, chain: TChain, callback: (duration: bigint) => void) => {
+  assert(_api, 'Api prop is not defined');
+  assert(chain, 'Chain prop is not defined');
+
+  if (chain.isRelayChain) {
+    const api = _api as TypedApi<TRelayChainDecsriptor>;
+    checkIfCompatable(
+      await api?.apis?.BabeApi?.configuration?.isCompatible(CompatibilityLevel.Partial),
+      'api.query.BabeApi.configuration is not compatable',
+    );
+
+    const target = await api.apis.BabeApi.configuration();
+    callback(target.slot_duration);
+
+  } else {
+    const api = _api as TypedApi<TParaChainDecsriptor>;
+    checkIfCompatable(
+      await api?.apis?.AuraApi?.slot_duration?.isCompatible(CompatibilityLevel.Partial),
+      'api.query.AuraApi.slot_duration is not compatable',
+    );
+
+    const target = await api.apis.AuraApi.slot_duration();
+    callback(target);
+
+  }
 };
