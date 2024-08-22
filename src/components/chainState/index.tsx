@@ -7,12 +7,13 @@ export const ChainState = () => {
       'grid gap-4',
       'p-3 md:p-6',
       'bg-dev-purple-100 dark:bg-dev-black-900',
-      'grid-cols-2 md:grid-cols-4 lg:grid-cols-6',
+      'grid-cols-1 md:grid-cols-4 lg:grid-cols-5',
     )}
     >
       <ChainStateBlock type="bestBlock" />
       <ChainStateBlock type="finalizedBlock" />
       <ChainStateBlock type="totalIssuance" />
+      <ChainStateBlock type="totalStake" />
     </div>
   );
 };

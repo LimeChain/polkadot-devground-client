@@ -5,6 +5,7 @@ import {
 import { createClient as createSubstrateClient } from '@polkadot-api/substrate-client';
 import { type PolkadotClient } from 'polkadot-api';
 import { createClient } from 'polkadot-api';
+// import { withLogsRecorder } from 'polkadot-api/logs-provider';
 import { getSmProvider } from 'polkadot-api/sm-provider';
 import { type Client } from 'polkadot-api/smoldot';
 import { startFromWorker } from 'polkadot-api/smoldot/from-worker';
@@ -22,6 +23,7 @@ import {
   getRuntime,
   initSmoldotChains,
   subscribeToRuntime,
+  subscribeToStakedTokens,
   subscribeToTotalIssuance,
 } from '@utils/papi';
 import { assert } from '@utils/papi/helpers';
@@ -57,6 +59,7 @@ export interface StoreInterface {
   bestBlock: number | null;
   finalizedBlock: number | null;
   totalIssuance: bigint | null;
+  totalStake: bigint | null;
 
   chainSpecs: TChainSpecs | null;
   runtime: IRuntime | null;
@@ -85,6 +88,7 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   bestBlock: null,
   finalizedBlock: null,
   totalIssuance: null,
+  totalStake: null,
   registry: new TypeRegistry(),
   chainSpecs: null,
   runtime: null,
@@ -149,6 +153,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
         // init clients and typed apis
         const newClient = createClient(getSmProvider(newChain));
+        // const newClient = createClient(withLogsRecorder(line => console.log(line), getSmProvider(newChain)));
         set({ client: newClient });
         const api = newClient.getTypedApi(CHAIN_DESCRIPTORS[chain.id]);
         set({ api });
@@ -160,7 +165,8 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         set({ peopleApi });
 
         // check if chain has staking pallet (rococo doesn't have)
-        if (chain.hasStaking && stakingChain) {
+        const hasStakingInformation = chain.hasStaking && stakingChain;
+        if (hasStakingInformation) {
           const stakingClient = createClient(getSmProvider(stakingChain));
           set({ stakingClient });
           const stakingApi = stakingClient.getTypedApi(CHAIN_DESCRIPTORS[chain.stakingChainId] as TStakingChainDecsriptor);
@@ -192,8 +198,15 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         subscribeToRuntime(api, (runtime) => set({ runtime }))
           .catch(console.error);
 
-        subscribeToTotalIssuance(api, (issuance) => set({ totalIssuance: issuance }))
+        subscribeToTotalIssuance(api, (totalIssuance) => set({ totalIssuance }))
           .catch(console.error);
+
+        if (hasStakingInformation) {
+          const stakingApi = get()?.stakingApi;
+          assert(stakingApi, 'Staking Api is not defined');
+          subscribeToStakedTokens(stakingApi, (totalStake) => set({ totalStake }))
+            .catch(console.error);
+        }
 
         // subscribe to chain head
         newClient.bestBlocks$.subscribe(async (bestBlocks) => {
@@ -218,9 +231,11 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
           }
 
-          await Promise.all(promises).then(results => {
+          await Promise.allSettled(promises).then(results => {
             results.forEach(blockData => {
-              blocksData.set(blockData.header.number, blockData);
+              if (blockData.status === 'fulfilled') {
+                blocksData.set(blockData.value.header.number, blockData.value);
+              }
             });
             set({ bestBlock: bestBlock?.number, finalizedBlock: finalizedBlock?.number });
 
@@ -228,9 +243,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
             // prevent state crash on random smoldot error
             .catch(err => {
               console.error(err);
-            },
-            );
-
+            });
         });
 
         const wsUrl = CHAIN_WEBSOCKET_URLS[chain.id];
@@ -246,7 +259,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
   },
   async init() {
     try {
-      const smoldot = startFromWorker(new SmWorker());
+      const smoldot = startFromWorker(new SmWorker(), {});
 
       set({ smoldot });
 
