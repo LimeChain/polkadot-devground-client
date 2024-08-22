@@ -152,6 +152,7 @@ export const LatestBlocks = () => {
   const isLoading = bestBlocks.length === 0;
 
   const loadInitialData = useCallback(() => {
+
     const keys: number[] = [];
     blocksData.keys().forEach(key => {
       keys.unshift(key);
@@ -184,9 +185,8 @@ export const LatestBlocks = () => {
     }
 
     if (!refInitalBlocksDisplayed.current) {
-      refInitalBlocksDisplayed.current = true;
-
       loadInitialData();
+      refInitalBlocksDisplayed.current = true;
     } else {
       loadNewData(bestBlock);
     }

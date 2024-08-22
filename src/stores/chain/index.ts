@@ -19,6 +19,7 @@ import {
   SUPPORTED_CHAINS,
 } from '@constants/chain';
 import {
+  getExpectedBlockTime,
   getMetadata,
   getRuntime,
   initSmoldotChains,
@@ -60,6 +61,7 @@ export interface StoreInterface {
   finalizedBlock: number | null;
   totalIssuance: bigint | null;
   totalStake: bigint | null;
+  blockTime: bigint | null;
 
   chainSpecs: TChainSpecs | null;
   runtime: IRuntime | null;
@@ -89,6 +91,7 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   finalizedBlock: null,
   totalIssuance: null,
   totalStake: null,
+  blockTime: null,
   registry: new TypeRegistry(),
   chainSpecs: null,
   runtime: null,
@@ -199,6 +202,9 @@ const baseStore = create<StoreInterface>()((set, get) => ({
           .catch(console.error);
 
         subscribeToTotalIssuance(api, (totalIssuance) => set({ totalIssuance }))
+          .catch(console.error);
+
+        getExpectedBlockTime(api, chain, (blockTime) => set({ blockTime }))
           .catch(console.error);
 
         if (hasStakingInformation) {

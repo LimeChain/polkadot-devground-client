@@ -21,4 +21,8 @@ export const chainStateBlockData: {
     name: 'Total Staked',
     icon: 'icon-transfer',
   },
+  'blockTime': {
+    name: 'Block Target',
+    icon: 'icon-transfer',
+  },
 };
