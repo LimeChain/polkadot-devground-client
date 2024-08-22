@@ -17,4 +17,8 @@ export const chainStateBlockData: {
     name: 'Total Issuance',
     icon: 'icon-transfer',
   },
+  'totalStake': {
+    name: 'Total Staked',
+    icon: 'icon-transfer',
+  },
 };

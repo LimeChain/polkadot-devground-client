@@ -43,8 +43,9 @@ interface IRowLatestBlock {
 const RowLatestBlock = (props: IRowLatestBlock) => {
   const { blockNumber } = props;
   const blockData = useStoreChain?.use?.blocksData?.()?.get(blockNumber);
-
-  const timestamp = blockData?.header?.timestamp || 0;
+  // default timestamp value => 1 second ago
+  const defaultTimestamp = new Date().getTime() - 1000;
+  const timestamp = blockData?.header?.timestamp || defaultTimestamp;
   const extrinsics = blockData?.body?.extrinsics;
   const eventsCount = blockData?.body?.events.length;
 
