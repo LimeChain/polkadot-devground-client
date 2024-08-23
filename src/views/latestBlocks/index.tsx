@@ -1,14 +1,7 @@
 import { formatDistanceToNowStrict } from 'date-fns';
-import {
-  useCallback,
-  useMemo,
-  useState,
-} from 'react';
 
 import { Icon } from '@components/icon';
-import Pagination from '@components/pagination';
 import { PDLink } from '@components/pdLink';
-import SearchBar from '@components/searchBar';
 import { useStoreChain } from '@stores';
 import { cn } from '@utils/helpers';
 
@@ -17,9 +10,6 @@ import styles from './styles.module.css';
 const LatestBlocks = () => {
   const latestFinalizedBlock = useStoreChain.use.finalizedBlock?.();
   const blocksData = useStoreChain?.use?.blocksData?.();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
-  const blocksPerPage = 11;
 
   const formatString = (hash: string) => {
     if (hash.length <= 8) {
@@ -28,38 +18,8 @@ const LatestBlocks = () => {
     return `${hash.slice(0, 6)}...${hash.slice(-6)}`;
   };
 
-  const sortedBlocks = useMemo(() => {
-    return Array.from(blocksData.values()).sort((a, b) => {
-      return new Date(b.header.timestamp).getTime() - new Date(a.header.timestamp).getTime();
-    });
-  }, [blocksData]);
-
-  const filteredBlocks = useMemo(() => {
-    return sortedBlocks.filter(block =>
-      block.header.number.toString().includes(searchQuery)
-      || block.header.hash.includes(searchQuery)
-      || block.header.identity.includes(searchQuery),
-    );
-  }, [sortedBlocks, searchQuery]);
-
-  const indexOfLastBlock = currentPage * blocksPerPage;
-  const indexOfFirstBlock = indexOfLastBlock - blocksPerPage;
-  const currentBlocks = filteredBlocks.slice(indexOfFirstBlock, indexOfLastBlock);
-
-  const totalPages = Math.ceil(filteredBlocks.length / blocksPerPage);
-
-  const handlePageChange = useCallback((page: number) => {
-    setCurrentPage(page);
-  }, []);
-
-  const handleSearch = useCallback((query: string) => {
-    setSearchQuery(query);
-    setCurrentPage(1);
-  }, []);
-
-  console.log('latestFinalizedBlock', latestFinalizedBlock);
   return (
-    <div className="mb-12 items-center justify-between">
+    <>
       <div className="flex items-center">
         <PDLink
           to="/explorer"
@@ -76,11 +36,11 @@ const LatestBlocks = () => {
         </PDLink>
         <h4 className="mr-2 font-h4-light">Latest Blocks</h4>
       </div>
-      <SearchBar
+      {/* <SearchBar
         label="Search by Block"
         classNames="mt-6"
-        onSearch={handleSearch}
-      />
+      /> */}
+
       <table className={styles['latest-blocks-table']}>
         <thead>
           <tr>
@@ -94,7 +54,7 @@ const LatestBlocks = () => {
           </tr>
         </thead>
         <tbody>
-          {currentBlocks.map((block) => {
+          {Array.from(blocksData.values()).reverse().map((block) => {
             const timeAgo = block.header.timestamp && formatDistanceToNowStrict(
               new Date(block.header.timestamp),
               { addSuffix: true },
@@ -111,7 +71,6 @@ const LatestBlocks = () => {
                         name="icon-checked"
                         className="text-dev-green-600"
                       />
-
                     )
                     : (
                       <Icon
@@ -132,13 +91,7 @@ const LatestBlocks = () => {
           })}
         </tbody>
       </table>
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-        classNames="mt-6 justify-end"
-      />
-    </div>
+    </>
   );
 };
 
