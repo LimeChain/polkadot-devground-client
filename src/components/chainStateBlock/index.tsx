@@ -36,13 +36,15 @@ export const ChainStateBlock = ({ type }: TChainStateBlockProps) => {
   let data;
 
   const formatData = useCallback((value: number | bigint) => {
-    return formatNumber(
+    const amount = formatNumber(
       Number(formatTokenValue({
         value: Number(value),
         precision: 2,
         tokenDecimals: chainSpecs?.properties.tokenDecimals,
       })),
     );
+
+    return `${amount} ${chainSpecs?.properties?.tokenSymbol}`;
   }, [chainSpecs]);
 
   switch (type) {
