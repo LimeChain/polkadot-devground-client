@@ -144,7 +144,7 @@ export const getBlockValidator = async ({
   // Identity for relay chains
   identity = await peopleApi?.query.Identity.IdentityOf.getValue(address);
   if (identity) {
-    identity = identity[0].info.display.value?.asText();
+    identity = identity?.[0]?.info?.display?.value?.asText?.();
   }
 
   const superIdentity = await peopleApi?.query.Identity.SuperOf.getValue(address);
@@ -152,8 +152,18 @@ export const getBlockValidator = async ({
   // Identity for para chains
   if (superIdentity?.[0] && !identity) {
     identity = await peopleApi?.query.Identity.IdentityOf.getValue(superIdentity[0]);
+
     if (identity) {
-      identity = identity[0].info.display.value?.asText();
+      const _identity = identity?.[0]?.info?.display?.value?.asText?.();
+      const _superIdentity = superIdentity?.[1]?.value?.asText?.();
+
+      if (_identity) {
+        if (_superIdentity) {
+          identity = `${_identity}/${_superIdentity}`;
+        } else {
+          identity = _identity;
+        }
+      }
     }
   }
 
