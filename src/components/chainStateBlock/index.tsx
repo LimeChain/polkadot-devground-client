@@ -98,7 +98,7 @@ export const ChainStateBlock = ({ type }: TChainStateBlockProps) => {
           {isBlockTimeBlock && data && ` ${data} sec`}
           {isBlockTimeBlock && !data && ` Loading...`}
 
-          {isStakingBlock && isParaChain && `at ${chain.relayChainId}`}
+          {isStakingBlock && isParaChain && ` at ${chain.relayChainId}`}
         </span>
         <span className="truncate font-geist font-body1-bold">
           {
