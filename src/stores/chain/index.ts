@@ -5,11 +5,9 @@ import {
 import { createClient as createSubstrateClient } from '@polkadot-api/substrate-client';
 import { type PolkadotClient } from 'polkadot-api';
 import { createClient } from 'polkadot-api';
+// import { withLogsRecorder } from 'polkadot-api/logs-provider';
 import { getSmProvider } from 'polkadot-api/sm-provider';
-import {
-  type Chain,
-  type Client,
-} from 'polkadot-api/smoldot';
+import { type Client } from 'polkadot-api/smoldot';
 import { startFromWorker } from 'polkadot-api/smoldot/from-worker';
 import SmWorker from 'polkadot-api/smoldot/worker?worker';
 import { getWsProvider } from 'polkadot-api/ws-provider/web';
@@ -17,14 +15,17 @@ import { create } from 'zustand';
 
 import {
   CHAIN_DESCRIPTORS,
-  CHAIN_SPECS,
   CHAIN_WEBSOCKET_URLS,
   SUPPORTED_CHAINS,
 } from '@constants/chain';
 import {
+  getExpectedBlockTime,
   getMetadata,
   getRuntime,
+  initSmoldotChains,
   subscribeToRuntime,
+  subscribeToStakedTokens,
+  subscribeToTotalIssuance,
 } from '@utils/papi';
 import { assert } from '@utils/papi/helpers';
 import { getBlockDetailsWithPAPI } from '@utils/rpc/getBlockDetails';
@@ -37,27 +38,30 @@ import type {
   TChain,
   TChainSpecs,
   TPeopleApi,
+  TStakingApi,
+  TStakingChainDecsriptor,
 } from '@custom-types/chain';
 import type { SubstrateClient } from '@polkadot-api/substrate-client';
 
-interface ISubscription {
-  unsubscribe: () => void;
-}
-
 export interface StoreInterface {
   chain: TChain;
-
   smoldot: Client | null;
+
   client: PolkadotClient | null;
   peopleClient: PolkadotClient | null;
+  stakingClient: PolkadotClient | null;
   rawClient: SubstrateClient | null;
+
   api: TApi | null;
   peopleApi: TPeopleApi | null;
-  _subscription: ISubscription | null;
+  stakingApi: TStakingApi | null;
 
   blocksData: Map<number, Awaited<ReturnType<typeof getBlockDetailsWithPAPI>>>;
   bestBlock: number | null;
   finalizedBlock: number | null;
+  totalIssuance: bigint | null;
+  totalStake: bigint | null;
+  blockTime: bigint | null;
 
   chainSpecs: TChainSpecs | null;
   runtime: IRuntime | null;
@@ -72,19 +76,22 @@ export interface StoreInterface {
   init: () => void;
 }
 
-const initialState = {
+const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   chain: SUPPORTED_CHAINS['polkadot'],
   client: null,
   peopleClient: null,
   rawClient: null,
-  rawObservableClient: null,
+  stakingClient: null,
   api: null,
   peopleApi: null,
+  stakingApi: null,
   smoldot: null,
-  _subscription: null,
   blocksData: new Map(),
   bestBlock: null,
   finalizedBlock: null,
+  totalIssuance: null,
+  totalStake: null,
+  blockTime: null,
   registry: new TypeRegistry(),
   chainSpecs: null,
   runtime: null,
@@ -98,12 +105,13 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         const client = get()?.client;
         const peopleClient = get()?.peopleClient;
         const rawClient = get()?.rawClient;
-        // const smoldot = get()?.smoldot;
+        const stakingClient = get()?.stakingClient;
 
         // clean up subscrptions / destroy old clients
         client?.destroy?.();
         peopleClient?.destroy?.();
         rawClient?.destroy?.();
+        stakingClient?.destroy?.();
         // dont think there is a need to terminate smoldot
         // await smoldot?.terminate?.();
 
@@ -113,114 +121,66 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         // reset data
         blocksData?.clear();
         registry.clearCache();
+        set({ finalizedBlock: undefined, bestBlock: undefined });
 
       } catch (error) {
         console.error(error);
 
       } finally {
-        set(initialState);
+        const smoldot = get()?.smoldot;
+        set({ ...initialState, smoldot });
 
       }
     },
     setChain: async (chain: TChain) => {
       try {
-        set({ chain });
-
-        const smoldot = get()?.smoldot;
-        if (!smoldot) {
-          return;
-        }
-
-        const client = get()?.client;
-        const peopleClient = get()?.peopleClient;
-        const rawClient = get()?.rawClient;
-
-        // clean up subscrptions / destroy old clients
-        client?.destroy?.();
-        peopleClient?.destroy?.();
-        rawClient?.destroy?.();
+        get()?.actions?.resetStore?.();
 
         const blocksData = get()?.blocksData;
         const registry = get().registry;
 
-        // reset data
-        blocksData?.clear();
-        registry.clearCache();
-        set({ finalizedBlock: undefined, bestBlock: undefined });
+        set({ chain });
+
+        const smoldot = get()?.smoldot;
+        assert(smoldot, 'Smoldot is not defined');
 
         // init relay chain / people chain
-        const isParachain = chain.isParaChain;
-        let newChain: Chain | void, peopleChain: Chain | void;
+        const {
+          newChain,
+          peopleChain,
+          stakingChain,
+        } = await initSmoldotChains({
+          smoldot,
+          chain,
+        });
 
-        if (isParachain) {
-          const relayChain = await smoldot?.addChain({
-            chainSpec: CHAIN_SPECS[chain.relayChainId],
-          })
-            .catch(console.error);
-
-          assert(relayChain, `RelayChain is not defined for ${chain.name}`);
-
-          newChain = await smoldot?.addChain({
-            chainSpec: CHAIN_SPECS[chain.id],
-            potentialRelayChains: [relayChain],
-          })
-            .catch(console.error);
-
-          assert(newChain, `newChain is not defined for ${chain.name}`);
-
-          peopleChain = await smoldot?.addChain({
-            chainSpec: CHAIN_SPECS[chain.peopleChainId],
-            potentialRelayChains: [relayChain],
-          })
-            .catch(console.error);
-
-          assert(peopleChain, `peopleChain is not defined for ${chain.name}`);
-
-        } else {
-          newChain = await smoldot?.addChain({
-            chainSpec: CHAIN_SPECS[chain.id],
-          })
-            .catch(console.error);
-
-          assert(newChain, `newChain is not defined for ${chain.name}`);
-
-          peopleChain = await smoldot?.addChain({
-            chainSpec: CHAIN_SPECS[chain.peopleChainId],
-            potentialRelayChains: [newChain],
-          })
-            .catch(console.error);
-
-          assert(peopleChain, `peopleChain is not defined for ${chain.name}`);
-
-        }
-
+        // init clients and typed apis
         const newClient = createClient(getSmProvider(newChain));
+        // const newClient = createClient(withLogsRecorder(line => console.log(line), getSmProvider(newChain)));
         set({ client: newClient });
+        const api = newClient.getTypedApi(CHAIN_DESCRIPTORS[chain.id]);
+        set({ api });
 
         const isPeopleParaChain = chain.id === chain.peopleChainId;
-        let newPeopleClient: PolkadotClient;
-
-        if (isPeopleParaChain) {
-          // if its a people para chain then the two clients are identical
-          newPeopleClient = newClient;
-
-        } else {
-          newPeopleClient = createClient(getSmProvider(peopleChain));
-
-        }
+        const newPeopleClient = isPeopleParaChain ? newClient : createClient(getSmProvider(peopleChain));
         set({ peopleClient: newPeopleClient });
+        const peopleApi = newPeopleClient.getTypedApi(CHAIN_DESCRIPTORS[chain.peopleChainId]);
+        set({ peopleApi });
 
-        newClient.getChainSpecData()
+        // check if chain has staking pallet (rococo doesn't have)
+        const hasStakingInformation = chain.hasStaking && stakingChain;
+        if (hasStakingInformation) {
+          const stakingClient = createClient(getSmProvider(stakingChain));
+          set({ stakingClient });
+          const stakingApi = stakingClient.getTypedApi(CHAIN_DESCRIPTORS[chain.stakingChainId] as TStakingChainDecsriptor);
+          set({ stakingApi });
+        }
+
+        await newClient.getChainSpecData()
           .then(chainSpecs => {
             set({ chainSpecs });
           })
           .catch(console.error);
-
-        const api = newClient.getTypedApi(CHAIN_DESCRIPTORS[chain.id]);
-        set({ api });
-
-        const peopleApi = newPeopleClient.getTypedApi(CHAIN_DESCRIPTORS[chain.peopleChainId]);
-        set({ peopleApi });
 
         // build metadata registry for decoding
         await getMetadata(api)
@@ -240,6 +200,19 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         // update spec_version on runtime update
         subscribeToRuntime(api, (runtime) => set({ runtime }))
           .catch(console.error);
+
+        subscribeToTotalIssuance(api, (totalIssuance) => set({ totalIssuance }))
+          .catch(console.error);
+
+        getExpectedBlockTime(api, chain, (blockTime) => set({ blockTime }))
+          .catch(console.error);
+
+        if (hasStakingInformation) {
+          const stakingApi = get()?.stakingApi;
+          assert(stakingApi, 'Staking Api is not defined');
+          subscribeToStakedTokens(stakingApi, (totalStake) => set({ totalStake }))
+            .catch(console.error);
+        }
 
         // subscribe to chain head
         newClient.bestBlocks$.subscribe(async (bestBlocks) => {
@@ -264,9 +237,11 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
           }
 
-          await Promise.all(promises).then(results => {
+          await Promise.allSettled(promises).then(results => {
             results.forEach(blockData => {
-              blocksData.set(blockData.header.number, blockData);
+              if (blockData.status === 'fulfilled') {
+                blocksData.set(blockData.value.header.number, blockData.value);
+              }
             });
             set({ bestBlock: bestBlock?.number, finalizedBlock: finalizedBlock?.number });
 
@@ -274,9 +249,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
             // prevent state crash on random smoldot error
             .catch(err => {
               console.error(err);
-            },
-            );
-
+            });
         });
 
         const wsUrl = CHAIN_WEBSOCKET_URLS[chain.id];
@@ -292,7 +265,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
   },
   async init() {
     try {
-      const smoldot = startFromWorker(new SmWorker());
+      const smoldot = startFromWorker(new SmWorker(), {});
 
       set({ smoldot });
 

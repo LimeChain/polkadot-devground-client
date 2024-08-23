@@ -27,6 +27,8 @@ export const SUPPORTED_CHAINS: TSupportedChains = {
     icon: 'icon-chain-polkadot',
     isRelayChain: true,
     peopleChainId: 'polkadot-people',
+    hasStaking: true,
+    stakingChainId: 'polkadot',
   },
   'polkadot-people': {
     name: 'Polkadot People',
@@ -35,6 +37,8 @@ export const SUPPORTED_CHAINS: TSupportedChains = {
     isParaChain: true,
     relayChainId: 'polkadot',
     peopleChainId: 'polkadot-people',
+    hasStaking: true,
+    stakingChainId: 'polkadot',
   },
   rococo: {
     name: 'Rococo',
@@ -42,6 +46,7 @@ export const SUPPORTED_CHAINS: TSupportedChains = {
     icon: 'icon-chain-rococo',
     isRelayChain: true,
     peopleChainId: 'rococo-people',
+    hasStaking: false,
   },
   'rococo-people': {
     name: 'Rococo People',
@@ -50,6 +55,7 @@ export const SUPPORTED_CHAINS: TSupportedChains = {
     isParaChain: true,
     relayChainId: 'rococo',
     peopleChainId: 'rococo-people',
+    hasStaking: false,
   },
 };
 

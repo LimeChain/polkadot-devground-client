@@ -1,3 +1,5 @@
+import { type Chain } from 'polkadot-api/smoldot';
+
 import type {
   dot,
   dotpeople,
@@ -21,27 +23,37 @@ export type TSupportedChains = {
 };
 
 export type TSupportedRelayChain = 'polkadot' | 'rococo';
+export type TSupportedStakingChain = 'polkadot';
 export type TSupportedParaChain = 'polkadot-people' | 'rococo-people';
 export type TSupportedChain = TSupportedRelayChain | TSupportedParaChain;
 
 export type TRelayChainDecsriptor = typeof dot | typeof rococo;
+export type TStakingChainDecsriptor = typeof dot;
 export type TParaChainDecsriptor = typeof dotpeople | typeof rococo_people;
 export type TChainDescriptor = TRelayChainDecsriptor | TParaChainDecsriptor;
 
 export type TApi = TypedApi<TChainDescriptor>;
 export type TPeopleApi = TypedApi<TParaChainDecsriptor>;
+export type TStakingApi = TypedApi<TStakingChainDecsriptor>;
 
 export type TChain = TRelayChain | TParaChain;
-export type TRelayChain = TChainBase & {
+export type TRelayChain = TChainBase & TStakingChain & {
   isRelayChain: true;
   isParaChain?: false;
   peopleChainId: TSupportedParaChain;
 };
-export type TParaChain = TChainBase & {
+export type TParaChain = TChainBase & TStakingChain & {
   isParaChain: true;
+  isRelayChain?: false;
   relayChainId: TSupportedRelayChain;
   peopleChainId: TSupportedParaChain;
-  isRelayChain?: false;
+};
+
+export type TStakingChain = {
+  hasStaking: true;
+  stakingChainId: TSupportedStakingChain;
+} | {
+  hasStaking: false;
 };
 
 type TChainBase = {
@@ -49,14 +61,6 @@ type TChainBase = {
   id: TSupportedChain;
   icon: `icon-chain-${TSupportedChain}`;
 };
-
-export type TChainSubscription =
-  'latest-block' |
-  'finalised-block' |
-  'signed-extrinsics' |
-  'transfers' |
-  'total-accounts' |
-  'circulating-supply';
 
 export interface TChainSpecs extends Awaited<ReturnType<PolkadotClient['getChainSpecData']>> {
   properties: {
@@ -70,3 +74,5 @@ export interface IRuntime {
   spec_version: number;
   spec_name: string;
 }
+
+export type TSmoldotChain = Chain | void;

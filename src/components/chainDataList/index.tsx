@@ -43,8 +43,17 @@ interface IRowLatestBlock {
 const RowLatestBlock = (props: IRowLatestBlock) => {
   const { blockNumber } = props;
   const blockData = useStoreChain?.use?.blocksData?.()?.get(blockNumber);
+  // default timestamp => 1 second ago
+  const defaultTimestamp = new Date().getTime() - 1000;
+  const blockTimestamp = blockData?.header?.timestamp;
 
-  const timestamp = blockData?.header?.timestamp || 0;
+  // the timestamp value will be "1 second ago" (sometimes showing as 0 second ago)
+  const timestamp = blockTimestamp
+    ? blockTimestamp > defaultTimestamp
+      ? defaultTimestamp
+      : blockTimestamp
+    : defaultTimestamp;
+
   const extrinsics = blockData?.body?.extrinsics;
   const eventsCount = blockData?.body?.events.length;
 
@@ -151,6 +160,7 @@ export const LatestBlocks = () => {
   const isLoading = bestBlocks.length === 0;
 
   const loadInitialData = useCallback(() => {
+
     const keys: number[] = [];
     blocksData.keys().forEach(key => {
       keys.unshift(key);
@@ -183,9 +193,8 @@ export const LatestBlocks = () => {
     }
 
     if (!refInitalBlocksDisplayed.current) {
-      refInitalBlocksDisplayed.current = true;
-
       loadInitialData();
+      refInitalBlocksDisplayed.current = true;
     } else {
       loadNewData(bestBlock);
     }
