@@ -123,7 +123,7 @@ const BlockTarget = ({ target }: { target: number }) => {
     let timePassed = 0;
     let interval: NodeJS.Timeout;
 
-    if (!refBlockDuration?.current?.innerText) {
+    if (!refBlockDuration?.current?.textContent) {
       return;
     }
 
@@ -131,13 +131,13 @@ const BlockTarget = ({ target }: { target: number }) => {
     const chainHasBeenChanged = refLastChain.current !== chain.id;
 
     if (chainHasBeenChanged) {
-      element.innerText = `Loading...`;
+      element.textContent = `Loading...`;
       refLastChain.current = chain.id;
     }
 
     if (target) {
       interval = setInterval(() => {
-        element.innerText = `${(timePassed / 1000).toFixed(1)} sec`;
+        element.textContent = `${(timePassed / 1000).toFixed(1)} sec`;
         timePassed += 100;
       }, 100);
     }
