@@ -3,6 +3,7 @@ import {
   CompatibilityLevel,
   type FixedSizeBinary,
   type PolkadotClient,
+  type SS58String,
   type TypedApi,
 } from 'polkadot-api';
 import { type Client } from 'polkadot-api/smoldot';
@@ -22,6 +23,7 @@ import type {
   TApi,
   TChain,
   TParaChainDecsriptor,
+  TPeopleApi,
   TRelayChainDecsriptor,
   TSmoldotChain,
   TStakingApi,
@@ -191,6 +193,28 @@ export const getValidators = async (api: TApi, at: string) => {
   );
 
   return await api.query.Session.Validators.getValue({ at });
+};
+
+export const getIdentity = async (api: TPeopleApi, address: SS58String) => {
+  assert(api, 'Api prop is not defined');
+  assert(address, 'Address prop is not defined');
+  checkIfCompatable(
+    await api?.query?.Identity?.IdentityOf?.isCompatible(CompatibilityLevel.Partial),
+    'api.query.Identity.IdentityOf is not compatable',
+  );
+
+  return await api?.query.Identity.IdentityOf.getValue(address);
+};
+
+export const getSuperIdentity = async (api: TPeopleApi, address: SS58String) => {
+  assert(api, 'Api prop is not defined');
+  assert(address, 'Address prop is not defined');
+  checkIfCompatable(
+    await api?.query?.Identity?.SuperOf?.isCompatible(CompatibilityLevel.Partial),
+    'api.query.Identity.SuperOf is not compatable',
+  );
+
+  return await api?.query.Identity.SuperOf.getValue(address);
 };
 
 export const subscribeToTotalIssuance = async (api: TApi, callback: (issuance: bigint) => void) => {

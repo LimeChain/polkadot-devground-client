@@ -16,7 +16,9 @@ import {
 } from '@utils/codec';
 import { formatPrettyNumberString } from '@utils/helpers';
 import {
+  getIdentity,
   getInvulnerables,
+  getSuperIdentity,
   getSystemDigestData,
   getSystemEvents,
   getValidators,
@@ -141,17 +143,15 @@ export const getBlockValidator = async ({
 
   let identity;
 
-  // Identity for relay chains
-  identity = await peopleApi?.query.Identity.IdentityOf.getValue(address);
+  identity = await getIdentity(peopleApi, address);
   if (identity) {
     identity = identity?.[0]?.info?.display?.value?.asText?.();
   }
 
-  const superIdentity = await peopleApi?.query.Identity.SuperOf.getValue(address);
+  const superIdentity = await getSuperIdentity(peopleApi, address);
 
-  // Identity for para chains
   if (superIdentity?.[0] && !identity) {
-    identity = await peopleApi?.query.Identity.IdentityOf.getValue(superIdentity[0]);
+    identity = await getIdentity(peopleApi, superIdentity[0]);
 
     if (identity) {
       const _identity = identity?.[0]?.info?.display?.value?.asText?.();
