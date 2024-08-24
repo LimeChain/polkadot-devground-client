@@ -2,6 +2,8 @@ import { formatDistanceToNowStrict } from 'date-fns';
 
 import { Icon } from '@components/icon';
 import { PDLink } from '@components/pdLink';
+import { PDScrollArea } from '@components/pdScrollArea';
+import { SearchBar } from '@components/searchBar';
 import { useStoreChain } from '@stores';
 import { cn } from '@utils/helpers';
 
@@ -36,61 +38,67 @@ const LatestBlocks = () => {
         </PDLink>
         <h4 className="mr-2 font-h4-light">Latest Blocks</h4>
       </div>
-      {/* <SearchBar
+      <SearchBar
         label="Search by Block"
         classNames="mt-6"
-      /> */}
+      />
+      <PDScrollArea
+        className={styles['table-container']}
+        viewportClassNames="py-3"
+        verticalScrollClassNames="py-3"
+      >
+        <table className={styles['latest-blocks-table']}>
+          <thead>
+            <tr>
+              <th>Block</th>
+              <th>Status</th>
+              <th>Time</th>
+              <th>Extrinsics</th>
+              <th>Events</th>
+              <th>Validator</th>
+              <th>Block Hash</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from(blocksData.values()).reverse().map((block) => {
+              const timeAgo = block.header.timestamp && formatDistanceToNowStrict(
+                new Date(block.header.timestamp),
+                { addSuffix: true },
+              );
 
-      <table className={styles['latest-blocks-table']}>
-        <thead>
-          <tr>
-            <th>Block</th>
-            <th>Status</th>
-            <th>Time</th>
-            <th>Extrinsics</th>
-            <th>Events</th>
-            <th>Validator</th>
-            <th>Block Hash</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Array.from(blocksData.values()).reverse().map((block) => {
-            const timeAgo = block.header.timestamp && formatDistanceToNowStrict(
-              new Date(block.header.timestamp),
-              { addSuffix: true },
-            );
-
-            return (
-              <tr key={block.header.number}>
-                <td>{block.header.number}</td>
-                <td>
-                  {latestFinalizedBlock && latestFinalizedBlock >= block.header.number
-                    ? (
-                      <Icon
-                        size={[16]}
-                        name="icon-checked"
-                        className="text-dev-green-600"
-                      />
-                    )
-                    : (
-                      <Icon
-                        size={[16]}
-                        name="icon-clock"
-                        className="text-dev-yellow-700"
-                      />
-                    )
-                  }
-                </td>
-                <td>{timeAgo}</td>
-                <td>{block.body.extrinsics.length}</td>
-                <td>{block.body.events.length}</td>
-                <td>{formatString(block.header.identity)}</td>
-                <td>{formatString(block.header.hash)}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+              return (
+                <tr key={block.header.number}>
+                  <td>{block.header.number}</td>
+                  <td>
+                    {latestFinalizedBlock && latestFinalizedBlock >= block.header.number
+                      ? (
+                        <Icon
+                          size={[16]}
+                          name="icon-checked"
+                          className="text-dev-green-600"
+                        />
+                      )
+                      : (
+                        <Icon
+                          size={[16]}
+                          name="icon-clock"
+                          className="text-dev-yellow-700"
+                        />
+                      )
+                    }
+                  </td >
+                  <td>{timeAgo}</td>
+                  <td>{block.body.extrinsics.length}</td>
+                  <td>{block.body.events.length}</td>
+                  <td>{formatString(block.header.identity)}</td>
+                  <td>{formatString(block.header.identity)}</td>
+                  <td>{formatString(block.header.hash)}</td>
+                </tr >
+              );
+            })}
+          </tbody >
+        </table >
+      </PDScrollArea >
     </>
   );
 };

@@ -9,25 +9,19 @@ import { cn } from '@utils/helpers';
 interface SearchBarProps {
   label: string;
   classNames?: string;
-  onSearch: (query: string) => void;
+  onSearch?: (query: string) => void;
 }
 
-const SearchBar: React.FC<SearchBarProps> = (props) => {
-  const { label, classNames, onSearch } = props;
+export const SearchBar: React.FC<SearchBarProps> = (props) => {
+  const { label, classNames } = props;
   const [searchInput, setSearchInput] = useState('');
 
   const handleSearchInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(event.target.value);
   }, []);
 
-  const handleSearchSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    onSearch(searchInput);
-  }, [onSearch, searchInput]);
-
   return (
     <form
-      onSubmit={handleSearchSubmit}
       className={cn(
         'relative flex items-center',
         classNames,
@@ -50,7 +44,7 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
         />
       </div>
       <button
-        type="submit"
+        disabled
         className={cn(
           'ml-4 px-6 py-2',
           'bg-dev-purple-700 text-dev-purple-300',
@@ -65,5 +59,3 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
     </form>
   );
 };
-
-export default SearchBar;
