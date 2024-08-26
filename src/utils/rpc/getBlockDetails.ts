@@ -171,7 +171,7 @@ export const getBlockValidator = async ({
     identity = address.toString();
   }
 
-  return identity;
+  return identity as string;
 };
 
 export const getBlockDetailsWithPAPI = async ({
