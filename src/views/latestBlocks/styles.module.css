@@ -8,7 +8,7 @@
   >thead {
     @apply bg-dev-purple-100 text-left;
     @apply dark:bg-dev-black-900;
-    @apply sticky top-[-13px] z-10;
+    @apply sticky top-0 z-10;
 
     >tr th {
       @apply py-2 pl-1 font-body3-regular font-geist;

@@ -7,7 +7,10 @@ import { PageHeader } from '@components/pageHeader';
 import { PDScrollArea } from '@components/pdScrollArea';
 import { SearchBar } from '@components/searchBar';
 import { useStoreChain } from '@stores';
-import { truncateAddress } from '@utils/helpers';
+import {
+  cn,
+  truncateAddress,
+} from '@utils/helpers';
 
 import styles from './styles.module.css';
 
@@ -29,8 +32,7 @@ const LatestBlocks = () => {
       />
       <PDScrollArea
         className={styles['table-container']}
-        viewportClassNames="py-3"
-        verticalScrollClassNames="py-3"
+        verticalScrollClassNames="pt-8"
       >
         <table className={styles['latest-blocks-table']}>
           <thead>
@@ -46,7 +48,7 @@ const LatestBlocks = () => {
           </thead>
           <tbody>
             {
-              Array.from(blocksData.values()).reverse().map((block) => {
+              Array.from(blocksData.values()).reverse().map((block, _idx) => {
                 const timeAgo = block.header.timestamp && formatDistanceToNowStrict(
                   new Date(block.header.timestamp),
                   { addSuffix: true },
@@ -58,6 +60,11 @@ const LatestBlocks = () => {
                     key={block.header.number}
                     onClick={goRouteId}
                     data-block-number={block.header.number}
+                    className={cn(
+                      {
+                        ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: _idx === 0,
+                      },
+                    )}
                   >
                     <td>{block.header.number}</td>
                     <td>

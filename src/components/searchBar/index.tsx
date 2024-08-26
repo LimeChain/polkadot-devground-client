@@ -28,18 +28,21 @@ export const SearchBar = (props: SearchBarProps) => {
       )}
     >
       <div className="relative w-96">
-        <Icon name="icon-search" className="absolute left-3 top-1/2 -translate-y-1/2 " />
+        <Icon
+          name="icon-search"
+          className="absolute left-3 top-1/2 -translate-y-1/2 "
+        />
         <input
           type="text"
           placeholder={label}
           value={searchInput}
           onChange={handleSearchInputChange}
           className={cn(
-            'w-full p-2 pl-10 ',
+            'w-full p-3 pl-10',
             'font-geist font-body2-regular',
             'rounded border-b border-gray-300',
             'dark:border-dev-purple-700 dark:bg-transparent',
-            'placeholder:font-geist placeholder:font-body2-regular dark:placeholder-dev-purple-300 ',
+            'placeholder:font-geist placeholder:font-body2-regular dark:placeholder-dev-purple-300',
           )}
         />
       </div>

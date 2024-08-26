@@ -2,7 +2,6 @@ import { lazy } from 'react';
 
 import { LayoutBasic } from '@components/layouts/basic';
 import { LayoutCodeEditor } from '@components/layouts/codeEditor';
-// import { App } from '@constants/snippets/snippet1';
 import LatestBlocks from '@views/latestBlocks';
 import { NotFound } from '@views/notFound';
 
@@ -33,16 +32,6 @@ export const routes = () => ([
           },
         ],
       },
-      // {
-      //   path: 'test',
-      //   element: <LayoutBasic hasFooter />,
-      //   children: [
-      //     {
-      //       path: '',
-      //       element: <App />,
-      //     },
-      //   ],
-      // },
       {
         path: 'code',
         element: <LayoutCodeEditor />,
