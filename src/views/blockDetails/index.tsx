@@ -8,13 +8,11 @@ import { useParams } from 'react-router-dom';
 
 import { CopyToClipboard } from '@components/copyToClipboard';
 import { Icon } from '@components/icon';
+import { PageHeader } from '@components/pageHeader';
 import { PDLink } from '@components/pdLink';
 import { ToggleButton } from '@components/toggleButton';
 import { useStoreChain } from '@stores';
-import {
-  cn,
-  formatNumber,
-} from '@utils/helpers';
+import { formatNumber } from '@utils/helpers';
 
 import styles from './styles.module.css';
 
@@ -81,26 +79,7 @@ const BlockDetails = () => {
   return (
     <>
       <div className="mb-12 flex items-center justify-between">
-        <div className="flex items-center">
-          <PDLink
-            to="/explorer"
-            className={cn(
-              'mr-8 duration-300 ease-out',
-              'bg-dev-purple-700 p-2 dark:bg-white',
-              'hover:bg-dev-purple-900 hover:dark:bg-dev-purple-200',
-            )}
-          >
-            <Icon
-              name="icon-arrowLeft"
-              className={cn(
-                'text-dev-white-200 dark:text-dev-purple-700',
-              )}
-            />
-          </PDLink>
-          <h4 className="mr-2 font-h4-light">Block</h4>
-          <h4 className="font-h4-bold">{formatNumber(blockData.number)}</h4>
-        </div>
-
+        <PageHeader title="Block" blockNumber={formatNumber(blockData.number)} />
         <div className="flex gap-6">
           <PDLink
             to={`https://polkadot.subscan.io/block/${blockData.number}`}

@@ -17,8 +17,9 @@
 
   >tbody {
     >tr {
-      @apply border-b border-dev-purple-100;
+      @apply border-b border-dev-purple-100 cursor-pointer;
       @apply dark:border-dev-purple-700;
+      @apply hover:bg-dev-purple-100 dark:hover:bg-dev-purple-900;
 
       >td {
         @apply pb-2 pt-4 pl-1 font-body2-regular font-geist;
