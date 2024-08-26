@@ -4,10 +4,9 @@ import {
   useState,
 } from 'react';
 
-import {
-  CallParam,
-  type ICallArgs,
-} from '.';
+import { CodecParam } from './CodecParam';
+
+import { type ICallArgs } from '.';
 
 import type { StructVar } from '@polkadot-api/metadata-builders';
 
@@ -19,11 +18,9 @@ export function StructParam({ struct, onChange }: IStructParam) {
   const [args, setArgs] = useState(
     () =>
       Object.fromEntries(
-        Object.keys(struct.value).map((key) => [key, {}] as const),
+        Object.keys(struct.value).map((key) => [key, undefined] as const),
       ),
   );
-
-  // console.log(struct);
 
   useEffect(() => {
     onChange(args);
@@ -34,16 +31,13 @@ export function StructParam({ struct, onChange }: IStructParam) {
     setArgs(args => ({ ...args, [key]: value } as typeof args));
   }, []);
 
-  console.log(struct.value);
-
-  return Object.entries(struct.value).map(([key, value], index) => {
+  return Object.entries(struct.value).map(([key, value]) => {
     return (
       <div key={key}>
         {key}
         <div>
-          <CallParam
-            name={key}
-            param={value}
+          <CodecParam
+            variable={value}
             // eslint-disable-next-line react/jsx-no-bind
             onChange={(args) => handleOnChange(key, args)}
           />

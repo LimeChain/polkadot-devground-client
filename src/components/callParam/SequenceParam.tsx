@@ -1,15 +1,14 @@
 import {
+  Fragment,
   useCallback,
   useEffect,
   useState,
 } from 'react';
 
 import { BinaryParam } from './BinaryParam';
+import { CodecParam } from './CodecParam';
 
-import {
-  CallParam,
-  type ICallArgs,
-} from '.';
+import { type ICallArgs } from '.';
 
 import type { SequenceVar } from '@polkadot-api/metadata-builders';
 
@@ -38,17 +37,31 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
   const [params, setParams] = useState(Array.from({ length }).map(() => ({ id: crypto.randomUUID(), value: undefined })));
 
   useEffect(() => {
-    onChange(params.map(p => p.value));
+    const res = params.map(p => p.value);
+    onChange(res.includes(undefined) ? undefined : res);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
 
-  // console.log(params.forEach(p => console.log(p.id, p?.value?.asText())));
+  console.log(params);
 
-  const handleOnChange = useCallback((args: unknown, index: number) => {
-    setParams(params => params.with(index, {
-      id: params[index].id,
-      value: args as undefined,
-    }));
+  const handleOnChange = useCallback((args: unknown, id: string) => {
+    // setParams(params => params.with(index, {
+    //   id: params[index].id,
+    //   value: args as undefined,
+    // }));
+
+    setParams(params => {
+      const item = params.find(p => p.id === id);
+      if (item) {
+        const index = params.indexOf(item);
+        return params.with(index, {
+          id: item.id,
+          value: args as undefined,
+        });
+      } else {
+        return params;
+      }
+    });
   }, []);
 
   const handleAddItem = useCallback(() => {
@@ -58,22 +71,21 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
 
   const handleRemoveItem = useCallback((idToRemove: string) => {
     setLength((length) => length - 1);
-    setParams(params => ([...params.filter(p => p.id !== idToRemove)]));
+    setParams(params => params.filter(p => p.id !== idToRemove));
   }, []);
 
   return (
     <>
       <div className="flex flex-col content-start">
         {
-          params.map((param, index) => {
+          params.map((param) => {
             return (
-              <>
-                <div key={param.id}>
-                  <CallParam
-                    key={param.id}
-                    param={sequence.value}
+              <Fragment key={param.id}>
+                <div>
+                  <CodecParam
+                    variable={sequence.value}
                     // eslint-disable-next-line react/jsx-no-bind
-                    onChange={args => handleOnChange(args, index)}
+                    onChange={args => handleOnChange(args, param.id)}
                   />
                   {
                     params.length > 1
@@ -89,7 +101,7 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
                   }
                 </div>
                 <br />
-              </>
+              </Fragment>
             );
           })
         }
