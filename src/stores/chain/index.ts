@@ -2,6 +2,15 @@ import {
   Metadata,
   TypeRegistry,
 } from '@polkadot/types';
+import {
+  getLookupFn,
+  type MetadataLookup,
+} from '@polkadot-api/metadata-builders';
+import {
+  metadata as metadataCodec,
+  type V14,
+  type V15,
+} from '@polkadot-api/substrate-bindings';
 import { createClient as createSubstrateClient } from '@polkadot-api/substrate-client';
 import { type PolkadotClient } from 'polkadot-api';
 import { createClient } from 'polkadot-api';
@@ -65,6 +74,8 @@ export interface StoreInterface {
 
   chainSpecs: TChainSpecs | null;
   runtime: IRuntime | null;
+  metadata: V14 | V15 | null;
+  lookup: MetadataLookup | null;
 
   registry: TypeRegistry;
 
@@ -95,6 +106,8 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   registry: new TypeRegistry(),
   chainSpecs: null,
   runtime: null,
+  metadata: null,
+  lookup: null,
 };
 
 const baseStore = create<StoreInterface>()((set, get) => ({
@@ -186,6 +199,16 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         await getMetadata(api)
           .then(metadataRaw => {
             const metadata = new Metadata(registry, metadataRaw.asBytes());
+            const decodededMetadata = metadataCodec.dec(metadataRaw.asBytes());
+            const metadataVersion = decodededMetadata.metadata.tag;
+
+            if (metadataVersion === 'v14' || metadataVersion === 'v15') {
+              set({
+                metadata: decodededMetadata.metadata.value,
+                lookup: getLookupFn(decodededMetadata.metadata.value),
+              });
+            }
+
             registry.setMetadata(metadata);
           })
           .catch(console.error);

@@ -12,8 +12,8 @@ const Callback = lazy(() => import('../components/login/callback'));
 const BlockDetails = lazy(() => import('../views/blockDetails'));
 const Explorer = lazy(() => import('../views/explorer'));
 const SignedExtrinsics = lazy(() => import('../views/signedExtrinsics'));
-
 const Forks = lazy(() => import('../views/forks'));
+const RpcCalls = lazy(() => import('../views/rpcCalls'));
 
 export const routes = () => ([
   {
@@ -76,6 +76,26 @@ export const routes = () => ([
           {
             path: 'extrinsics',
             element: <SignedExtrinsics />,
+          },
+        ],
+      },
+      {
+        path: 'rpc-calls',
+        element: <LayoutBasic hasFooter classNames="lg:pb-8" />,
+        children: [
+          {
+            path: '',
+            element: <RpcCalls />,
+          },
+        ],
+      },
+      {
+        path: 'rpc-calls',
+        element: <LayoutBasic hasFooter classNames="lg:pb-8" />,
+        children: [
+          {
+            path: '',
+            element: <RpcCalls />,
           },
         ],
       },
