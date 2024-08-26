@@ -49,10 +49,10 @@ const CallSelect = ({
   calls,
   onCallSelect,
 }: {
-  calls: Omit<ICallParam, 'onChange'>[];
+    calls: Omit<ICallParam, 'pallet' | 'onChange'>[];
   onCallSelect: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-}) => {
-
+  },
+) => {
   return (
     <select
       name="call"
@@ -80,8 +80,6 @@ const RpcCalls = () => {
 
   const [palletSelected, setPalledSelected] = useState(palletsWithCalls?.[0]);
   const [callArgs, setCallArgs] = useState<unknown>();
-
-  console.log('callArgs', callArgs);
 
   useEffect(() => {
     if (palletsWithCalls) {
@@ -140,11 +138,12 @@ const RpcCalls = () => {
         }
       </div >
       {
-        callSelected
+        palletSelected && callSelected
         && (
           <CallParam
             key={`call-param-${callSelected.name}`}
-            // name={callSelected.name}
+            pallet={palletSelected}
+            name={callSelected.name}
             param={callSelected.param}
             onChange={setCallArgs}
           />

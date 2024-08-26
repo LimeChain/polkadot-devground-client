@@ -1,20 +1,19 @@
 import { useStoreChain } from '@stores';
 
-import { CompactParam } from './CompactParam';
-import { SequenceParam } from './SequenceParam';
-import { StructParam } from './StructParam';
+import { CodecParam } from './CodecParam';
 
 import type {
   LookupEntry,
   Var,
 } from '@polkadot-api/metadata-builders';
-
+import type { V14 } from '@polkadot-api/substrate-bindings';
 export interface ICallArgs {
   onChange: (args: unknown) => void;
 }
 
 export interface ICallParam extends ICallArgs {
-  name?: string;
+  pallet: V14['pallets'][number];
+  name: string;
   param: Var | {
     type: 'lookupEntry';
     value: LookupEntry;
@@ -36,18 +35,5 @@ export function CallParam({ param, onChange }: ICallParam) {
   const variable =
     param.type === 'lookupEntry' ? lookup(param.value.id) : param;
 
-  switch (variable.type) {
-    case 'struct':
-      return <StructParam struct={variable} onChange={onChange} />;
-    case 'compact':
-      return <CompactParam compact={variable} onChange={onChange} />;
-    case 'sequence':
-      return <SequenceParam sequence={variable} onChange={onChange} />;
-    default:
-      return (
-        <div>
-          Not Implemented
-        </div>
-      );
-  }
+  return <CodecParam variable={variable} onChange={onChange} />;
 }
