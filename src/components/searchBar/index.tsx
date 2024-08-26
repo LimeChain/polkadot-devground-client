@@ -12,7 +12,7 @@ interface SearchBarProps {
   onSearch?: (query: string) => void;
 }
 
-export const SearchBar: React.FC<SearchBarProps> = (props) => {
+export const SearchBar = (props: SearchBarProps) => {
   const { label, classNames } = props;
   const [searchInput, setSearchInput] = useState('');
 
