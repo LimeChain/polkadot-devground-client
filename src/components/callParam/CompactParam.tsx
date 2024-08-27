@@ -24,19 +24,21 @@ export function CompactParam({ compact, onChange }: ICompactParam) {
   }, []);
 
   return (
-    <input
-      type="number"
-      inputMode="numeric"
-      placeholder="Compact"
-      min={
-        compact.isBig
-          ? '-57896044618658097711785492504343953926634992332820282019728792003956564819968'
-          : -2147483648
-      }
-      max={
-        compact.isBig ? '170141183460469231731687303715884105727' : 4294967295
-      }
-      onChange={handleChange}
-    />
+    <div>
+      <input
+        type="number"
+        inputMode="numeric"
+        placeholder="Compact"
+        min={
+          compact.isBig
+            ? '-57896044618658097711785492504343953926634992332820282019728792003956564819968'
+            : -2147483648
+        }
+        max={
+          compact.isBig ? '170141183460469231731687303715884105727' : 4294967295
+        }
+        onChange={handleChange}
+      />
+    </div>
   );
 }
