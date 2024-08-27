@@ -11,7 +11,6 @@ import {
 } from '@components/callParam';
 import { useStoreChain } from '@stores';
 
-// Var,
 import type { EnumVar } from '@polkadot-api/metadata-builders';
 import type { V14 } from '@polkadot-api/substrate-bindings';
 
@@ -80,6 +79,7 @@ const RpcCalls = () => {
 
   const [palletSelected, setPalledSelected] = useState(palletsWithCalls?.[0]);
   const [callArgs, setCallArgs] = useState<unknown>();
+  console.log('callargs', callArgs);
 
   useEffect(() => {
     if (palletsWithCalls) {

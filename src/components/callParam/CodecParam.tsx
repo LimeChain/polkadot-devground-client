@@ -1,4 +1,7 @@
+import { ArrayParam } from './ArrayParam';
 import { CompactParam } from './CompactParam';
+import { EnumParam } from './EnumParam';
+import { PrimitiveParam } from './PrimitiveParam';
 import { SequenceParam } from './SequenceParam';
 import { StructParam } from './StructParam';
 
@@ -17,6 +20,15 @@ export const CodecParam = ({ variable, onChange }: ICodecParam) => {
       return <CompactParam compact={variable} onChange={onChange} />;
     case 'sequence':
       return <SequenceParam sequence={variable} onChange={onChange} />;
+    case 'primitive':
+      return <PrimitiveParam primitive={variable} onChange={onChange} />;
+    case 'array':
+      return <ArrayParam array={variable} onChange={onChange} />;
+    case 'enum':
+      return <EnumParam enum={variable} onChange={onChange} />;
+    case 'AccountId20':
+    case 'AccountId32':
+      return null;
     default:
       return (
         <div>
