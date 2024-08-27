@@ -157,13 +157,22 @@ const SignedExtrinsics = () => {
             <th />
           </tr>
           {
-            signedExtrinsics.map((extrinsic, idx) => {
+            signedExtrinsics.map((extrinsic, extrinsicIndex) => {
               const timeAgo = extrinsic.timestamp && formatDistanceToNowStrict(
                 new Date(extrinsic.timestamp),
                 { addSuffix: true },
               );
+
               return (
-                <tr key={idx} className="table-row">
+                <tr
+                  key={extrinsic.id}
+                  className={cn(
+                    'table-row',
+                    {
+                      ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: extrinsicIndex === 0,
+                    },
+                  )}
+                >
                   <td>{extrinsic.id}</td>
                   <td>{extrinsic.blockNumber}</td>
                   <td>{truncateAddress(extrinsic.signer.Id, 6)}</td>
