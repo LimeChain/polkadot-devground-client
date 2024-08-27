@@ -5,12 +5,12 @@ export const ChainData = () => {
     <div className="flex size-full flex-col gap-8 overflow-hidden lg:flex-row">
       <ChainDataList
         title="Latest Blocks"
-        link="/latest-blocks"
+        link="latest-blocks"
         linkText="View All"
       />
       <ChainDataList
         title="Signed Extrinsics"
-        link="/signed-extrinsics"
+        link="signed-extrinsics"
         linkText="View All"
       />
     </div>
