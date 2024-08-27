@@ -12,8 +12,6 @@ import {
   truncateAddress,
 } from '@utils/helpers';
 
-import styles from './styles.module.css';
-
 const LatestBlocks = () => {
   const navigate = useNavigate();
   const latestFinalizedBlock = useStoreChain.use.finalizedBlock?.();
@@ -32,10 +30,10 @@ const LatestBlocks = () => {
         classNames="mt-6"
       />
       <PDScrollArea
-        className={styles['table-container']}
+        className="table-container"
         verticalScrollClassNames="pt-8"
       >
-        <table className={styles['latest-blocks-table']}>
+        <table className="explorer-pages-table">
           <thead>
             <tr>
               <th>Block</th>
