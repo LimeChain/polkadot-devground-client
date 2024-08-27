@@ -1,6 +1,7 @@
 import ReactJson from '@microlink/react-json-view';
 
 import { PDScrollArea } from '@components/pdScrollArea';
+import { useStoreUI } from '@stores';
 import { cn } from '@utils/helpers';
 
 import {
@@ -14,6 +15,7 @@ interface IModalShowJson extends Pick<IModal, 'onClose'> {
 
 export const ModalShowJson = (props: IModalShowJson) => {
   const { onClose, data } = props;
+  const theme = useStoreUI.use.theme?.();
 
   return (
     <Modal
@@ -34,7 +36,7 @@ export const ModalShowJson = (props: IModalShowJson) => {
           <ReactJson
             src={data}
             iconStyle="circle"
-            theme="rjv-default"
+            theme={theme === 'dark' ? 'monokai' : 'rjv-default'}
             style={{
               backgroundColor: 'transparent',
             }}

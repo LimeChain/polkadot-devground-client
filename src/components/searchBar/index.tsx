@@ -51,7 +51,7 @@ export const SearchBar = (props: SearchBarProps) => {
         disabled
         className={cn(
           'ml-4 px-6 py-2',
-          'bg-dev-purple-700 text-dev-purple-300',
+          'cursor-pointer bg-dev-purple-700 text-dev-white-200',
           'transition-all duration-300 hover:bg-dev-purple-900',
           'dark:bg-dev-purple-50 dark:text-dev-black-1000 dark:hover:bg-dev-purple-200',
         )}

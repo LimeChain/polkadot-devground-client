@@ -27,30 +27,16 @@ const SignedExtrinsics = () => {
   const blocksData = useStoreChain?.use?.blocksData?.();
   const chain = useStoreChain?.use?.chain?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
-  const [
-    ShowJsonModal,
-    toggleVisibility,
-  ] = useToggleVisibility(ModalShowJson);
-
-  const refInitalExtrinsicsDisplayed = useRef(false);
+  const [ShowJsonModal, toggleVisibility] = useToggleVisibility(ModalShowJson);
 
   const [signedExtrinsics, setSignedExtrinsics] = useState<IMappedTransferExtrinsic[]>([]);
   const [selectedExtrinsic, setSelectedExtrinsic] = useState<IMappedTransferExtrinsic | null>(null);
+  const refInitalExtrinsicsDisplayed = useRef(false);
+  const isLoading = blocksData.size === 0;
 
-  const filterTransferExtrinsics = useCallback((extrinsics: IMappedBlockExtrinsic[] = []) => {
+  const filterExtrinsics = useCallback((extrinsics: IMappedBlockExtrinsic[] = []) => {
     return extrinsics.filter(extrinsic => extrinsic.isSigned).reverse() as IMappedTransferExtrinsic[];
   }, []);
-
-  // handle state resets on chain change
-  useEffect(() => {
-    refInitalExtrinsicsDisplayed.current = false;
-    setSignedExtrinsics([]);
-
-    return () => {
-      refInitalExtrinsicsDisplayed.current = false;
-      setSignedExtrinsics([]);
-    };
-  }, [chain]);
 
   const loadInitialData = useCallback(() => {
     blocksData.entries().forEach(entry => {
@@ -60,7 +46,7 @@ const SignedExtrinsics = () => {
       }
       const extrinsics = block.body.extrinsics;
 
-      const signedExtrinsics = filterTransferExtrinsics(extrinsics);
+      const signedExtrinsics = filterExtrinsics(extrinsics);
       setSignedExtrinsics(extrinsics => ([
         ...signedExtrinsics,
         ...extrinsics,
@@ -70,12 +56,12 @@ const SignedExtrinsics = () => {
 
   }, [
     blocksData,
-    filterTransferExtrinsics,
+    filterExtrinsics,
   ]);
 
   const loadNewData = useCallback((blockNumber: number) => {
     const latestBlockData = blocksData.get(blockNumber);
-    const signedExtrinsics = filterTransferExtrinsics(latestBlockData?.body.extrinsics);
+    const signedExtrinsics = filterExtrinsics(latestBlockData?.body.extrinsics);
 
     setSignedExtrinsics(extrinsics => ([
       ...signedExtrinsics,
@@ -84,8 +70,18 @@ const SignedExtrinsics = () => {
 
   }, [
     blocksData,
-    filterTransferExtrinsics,
+    filterExtrinsics,
   ]);
+
+  const handleOpenModal = useCallback((extrinsic: IMappedTransferExtrinsic) => {
+    setSelectedExtrinsic(extrinsic);
+    toggleVisibility();
+  }, [toggleVisibility]);
+
+  const handleCloseModal = useCallback(() => {
+    setSelectedExtrinsic(null);
+    toggleVisibility();
+  }, [toggleVisibility]);
 
   useEffect(() => {
     if (!latestBlock) {
@@ -102,32 +98,20 @@ const SignedExtrinsics = () => {
   }, [
     latestBlock,
     blocksData,
-    filterTransferExtrinsics,
+    filterExtrinsics,
     loadInitialData,
     loadNewData,
   ]);
 
-  const handleOpenModal = (extrinsic: IMappedTransferExtrinsic) => {
-    const rawExtrinsic = Object.fromEntries(
-      Object.entries(extrinsic).filter(([key]) => {
-        switch (key) {
-          case 'isSigned':
-          case 'isSuccess':
-            return false;
-          default:
-            return true;
-        }
-      }),
-    );
+  useEffect(() => {
+    refInitalExtrinsicsDisplayed.current = false;
+    setSignedExtrinsics([]);
 
-    setSelectedExtrinsic(rawExtrinsic as IMappedTransferExtrinsic);
-    toggleVisibility();
-  };
-
-  const handleCloseModal = useCallback(() => {
-    setSelectedExtrinsic(null);
-    toggleVisibility();
-  }, [toggleVisibility]);
+    return () => {
+      refInitalExtrinsicsDisplayed.current = false;
+      setSignedExtrinsics([]);
+    };
+  }, [chain]);
 
   return (
     <div className="grid h-full grid-rows-[40px_46px_1fr] gap-6">
@@ -157,66 +141,69 @@ const SignedExtrinsics = () => {
             <th />
           </tr>
           {
-            signedExtrinsics.map((extrinsic, extrinsicIndex) => {
-              const timeAgo = extrinsic.timestamp && formatDistanceToNowStrict(
-                new Date(extrinsic.timestamp),
-                { addSuffix: true },
-              );
+            isLoading
+              ? 'Loading...'
+              : (
+                signedExtrinsics.map((extrinsic, extrinsicIndex) => {
+                  const timeAgo = extrinsic.timestamp && formatDistanceToNowStrict(
+                    new Date(extrinsic.timestamp),
+                    { addSuffix: true },
+                  );
 
-              return (
-                <tr
-                  key={extrinsic.id}
-                  className={cn(
-                    'table-row',
-                    {
-                      ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: extrinsicIndex === 0,
-                    },
-                  )}
-                >
-                  <td>{extrinsic.id}</td>
-                  <td>{extrinsic.blockNumber}</td>
-                  <td>{truncateAddress(extrinsic.signer.Id, 6)}</td>
-                  <td>{timeAgo}</td>
-                  <td>{
-                    extrinsic.isSuccess
-                      ? (
-                        <Icon
-                          size={[16]}
-                          name="icon-checked"
-                          className="text-dev-green-600"
-                        />
-                      )
-                      : (
-                        <Icon
-                          size={[16]}
-                          name="icon-failed"
-                          className="text-dev-red-800"
-                        />
-                      )}
-                  </td>
-                  <td>{extrinsic.method.method}</td>
-                  <td>
-                    <button
+                  return (
+                    <tr
+                      key={extrinsic.id}
                       className={cn(
-                        'px-3 py-1',
-                        'bg-dev-purple-700 text-dev-purple-300',
-                        'transition-all duration-300 hover:bg-dev-purple-900',
-                        'dark:bg-dev-purple-50 dark:text-dev-black-1000 dark:hover:bg-dev-purple-200',
+                        'table-row',
+                        {
+                          ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: extrinsicIndex === 0,
+                        },
                       )}
-                      // eslint-disable-next-line react/jsx-no-bind
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleOpenModal(extrinsic);
-                      }}
                     >
-                      <span className="font-geist font-body3-bold">
-                          Details
-                      </span>
-                    </button>
-                  </td>
-                </tr>
-              );
-            })
+                      <td>{extrinsic.id}</td>
+                      <td>{extrinsic.blockNumber}</td>
+                      <td>{truncateAddress(extrinsic.signer.Id, 6)}</td>
+                      <td>{timeAgo}</td>
+                      <td>{
+                        extrinsic.isSuccess
+                          ? (
+                            <Icon
+                              size={[16]}
+                              name="icon-checked"
+                              className="text-dev-green-600"
+                            />
+                          )
+                          : (
+                            <Icon
+                              size={[16]}
+                              name="icon-failed"
+                              className="text-dev-red-800"
+                            />
+                          )}
+                      </td>
+                      <td>{extrinsic.method.method}</td>
+                      <td>
+                        <button
+                          className={cn(
+                            'px-3 py-1',
+                            'bg-dev-purple-700 text-dev-white-200',
+                            'transition-all duration-300 hover:bg-dev-purple-900',
+                            'dark:bg-dev-purple-50 dark:text-dev-black-1000 dark:hover:bg-dev-purple-200',
+                          )}
+                          // eslint-disable-next-line react/jsx-no-bind
+                          onClick={() => {
+                            handleOpenModal(extrinsic);
+                          }}
+                        >
+                          <span className="font-geist font-body3-bold">
+                              Details
+                          </span>
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              )
           }
         </table >
       </PDScrollArea >
