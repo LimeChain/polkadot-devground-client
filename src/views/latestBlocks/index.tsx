@@ -53,7 +53,7 @@ const LatestBlocks = () => {
             isLoading
               ? 'Loading...'
               : (
-                Array.from(blocksData.values()).reverse().map((block, _idx) => {
+                Array.from(blocksData.values()).reverse().map((block, blockIndex) => {
                   const timeAgo = block.header.timestamp && formatDistanceToNowStrict(
                     new Date(block.header.timestamp),
                     { addSuffix: true },
@@ -68,7 +68,7 @@ const LatestBlocks = () => {
                       className={cn(
                         'table-row cursor-pointer',
                         {
-                          ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: _idx === 0,
+                          ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: blockIndex === 0,
                         },
                       )}
                     >
