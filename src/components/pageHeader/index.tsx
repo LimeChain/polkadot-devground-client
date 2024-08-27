@@ -6,16 +6,21 @@ import { cn } from '@utils/helpers';
 
 interface IPageHeader {
   title: string;
-  blockNumber?: number;
+  location?: string;
+  blockNumber?: string;
 }
 
 export const PageHeader = (props: IPageHeader) => {
-  const { title, blockNumber } = props;
+  const { title, location = -1, blockNumber } = props;
   const navigate = useNavigate();
 
   const goBack = useCallback(() => {
-    navigate(-1);
-  }, [navigate]);
+    if (location === -1) {
+      navigate(-1);
+    } else {
+      navigate(location);
+    }
+  }, [location, navigate]);
 
   return (
     <div className="flex items-center">

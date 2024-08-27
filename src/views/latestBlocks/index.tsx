@@ -18,8 +18,9 @@ const LatestBlocks = () => {
   const navigate = useNavigate();
   const latestFinalizedBlock = useStoreChain.use.finalizedBlock?.();
   const blocksData = useStoreChain?.use?.blocksData?.();
+  const isLoading = blocksData.size === 0;
 
-  const goRouteId = useCallback((e) => {
+  const goRouteId = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
     navigate(`/explorer/${e.currentTarget.dataset.blockNumber}`);
   }, [navigate]);
 
@@ -48,52 +49,56 @@ const LatestBlocks = () => {
           </thead>
           <tbody>
             {
-              Array.from(blocksData.values()).reverse().map((block, _idx) => {
-                const timeAgo = block.header.timestamp && formatDistanceToNowStrict(
-                  new Date(block.header.timestamp),
-                  { addSuffix: true },
-                );
-                const isFinalized = latestFinalizedBlock && latestFinalizedBlock >= block.header.number;
+              isLoading
+                ? 'Loading...'
+                : (
+                  Array.from(blocksData.values()).reverse().map((block, _idx) => {
+                    const timeAgo = block.header.timestamp && formatDistanceToNowStrict(
+                      new Date(block.header.timestamp),
+                      { addSuffix: true },
+                    );
+                    const isFinalized = latestFinalizedBlock && latestFinalizedBlock >= block.header.number;
 
-                return (
-                  <tr
-                    key={block.header.number}
-                    onClick={goRouteId}
-                    data-block-number={block.header.number}
-                    className={cn(
-                      {
-                        ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: _idx === 0,
-                      },
-                    )}
-                  >
-                    <td>{block.header.number}</td>
-                    <td>
-                      {
-                        isFinalized
-                          ? (
-                            <Icon
-                              size={[16]}
-                              name="icon-checked"
-                              className="text-dev-green-600"
-                            />
-                          )
-                          : (
-                            <Icon
-                              size={[16]}
-                              name="icon-clock"
-                              className="text-dev-yellow-700"
-                            />
-                          )
-                      }
-                    </td >
-                    <td>{timeAgo}</td>
-                    <td>{block.body.extrinsics.length}</td>
-                    <td>{block.body.events.length}</td>
-                    <td>{truncateAddress(block.header.identity, 6)}</td>
-                    <td>{truncateAddress(block.header.hash, 6)}</td>
-                  </tr >
-                );
-              })
+                    return (
+                      <tr
+                        key={block.header.number}
+                        onClick={goRouteId}
+                        data-block-number={block.header.number}
+                        className={cn(
+                          {
+                            ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: _idx === 0,
+                          },
+                        )}
+                      >
+                        <td>{block.header.number}</td>
+                        <td>
+                          {
+                            isFinalized
+                              ? (
+                                <Icon
+                                  size={[16]}
+                                  name="icon-checked"
+                                  className="text-dev-green-600"
+                                />
+                              )
+                              : (
+                                <Icon
+                                  size={[16]}
+                                  name="icon-clock"
+                                  className="text-dev-yellow-700"
+                                />
+                              )
+                          }
+                        </td >
+                        <td>{timeAgo}</td>
+                        <td>{block.body.extrinsics.length}</td>
+                        <td>{block.body.events.length}</td>
+                        <td>{truncateAddress(block.header.identity, 6)}</td>
+                        <td>{truncateAddress(block.header.hash, 6)}</td>
+                      </tr >
+                    );
+                  })
+                )
             }
           </tbody >
         </table >
