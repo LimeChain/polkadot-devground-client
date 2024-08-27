@@ -1,3 +1,4 @@
+import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import { formatDistanceToNowStrict } from 'date-fns';
 import {
   useCallback,
@@ -7,11 +8,15 @@ import {
 } from 'react';
 
 import { Icon } from '@components/icon';
+import { ModalShowJson } from '@components/modals/modalShowJson';
 import { PageHeader } from '@components/pageHeader';
 import { PDScrollArea } from '@components/pdScrollArea';
 import { SearchBar } from '@components/searchBar';
 import { useStoreChain } from '@stores';
-import { truncateAddress } from '@utils/helpers';
+import {
+  cn,
+  truncateAddress,
+} from '@utils/helpers';
 
 import type {
   IMappedBlockExtrinsic,
@@ -20,13 +25,17 @@ import type {
 
 const SignedExtrinsics = () => {
   const blocksData = useStoreChain?.use?.blocksData?.();
-
   const chain = useStoreChain?.use?.chain?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
+  const [
+    ShowJsonModal,
+    toggleVisibility,
+  ] = useToggleVisibility(ModalShowJson);
 
   const refInitalExtrinsicsDisplayed = useRef(false);
 
   const [signedExtrinsics, setSignedExtrinsics] = useState<IMappedTransferExtrinsic[]>([]);
+  const [selectedExtrinsic, setSelectedExtrinsic] = useState<IMappedTransferExtrinsic | null>(null);
 
   const filterTransferExtrinsics = useCallback((extrinsics: IMappedBlockExtrinsic[] = []) => {
     return extrinsics.filter(extrinsic => extrinsic.isSigned).reverse() as IMappedTransferExtrinsic[];
@@ -98,70 +107,115 @@ const SignedExtrinsics = () => {
     loadNewData,
   ]);
 
-  console.log(signedExtrinsics);
+  const handleOpenModal = (extrinsic: IMappedTransferExtrinsic) => {
+    const rawExtrinsic = Object.fromEntries(
+      Object.entries(extrinsic).filter(([key]) => {
+        switch (key) {
+          case 'isSigned':
+          case 'isSuccess':
+            return false;
+          default:
+            return true;
+        }
+      }),
+    );
+
+    setSelectedExtrinsic(rawExtrinsic as IMappedTransferExtrinsic);
+    toggleVisibility();
+  };
+
+  const handleCloseModal = useCallback(() => {
+    setSelectedExtrinsic(null);
+    toggleVisibility();
+  }, [toggleVisibility]);
+
   return (
-    <>
+    <div className="grid h-full grid-rows-[40px_46px_1fr] gap-6">
       <PageHeader title="Signed Extrinsics" />
-      <SearchBar
-        label="Search by Block"
-        classNames="mt-6"
-      />
+      <SearchBar label="Search by Block"/>
       <PDScrollArea
-        className="table-container"
+        className="h-full"
         verticalScrollClassNames="pt-8"
       >
         <table className="explorer-pages-table">
-          <thead>
-            <tr>
-              <th>Extrinsic ID</th>
-              <th>Block</th>
-              <th>Signer</th>
-              <th>Time</th>
-              <th>Result</th>
-              <th>Action</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {
-              signedExtrinsics.map((extrinsic, idx) => {
-                const timeAgo = extrinsic.timestamp && formatDistanceToNowStrict(
-                  new Date(extrinsic.timestamp),
-                  { addSuffix: true },
-                );
-                return (
-                  <tr key={idx}>
-                    <td>{extrinsic.id}</td>
-                    <td>{extrinsic.blockNumber}</td>
-                    <td>{truncateAddress(extrinsic.signer.Id, 6)}</td>
-                    <td>{timeAgo}</td>
-                    <td>{
-                      extrinsic.isSuccess
-                        ? (
-                          <Icon
-                            size={[16]}
-                            name="icon-checked"
-                            className="text-dev-green-600"
-                          />
-                        )
-                        : (
-                          <Icon
-                            size={[16]}
-                            name="icon-failed"
-                            className="text-dev-red-800"
-                          />
-                        )}
-                    </td>
-                    <td>{extrinsic.method.method}</td>
-                    <td />
-                  </tr>
-                );
-              })
-            }
-          </tbody>
+          <colgroup>
+            <col style={{ width: '10%', minWidth: '8rem' }} />
+            <col style={{ width: '10%', minWidth: '8rem' }} />
+            <col style={{ width: '10%', minWidth: '10rem' }} />
+            <col style={{ width: '10%', minWidth: '10rem' }} />
+            <col style={{ width: '5%', minWidth: '6rem' }} />
+            <col style={{ width: '10%', minWidth: '10rem' }} />
+            <col style={{ width: '1%', minWidth: '6rem' }} />
+          </colgroup>
+          <tr className="table-head">
+            <th>Extrinsic ID</th>
+            <th>Block</th>
+            <th>Signer</th>
+            <th>Time</th>
+            <th>Result</th>
+            <th>Action</th>
+            <th />
+          </tr>
+          {
+            signedExtrinsics.map((extrinsic, idx) => {
+              const timeAgo = extrinsic.timestamp && formatDistanceToNowStrict(
+                new Date(extrinsic.timestamp),
+                { addSuffix: true },
+              );
+              return (
+                <tr key={idx} className="table-row">
+                  <td>{extrinsic.id}</td>
+                  <td>{extrinsic.blockNumber}</td>
+                  <td>{truncateAddress(extrinsic.signer.Id, 6)}</td>
+                  <td>{timeAgo}</td>
+                  <td>{
+                    extrinsic.isSuccess
+                      ? (
+                        <Icon
+                          size={[16]}
+                          name="icon-checked"
+                          className="text-dev-green-600"
+                        />
+                      )
+                      : (
+                        <Icon
+                          size={[16]}
+                          name="icon-failed"
+                          className="text-dev-red-800"
+                        />
+                      )}
+                  </td>
+                  <td>{extrinsic.method.method}</td>
+                  <td>
+                    <button
+                      className={cn(
+                        'px-3 py-1',
+                        'bg-dev-purple-700 text-dev-purple-300',
+                        'transition-all duration-300 hover:bg-dev-purple-900',
+                        'dark:bg-dev-purple-50 dark:text-dev-black-1000 dark:hover:bg-dev-purple-200',
+                      )}
+                      // eslint-disable-next-line react/jsx-no-bind
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenModal(extrinsic);
+                      }}
+                    >
+                      <span className="font-geist font-body3-bold">
+                          Details
+                      </span>
+                    </button>
+                  </td>
+                </tr>
+              );
+            })
+          }
         </table >
       </PDScrollArea >
-    </>
+      {selectedExtrinsic && (
+        <ShowJsonModal onClose={handleCloseModal} data={selectedExtrinsic} />
+      )}
+    </div>
+
   );
 };
 

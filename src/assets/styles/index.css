@@ -145,25 +145,20 @@ html[data-color-scheme="light"] #icon-checked {
   --svg-icon-fill: white;
 }
 
-.table-container {
-  @apply mt-10 max-h-[76%] overflow-auto;
-}
-
 .explorer-pages-table {
   @apply w-full;
 
-  >thead {
+  .table-head {
     @apply bg-dev-purple-100 text-left;
     @apply dark:bg-dev-black-900;
     @apply sticky top-0 z-10;
 
-    >tr th {
+    >th {
       @apply py-2 pl-1 font-body3-regular font-geist;
     }
   }
 
-  >tbody {
-    >tr {
+  .table-row {
       @apply border-b border-dev-purple-100 cursor-pointer;
       @apply dark:border-dev-purple-700;
       @apply hover:bg-dev-purple-100 dark:hover:bg-dev-purple-900;
@@ -171,6 +166,6 @@ html[data-color-scheme="light"] #icon-checked {
       >td {
         @apply pb-2 pt-4 pl-1 font-body2-regular font-geist;
       }
-    }
+
   }
 }

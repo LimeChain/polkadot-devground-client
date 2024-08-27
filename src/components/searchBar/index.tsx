@@ -34,6 +34,7 @@ export const SearchBar = (props: SearchBarProps) => {
         />
         <input
           type="text"
+          name="search"
           placeholder={label}
           value={searchInput}
           onChange={handleSearchInputChange}

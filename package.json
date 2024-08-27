@@ -18,6 +18,7 @@
     "start": "vite"
   },
   "dependencies": {
+    "@microlink/react-json-view": "1.23.1",
     "@pivanov/event-bus": "1.0.0",
     "@pivanov/use-toggle-visibility": "0.0.1",
     "@polkadot-api/descriptors": "file:.papi/descriptors",
