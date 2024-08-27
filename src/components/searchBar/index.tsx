@@ -42,7 +42,7 @@ export const SearchBar = (props: SearchBarProps) => {
             'w-full p-3 pl-10',
             'font-geist font-body2-regular',
             'rounded border-b border-gray-300',
-            'dark:border-dev-purple-700 dark:bg-transparent',
+            'bg-transparent dark:border-dev-purple-700',
             'placeholder:font-geist placeholder:font-body2-regular dark:placeholder-dev-purple-300',
           )}
         />
