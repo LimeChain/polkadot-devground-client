@@ -15,6 +15,7 @@ export const PrimitiveParam = ({ primitive, onChange }: IPrimitiveParam) => {
   const commonProps = {
     placeholder: primitive.value,
     value,
+    className: 'p-2 w-full',
     onChange: (event: React.ChangeEvent<HTMLInputElement>) =>
       setValue(event.target.value),
   };
@@ -63,7 +64,7 @@ export const PrimitiveParam = ({ primitive, onChange }: IPrimitiveParam) => {
           type="checkbox"
           checked={Boolean(value)}
           // eslint-disable-next-line react/jsx-no-bind
-          onChange={(event) => setValue(String(event.target.checked))}
+          onChange={(event) => setValue(event.target.checked ? `${event.target.checked}` : '')}
         />
       );
     case 'char':

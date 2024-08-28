@@ -35,7 +35,7 @@ export function StructParam({ struct, onChange }: IStructParam) {
     return (
       <div key={key}>
         {key}
-        <div>
+        <div className="border-l pl-4 pt-2">
           <CodecParam
             variable={value}
             // eslint-disable-next-line react/jsx-no-bind

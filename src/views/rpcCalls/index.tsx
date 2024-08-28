@@ -10,6 +10,7 @@ import {
   type ICallParam,
 } from '@components/callParam';
 import { useStoreChain } from '@stores';
+import { useStoreWallet } from 'src/stores/wallet';
 
 import type { EnumVar } from '@polkadot-api/metadata-builders';
 import type { V14 } from '@polkadot-api/substrate-bindings';
@@ -23,24 +24,31 @@ const PalletSelect = ({
 },
 ) => {
   return (
-    <select
-      name="pallet"
-      onChange={onPalletSelect}
-    >
-      {
-        pallets?.map((ex, index) => {
-          return (
-            <option
-              key={`pallet-${ex.name}`}
-              id={ex.name}
-              value={index}
-            >
-              {ex.name}
-            </option>
-          );
-        })
-      }
-    </select>
+    <div>
+      <label className="flex flex-col gap-2">
+        <span className="pl-2">Pallet</span>
+        <select
+          name="pallet"
+          onChange={onPalletSelect}
+          className="w-full p-2"
+        >
+          {
+            pallets?.map((ex, index) => {
+              return (
+                <option
+                  key={`pallet-${ex.name}`}
+                  id={ex.name}
+                  value={index}
+                >
+                  {ex.name}
+                </option>
+              );
+            })
+          }
+        </select>
+      </label>
+    </div>
+
   );
 };
 
@@ -53,21 +61,29 @@ const CallSelect = ({
   },
 ) => {
   return (
-    <select
-      name="call"
-      onChange={onCallSelect}
-    >
-      {calls.map((call, index) => {
-        return (
-          <option
-            key={`call-${call.name}`}
-            value={index}
-          >
-            {call.name}
-          </option>
-        );
-      })};
-    </select>
+    <div>
+      <label className="flex flex-col gap-2">
+        <span className="pl-2">
+          Call
+        </span>
+        <select
+          name="call"
+          onChange={onCallSelect}
+          className="p-2"
+        >
+          {calls.map((call, index) => {
+            return (
+              <option
+                key={`call-${call.name}`}
+                value={index}
+              >
+                {call.name}
+              </option>
+            );
+          })};
+        </select>
+      </label>
+    </div>
   );
 
 };
@@ -75,11 +91,12 @@ const CallSelect = ({
 const RpcCalls = () => {
   const metadata = useStoreChain?.use?.metadata?.();
   const lookup = useStoreChain?.use?.lookup?.();
+  const api = useStoreChain?.use?.api?.();
+  const accounts = useStoreWallet?.use?.accounts?.();
   const palletsWithCalls = useMemo(() => metadata?.pallets?.filter(p => p.calls), [metadata]);
 
   const [palletSelected, setPalledSelected] = useState(palletsWithCalls?.[0]);
   const [callArgs, setCallArgs] = useState<unknown>();
-  console.log('callargs', callArgs);
 
   useEffect(() => {
     if (palletsWithCalls) {
@@ -94,6 +111,32 @@ const RpcCalls = () => {
   })), [palletCalls]);
 
   const [callSelected, setCallSelected] = useState(calls.at(0));
+
+  // console.log('pallet', palletSelected);
+  // console.log('call', callSelected);
+
+  const submitTx = useCallback(async () => {
+    if (api) {
+      try {
+        console.log('args', callArgs);
+        // console.log('palletselected', palletSelected);
+        // console.log('calselected', callSelected);
+        // api.tx.Balances.transfer_allow_death().sign()
+        const res = api.tx[palletSelected.name][callSelected?.name](callArgs);
+        console.log(res);
+        const encoded = (await res.getEncodedData());
+        // const signed = (await res.sign(accounts.at(0)?.polkadotSigner));
+        // console.log('sig', signed);
+        console.log('encoded', encoded.asHex());
+
+        res.signSubmitAndWatch(accounts.at(0)?.polkadotSigner).subscribe(console.log);
+
+      } catch (err) {
+        console.log('error', err);
+
+      }
+    }
+  }, [api, callArgs, palletSelected, callSelected, accounts]);
 
   useEffect(() => {
     if (calls) {
@@ -121,7 +164,7 @@ const RpcCalls = () => {
 
   return (
     <>
-      <div>
+      <div className="grid w-full grid-cols-2 gap-4">
         <PalletSelect
           pallets={palletsWithCalls}
           onPalletSelect={handlePalletSelect}
@@ -140,13 +183,32 @@ const RpcCalls = () => {
       {
         palletSelected && callSelected
         && (
-          <CallParam
-            key={`call-param-${callSelected.name}`}
-            pallet={palletSelected}
-            name={callSelected.name}
-            param={callSelected.param}
-            onChange={setCallArgs}
-          />
+          <>
+            <br />
+            <CallParam
+              key={`call-param-${callSelected.name}`}
+              pallet={palletSelected}
+              name={callSelected.name}
+              param={callSelected.param}
+              onChange={setCallArgs}
+            />
+          </>
+        )
+      }
+
+      {
+        accounts.at(0)?.polkadotSigner
+        && (
+          <>
+            <br />
+            <button
+              type="button"
+              className="w-fit border p-2"
+              onClick={submitTx}
+            >
+              Submit Transaction
+            </button>
+          </>
         )
       }
     </>

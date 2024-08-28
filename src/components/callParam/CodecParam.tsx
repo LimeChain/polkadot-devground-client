@@ -1,3 +1,4 @@
+import { AccountParam } from './AccountParam';
 import { ArrayParam } from './ArrayParam';
 import { CompactParam } from './CompactParam';
 import { EnumParam } from './EnumParam';
@@ -28,7 +29,7 @@ export const CodecParam = ({ variable, onChange }: ICodecParam) => {
       return <EnumParam enum={variable} onChange={onChange} />;
     case 'AccountId20':
     case 'AccountId32':
-      return null;
+      return <AccountParam accountId={variable} onChange={onChange} />;
     default:
       return (
         <div>
