@@ -18,14 +18,14 @@ export const BinaryParam = ({ onChange }: IBinaryParam) => {
   }, []);
 
   return (
-    <div className="flex flex-col">
-      <label >
+    <div className="flex flex-col gap-2">
+      <label className="flex gap-2">
         <span>Upload File</span>
         <input
           id="fileUpload"
           type="checkbox"
           checked={useFileUpload}
-          onClick={handleFileUploadToggle}
+          onChange={handleFileUploadToggle}
         />
       </label>
       {
@@ -58,6 +58,7 @@ export const TextBinaryParam = ({ onChange }: IBinaryParam) => {
     <input
       type="text"
       placeholder="Binary hex or string"
+      className="p-2"
       value={value}
       onChange={handleOnChange}
     />

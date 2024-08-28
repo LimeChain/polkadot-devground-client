@@ -18,7 +18,11 @@ interface ISequence extends ICallArgs {
 
 export const SequenceParam = ({ sequence, onChange }: ISequence) => {
   if (sequence.value.type === 'primitive' && sequence.value.value === 'u8') {
-    return <BinaryParam onChange={onChange} />;
+    return (
+      <div className="border-l pl-4 pt-2">
+        <BinaryParam onChange={onChange} />
+      </div>
+    );
   }
 
   console.log('sequence', sequence);
@@ -78,7 +82,7 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
     <>
       <div className="flex flex-col content-start">
         {
-          params.map((param) => {
+          params.map((param, index) => {
             return (
               <Fragment key={param.id}>
                 <div>
@@ -92,6 +96,7 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
                     && (
                       <button
                         type="button"
+                        className="ml-4 mt-2 w-fit border p-2"
                         // eslint-disable-next-line react/jsx-no-bind
                         onClick={() => handleRemoveItem(param.id)}
                       >
@@ -100,7 +105,10 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
                     )
                   }
                 </div>
-                <br />
+                {
+                  index !== params.length
+                  && <br />
+                }
               </Fragment>
             );
           })
@@ -108,13 +116,12 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
 
         <button
           type="button"
-          className="w-fit"
+          className="w-fit border p-2"
           onClick={handleAddItem}
         >
           add item
         </button>
       </div>
-      <br />
     </>
   );
 };

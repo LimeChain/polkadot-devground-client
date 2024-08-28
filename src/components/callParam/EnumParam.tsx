@@ -35,6 +35,7 @@ export const EnumParam = ({ onChange, ...props }: IEnumParam) => {
         value={key}
         // eslint-disable-next-line react/jsx-no-bind
         onChange={(e) => setKey(e.target.value)}
+        className="p-1"
       >
         {
           enumKeys.map((e, i) => {
@@ -51,7 +52,11 @@ export const EnumParam = ({ onChange, ...props }: IEnumParam) => {
       </select>
       {
         variable
-        && <CodecParam variable={variable} onChange={handleSetValue} />
+        && (
+          <div className="border-l pl-4 pt-2">
+            <CodecParam variable={variable} onChange={handleSetValue} />
+          </div>
+        )
       }
     </div>
   );
