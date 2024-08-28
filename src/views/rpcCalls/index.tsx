@@ -131,8 +131,8 @@ const RpcCalls = () => {
 
         res.signSubmitAndWatch(accounts.at(0)?.polkadotSigner).subscribe(console.log);
 
-      } catch (err) {
-        console.log('error', err);
+      } catch (error) {
+        console.log('error', error);
 
       }
     }
