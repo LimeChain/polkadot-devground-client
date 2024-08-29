@@ -2,9 +2,12 @@ import { AccountParam } from './AccountParam';
 import { ArrayParam } from './ArrayParam';
 import { CompactParam } from './CompactParam';
 import { EnumParam } from './EnumParam';
+import { OptionParam } from './OptionParam';
 import { PrimitiveParam } from './PrimitiveParam';
 import { SequenceParam } from './SequenceParam';
 import { StructParam } from './StructParam';
+import { TupleParam } from './TupleParam';
+import { VoidParam } from './VoidParam';
 
 import type { ICallArgs } from '.';
 import type { Var } from '@polkadot-api/metadata-builders';
@@ -30,6 +33,12 @@ export const CodecParam = ({ variable, onChange }: ICodecParam) => {
     case 'AccountId20':
     case 'AccountId32':
       return <AccountParam accountId={variable} onChange={onChange} />;
+    case 'tuple':
+      return <TupleParam tuple={variable} onChange={onChange} />;
+    case 'void':
+      return <VoidParam onChange={onChange} />;
+    case 'option':
+      return <OptionParam option={variable} onChange={onChange} />;
     default:
       return (
         <div>
