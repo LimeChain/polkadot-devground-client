@@ -53,7 +53,7 @@ export const EnumParam = ({ onChange, ...props }: IEnumParam) => {
       {
         variable
         && (
-          <div className="border-l pl-4 pt-2">
+          <div className="border-l pl-4 pt-2 empty:hidden">
             <CodecParam variable={variable} onChange={handleSetValue} />
           </div>
         )

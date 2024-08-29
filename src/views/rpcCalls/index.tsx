@@ -98,6 +98,8 @@ const RpcCalls = () => {
   const [palletSelected, setPalledSelected] = useState(palletsWithCalls?.[0]);
   const [callArgs, setCallArgs] = useState<unknown>();
 
+  console.log('call args', callArgs);
+
   useEffect(() => {
     if (palletsWithCalls) {
       setPalledSelected(palletsWithCalls[0]);

@@ -25,8 +25,6 @@ export const SequenceParam = ({ sequence, onChange }: ISequence) => {
     );
   }
 
-  console.log('sequence', sequence);
-
   return (
     <_SequenceParam
       key={sequence.value.id}
@@ -45,8 +43,6 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
     onChange(res.includes(undefined) ? undefined : res);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
-
-  console.log(params);
 
   const handleOnChange = useCallback((args: unknown, id: string) => {
     // setParams(params => params.with(index, {
