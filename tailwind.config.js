@@ -4,7 +4,7 @@ const defaultTheme = require('tailwindcss/defaultTheme')
 
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
-  darkMode: ["selector" , '[data-color-scheme="dark"]'],
+  darkMode: ["selector", '[data-color-scheme="dark"]'],
   theme: {
     extend: {
       spacing: {
@@ -34,13 +34,13 @@ export default {
         "dev-yellow": {
           700: '#FFB800',
         },
-        "dev-pink" : {
+        "dev-pink": {
           600: '#A80059',
           500: '#E6007A',
           400: '#FF2D9C',
           300: '#FF70BC',
         },
-        "dev-purple" : {
+        "dev-purple": {
           950: "#140523",
           925: "#160527",
           900: "#1C0533",
@@ -54,27 +54,28 @@ export default {
           100: "#F3F5FB",
           50: "#FBFCFE",
         },
-        "dev-cyan" : {
+        "dev-cyan": {
           700: '#0094D4',
           600: '#00A6ED',
           500: '#00B2FF',
         },
-        "dev-green" : {
+        "dev-green": {
           700: '#48CC81',
           600: '#51E591',
           500: '#56F39A',
         },
-        "dev-lime" : {
+        "dev-lime": {
           700: '#A9CC29',
           600: '#BEE52E',
           500: '#D3FF33',
         },
-        "dev-red" : {
+        "dev-red": {
+          800: '#EA1548',
           700: '#EA2727',
           600: '#FF5353',
           500: '#FF9797',
         },
-        "dev-black" : {
+        "dev-black": {
           1000: '#000000',
           950: '#0C0C0C',
           900: '#111111',
@@ -87,7 +88,7 @@ export default {
           200: '#454545',
           200: '#555555',
         },
-        "dev-white" : {
+        "dev-white": {
           1000: '#BBBBBB',
           900: '#CCCCCC',
           800: '#DDDDDD',
@@ -101,7 +102,7 @@ export default {
         },
       },
       fontFamily: {
-        popins: ['"Poppins"',  ...defaultTheme.fontFamily.sans],
+        popins: ['"Poppins"', ...defaultTheme.fontFamily.sans],
         geist: ['"Geist"', ...defaultTheme.fontFamily.sans],
       },
     },

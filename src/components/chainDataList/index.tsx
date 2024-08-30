@@ -36,10 +36,16 @@ interface TChainDataList {
 
 interface IRowLatestBlock {
   blockNumber: number;
+  classNames: string;
+}
+
+interface IRowSignedExtrinsic {
+  extrinsic: IMappedTransferExtrinsic;
+  classNames: string;
 }
 
 const RowLatestBlock = (props: IRowLatestBlock) => {
-  const { blockNumber } = props;
+  const { blockNumber, classNames } = props;
   const blockData = useStoreChain?.use?.blocksData?.()?.get(blockNumber);
   // default timestamp => 1 second ago
   const defaultTimestamp = new Date().getTime() - 1000;
@@ -62,7 +68,13 @@ const RowLatestBlock = (props: IRowLatestBlock) => {
     );
 
   return (
-    <PDLink to={`${blockNumber}`} className={styles['pd-explorer-list']}>
+    <PDLink
+      to={`${blockNumber}`}
+      className={cn(
+        styles['pd-explorer-list'],
+        classNames,
+      )}
+    >
       <div>
         <p>
           <span className="text-dev-black-300 dark:text-dev-purple-300" >
@@ -86,16 +98,14 @@ const RowLatestBlock = (props: IRowLatestBlock) => {
   );
 };
 
-const RowSignedExtrinsic = ({
-  id,
-  // blockNumber,
-  // isSigned,
-  // signature,
-  method,
-  signer,
-  timestamp,
-  isSuccess,
-}: IMappedTransferExtrinsic) => {
+const RowSignedExtrinsic = (props: IRowSignedExtrinsic) => {
+  const { extrinsic, classNames } = props;
+  const {
+    id,
+    isSuccess,
+    method,
+    timestamp,
+  } = extrinsic;
 
   const timeAgo = timestamp
     && formatDistanceToNowStrict(
@@ -104,7 +114,13 @@ const RowSignedExtrinsic = ({
     );
 
   return (
-    <PDLink to={id} className={styles['pd-explorer-list-extrinsic']}>
+    <PDLink
+      to={id}
+      className={cn(
+        styles['pd-explorer-list-extrinsic'],
+        classNames,
+      )}
+    >
       <div>
         <p>
           <span className="text-dev-black-300 dark:text-dev-purple-300" >
@@ -134,7 +150,7 @@ const RowSignedExtrinsic = ({
                 <Icon
                   size={[16]}
                   name="icon-failed"
-                  className="text-dev-green-600"
+                  className="text-dev-red-800"
                 />
               )
           }
@@ -210,10 +226,15 @@ export const LatestBlocks = () => {
       verticalScrollClassNames="py-3"
     >
       {
-        bestBlocks.map((blockNumber) => (
+        bestBlocks.map((blockNumber, blockIndex) => (
           <RowLatestBlock
             key={`latest-block-row-${blockNumber}-${chain.id}`}
             blockNumber={blockNumber}
+            classNames={cn(
+              {
+                ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: blockIndex === 0,
+              },
+            )}
           />
         ))
       }
@@ -227,13 +248,12 @@ export const LatestBlocks = () => {
 
 export const SignedExtrinsics = () => {
   const blocksData = useStoreChain?.use?.blocksData?.();
-
   const chain = useStoreChain?.use?.chain?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
 
   const [signedExtrinsics, setSignedExtrinsics] = useState<IMappedTransferExtrinsic[]>([]);
 
-  const filterTransferExtrinsics = useCallback((extrinsics: IMappedBlockExtrinsic[] = []) => {
+  const filterExtrinsics = useCallback((extrinsics: IMappedBlockExtrinsic[] = []) => {
     // Filter out blocks with 0 or 1 extrinsics
     if (extrinsics.length <= 1) {
       return [];
@@ -241,7 +261,7 @@ export const SignedExtrinsics = () => {
     return extrinsics.slice(2).reverse() as IMappedTransferExtrinsic[];
   }, []);
 
-  const loadInitialData = useCallback(() => {
+  const loadExtrinsic = useCallback(() => {
     blocksData.entries().forEach(entry => {
       const [, block] = entry;
       if (!block) {
@@ -249,7 +269,7 @@ export const SignedExtrinsics = () => {
       }
       const extrinsics = block.body.extrinsics;
 
-      const signedExtrinsics = filterTransferExtrinsics(extrinsics);
+      const signedExtrinsics = filterExtrinsics(extrinsics);
       setSignedExtrinsics(extrinsics => ([
         ...signedExtrinsics,
         ...extrinsics,
@@ -259,17 +279,18 @@ export const SignedExtrinsics = () => {
 
   }, [
     blocksData,
-    filterTransferExtrinsics,
+    filterExtrinsics,
   ]);
 
   useEffect(() => {
     setSignedExtrinsics([]);
+
     if (!latestBlock) {
       return;
     }
-    loadInitialData();
 
-  }, [latestBlock, loadInitialData]);
+    loadExtrinsic();
+  }, [latestBlock, loadExtrinsic]);
 
   return (
     <PDScrollArea
@@ -278,10 +299,15 @@ export const SignedExtrinsics = () => {
       verticalScrollClassNames="py-3"
     >
       {
-        signedExtrinsics.map(extrinsic => (
+        signedExtrinsics.map((extrinsic, extrinsicIndex) => (
           <RowSignedExtrinsic
             key={`latest-signed-extrinsic-${extrinsic.id}-${chain.id}`}
-            {...extrinsic}
+            extrinsic={extrinsic}
+            classNames={cn(
+              {
+                ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: extrinsicIndex === 0,
+              },
+            )}
           />
         ))
       }
