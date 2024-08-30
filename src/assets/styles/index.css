@@ -145,7 +145,8 @@ html[data-color-scheme="light"] #icon-checked {
   --svg-icon-fill: white;
 }
 
-.explorer-pages-table {
+/* Explorer tables */
+.pd-table {
   @apply w-full;
 
   .table-head {

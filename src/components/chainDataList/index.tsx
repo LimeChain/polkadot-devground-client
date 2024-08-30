@@ -1,3 +1,8 @@
+import {
+  busDispatch,
+  useEventBus,
+} from '@pivanov/event-bus';
+import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import { formatDistanceToNowStrict } from 'date-fns';
 import {
   useCallback,
@@ -7,6 +12,7 @@ import {
 } from 'react';
 
 import { Icon } from '@components/icon';
+import { ModalShowJson } from '@components/modals/modalShowJson';
 import {
   type IPDLink,
   PDLink,
@@ -25,8 +31,9 @@ import styles from './styles.module.css';
 
 import type {
   IMappedBlockExtrinsic,
-  IMappedTransferExtrinsic,
+  IMappedExtrinsic,
 } from '@custom-types/block';
+import type { IEventBusOpenJsonModal } from '@custom-types/eventBus';
 
 interface TChainDataList {
   title: string;
@@ -40,7 +47,7 @@ interface IRowLatestBlock {
 }
 
 interface IRowSignedExtrinsic {
-  extrinsic: IMappedTransferExtrinsic;
+  extrinsic: IMappedExtrinsic;
   classNames: string;
 }
 
@@ -69,7 +76,7 @@ const RowLatestBlock = (props: IRowLatestBlock) => {
 
   return (
     <PDLink
-      to={`${blockNumber}`}
+      to={blockNumber.toString()}
       className={cn(
         styles['pd-explorer-list'],
         classNames,
@@ -114,12 +121,15 @@ const RowSignedExtrinsic = (props: IRowSignedExtrinsic) => {
     );
 
   return (
-    <PDLink
-      to={id}
+    <div
       className={cn(
         styles['pd-explorer-list-extrinsic'],
         classNames,
       )}
+      // eslint-disable-next-line react/jsx-no-bind
+      onClick={() => {
+        busDispatch<IEventBusOpenJsonModal>({ type: '@@-open-json-modal', data: extrinsic });
+      }}
     >
       <div>
         <p>
@@ -157,7 +167,7 @@ const RowSignedExtrinsic = (props: IRowSignedExtrinsic) => {
         </span>
         <span>{timeAgo}</span>
       </div>
-    </PDLink>
+    </div>
   );
 };
 
@@ -250,12 +260,19 @@ export const SignedExtrinsics = () => {
   const blocksData = useStoreChain?.use?.blocksData?.();
   const chain = useStoreChain?.use?.chain?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
+  const [ShowJsonModal, toggleVisibility] = useToggleVisibility(ModalShowJson);
 
-  const [signedExtrinsics, setSignedExtrinsics] = useState<IMappedTransferExtrinsic[]>([]);
+  const [signedExtrinsics, setSignedExtrinsics] = useState<IMappedExtrinsic[]>([]);
+  const [selectedExtrinsic, setSelectedExtrinsic] = useState<IMappedExtrinsic | null>(null);
+
+  useEventBus<IEventBusOpenJsonModal>('@@-open-json-modal', (event) => {
+    setSelectedExtrinsic(event.data);
+    toggleVisibility();
+  });
 
   const filterExtrinsics = useCallback((extrinsics: IMappedBlockExtrinsic[] = []) => {
     // Filter out blocks with 0 or 1 extrinsics
-    return extrinsics.slice(2).reverse() as IMappedTransferExtrinsic[];
+    return extrinsics.slice(2).reverse() as IMappedExtrinsic[];
   }, []);
 
   const loadExtrinsic = useCallback(() => {
@@ -279,6 +296,11 @@ export const SignedExtrinsics = () => {
     filterExtrinsics,
   ]);
 
+  const handleCloseModal = useCallback(() => {
+    setSelectedExtrinsic(null);
+    toggleVisibility();
+  }, [toggleVisibility]);
+
   useEffect(() => {
     setSignedExtrinsics([]);
 
@@ -290,29 +312,34 @@ export const SignedExtrinsics = () => {
   }, [latestBlock, loadExtrinsic]);
 
   return (
-    <PDScrollArea
-      className="h-80 lg:h-full"
-      viewportClassNames="py-3"
-      verticalScrollClassNames="py-3"
-    >
-      {
-        signedExtrinsics.map((extrinsic, extrinsicIndex) => (
-          <RowSignedExtrinsic
-            key={`latest-signed-extrinsic-${extrinsic.id}-${chain.id}`}
-            extrinsic={extrinsic}
-            classNames={cn(
-              {
-                ['opacity-0 animate-fade-in']: extrinsicIndex === 0,
-              },
-            )}
-          />
-        ))
-      }
-      {
-        !latestBlock
+    <>
+      <PDScrollArea
+        className="h-80 lg:h-full"
+        viewportClassNames="py-3"
+        verticalScrollClassNames="py-3"
+      >
+        {
+          signedExtrinsics.map((extrinsic, extrinsicIndex) => (
+            <RowSignedExtrinsic
+              key={`latest-signed-extrinsic-${extrinsic.id}-${chain.id}`}
+              extrinsic={extrinsic}
+              classNames={cn(
+                {
+                  ['opacity-0 animate-fade-in']: extrinsicIndex === 0,
+                },
+              )}
+            />
+          ))
+        }
+        {
+          !latestBlock
         && 'Loading...'
+        }
+      </PDScrollArea>
+      {
+        selectedExtrinsic && <ShowJsonModal onClose={handleCloseModal} data={selectedExtrinsic} />
       }
-    </PDScrollArea>
+    </>
   );
 };
 

@@ -30,7 +30,7 @@ const LatestBlocks = () => {
         className="table-container"
         verticalScrollClassNames="pt-8"
       >
-        <table className="explorer-pages-table">
+        <table className="pd-table">
           <colgroup>
             <col style={{ width: '10%', minWidth: '8rem' }} />
             <col style={{ width: '10%', minWidth: '4rem' }} />

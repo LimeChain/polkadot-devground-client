@@ -74,7 +74,7 @@ export const routes = () => ([
             element: <BlockDetails />,
           },
           {
-            path: 'signed-extrinsics',
+            path: 'extrinsics',
             element: <SignedExtrinsics />,
           },
         ],

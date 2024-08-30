@@ -3,7 +3,6 @@ import { formatDistanceToNowStrict } from 'date-fns';
 import {
   useCallback,
   useEffect,
-  useRef,
   useState,
 } from 'react';
 
@@ -20,25 +19,24 @@ import {
 
 import type {
   IMappedBlockExtrinsic,
-  IMappedTransferExtrinsic,
+  IMappedExtrinsic,
 } from '@custom-types/block';
 
 const SignedExtrinsics = () => {
   const blocksData = useStoreChain?.use?.blocksData?.();
-  const chain = useStoreChain?.use?.chain?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
   const [ShowJsonModal, toggleVisibility] = useToggleVisibility(ModalShowJson);
 
-  const [signedExtrinsics, setSignedExtrinsics] = useState<IMappedTransferExtrinsic[]>([]);
-  const [selectedExtrinsic, setSelectedExtrinsic] = useState<IMappedTransferExtrinsic | null>(null);
-  const refInitalExtrinsicsDisplayed = useRef(false);
+  const [signedExtrinsics, setSignedExtrinsics] = useState<IMappedExtrinsic[]>([]);
+  const [selectedExtrinsic, setSelectedExtrinsic] = useState<IMappedExtrinsic | null>(null);
   const isLoading = blocksData.size === 0;
 
   const filterExtrinsics = useCallback((extrinsics: IMappedBlockExtrinsic[] = []) => {
-    return extrinsics.filter(extrinsic => extrinsic.isSigned).reverse() as IMappedTransferExtrinsic[];
+    // Filter out blocks with 0 or 1 extrinsics
+    return extrinsics.slice(2).reverse() as IMappedExtrinsic[];
   }, []);
 
-  const loadInitialData = useCallback(() => {
+  const loadExtrinsic = useCallback(() => {
     blocksData.entries().forEach(entry => {
       const [, block] = entry;
       if (!block) {
@@ -59,21 +57,7 @@ const SignedExtrinsics = () => {
     filterExtrinsics,
   ]);
 
-  const loadNewData = useCallback((blockNumber: number) => {
-    const latestBlockData = blocksData.get(blockNumber);
-    const signedExtrinsics = filterExtrinsics(latestBlockData?.body.extrinsics);
-
-    setSignedExtrinsics(extrinsics => ([
-      ...signedExtrinsics,
-      ...extrinsics,
-    ]));
-
-  }, [
-    blocksData,
-    filterExtrinsics,
-  ]);
-
-  const handleOpenModal = useCallback((extrinsic: IMappedTransferExtrinsic) => {
+  const handleOpenModal = useCallback((extrinsic: IMappedExtrinsic) => {
     setSelectedExtrinsic(extrinsic);
     toggleVisibility();
   }, [toggleVisibility]);
@@ -84,34 +68,14 @@ const SignedExtrinsics = () => {
   }, [toggleVisibility]);
 
   useEffect(() => {
+    setSignedExtrinsics([]);
+
     if (!latestBlock) {
       return;
     }
 
-    if (!refInitalExtrinsicsDisplayed.current) {
-      refInitalExtrinsicsDisplayed.current = true;
-      loadInitialData();
-    } else {
-      loadNewData(latestBlock);
-    }
-
-  }, [
-    latestBlock,
-    blocksData,
-    filterExtrinsics,
-    loadInitialData,
-    loadNewData,
-  ]);
-
-  useEffect(() => {
-    refInitalExtrinsicsDisplayed.current = false;
-    setSignedExtrinsics([]);
-
-    return () => {
-      refInitalExtrinsicsDisplayed.current = false;
-      setSignedExtrinsics([]);
-    };
-  }, [chain]);
+    loadExtrinsic();
+  }, [latestBlock, loadExtrinsic]);
 
   return (
     <div className="grid h-full grid-rows-[40px_46px_1fr] gap-6">
@@ -121,7 +85,7 @@ const SignedExtrinsics = () => {
         className="h-full"
         verticalScrollClassNames="pt-8"
       >
-        <table className="explorer-pages-table">
+        <table className="pd-table">
           <colgroup>
             <col style={{ width: '10%', minWidth: '8rem' }} />
             <col style={{ width: '10%', minWidth: '8rem' }} />
@@ -159,6 +123,10 @@ const SignedExtrinsics = () => {
                           ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: extrinsicIndex === 0,
                         },
                       )}
+                      // eslint-disable-next-line react/jsx-no-bind
+                      onClick={() => {
+                        handleOpenModal(extrinsic);
+                      }}
                     >
                       <td>{extrinsic.id}</td>
                       <td>{extrinsic.blockNumber}</td>
@@ -183,22 +151,11 @@ const SignedExtrinsics = () => {
                       </td>
                       <td>{extrinsic.method.method}</td>
                       <td>
-                        <button
-                          className={cn(
-                            'px-3 py-1',
-                            'bg-dev-purple-700 text-dev-white-200',
-                            'transition-all duration-300 hover:bg-dev-purple-900',
-                            'dark:bg-dev-purple-50 dark:text-dev-black-1000 dark:hover:bg-dev-purple-200',
-                          )}
-                          // eslint-disable-next-line react/jsx-no-bind
-                          onClick={() => {
-                            handleOpenModal(extrinsic);
-                          }}
-                        >
-                          <span className="font-geist font-body3-bold">
-                              Details
-                          </span>
-                        </button>
+                        <Icon
+                          size={[18]}
+                          name="icon-dropdownArrow"
+                          className="text-dev-black-1000 dark:text-dev-purple-50"
+                        />
                       </td>
                     </tr>
                   );
