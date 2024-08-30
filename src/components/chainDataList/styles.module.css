@@ -6,7 +6,7 @@
   @apply transition-[background] duration-300;
 
   > div {
-    @apply flex;
+    @apply flex gap-1;
 
     &:first-child {
       @apply flex-col justify-center;
@@ -27,7 +27,7 @@
   @apply transition-[background] duration-300;
 
   >div {
-    @apply flex flex-col;
+    @apply flex flex-col gap-1;
     @apply justify-center;
 
     &:first-child {}
