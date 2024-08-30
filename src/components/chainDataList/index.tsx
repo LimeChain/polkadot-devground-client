@@ -6,6 +6,7 @@ import {
   useState,
 } from 'react';
 
+import { Icon } from '@components/icon';
 import {
   type IPDLink,
   PDLink,
@@ -18,9 +19,6 @@ import {
 import {
   cn,
   formatNumber,
-  formatPrettyNumberString,
-  formatTokenValue,
-  truncateAddress,
 } from '@utils/helpers';
 
 import styles from './styles.module.css';
@@ -98,18 +96,6 @@ const RowSignedExtrinsic = ({
   timestamp,
   isSuccess,
 }: IMappedTransferExtrinsic) => {
-  const chainSpecs = useStoreChain?.use?.chainSpecs?.();
-  const {
-    tokenSymbol,
-    tokenDecimals,
-  } = chainSpecs?.properties || {};
-
-  const extrinsicValue = formatPrettyNumberString(method.args.value) || 0;
-  const formatedExtrinsicValue = formatTokenValue({
-    value: extrinsicValue,
-    tokenDecimals,
-    precision: 1,
-  });
 
   const timeAgo = timestamp
     && formatDistanceToNowStrict(
@@ -124,24 +110,34 @@ const RowSignedExtrinsic = ({
           <span className="text-dev-black-300 dark:text-dev-purple-300" >
             Extrinsic#
           </span>
-          {' '}
-          <strong className="font-body1-bold">{id}</strong>
+          <strong className="font-body1-bold">
+            {' '}{id}
+          </strong>
         </p>
         <p>
-          <span className="text-dev-black-300 dark:text-dev-purple-300">Includes</span>
-          {' '}
-          <span>from {truncateAddress(signer.Id)}</span>
-          {' '}
-          <span>to {truncateAddress(method.args.dest.Id)}</span>
+          <span className="text-dev-black-300 dark:text-dev-purple-300">Action: </span>
+          {method.section}.{method.method}
         </p>
       </div>
       <div>
-        <span className="font-body1-bold">
-          {formatedExtrinsicValue}
-          {' '}
-          {tokenSymbol}
-          {' '}
-          {isSuccess ? '√' : 'x'}
+        <span className="flex justify-end gap-1 font-body1-bold">
+          {
+            isSuccess
+              ? (
+                <Icon
+                  size={[16]}
+                  name="icon-checked"
+                  className="text-dev-green-600"
+                />
+              )
+              : (
+                <Icon
+                  size={[16]}
+                  name="icon-failed"
+                  className="text-dev-green-600"
+                />
+              )
+          }
         </span>
         <span>{timeAgo}</span>
       </div>
@@ -235,24 +231,15 @@ export const SignedExtrinsics = () => {
   const chain = useStoreChain?.use?.chain?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
 
-  const refInitalExtrinsicsDisplayed = useRef(false);
-
   const [signedExtrinsics, setSignedExtrinsics] = useState<IMappedTransferExtrinsic[]>([]);
 
   const filterTransferExtrinsics = useCallback((extrinsics: IMappedBlockExtrinsic[] = []) => {
-    return extrinsics.filter(extrinsic => extrinsic.method.method.startsWith('transfer')).reverse() as IMappedTransferExtrinsic[];
+    // Filter out blocks with 0 or 1 extrinsics
+    if (extrinsics.length <= 1) {
+      return [];
+    }
+    return extrinsics.slice(2).reverse() as IMappedTransferExtrinsic[];
   }, []);
-
-  // handle state resets on chain change
-  useEffect(() => {
-    refInitalExtrinsicsDisplayed.current = false;
-    setSignedExtrinsics([]);
-
-    return () => {
-      refInitalExtrinsicsDisplayed.current = false;
-      setSignedExtrinsics([]);
-    };
-  }, [chain]);
 
   const loadInitialData = useCallback(() => {
     blocksData.entries().forEach(entry => {
@@ -275,39 +262,14 @@ export const SignedExtrinsics = () => {
     filterTransferExtrinsics,
   ]);
 
-  const loadNewData = useCallback((blockNumber: number) => {
-    const latestBlockData = blocksData.get(blockNumber);
-    const signedExtrinsics = filterTransferExtrinsics(latestBlockData?.body.extrinsics);
-
-    setSignedExtrinsics(extrinsics => ([
-      ...signedExtrinsics,
-      ...extrinsics,
-    ]));
-
-  }, [
-    blocksData,
-    filterTransferExtrinsics,
-  ]);
-
   useEffect(() => {
+    setSignedExtrinsics([]);
     if (!latestBlock) {
       return;
     }
+    loadInitialData();
 
-    if (!refInitalExtrinsicsDisplayed.current) {
-      refInitalExtrinsicsDisplayed.current = true;
-      loadInitialData();
-    } else {
-      loadNewData(latestBlock);
-    }
-
-  }, [
-    latestBlock,
-    blocksData,
-    filterTransferExtrinsics,
-    loadInitialData,
-    loadNewData,
-  ]);
+  }, [latestBlock, loadInitialData]);
 
   return (
     <PDScrollArea
