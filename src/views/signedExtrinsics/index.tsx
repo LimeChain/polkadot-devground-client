@@ -17,47 +17,18 @@ import {
   truncateAddress,
 } from '@utils/helpers';
 
-import type {
-  IMappedBlockExtrinsic,
-  IMappedExtrinsic,
-} from '@custom-types/block';
+import type { IMappedBlockExtrinsic } from '@custom-types/block';
 
 const SignedExtrinsics = () => {
   const blocksData = useStoreChain?.use?.blocksData?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
   const [ShowJsonModal, toggleVisibility] = useToggleVisibility(ModalShowJson);
 
-  const [signedExtrinsics, setSignedExtrinsics] = useState<IMappedExtrinsic[]>([]);
-  const [selectedExtrinsic, setSelectedExtrinsic] = useState<IMappedExtrinsic | null>(null);
+  const [signedExtrinsics, setSignedExtrinsics] = useState<IMappedBlockExtrinsic[]>([]);
+  const [selectedExtrinsic, setSelectedExtrinsic] = useState<IMappedBlockExtrinsic | null>(null);
   const isLoading = blocksData.size === 0;
 
-  const filterExtrinsics = useCallback((extrinsics: IMappedBlockExtrinsic[] = []) => {
-    // Filter out blocks with 0 or 1 extrinsics
-    return extrinsics.slice(2).reverse() as IMappedExtrinsic[];
-  }, []);
-
-  const loadExtrinsic = useCallback(() => {
-    blocksData.entries().forEach(entry => {
-      const [, block] = entry;
-      if (!block) {
-        return;
-      }
-      const extrinsics = block.body.extrinsics;
-
-      const signedExtrinsics = filterExtrinsics(extrinsics);
-      setSignedExtrinsics(extrinsics => ([
-        ...signedExtrinsics,
-        ...extrinsics,
-      ]));
-
-    });
-
-  }, [
-    blocksData,
-    filterExtrinsics,
-  ]);
-
-  const handleOpenModal = useCallback((extrinsic: IMappedExtrinsic) => {
+  const handleOpenModal = useCallback((extrinsic: IMappedBlockExtrinsic) => {
     setSelectedExtrinsic(extrinsic);
     toggleVisibility();
   }, [toggleVisibility]);
@@ -68,18 +39,16 @@ const SignedExtrinsics = () => {
   }, [toggleVisibility]);
 
   useEffect(() => {
-    setSignedExtrinsics([]);
+    const extrinsics = Array.from(blocksData.values())
+      .flatMap(block => block?.body?.extrinsics?.slice(2) ?? [])
+      .reverse();
 
-    if (!latestBlock) {
-      return;
-    }
-
-    loadExtrinsic();
-  }, [latestBlock, loadExtrinsic]);
+    setSignedExtrinsics(extrinsics);
+  }, [blocksData, latestBlock]);
 
   return (
     <div className="grid h-full grid-rows-[40px_46px_1fr] gap-6">
-      <PageHeader title="Signed Extrinsics" />
+      <PageHeader title="Extrinsics" />
       <SearchBar label="Search by Block"/>
       <PDScrollArea
         className="h-full"
@@ -165,7 +134,7 @@ const SignedExtrinsics = () => {
         </table >
       </PDScrollArea >
       {selectedExtrinsic && (
-        <ShowJsonModal onClose={handleCloseModal} data={selectedExtrinsic} />
+        <ShowJsonModal onClose={handleCloseModal} extrinsic={selectedExtrinsic} />
       )}
     </div>
 
