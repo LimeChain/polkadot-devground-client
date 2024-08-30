@@ -232,7 +232,7 @@ export const LatestBlocks = () => {
             blockNumber={blockNumber}
             classNames={cn(
               {
-                ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: blockIndex === 0,
+                ['opacity-0 animate-fade-in']: blockIndex === 0,
               },
             )}
           />
@@ -255,9 +255,6 @@ export const SignedExtrinsics = () => {
 
   const filterExtrinsics = useCallback((extrinsics: IMappedBlockExtrinsic[] = []) => {
     // Filter out blocks with 0 or 1 extrinsics
-    if (extrinsics.length <= 1) {
-      return [];
-    }
     return extrinsics.slice(2).reverse() as IMappedTransferExtrinsic[];
   }, []);
 
@@ -305,7 +302,7 @@ export const SignedExtrinsics = () => {
             extrinsic={extrinsic}
             classNames={cn(
               {
-                ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: extrinsicIndex === 0,
+                ['opacity-0 animate-fade-in']: extrinsicIndex === 0,
               },
             )}
           />
