@@ -1,4 +1,4 @@
-import {
+import React, {
   useCallback,
   useState,
 } from 'react';
@@ -12,84 +12,99 @@ import { Results } from './results';
 interface SearchBarProps {
   label: string;
   classNames?: string;
-  type: string;
+  type: 'all' | 'block' | 'extrinsics';
   onSearch?: (query: string) => void;
 }
 
-export const SearchBar = (props: SearchBarProps) => {
-  const { label, classNames, type } = props;
+export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
   const blocksData = useStoreChain?.use?.blocksData?.();
-  const [blockNumber, setBlockNumber] = useState('');
-  const [extrinsics, setExtrinsics] = useState('');
-
-  const searchAll = useCallback((value: string) => {
-    const block = Array.from(blocksData.values()).find(block => block.header.number === Number(value));
-
-    setBlockNumber(block?.header.number);
-    setExtrinsics(block?.body?.extrinsics);
-    return block;
-  }, [blocksData]);
-
-  const searchBlock = useCallback((value: string) => {
-
-    if (value.startsWith('0x')) {
-      console.log('asdas');
-    }
-
-    const block = Array.from(blocksData.values()).find(block => block.header.number === Number(value));
-
-    setBlockNumber(block?.header.number);
-    return block;
-  }, [blocksData]);
-
-  const searchExtrinsic = useCallback((value: string) => {
-    const pattern = /^([0-9]+)-[0-9]+$/;
-    if (pattern.test(value)) {
-      console.log('da');
-      const extrinsics = Array.from(blocksData.values())
-        .flatMap(block => block?.body?.extrinsics?.slice(2) ?? [])
-        .find(extrinsic => extrinsic.id === value);
-
-      console.log(extrinsics);
-      return extrinsics;
-    }
-    return null;
-  }, [blocksData]);
-
+  const [blockNumber, setBlockNumber] = useState<string | null>(null);
+  const [extrinsics, setExtrinsics] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState('');
 
-  const handleSearchInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(event.target.value);
-    switch (type) {
-      case 'all':
-        searchAll(event.target.value);
-        break;
-      case 'block':
-        searchBlock(event.target.value);
-        break;
-      case 'extrinsics':
-        searchExtrinsic(event.target.value);
-        break;
-      default:
-        break;
-    }
-  }, [searchAll, searchBlock, searchExtrinsic, type]);
+  const searchAll = useCallback(
+    (value: string) => {
+      const block = Array.from(blocksData.values()).find(
+        (block) => block.header.number === Number(value),
+      );
+
+      if (/^([0-9]+)-[0-9]+$/.test(value)) {
+        const extrinsic = Array.from(blocksData.values())
+          .flatMap((block) => block?.body?.extrinsics ?? [])
+          .filter((extrinsic) => extrinsic.id === value);
+
+        setExtrinsics(extrinsic ?? null);
+        console.log('Extrinsic found:', extrinsic);
+        return;
+      }
+
+      setBlockNumber(block?.header.number ?? null);
+      setExtrinsics(block?.body?.extrinsics ?? null);
+    },
+    [blocksData],
+  );
+
+  const searchBlock = useCallback(
+    (value: string) => {
+      if (value.startsWith('0x')) {
+        console.log('Hexadecimal input detected');
+      }
+      const block = Array.from(blocksData.values()).find(
+        (block) => block.header.number === Number(value),
+      );
+      setBlockNumber(block?.header.number ?? null);
+    },
+    [blocksData],
+  );
+
+  const searchExtrinsic = useCallback(
+    (value: string) => {
+      if (/^([0-9]+)-[0-9]+$/.test(value)) {
+        const extrinsic = Array.from(blocksData.values())
+          .flatMap((block) => block?.body?.extrinsics?.slice(2) ?? [])
+          .find((extrinsic) => extrinsic.id === value);
+
+        setExtrinsics(extrinsic ?? null);
+      }
+      return null;
+    },
+    [blocksData],
+  );
+
+  const handleSearchInputChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const value = event.target.value;
+      setSearchInput(value);
+
+      switch (type) {
+        case 'all':
+          searchAll(value);
+          break;
+        case 'block':
+          searchBlock(value);
+          break;
+        case 'extrinsics':
+          searchExtrinsic(value);
+          break;
+        default:
+          break;
+      }
+    },
+    [searchAll, searchBlock, searchExtrinsic, type],
+  );
 
   return (
     <>
-      <div className={cn(
-        'flex items-center',
-        classNames,
-      )}
-      >
-        <div className={cn(
-          'flex w-96 items-center gap-1 p-3',
-          'border-b border-gray-300',
-          'dark:border-dev-purple-700 dark:bg-transparent',
-          'duration-300 ease-out hover:border-dev-pink-500',
-        )}
+      <div className={cn('flex items-center', classNames)}>
+        <div
+          className={cn(
+            'flex w-96 items-center gap-1 p-3',
+            'border-b border-gray-300',
+            'dark:border-dev-purple-700 dark:bg-transparent',
+            'duration-300 ease-out hover:border-dev-pink-500',
+          )}
         >
-          <Icon name="icon-search"/>
+          <Icon name="icon-search" />
           <input
             type="text"
             placeholder={label}
@@ -111,24 +126,23 @@ export const SearchBar = (props: SearchBarProps) => {
             'dark:bg-dev-purple-50 dark:text-dev-black-1000 dark:hover:bg-dev-purple-200',
           )}
         >
-          <span className="font-geist font-body2-bold">
-          Search
-          </span>
+          <span className="font-geist font-body2-bold">Search</span>
         </button>
       </div>
 
-      <div className={cn(
-        'absolute top-40 z-50 w-96 p-2',
-        'bg-dev-black-1000 dark:bg-dev-purple-50',
-        'pointer-events-none -translate-y-2',
-        'transition-all',
-        'opacity-0',
-        {
-          ['opacity-100 translate-y-0 pointer-events-auto']: true,
-        },
-      )}
+      <div
+        className={cn(
+          'absolute top-40 z-50 w-96 p-2',
+          'bg-dev-black-1000 dark:bg-dev-purple-50',
+          'pointer-events-none -translate-y-2',
+          'transition-all',
+          'opacity-0',
+          {
+            ['opacity-100 translate-y-0 pointer-events-auto']: blockNumber || extrinsics,
+          },
+        )}
       >
-        <Results block={blockNumber} extrinsics={extrinsics}/>
+        <Results block={blockNumber} extrinsics={extrinsics} />
       </div>
     </>
   );
