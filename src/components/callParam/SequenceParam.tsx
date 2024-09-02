@@ -7,11 +7,11 @@ import {
 
 import { BinaryParam } from './BinaryParam';
 import { CodecParam } from './CodecParam';
+import styles from './styles.module.css';
 
 import { type ICallArgs } from '.';
 
 import type { SequenceVar } from '@polkadot-api/metadata-builders';
-
 interface ISequence extends ICallArgs {
   sequence: SequenceVar;
 }
@@ -19,8 +19,8 @@ interface ISequence extends ICallArgs {
 export const SequenceParam = ({ sequence, onChange }: ISequence) => {
   if (sequence.value.type === 'primitive' && sequence.value.value === 'u8') {
     return (
-      <div className="border-l pl-4 pt-2">
-        <BinaryParam onChange={onChange} />
+      <div className={styles.codecParam}>
+        <BinaryParam onChange={onChange} minLength={0} />
       </div>
     );
   }
@@ -76,35 +76,36 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
 
   return (
     <>
-      <div className="flex flex-col content-start">
+      <div className="flex flex-col content-start gap-4">
         {
-          params.map((param, index) => {
+          params.map((param) => {
+            const showRemoveButton = params.length > 1;
             return (
               <Fragment key={param.id}>
-                <div>
+                <div className="grid grid-cols-[1fr_48px] gap-2">
                   <CodecParam
                     variable={sequence.value}
                     // eslint-disable-next-line react/jsx-no-bind
                     onChange={args => handleOnChange(args, param.id)}
                   />
                   {
-                    params.length > 1
+                    showRemoveButton
                     && (
                       <button
                         type="button"
-                        className="ml-4 mt-2 w-fit border p-2"
+                        className="ml-4 h-fit border p-2"
                         // eslint-disable-next-line react/jsx-no-bind
                         onClick={() => handleRemoveItem(param.id)}
                       >
-                        remove
+                        -
                       </button>
                     )
                   }
                 </div>
-                {
+                {/* {
                   index !== params.length
                   && <br />
-                }
+                } */}
               </Fragment>
             );
           })

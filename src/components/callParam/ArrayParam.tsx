@@ -14,9 +14,8 @@ export interface IArrayParam extends ICallArgs {
 }
 
 export const ArrayParam = ({ array, onChange }: IArrayParam) => {
-
   if (array.value.type === 'primitive' && array.value.value === 'u8') {
-    return <BinaryParam onChange={onChange} />;
+    return <BinaryParam onChange={onChange} minLength={array.len} />;
   }
 
   return <_ArrayParam array={array} onChange={onChange} />;
@@ -35,7 +34,7 @@ const _ArrayParam = ({ array, onChange }: IArrayParam) => {
   }, [arrayProps]);
 
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       {
         arrayProps.map((_, index) => {
           return (

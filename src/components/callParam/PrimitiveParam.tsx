@@ -3,6 +3,8 @@ import {
   useState,
 } from 'react';
 
+import styles from './styles.module.css';
+
 import type { ICallArgs } from '.';
 import type { PrimitiveVar } from '@polkadot-api/metadata-builders';
 interface IPrimitiveParam extends ICallArgs {
@@ -15,7 +17,7 @@ export const PrimitiveParam = ({ primitive, onChange }: IPrimitiveParam) => {
   const commonProps = {
     placeholder: primitive.value,
     value,
-    className: 'p-2 w-full',
+    className: styles.codecInput,
     onChange: (event: React.ChangeEvent<HTMLInputElement>) =>
       setValue(event.target.value),
   };
@@ -63,6 +65,7 @@ export const PrimitiveParam = ({ primitive, onChange }: IPrimitiveParam) => {
         <input
           type="checkbox"
           checked={Boolean(value)}
+          className="w-fit"
           // eslint-disable-next-line react/jsx-no-bind
           onChange={(event) => setValue(event.target.checked ? `${event.target.checked}` : '')}
         />

@@ -5,6 +5,7 @@ import {
 } from 'react';
 
 import { CodecParam } from './CodecParam';
+import styles from './styles.module.css';
 
 import { type ICallArgs } from '.';
 
@@ -31,11 +32,11 @@ export function StructParam({ struct, onChange }: IStructParam) {
     setArgs(args => ({ ...args, [key]: value } as typeof args));
   }, []);
 
-  return Object.entries(struct.value).map(([key, value]) => {
+  return Object.entries(struct.value).map(([key, value], index) => {
     return (
-      <div key={key}>
+      <div key={`${key}-${index}-${value.id}`}>
         {key}
-        <div className="border-l pl-4 pt-2 empty:hidden">
+        <div className={styles.codecContainer}>
           <CodecParam
             variable={value}
             // eslint-disable-next-line react/jsx-no-bind
