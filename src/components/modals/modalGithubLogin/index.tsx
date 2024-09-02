@@ -31,7 +31,7 @@ export const ModalGithubLogin = ({ onClose }: IModalGithubLogin) => {
           'dark:text-dev-purple-50',
         )}
       />
-      <div className="flex flex-col" >
+      <div className="flex flex-col">
         <h4 className="mb-4 self-center font-h4-bold">Please Log in</h4>
         <p className="text-center font-geist font-body1-regular">
           To access your custom examples, please log in using your GitHub account.

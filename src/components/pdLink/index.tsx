@@ -1,14 +1,13 @@
-import {
-  Link,
-  type LinkProps,
-} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { cn } from '@utils/helpers';
 
-export interface IPDLink  {
+export interface IPDLink {
   to: number | string;
   children: React.ReactNode;
+  target?: string; // Add this line
   className?: string;
+  rel?: string;
 }
 
 export const PDLink = ({ to, children, className, ...props }: IPDLink) => {

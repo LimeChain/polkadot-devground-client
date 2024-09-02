@@ -77,7 +77,7 @@ const RowLatestBlock = (props: IRowLatestBlock) => {
     >
       <div>
         <p>
-          <span className="text-dev-black-300 dark:text-dev-purple-300" >
+          <span className="text-dev-black-300 dark:text-dev-purple-300">
             Block#
           </span>
           {' '}
@@ -129,7 +129,7 @@ const RowSignedExtrinsic = (props: IRowSignedExtrinsic) => {
     >
       <div>
         <p>
-          <span className="text-dev-black-300 dark:text-dev-purple-300" >
+          <span className="text-dev-black-300 dark:text-dev-purple-300">
             Extrinsic#
           </span>
           <strong className="font-body1-bold">
@@ -298,7 +298,7 @@ export const SignedExtrinsics = () => {
         }
         {
           !latestBlock
-        && 'Loading...'
+          && 'Loading...'
         }
       </PDScrollArea>
       {

@@ -40,7 +40,7 @@ const LatestBlocks = () => {
             <col style={{ width: '20%', minWidth: '10rem' }} />
             <col style={{ width: '20%', minWidth: '10rem' }} />
           </colgroup>
-          <tr className="pd-table-head">
+          <tr>
             <th>Block</th>
             <th>Status</th>
             <th>Time</th>
@@ -91,19 +91,19 @@ const LatestBlocks = () => {
                               />
                             )
                         }
-                      </td >
+                      </td>
                       <td>{timeAgo}</td>
                       <td>{block.body.extrinsics.length}</td>
                       <td>{block.body.events.length}</td>
                       <td>{truncateAddress(block.header.identity.toString(), 6)}</td>
                       <td>{truncateAddress(block.header.hash, 6)}</td>
-                    </tr >
+                    </tr>
                   );
                 })
               )
           }
-        </table >
-      </PDScrollArea >
+        </table>
+      </PDScrollArea>
     </div>
   );
 };

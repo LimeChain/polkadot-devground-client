@@ -23,7 +23,7 @@ interface IBlockData {
   parentHash: string;
   stateRoot: string;
   specVersion: number;
-  validatorId: string ;
+  validatorId: string;
   timeStamp: string;
 }
 
@@ -189,7 +189,7 @@ const BlockDetails = () => {
             }
           </CopyToClipboard>
         </div>
-      </div >
+      </div>
 
       {/* State Root */}
       <div className={styles['pd-block-details']}>

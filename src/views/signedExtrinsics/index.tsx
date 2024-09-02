@@ -128,7 +128,7 @@ const SignedExtrinsics = () => {
                 })
               )
           }
-        </table >
+        </table>
       </PDScrollArea>
 
       {
