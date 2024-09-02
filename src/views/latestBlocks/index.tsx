@@ -25,12 +25,12 @@ const LatestBlocks = () => {
   return (
     <div className="grid h-full grid-rows-[40px_46px_1fr] gap-6">
       <PageHeader title="Latest Blocks" />
-      <SearchBar label="Search by Block"/>
+      <SearchBar label="Search by Block" />
       <PDScrollArea
         className="table-container"
         verticalScrollClassNames="pt-8"
       >
-        <table className="pd-table">
+        <table>
           <colgroup>
             <col style={{ width: '10%', minWidth: '8rem' }} />
             <col style={{ width: '10%', minWidth: '4rem' }} />
@@ -40,7 +40,7 @@ const LatestBlocks = () => {
             <col style={{ width: '20%', minWidth: '10rem' }} />
             <col style={{ width: '20%', minWidth: '10rem' }} />
           </colgroup>
-          <tr className="table-head">
+          <tr className="pd-table-head">
             <th>Block</th>
             <th>Status</th>
             <th>Time</th>
@@ -66,7 +66,7 @@ const LatestBlocks = () => {
                       onClick={goRouteId}
                       data-block-number={block.header.number}
                       className={cn(
-                        'table-row cursor-pointer',
+                        'pd-table-row',
                         {
                           ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: blockIndex === 0,
                         },
@@ -95,7 +95,7 @@ const LatestBlocks = () => {
                       <td>{timeAgo}</td>
                       <td>{block.body.extrinsics.length}</td>
                       <td>{block.body.events.length}</td>
-                      <td>{truncateAddress(block.header.identity, 6)}</td>
+                      <td>{truncateAddress(block.header.identity.toString(), 6)}</td>
                       <td>{truncateAddress(block.header.hash, 6)}</td>
                     </tr >
                   );

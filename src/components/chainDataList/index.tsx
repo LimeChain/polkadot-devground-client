@@ -1,7 +1,3 @@
-import {
-  busDispatch,
-  useEventBus,
-} from '@pivanov/event-bus';
 import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import { formatDistanceToNowStrict } from 'date-fns';
 import {
@@ -30,7 +26,6 @@ import {
 import styles from './styles.module.css';
 
 import type { IMappedBlockExtrinsic } from '@custom-types/block';
-import type { IEventBusOpenJsonModal } from '@custom-types/eventBus';
 
 interface TChainDataList {
   title: string;
@@ -46,6 +41,7 @@ interface IRowLatestBlock {
 interface IRowSignedExtrinsic {
   extrinsic: IMappedBlockExtrinsic;
   classNames: string;
+  handleOpenModal: (e: React.MouseEvent<HTMLTableRowElement>) => void;
 }
 
 const RowLatestBlock = (props: IRowLatestBlock) => {
@@ -73,7 +69,7 @@ const RowLatestBlock = (props: IRowLatestBlock) => {
 
   return (
     <PDLink
-      to={blockNumber.toString()}
+      to={blockNumber}
       className={cn(
         styles['pd-explorer-list'],
         classNames,
@@ -103,7 +99,12 @@ const RowLatestBlock = (props: IRowLatestBlock) => {
 };
 
 const RowSignedExtrinsic = (props: IRowSignedExtrinsic) => {
-  const { extrinsic, classNames } = props;
+  const {
+    extrinsic,
+    handleOpenModal,
+    classNames,
+  } = props;
+
   const {
     id,
     isSuccess,
@@ -119,14 +120,12 @@ const RowSignedExtrinsic = (props: IRowSignedExtrinsic) => {
 
   return (
     <div
+      data-extrinsic-id={id}
       className={cn(
         styles['pd-explorer-list-extrinsic'],
         classNames,
       )}
-      // eslint-disable-next-line react/jsx-no-bind
-      onClick={() => {
-        busDispatch<IEventBusOpenJsonModal>({ type: '@@-open-json-modal', data: extrinsic });
-      }}
+      onClick={handleOpenModal}
     >
       <div>
         <p>
@@ -179,9 +178,8 @@ export const LatestBlocks = () => {
   const isLoading = bestBlocks.length === 0;
 
   const loadInitialData = useCallback(() => {
-
     const keys: number[] = [];
-    blocksData.keys().forEach(key => {
+    Array.from(blocksData.keys()).forEach(key => {
       keys.unshift(key);
     });
 
@@ -254,23 +252,20 @@ export const LatestBlocks = () => {
 };
 
 export const SignedExtrinsics = () => {
+  const refSelectedExtrinsic = useRef<IMappedBlockExtrinsic | undefined>();
+
   const blocksData = useStoreChain?.use?.blocksData?.();
   const chain = useStoreChain?.use?.chain?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
   const [ShowJsonModal, toggleVisibility] = useToggleVisibility(ModalShowJson);
 
   const [signedExtrinsics, setSignedExtrinsics] = useState<IMappedBlockExtrinsic[]>([]);
-  const [selectedExtrinsic, setSelectedExtrinsic] = useState<IMappedBlockExtrinsic | null>(null);
 
-  useEventBus<IEventBusOpenJsonModal>('@@-open-json-modal', (event) => {
-    setSelectedExtrinsic(event.data);
+  const handleOpenModal = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
+    const extrinsicId = e.currentTarget.getAttribute('data-extrinsic-id');
+    refSelectedExtrinsic.current = signedExtrinsics.find(extrinsic => extrinsic.id === extrinsicId);
     toggleVisibility();
-  });
-
-  const handleCloseModal = useCallback(() => {
-    toggleVisibility();
-    setSelectedExtrinsic(null);
-  }, [toggleVisibility]);
+  }, [signedExtrinsics, toggleVisibility]);
 
   useEffect(() => {
     const extrinsics = Array.from(blocksData.values())
@@ -292,6 +287,7 @@ export const SignedExtrinsics = () => {
             <RowSignedExtrinsic
               key={`latest-signed-extrinsic-${extrinsic.id}-${chain.id}`}
               extrinsic={extrinsic}
+              handleOpenModal={handleOpenModal}
               classNames={cn(
                 {
                   ['opacity-0 animate-fade-in']: extrinsicIndex === 0,
@@ -306,7 +302,12 @@ export const SignedExtrinsics = () => {
         }
       </PDScrollArea>
       {
-        selectedExtrinsic && <ShowJsonModal onClose={handleCloseModal} extrinsic={selectedExtrinsic} />
+        refSelectedExtrinsic.current && (
+          <ShowJsonModal
+            onClose={toggleVisibility}
+            extrinsic={refSelectedExtrinsic.current}
+          />
+        )
       }
     </>
   );

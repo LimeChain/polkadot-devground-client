@@ -1,4 +1,3 @@
-import type { IMappedExtrinsic } from './block';
 import type { TChain } from './chain';
 import type {
   IConsoleMessage,
@@ -64,9 +63,4 @@ export interface IEventBusForksScrollToBlock {
     scrollToIndex: number;
     scrollToBlockHash: string;
   };
-}
-
-export interface IEventBusOpenJsonModal {
-  type: '@@-open-json-modal';
-  data: IMappedExtrinsic;
 }

@@ -3,6 +3,7 @@ import { formatDistanceToNowStrict } from 'date-fns';
 import {
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 
@@ -20,23 +21,21 @@ import {
 import type { IMappedBlockExtrinsic } from '@custom-types/block';
 
 const SignedExtrinsics = () => {
+
+  const refSelectedExtrinsic = useRef<IMappedBlockExtrinsic | undefined>();
+
   const blocksData = useStoreChain?.use?.blocksData?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
   const [ShowJsonModal, toggleVisibility] = useToggleVisibility(ModalShowJson);
 
   const [signedExtrinsics, setSignedExtrinsics] = useState<IMappedBlockExtrinsic[]>([]);
-  const [selectedExtrinsic, setSelectedExtrinsic] = useState<IMappedBlockExtrinsic | null>(null);
   const isLoading = blocksData.size === 0;
 
-  const handleOpenModal = useCallback((extrinsic: IMappedBlockExtrinsic) => {
-    setSelectedExtrinsic(extrinsic);
+  const handleOpenModal = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
+    const extrinsicId = e.currentTarget.getAttribute('data-extrinsic-id');
+    refSelectedExtrinsic.current = signedExtrinsics.find(extrinsic => extrinsic.id === extrinsicId);
     toggleVisibility();
-  }, [toggleVisibility]);
-
-  const handleCloseModal = useCallback(() => {
-    setSelectedExtrinsic(null);
-    toggleVisibility();
-  }, [toggleVisibility]);
+  }, [signedExtrinsics, toggleVisibility]);
 
   useEffect(() => {
     const extrinsics = Array.from(blocksData.values())
@@ -49,12 +48,12 @@ const SignedExtrinsics = () => {
   return (
     <div className="grid h-full grid-rows-[40px_46px_1fr] gap-6">
       <PageHeader title="Extrinsics" />
-      <SearchBar label="Search by Block"/>
+      <SearchBar label="Search by Block" />
       <PDScrollArea
         className="h-full"
         verticalScrollClassNames="pt-8"
       >
-        <table className="pd-table">
+        <table>
           <colgroup>
             <col style={{ width: '10%', minWidth: '8rem' }} />
             <col style={{ width: '10%', minWidth: '8rem' }} />
@@ -64,7 +63,7 @@ const SignedExtrinsics = () => {
             <col style={{ width: '10%', minWidth: '10rem' }} />
             <col style={{ width: '1%', minWidth: '6rem' }} />
           </colgroup>
-          <tr className="table-head">
+          <tr className="pd-table-head">
             <th>Extrinsic ID</th>
             <th>Block</th>
             <th>Signer</th>
@@ -86,16 +85,14 @@ const SignedExtrinsics = () => {
                   return (
                     <tr
                       key={extrinsic.id}
+                      data-extrinsic-id={extrinsic.id}
                       className={cn(
-                        'table-row',
+                        'pd-table-row',
                         {
                           ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: extrinsicIndex === 0,
                         },
                       )}
-                      // eslint-disable-next-line react/jsx-no-bind
-                      onClick={() => {
-                        handleOpenModal(extrinsic);
-                      }}
+                      onClick={handleOpenModal}
                     >
                       <td>{extrinsic.id}</td>
                       <td>{extrinsic.blockNumber}</td>
@@ -132,10 +129,16 @@ const SignedExtrinsics = () => {
               )
           }
         </table >
-      </PDScrollArea >
-      {selectedExtrinsic && (
-        <ShowJsonModal onClose={handleCloseModal} extrinsic={selectedExtrinsic} />
-      )}
+      </PDScrollArea>
+
+      {
+        refSelectedExtrinsic.current && (
+          <ShowJsonModal
+            onClose={toggleVisibility}
+            extrinsic={refSelectedExtrinsic.current}
+          />
+        )
+      }
     </div>
 
   );

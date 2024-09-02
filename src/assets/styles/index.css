@@ -146,10 +146,7 @@ html[data-color-scheme="light"] #icon-checked {
 }
 
 /* Explorer tables */
-.pd-table {
-  @apply w-full;
-
-  .table-head {
+  .pd-table-head {
     @apply bg-dev-purple-100 text-left;
     @apply dark:bg-dev-black-900;
     @apply sticky top-0 z-10;
@@ -159,7 +156,7 @@ html[data-color-scheme="light"] #icon-checked {
     }
   }
 
-  .table-row {
+  .pd-table-row {
       @apply border-b border-dev-purple-100 cursor-pointer;
       @apply dark:border-dev-purple-700;
       @apply hover:bg-dev-purple-100 dark:hover:bg-dev-purple-900;
@@ -169,4 +166,3 @@ html[data-color-scheme="light"] #icon-checked {
       }
 
   }
-}
