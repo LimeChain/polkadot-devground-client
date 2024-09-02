@@ -5,10 +5,10 @@ import {
 
 import { BinaryParam } from './BinaryParam';
 import { CodecParam } from './CodecParam';
+import styles from './styles.module.css';
 
 import type { ICallArgs } from '.';
 import type { TupleVar } from '@polkadot-api/metadata-builders';
-
 interface ISequence extends ICallArgs {
   tuple: TupleVar;
 }
@@ -20,7 +20,7 @@ export const TupleParam = ({ tuple, onChange }: ISequence) => {
   ) {
     return (
       <div className="border-l pl-4 pt-2">
-        <BinaryParam onChange={onChange} />;
+        <BinaryParam onChange={onChange} minLength={0} />;
       </div>
     );
   }
@@ -38,6 +38,7 @@ export const _TupleParam = ({
   onChange,
 }: ISequence) => {
   const [params, setParams] = useState(Array.from({ length: tuple.value.length }).fill(undefined));
+  console.log('TUPLE');
 
   useEffect(() => {
     onChange(params);
@@ -45,7 +46,7 @@ export const _TupleParam = ({
   }, [params]);
 
   return (
-    <>
+    <div className={styles.codecContainer}>
       {
         tuple.value.map((entry, index) => (
           <CodecParam
@@ -58,6 +59,6 @@ export const _TupleParam = ({
           />
         ))
       }
-    </>
+    </div>
   );
 };

@@ -1,0 +1,11 @@
+.codecContainer {
+  @apply border-l border-dashed pl-4 pt-2 empty:hidden flex flex-col gap-4
+}
+
+.codecInput {
+  @apply w-full p-2 border border-transparent outline-none
+}
+
+.codecSelect {
+  @apply w-full p-2
+}

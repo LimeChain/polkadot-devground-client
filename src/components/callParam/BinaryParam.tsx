@@ -1,15 +1,21 @@
 import { Binary } from 'polkadot-api';
 import React, {
   useCallback,
+  useEffect,
   useState,
 } from 'react';
+
+import { cn } from '@utils/helpers';
+
+import styles from './styles.module.css';
 
 import type { ICallArgs } from '.';
 
 interface IBinaryParam extends ICallArgs {
+  minLength: number;
 }
 
-export const BinaryParam = ({ onChange }: IBinaryParam) => {
+export const BinaryParam = ({ onChange, minLength }: IBinaryParam) => {
 
   const [useFileUpload, setUseFileUpload] = useState(false);
 
@@ -30,36 +36,49 @@ export const BinaryParam = ({ onChange }: IBinaryParam) => {
       </label>
       {
         useFileUpload
-          ? <FileUploadBinaryParam onChange={onChange} />
-          : <TextBinaryParam onChange={onChange} />
+          ? <FileUploadBinaryParam onChange={onChange} minLength={minLength} />
+          : <TextBinaryParam onChange={onChange} minLength={minLength} />
       }
     </div>
   );
 };
 
-export const TextBinaryParam = ({ onChange }: IBinaryParam) => {
-  const [value, setValue] = useState('');
+// const defaultBinaryValue = '0x0000000000000000000000000000000000000000000000000000000000000000';
+export const TextBinaryParam = ({ onChange, minLength }: IBinaryParam) => {
+  const binaryMinLength = minLength * 2;
+  const encodedValue = String().padEnd(binaryMinLength, '0');
+
+  const [value, setValue] = useState(binaryMinLength ? `0x${encodedValue}` : '');
+  const [isError, setIsError] = useState(false);
 
   const handleOnChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
     setValue(text);
-
-    const isHex = text.startsWith('0x');
-    if (isHex) {
-      onChange(Binary.fromHex(text));
-    } else {
-      onChange(Binary.fromText(text));
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const isHex = value.startsWith('0x');
+
+    const isMinLengthError = binaryMinLength ? value.length < binaryMinLength + 1 : false;
+    const isMaxLengthError = binaryMinLength ? value.length > binaryMinLength + 2 : false;
+    setIsError(isMinLengthError || isMaxLengthError);
+    if (isHex) {
+      onChange(Binary.fromHex(value));
+
+    } else {
+      onChange(Binary.fromText(value));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
 
   return (
     <input
       type="text"
       placeholder="Binary hex or string"
-      className="p-2"
+      className={cn(styles.codecInput, { ['!border-dev-red-700']: isError })}
       value={value}
+      // minLength={minLength ? minLength * 2 + 2 : 0}
+      required
       onChange={handleOnChange}
     />
   );

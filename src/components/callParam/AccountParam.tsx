@@ -7,12 +7,13 @@ import React, {
 
 import { useStoreWallet } from 'src/stores/wallet';
 
+import styles from './styles.module.css';
+
 import type { ICallArgs } from '.';
 import type {
   AccountId20,
   AccountId32,
 } from '@polkadot-api/metadata-builders';
-
 export interface IAccountParam extends ICallArgs {
   accountId: AccountId20 | AccountId32;
 }
@@ -79,16 +80,14 @@ const AccountSelectParam = ({ accounts, onChange }: IAccountSelectParam) => {
     const accAddress = e.target.value;
     const selectedAccount = accounts.find(ac => ac.address === accAddress);
 
-    // if (selectedAccount) {
     onChange(selectedAccount);
-    // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [accounts]);
 
   return (
     <select
       onChange={handleOnAccountSelect}
-      className="w-full p-2"
+      className={styles.codecSelect}
     >
       {
         accounts.length > 0
@@ -135,7 +134,7 @@ const CustomAccountParam = ({
       type="text"
       placeholder={accountId.type}
       value={value}
-      className="w-full p-2"
+      className={styles.codecInput}
       // eslint-disable-next-line react/jsx-no-bind
       onChange={(event) => setValue(event.target.value)}
     />

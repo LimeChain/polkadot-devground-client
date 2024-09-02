@@ -4,6 +4,7 @@ import {
 } from 'react';
 
 import { CodecParam } from './CodecParam';
+import styles from './styles.module.css';
 
 import type { ICallArgs } from '.';
 import type { EnumVar } from '@polkadot-api/metadata-builders';
@@ -35,7 +36,7 @@ export const EnumParam = ({ onChange, ...props }: IEnumParam) => {
         value={key}
         // eslint-disable-next-line react/jsx-no-bind
         onChange={(e) => setKey(e.target.value)}
-        className="p-1"
+        className={styles.codecSelect}
       >
         {
           enumKeys.map((e, i) => {
@@ -53,8 +54,12 @@ export const EnumParam = ({ onChange, ...props }: IEnumParam) => {
       {
         variable
         && (
-          <div className="border-l pl-4 pt-2 empty:hidden">
-            <CodecParam variable={variable} onChange={handleSetValue} />
+          <div className={styles.codecContainer}>
+            <CodecParam
+              key={`${variable.type}-${variable?.id}`}
+              variable={variable}
+              onChange={handleSetValue}
+            />
           </div>
         )
       }
