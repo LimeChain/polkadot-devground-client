@@ -52,7 +52,11 @@ const LatestBlocks = () => {
   return (
     <div className="grid h-full grid-rows-[40px_46px_1fr] gap-6">
       <PageHeader title="Latest Blocks" />
-      <SearchBar label="Search by Block" />
+      <SearchBar
+        label="Search by Block"
+        type="block"
+        classNames="mt-6"
+      />
       <PDScrollArea
         className="table-container"
         verticalScrollClassNames="pt-8"
