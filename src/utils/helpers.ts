@@ -122,3 +122,15 @@ export const formatTokenValue = (
   }) => {
   return (value / 10 ** tokenDecimals).toFixed(precision);
 };
+
+export const findBlockByNumber = (blocksData: Map<number, any>, value: string) => {
+  return Array.from(blocksData.values()).find(
+    (block) => block.header.number === Number(value),
+  );
+};
+
+export const findExtrinsicById = (blocksData: Map<number, any>, value: string) => {
+  return Array.from(blocksData.values())
+    .flatMap((block) => block?.body?.extrinsics ?? [])
+    .find((extrinsic) => extrinsic.id === value);
+};

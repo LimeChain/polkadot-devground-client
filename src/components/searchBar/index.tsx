@@ -5,7 +5,11 @@ import React, {
 
 import { Icon } from '@components/icon';
 import { useStoreChain } from '@stores';
-import { cn } from '@utils/helpers';
+import {
+  cn,
+  findBlockByNumber,
+  findExtrinsicById,
+} from '@utils/helpers';
 
 import { Results } from './results';
 
@@ -19,83 +23,65 @@ interface SearchBarProps {
 export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
   const blocksData = useStoreChain?.use?.blocksData?.();
   const [blockNumber, setBlockNumber] = useState<string | null>(null);
-  const [extrinsics, setExtrinsics] = useState<string | null>(null);
+  const [extrinsics, setExtrinsics] = useState<string[]>([]);
   const [searchInput, setSearchInput] = useState('');
 
-  const searchAll = useCallback(
-    (value: string) => {
-      const block = Array.from(blocksData.values()).find(
-        (block) => block.header.number === Number(value),
-      );
+  const searchAll = useCallback((value: string) => {
+    const block = findBlockByNumber(blocksData, value);
+    const extrinsicMatch = /^([0-9]+)-[0-9]+$/.test(value);
 
-      if (/^([0-9]+)-[0-9]+$/.test(value)) {
-        const extrinsic = Array.from(blocksData.values())
-          .flatMap((block) => block?.body?.extrinsics ?? [])
-          .filter((extrinsic) => extrinsic.id === value);
-
-        setExtrinsics(extrinsic ?? null);
-        console.log('Extrinsic found:', extrinsic);
-        return;
-      }
-
+    if (extrinsicMatch) {
+      const extrinsic = findExtrinsicById(blocksData, value);
+      setExtrinsics([extrinsic]);
+    } else {
       setBlockNumber(block?.header.number ?? null);
       setExtrinsics(block?.body?.extrinsics ?? null);
-    },
-    [blocksData],
+    }
+  },
+  [blocksData],
   );
 
-  const searchBlock = useCallback(
-    (value: string) => {
-      if (value.startsWith('0x')) {
-        console.log('Hexadecimal input detected');
-      }
-      const block = Array.from(blocksData.values()).find(
-        (block) => block.header.number === Number(value),
-      );
-      setBlockNumber(block?.header.number ?? null);
-    },
-    [blocksData],
-  );
+  const searchBlock = useCallback((value: string) => {
+    if (value.startsWith('0x')) {
+      console.log('Hexadecimal input detected');
+    }
 
-  const searchExtrinsic = useCallback(
-    (value: string) => {
-      if (/^([0-9]+)-[0-9]+$/.test(value)) {
-        const extrinsic = Array.from(blocksData.values())
-          .flatMap((block) => block?.body?.extrinsics?.slice(2) ?? [])
-          .find((extrinsic) => extrinsic.id === value);
+    const block = findBlockByNumber(blocksData, value);
+    setBlockNumber(block?.header.number ?? null);
+  }, [blocksData]);
 
-        setExtrinsics(extrinsic ?? null);
-      }
-      return null;
-    },
-    [blocksData],
-  );
+  const searchExtrinsic = useCallback((value: string) => {
+    if (/^([0-9]+)-[0-9]+$/.test(value)) {
+      const extrinsic = findExtrinsicById(blocksData, value);
+      setExtrinsics([extrinsic]);
+    }
+  }, [blocksData]);
 
-  const handleSearchInputChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const value = event.target.value;
-      setSearchInput(value);
+  const handleSearchInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchInput(value);
 
-      switch (type) {
-        case 'all':
-          searchAll(value);
-          break;
-        case 'block':
-          searchBlock(value);
-          break;
-        case 'extrinsics':
-          searchExtrinsic(value);
-          break;
-        default:
-          break;
-      }
-    },
-    [searchAll, searchBlock, searchExtrinsic, type],
-  );
+    switch (type) {
+      case 'all':
+        searchAll(value);
+        break;
+      case 'block':
+        searchBlock(value);
+        break;
+      case 'extrinsics':
+        searchExtrinsic(value);
+        break;
+      default:
+        break;
+    }
+  }, [searchAll, searchBlock, searchExtrinsic, type]);
 
   return (
     <>
-      <div className={cn('flex items-center', classNames)}>
+      <div className={cn(
+        'flex items-center', classNames,
+      )}
+      >
         <div
           className={cn(
             'flex w-96 items-center gap-1 p-3',
@@ -111,9 +97,8 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
             value={searchInput}
             onChange={handleSearchInputChange}
             className={cn(
-              'w-full',
+              'w-full dark:bg-transparent',
               'caret-dev-pink-500 focus-visible:outline-none',
-              'dark:bg-transparent',
               'placeholder:font-geist placeholder:font-body2-regular dark:placeholder-dev-purple-300',
             )}
           />
@@ -129,21 +114,16 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
           <span className="font-geist font-body2-bold">Search</span>
         </button>
       </div>
-
-      <div
-        className={cn(
-          'absolute top-40 z-50 w-96 p-2',
-          'bg-dev-black-1000 dark:bg-dev-purple-50',
-          'pointer-events-none -translate-y-2',
-          'transition-all',
-          'opacity-0',
+      <Results
+        blockNumber={blockNumber}
+        extrinsics={extrinsics}
+        classNames={cn(
+          'opacity-0 transition-all',
           {
-            ['opacity-100 translate-y-0 pointer-events-auto']: blockNumber || extrinsics,
-          },
-        )}
-      >
-        <Results block={blockNumber} extrinsics={extrinsics} />
-      </div>
+            'opacity-100 translate-y-0 pointer-events-auto': searchInput,
+          })
+        }
+      />
     </>
   );
 };
