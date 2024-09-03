@@ -34,6 +34,7 @@ export type TChainDescriptor = TRelayChainDecsriptor | TParaChainDecsriptor;
 
 export type TApi = TypedApi<TChainDescriptor>;
 export type TPeopleApi = TypedApi<TParaChainDecsriptor>;
+export type TRelayApi = TypedApi<TRelayChainDecsriptor>;
 export type TStakingApi = TypedApi<TStakingChainDecsriptor>;
 
 export type TChain = TRelayChain | TParaChain;
