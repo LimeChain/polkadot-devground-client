@@ -1,5 +1,9 @@
 import { formatDistanceToNowStrict } from 'date-fns';
-import { useCallback } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Icon } from '@components/icon';
@@ -12,11 +16,31 @@ import {
   truncateAddress,
 } from '@utils/helpers';
 
+interface Block {
+  header: {
+    number: number;
+    timestamp: number;
+  };
+  body: {
+    extrinsics: any[];
+    events: any[];
+  };
+}
+
 const LatestBlocks = () => {
   const navigate = useNavigate();
-  const latestFinalizedBlock = useStoreChain.use.finalizedBlock?.();
   const blocksData = useStoreChain?.use?.blocksData?.();
+  const bestBlock = useStoreChain?.use?.bestBlock?.();
+  const latestFinalizedBlock = useStoreChain?.use?.finalizedBlock?.();
+  const chain = useStoreChain?.use?.chain?.();
+
+  const [blocks, setBlocks] = useState<Block[]>([]);
   const isLoading = blocksData.size === 0;
+
+  useEffect(() => {
+    const blocksArray = Array.from(blocksData.values()).reverse();
+    setBlocks(blocksArray);
+  }, [blocksData, bestBlock, chain, latestFinalizedBlock]);
 
   const goRouteId = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
     navigate(`/explorer/${e.currentTarget.dataset.blockNumber}`);
@@ -53,7 +77,7 @@ const LatestBlocks = () => {
             isLoading
               ? 'Loading...'
               : (
-                Array.from(blocksData.values()).reverse().map((block, blockIndex) => {
+                blocks.map((block, blockIndex) => {
                   const timeAgo = block.header.timestamp && formatDistanceToNowStrict(
                     new Date(block.header.timestamp),
                     { addSuffix: true },
@@ -87,7 +111,7 @@ const LatestBlocks = () => {
                               <Icon
                                 size={[16]}
                                 name="icon-clock"
-                                className="text-dev-yellow-700"
+                                className="animate-rotate text-dev-yellow-700"
                               />
                             )
                         }
