@@ -40,7 +40,7 @@ const LatestBlocks = () => {
             <col style={{ width: '20%', minWidth: '10rem' }} />
             <col style={{ width: '20%', minWidth: '10rem' }} />
           </colgroup>
-          <tr>
+          <tr className="pd-table-head">
             <th>Block</th>
             <th>Status</th>
             <th>Time</th>
