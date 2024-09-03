@@ -15,80 +15,102 @@ const Button = ({ children }) => (
   </button>
 );
 
-export const Results = ({ blockNumber, extrinsics = [], classNames }) => (
-  <div className={cn(
-    'absolute top-40 z-50 w-96 p-2',
-    'bg-dev-black-1000 dark:bg-dev-purple-50',
-    'pointer-events-none -translate-y-2',
-    classNames,
-  )}
-  >
-    {/* <div className="mb-4 flex gap-2 border-b border-dev-purple-700 px-2 font-geist dark:border-dev-purple-300 dark:text-dev-black-800">
-      <Button>All</Button>
-      <Button>Blocks</Button>
-      <Button>Extrinsics</Button>
-    </div> */}
-    <PDScrollArea
-      verticalScrollClassNames="py-4"
-      verticalScrollThumbClassNames="before:bg-dev-purple-700 dark:before:bg-dev-purple-300"
+export const Results = ({ blockNumber, extrinsics = [], handleOpenModal, classNames }) => {
+
+  return (
+    <div className={cn(
+      'absolute z-[101] w-[38rem] p-2',
+      'bg-dev-black-1000 dark:bg-dev-purple-50',
+      'pointer-events-none -translate-y-2',
+      classNames,
+    )}
     >
-      <div className="flex flex-col gap-4">
-        {blockNumber && (
-          <>
-            <div className={cn(
-              'border-b p-1',
-              'font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000',
-            )}
-            >
-              Blocks
-            </div>
-            <PDLink
-              to={`/explorer/${blockNumber}`}
-              className={cn(
-                'flex w-full items-center',
-                'px-4 py-3.5',
-                'transition-[background] duration-300',
-                'hover:bg-dev-black-900 hover:dark:bg-dev-purple-200',
+      {/* <div className="mb-4 flex gap-2 border-b border-dev-purple-700 px-2 font-geist dark:border-dev-purple-300 dark:text-dev-black-800">
+        <Button>All</Button>
+        <Button>Blocks</Button>
+        <Button>Extrinsics</Button>
+      </div> */}
+      <PDScrollArea
+        verticalScrollClassNames="py-4"
+        verticalScrollThumbClassNames="before:bg-dev-purple-700 dark:before:bg-dev-purple-300"
+        className="h-80 lg:h-full"
+      >
+        <div className="flex flex-col gap-4">
+          {blockNumber && (
+            <>
+              <div className={cn(
+                'border-b p-1',
+                'font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000',
               )}
-            >
-              <p className="font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000">
-                Block#
-              </p>
-              <p className="font-geist text-dev-white-1000 font-body1-bold dark:text-dev-black-300">
-                {blockNumber}
-              </p>
-            </PDLink>
-          </>
-        )}
-
-        {extrinsics?.length > 0 && (
-          <>
-            <div className={cn(
-              'border-b p-1',
-              'font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000',
-            )}
-            >
-              Extrinsics ({extrinsics?.length})
-            </div>
-
-            {extrinsics.map(({ id }) => (
-              <div
-                key={id}
+              >
+                Blocks
+              </div>
+              <PDLink
+                to={`/explorer/${blockNumber}`}
                 className={cn(
-                  'flex w-full items-center',
+                  'flex w-full items-center justify-between',
                   'px-4 py-3.5',
                   'transition-[background] duration-300',
                   'hover:bg-dev-black-900 hover:dark:bg-dev-purple-200',
                 )}
               >
                 <p className="font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000">
-                  Extrinsic# {id}
+                  Block#
+                  <span className="font-body2-bold"> {blockNumber}</span>
                 </p>
+                <p className="font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000">
+                  Block
+                </p>
+              </PDLink>
+            </>
+          )}
+
+          {extrinsics?.length > 0 && (
+            <>
+              <div className={cn(
+                'border-b p-1',
+                'font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000',
+              )}
+              >
+                Extrinsics ({extrinsics?.length})
               </div>
-            ))}
-          </>
-        )}
-      </div>
-    </PDScrollArea>
-  </div>
-);
+
+              {extrinsics.map(({ id }) => (
+                <div
+                  key={id}
+                  data-extrinsic-id={id}
+                  onClick={handleOpenModal}
+                  className={cn(
+                    'flex w-full items-center justify-between',
+                    'cursor-pointer px-4 py-3.5',
+                    'transition-[background] duration-300',
+                    'hover:bg-dev-black-900 hover:dark:bg-dev-purple-200',
+                  )}
+                >
+                  <p className="font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000">
+                  Extrinsic#
+                    <span className="font-body2-bold"> {id}</span>
+                  </p>
+                  <p className="font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000">
+                  Extrinsic
+                  </p>
+                </div>
+              ))}
+            </>
+          )}
+
+          {blockNumber || extrinsics?.length > 0 ? null : (
+            <div className={cn(
+              'p-4',
+              'font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000',
+            )}
+            >
+              No results found
+            </div>
+          )}
+        </div>
+      </PDScrollArea>
+    </div>
+  );
+
+};

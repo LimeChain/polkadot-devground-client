@@ -1,9 +1,12 @@
+import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import React, {
   useCallback,
+  useRef,
   useState,
 } from 'react';
 
 import { Icon } from '@components/icon';
+import { ModalShowJson } from '@components/modals/modalShowJson';
 import { useStoreChain } from '@stores';
 import {
   cn,
@@ -12,6 +15,8 @@ import {
 } from '@utils/helpers';
 
 import { Results } from './results';
+
+import type { IMappedBlockExtrinsic } from '@custom-types/block';
 
 interface SearchBarProps {
   label: string;
@@ -25,6 +30,17 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
   const [blockNumber, setBlockNumber] = useState<string | null>(null);
   const [extrinsics, setExtrinsics] = useState<string[]>([]);
   const [searchInput, setSearchInput] = useState('');
+
+  const refSelectedExtrinsic = useRef<IMappedBlockExtrinsic | undefined>();
+
+  const [ShowJsonModal, toggleVisibility] = useToggleVisibility(ModalShowJson);
+
+  const handleOpenModal = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
+    const extrinsicId = e.currentTarget.getAttribute('data-extrinsic-id');
+    console.log(extrinsicId);
+    refSelectedExtrinsic.current = extrinsics.find(extrinsic => extrinsic.id === extrinsicId);
+    toggleVisibility();
+  }, [extrinsics, toggleVisibility]);
 
   const searchAll = useCallback((value: string) => {
     const block = findBlockByNumber(blocksData, value);
@@ -58,33 +74,39 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
   }, [blocksData]);
 
   const handleSearchInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+    let value = e.target.value;
+
+    value = value.replace(/,/g, '');
     setSearchInput(value);
 
-    switch (type) {
-      case 'all':
-        searchAll(value);
-        break;
-      case 'block':
-        searchBlock(value);
-        break;
-      case 'extrinsics':
-        searchExtrinsic(value);
-        break;
-      default:
-        break;
-    }
+    setTimeout(() => {
+      switch (type) {
+        case 'all':
+          searchAll(value);
+          break;
+        case 'block':
+          searchBlock(value);
+          break;
+        case 'extrinsics':
+          searchExtrinsic(value);
+          break;
+        default:
+          break;
+      }
+    }, 500);
+
   }, [searchAll, searchBlock, searchExtrinsic, type]);
 
   return (
-    <>
+    <div className="w-[38rem]">
       <div className={cn(
-        'flex items-center', classNames,
+        'flex items-center gap-4',
+        classNames,
       )}
       >
         <div
           className={cn(
-            'flex w-96 items-center gap-1 p-3',
+            'flex w-full items-center gap-1 p-3',
             'border-b border-gray-300',
             'dark:border-dev-purple-700 dark:bg-transparent',
             'duration-300 ease-out hover:border-dev-pink-500',
@@ -105,7 +127,7 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
         </div>
         <button
           className={cn(
-            'ml-4 px-6 py-2',
+            'px-6 py-2',
             'bg-dev-purple-700 text-dev-purple-300',
             'transition-all duration-300 hover:bg-dev-purple-900',
             'dark:bg-dev-purple-50 dark:text-dev-black-1000 dark:hover:bg-dev-purple-200',
@@ -117,6 +139,7 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
       <Results
         blockNumber={blockNumber}
         extrinsics={extrinsics}
+        handleOpenModal={handleOpenModal}
         classNames={cn(
           'opacity-0 transition-all',
           {
@@ -124,6 +147,15 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
           })
         }
       />
-    </>
+
+      {
+        refSelectedExtrinsic.current && (
+          <ShowJsonModal
+            onClose={toggleVisibility}
+            extrinsic={refSelectedExtrinsic.current}
+          />
+        )
+      }
+    </div>
   );
 };
