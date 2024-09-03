@@ -2,6 +2,8 @@ import { cn } from '@utils/helpers';
 
 import { ChainDataList } from './components/chainDataList';
 import { ChainStateBlock } from './components/chainStateBlock';
+import { ExtrinsicsList } from './components/extrinsicsList';
+import { LatestBlocksList } from './components/latestBlocksList';
 
 const Explorer = () => {
   return (
@@ -29,12 +31,17 @@ const Explorer = () => {
           title="Latest Blocks"
           link="latest-blocks"
           linkText="View All"
-        />
+        >
+          <LatestBlocksList />
+        </ChainDataList>
+
         <ChainDataList
           title="Extrinsics"
           link="extrinsics"
           linkText="View All"
-        />
+        >
+          <ExtrinsicsList />
+        </ChainDataList>
       </div>
     </div>
   );

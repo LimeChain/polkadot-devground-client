@@ -18,7 +18,7 @@ import {
 
 interface Block {
   header: {
-    identity: any;
+    identity: string | object;
     hash: string | undefined;
     number: number;
     timestamp: number;
@@ -41,6 +41,7 @@ const LatestBlocks = () => {
 
   useEffect(() => {
     const blocksArray = Array.from(blocksData.values()).reverse();
+
     setBlocks(blocksArray);
   }, [blocksData, bestBlock, chain, latestFinalizedBlock]);
 

@@ -1,17 +1,15 @@
 import { PDLink } from '@components/pdLink';
 import { cn } from '@utils/helpers';
 
-import { ExtrinsicsList } from './extrinsicsList';
-import { LatestBlocksList } from './latestBlocksList';
-
 interface TChainDataList {
   title: string;
   link: string;
   linkText: string;
+  children: React.ReactNode;
 }
 
-export const ChainDataList = ({ title, link, linkText }: TChainDataList) => {
-  const isLatestBlocks = link === 'latest-blocks';
+export const ChainDataList = ({ title, link, linkText, children }: TChainDataList) => {
+
   return (
     <div className="flex flex-1 flex-col gap-y-3 overflow-hidden">
       <div className="flex items-center gap-3">
@@ -26,14 +24,7 @@ export const ChainDataList = ({ title, link, linkText }: TChainDataList) => {
           {linkText}
         </PDLink>
       </div>
-      {
-        isLatestBlocks
-        && <LatestBlocksList />
-      }
-      {
-        !isLatestBlocks
-        && <ExtrinsicsList/>
-      }
+      {children}
     </div>
   );
 };

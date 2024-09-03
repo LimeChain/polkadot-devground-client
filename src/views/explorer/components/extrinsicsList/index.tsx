@@ -13,7 +13,7 @@ import { PDScrollArea } from '@components/pdScrollArea';
 import { useStoreChain } from '@stores';
 import { cn } from '@utils/helpers';
 
-import styles from '../styles.module.css';
+import styles from '../../styles.module.css';
 
 import type { IMappedBlockExtrinsic } from '@custom-types/block';
 
