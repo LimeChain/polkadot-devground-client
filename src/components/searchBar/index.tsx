@@ -34,6 +34,7 @@ export const SearchBar = (props: SearchBarProps) => {
         />
         <input
           type="text"
+          name="search"
           placeholder={label}
           value={searchInput}
           onChange={handleSearchInputChange}
@@ -41,7 +42,7 @@ export const SearchBar = (props: SearchBarProps) => {
             'w-full p-3 pl-10',
             'font-geist font-body2-regular',
             'rounded border-b border-gray-300',
-            'dark:border-dev-purple-700 dark:bg-transparent',
+            'bg-transparent dark:border-dev-purple-700',
             'placeholder:font-geist placeholder:font-body2-regular dark:placeholder-dev-purple-300',
           )}
         />
@@ -50,7 +51,7 @@ export const SearchBar = (props: SearchBarProps) => {
         disabled
         className={cn(
           'ml-4 px-6 py-2',
-          'bg-dev-purple-700 text-dev-purple-300',
+          'cursor-pointer bg-dev-purple-700 text-dev-white-200',
           'transition-all duration-300 hover:bg-dev-purple-900',
           'dark:bg-dev-purple-50 dark:text-dev-black-1000 dark:hover:bg-dev-purple-200',
         )}

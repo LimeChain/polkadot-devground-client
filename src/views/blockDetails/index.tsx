@@ -23,7 +23,7 @@ interface IBlockData {
   parentHash: string;
   stateRoot: string;
   specVersion: number;
-  validatorId: string | null;
+  validatorId: string;
   timeStamp: string;
 }
 
@@ -57,7 +57,7 @@ const BlockDetails = () => {
         parentHash: block.header.parentHash,
         stateRoot: block.header.stateRoot,
         specVersion: block.header.runtime?.spec_version || 0,
-        validatorId: block.header.identity,
+        validatorId: block.header.identity.toString(),
         timeStamp: format(new Date(block.header.timestamp), 'yyyy-MM-dd HH:mm:ss'),
       });
     }
@@ -189,7 +189,7 @@ const BlockDetails = () => {
             }
           </CopyToClipboard>
         </div>
-      </div >
+      </div>
 
       {/* State Root */}
       <div className={styles['pd-block-details']}>

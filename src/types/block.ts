@@ -26,6 +26,7 @@ export interface IBlockExtrinsic {
 }
 
 export interface IMappedBlockExtrinsic extends IBlockExtrinsic {
+  signer: any;
   id: string;
   blockNumber: number;
   timestamp: number;
@@ -43,7 +44,7 @@ export interface ITransferExtrinsicMethod extends IGenericExtrinsicMethod {
 }
 
 // TODO use correct types for signature / account ids (ss58 strings)
-export interface IMappedTransferExtrinsic extends IMappedBlockExtrinsic {
+export interface IMappedExtrinsic extends IMappedBlockExtrinsic {
   method: ITransferExtrinsicMethod;
   signature: string;
   signer: {
@@ -80,7 +81,7 @@ export interface ITransferExtrinsicMethod extends IGenericExtrinsicMethod {
 }
 
 // TODO use correct types for signature / account ids (ss58 strings)
-export interface IMappedTransferExtrinsic extends IMappedBlockExtrinsic {
+export interface IMappedExtrinsic extends IMappedBlockExtrinsic {
   method: ITransferExtrinsicMethod;
   signature: string;
   signer: {

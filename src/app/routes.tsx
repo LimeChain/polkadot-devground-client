@@ -11,6 +11,7 @@ const CodePreview = lazy(() => import('../views/codePreview'));
 const Callback = lazy(() => import('../components/login/callback'));
 const BlockDetails = lazy(() => import('../views/blockDetails'));
 const Explorer = lazy(() => import('../views/explorer'));
+const SignedExtrinsics = lazy(() => import('../views/signedExtrinsics'));
 
 const Forks = lazy(() => import('../views/forks'));
 
@@ -71,6 +72,10 @@ export const routes = () => ([
           {
             path: ':blockNumber',
             element: <BlockDetails />,
+          },
+          {
+            path: 'extrinsics',
+            element: <SignedExtrinsics />,
           },
         ],
       },

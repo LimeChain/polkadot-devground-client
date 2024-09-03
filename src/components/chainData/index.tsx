@@ -9,8 +9,8 @@ export const ChainData = () => {
         linkText="View All"
       />
       <ChainDataList
-        title="Signed Extrinsics"
-        link="signed-extrinsics"
+        title="Extrinsics"
+        link="extrinsics"
         linkText="View All"
       />
     </div>

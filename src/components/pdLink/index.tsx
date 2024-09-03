@@ -1,16 +1,19 @@
-import {
-  Link,
-  type LinkProps,
-} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { cn } from '@utils/helpers';
 
-export interface IPDLink extends LinkProps {}
+export interface IPDLink {
+  to: number | string;
+  children: React.ReactNode;
+  target?: string; // Add this line
+  className?: string;
+  rel?: string;
+}
 
 export const PDLink = ({ to, children, className, ...props }: IPDLink) => {
   return (
     <Link
-      to={to}
+      to={to.toString()}
       className={cn('text-current  hover:text-current', className)}
       {...props}
     >{children}

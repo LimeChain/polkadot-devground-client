@@ -1,3 +1,4 @@
+import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import { formatDistanceToNowStrict } from 'date-fns';
 import {
   useCallback,
@@ -7,6 +8,7 @@ import {
 } from 'react';
 
 import { Icon } from '@components/icon';
+import { ModalShowJson } from '@components/modals/modalShowJson';
 import {
   type IPDLink,
   PDLink,
@@ -23,10 +25,7 @@ import {
 
 import styles from './styles.module.css';
 
-import type {
-  IMappedBlockExtrinsic,
-  IMappedTransferExtrinsic,
-} from '@custom-types/block';
+import type { IMappedBlockExtrinsic } from '@custom-types/block';
 
 interface TChainDataList {
   title: string;
@@ -40,8 +39,9 @@ interface IRowLatestBlock {
 }
 
 interface IRowSignedExtrinsic {
-  extrinsic: IMappedTransferExtrinsic;
+  extrinsic: IMappedBlockExtrinsic;
   classNames: string;
+  handleOpenModal: (e: React.MouseEvent<HTMLTableRowElement>) => void;
 }
 
 const RowLatestBlock = (props: IRowLatestBlock) => {
@@ -69,7 +69,7 @@ const RowLatestBlock = (props: IRowLatestBlock) => {
 
   return (
     <PDLink
-      to={`${blockNumber}`}
+      to={blockNumber}
       className={cn(
         styles['pd-explorer-list'],
         classNames,
@@ -77,7 +77,7 @@ const RowLatestBlock = (props: IRowLatestBlock) => {
     >
       <div>
         <p>
-          <span className="text-dev-black-300 dark:text-dev-purple-300" >
+          <span className="text-dev-black-300 dark:text-dev-purple-300">
             Block#
           </span>
           {' '}
@@ -99,7 +99,12 @@ const RowLatestBlock = (props: IRowLatestBlock) => {
 };
 
 const RowSignedExtrinsic = (props: IRowSignedExtrinsic) => {
-  const { extrinsic, classNames } = props;
+  const {
+    extrinsic,
+    handleOpenModal,
+    classNames,
+  } = props;
+
   const {
     id,
     isSuccess,
@@ -114,16 +119,17 @@ const RowSignedExtrinsic = (props: IRowSignedExtrinsic) => {
     );
 
   return (
-    <PDLink
-      to={id}
+    <div
+      data-extrinsic-id={id}
       className={cn(
         styles['pd-explorer-list-extrinsic'],
         classNames,
       )}
+      onClick={handleOpenModal}
     >
       <div>
         <p>
-          <span className="text-dev-black-300 dark:text-dev-purple-300" >
+          <span className="text-dev-black-300 dark:text-dev-purple-300">
             Extrinsic#
           </span>
           <strong className="font-body1-bold">
@@ -157,7 +163,7 @@ const RowSignedExtrinsic = (props: IRowSignedExtrinsic) => {
         </span>
         <span>{timeAgo}</span>
       </div>
-    </PDLink>
+    </div>
   );
 };
 
@@ -172,9 +178,8 @@ export const LatestBlocks = () => {
   const isLoading = bestBlocks.length === 0;
 
   const loadInitialData = useCallback(() => {
-
     const keys: number[] = [];
-    blocksData.keys().forEach(key => {
+    Array.from(blocksData.keys()).forEach(key => {
       keys.unshift(key);
     });
 
@@ -247,72 +252,64 @@ export const LatestBlocks = () => {
 };
 
 export const SignedExtrinsics = () => {
+  const refSelectedExtrinsic = useRef<IMappedBlockExtrinsic | undefined>();
+
   const blocksData = useStoreChain?.use?.blocksData?.();
   const chain = useStoreChain?.use?.chain?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
+  const [ShowJsonModal, toggleVisibility] = useToggleVisibility(ModalShowJson);
 
-  const [signedExtrinsics, setSignedExtrinsics] = useState<IMappedTransferExtrinsic[]>([]);
+  const [signedExtrinsics, setSignedExtrinsics] = useState<IMappedBlockExtrinsic[]>([]);
 
-  const filterExtrinsics = useCallback((extrinsics: IMappedBlockExtrinsic[] = []) => {
-    // Filter out blocks with 0 or 1 extrinsics
-    return extrinsics.slice(2).reverse() as IMappedTransferExtrinsic[];
-  }, []);
-
-  const loadExtrinsic = useCallback(() => {
-    blocksData.entries().forEach(entry => {
-      const [, block] = entry;
-      if (!block) {
-        return;
-      }
-      const extrinsics = block.body.extrinsics;
-
-      const signedExtrinsics = filterExtrinsics(extrinsics);
-      setSignedExtrinsics(extrinsics => ([
-        ...signedExtrinsics,
-        ...extrinsics,
-      ]));
-
-    });
-
-  }, [
-    blocksData,
-    filterExtrinsics,
-  ]);
+  const handleOpenModal = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
+    const extrinsicId = e.currentTarget.getAttribute('data-extrinsic-id');
+    refSelectedExtrinsic.current = signedExtrinsics.find(extrinsic => extrinsic.id === extrinsicId);
+    toggleVisibility();
+  }, [signedExtrinsics, toggleVisibility]);
 
   useEffect(() => {
-    setSignedExtrinsics([]);
+    const extrinsics = Array.from(blocksData.values())
+      .flatMap(block => block?.body?.extrinsics?.slice(2) ?? [])
+      .reverse();
 
-    if (!latestBlock) {
-      return;
-    }
-
-    loadExtrinsic();
-  }, [latestBlock, loadExtrinsic]);
+    setSignedExtrinsics(extrinsics);
+  }, [blocksData, latestBlock]);
 
   return (
-    <PDScrollArea
-      className="h-80 lg:h-full"
-      viewportClassNames="py-3"
-      verticalScrollClassNames="py-3"
-    >
+    <>
+      <PDScrollArea
+        className="h-80 lg:h-full"
+        viewportClassNames="py-3"
+        verticalScrollClassNames="py-3"
+      >
+        {
+          signedExtrinsics.map((extrinsic, extrinsicIndex) => (
+            <RowSignedExtrinsic
+              key={`latest-signed-extrinsic-${extrinsic.id}-${chain.id}`}
+              extrinsic={extrinsic}
+              handleOpenModal={handleOpenModal}
+              classNames={cn(
+                {
+                  ['opacity-0 animate-fade-in']: extrinsicIndex === 0,
+                },
+              )}
+            />
+          ))
+        }
+        {
+          !latestBlock
+          && 'Loading...'
+        }
+      </PDScrollArea>
       {
-        signedExtrinsics.map((extrinsic, extrinsicIndex) => (
-          <RowSignedExtrinsic
-            key={`latest-signed-extrinsic-${extrinsic.id}-${chain.id}`}
-            extrinsic={extrinsic}
-            classNames={cn(
-              {
-                ['opacity-0 animate-fade-in']: extrinsicIndex === 0,
-              },
-            )}
+        refSelectedExtrinsic.current && (
+          <ShowJsonModal
+            onClose={toggleVisibility}
+            extrinsic={refSelectedExtrinsic.current}
           />
-        ))
+        )
       }
-      {
-        !latestBlock
-        && 'Loading...'
-      }
-    </PDScrollArea>
+    </>
   );
 };
 
