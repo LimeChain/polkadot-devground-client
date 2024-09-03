@@ -25,8 +25,15 @@ export const AccountParam = ({ accountId, onChange }: IAccountParam) => {
   const [useCustomAccount, setUseCustomAccount] = useState(false);
 
   useEffect(() => {
+    setUseCustomAccount(false);
     setAccount(accounts[0]);
   }, [accounts]);
+
+  useEffect(() => {
+    if (!useCustomAccount && accounts.length) {
+      onChange(accounts[0].address);
+    }
+  }, [useCustomAccount, onChange, accounts]);
 
   useEffect(() => {
     onChange(account?.address);
