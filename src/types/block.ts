@@ -26,7 +26,7 @@ export interface IBlockExtrinsic {
 }
 
 export interface IMappedBlockExtrinsic extends IBlockExtrinsic {
-  signer: any;
+  signer: unknown;
   id: string;
   blockNumber: number;
   timestamp: number;

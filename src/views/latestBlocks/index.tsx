@@ -18,12 +18,14 @@ import {
 
 interface Block {
   header: {
+    identity: any;
+    hash: string | undefined;
     number: number;
     timestamp: number;
   };
   body: {
-    extrinsics: any[];
-    events: any[];
+    extrinsics: unknown[];
+    events: unknown[];
   };
 }
 
