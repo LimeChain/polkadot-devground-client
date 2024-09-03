@@ -7,7 +7,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 
 import {
   CallParam,
@@ -103,10 +103,6 @@ const Extrinsics = () => {
         toast.loading('Loading...', { position: 'top-right', id: toastId, duration: 99999 });
         const res = api.tx[palletSelected.name][callSelected?.name](callArgs);
         console.log(res);
-        const encoded = (await res.getEncodedData());
-        // const signed = (await res.sign(accounts.at(0)?.polkadotSigner));
-        // console.log('sig', signed);
-        console.log('encoded', encoded.asHex());
 
         const submited = await res.signAndSubmit(signer);
         toast.success('Success', { position: 'top-right', id: toastId, duration: 4000 });
