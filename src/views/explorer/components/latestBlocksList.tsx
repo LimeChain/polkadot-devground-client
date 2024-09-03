@@ -21,8 +21,8 @@ interface Block {
     timestamp: number;
   };
   body: {
-    extrinsics: any[];
-    events: any[];
+    extrinsics: unknown[];
+    events: unknown[];
   };
 }
 
@@ -58,7 +58,6 @@ export const LatestBlocksList = () => {
               key={block.header.number}
               to={block.header.number}
               className={cn(
-                'grid grid-cols-[1fr_theme(width.28)]',
                 styles['pd-explorer-list'],
                 {
                   ['opacity-0 animate-fade-in']: blockIndex === 0,
@@ -66,18 +65,11 @@ export const LatestBlocksList = () => {
               )}
             >
               <div>
-                <p>
+                <span>
                   <span className="text-dev-black-300 dark:text-dev-purple-300">Block# </span>
                   <strong className="font-body1-bold">{formatNumber(block.header.number)}</strong>
-                </p>
-                <p>
-                  <span className="text-dev-black-300 dark:text-dev-purple-300">Includes </span>
-                  <span>{block.body.extrinsics.length} Extrinsics </span>
-                  {block.body.events.length} Events
-                </p>
-              </div>
-              <div>
-                <span className="flex justify-end gap-1 font-body1-bold">
+                </span>
+                <span className="flex items-center">
                   {
                     isFinalized
                       ? (
@@ -95,6 +87,13 @@ export const LatestBlocksList = () => {
                         />
                       )
                   }
+                </span>
+              </div>
+              <div>
+                <span>
+                  <span className="text-dev-black-300 dark:text-dev-purple-300">Includes </span>
+                  <span>{block.body.extrinsics.length} Extrinsics </span>
+                  {block.body.events.length} Events
                 </span>
                 <span>{timeAgo}</span>
               </div>

@@ -54,7 +54,6 @@ export const ExtrinsicsList = () => {
               key={`latest-signed-extrinsic-${extrinsic.id}-${chain.id}`}
               data-extrinsic-id={extrinsic.id}
               className={cn(
-                'grid grid-cols-[1fr_theme(width.32)]',
                 styles['pd-explorer-list'],
                 {
                   ['opacity-0 animate-fade-in']: extrinsicIndex === 0,
@@ -63,21 +62,15 @@ export const ExtrinsicsList = () => {
               onClick={handleOpenModal}
             >
               <div>
-                <p>
+                <span>
                   <span className="text-dev-black-300 dark:text-dev-purple-300">
                   Extrinsic#
                   </span>
                   <strong className="font-body1-bold">
                     {' '}{extrinsic.id}
                   </strong>
-                </p>
-                <p>
-                  <span className="text-dev-black-300 dark:text-dev-purple-300">Action: </span>
-                  {extrinsic.method.section}.{extrinsic.method.method}
-                </p>
-              </div>
-              <div>
-                <span className="flex justify-end gap-1 font-body1-bold">
+                </span>
+                <span className="flex items-center">
                   {
                     extrinsic.isSuccess
                       ? (
@@ -95,6 +88,12 @@ export const ExtrinsicsList = () => {
                         />
                       )
                   }
+                </span>
+              </div>
+              <div>
+                <span>
+                  <span className="text-dev-black-300 dark:text-dev-purple-300">Action: </span>
+                  {extrinsic.method.section}.{extrinsic.method.method}
                 </span>
                 <span>
                   {formatDistanceToNowStrict(extrinsic.timestamp, { addSuffix: true })}
