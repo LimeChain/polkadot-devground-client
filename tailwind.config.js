@@ -15,9 +15,14 @@ export default {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
         },
+        rotate: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        }
       },
       animation: {
         'fade-in': 'fadeIn .5s ease-in-out forwards',
+        'rotate': 'rotate 2s linear infinite',
       },
       transitionProperty: {
         'height': 'height',
