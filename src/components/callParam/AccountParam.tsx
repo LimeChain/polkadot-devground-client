@@ -5,6 +5,7 @@ import React, {
   useState,
 } from 'react';
 
+import { Switch } from '@components/Switch';
 import { useStoreWallet } from 'src/stores/wallet';
 
 import styles from './styles.module.css';
@@ -45,15 +46,12 @@ export const AccountParam = ({ accountId, onChange }: IAccountParam) => {
   }, []);
 
   return (
-    <div className="flex flex-col gap-2">
-      <label className="flex gap-2">
-        use custom account
-        <input
-          type="checkbox"
-          checked={useCustomAccount}
-          onChange={handleUseCustomAccount}
-        />
-      </label>
+    <div className={styles.codecGroup}>
+      <Switch
+        title="Use Custom Accoun"
+        checked={useCustomAccount}
+        onChange={handleUseCustomAccount}
+      />
       <div>
         {
           useCustomAccount

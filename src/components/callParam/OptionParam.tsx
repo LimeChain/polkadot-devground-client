@@ -4,11 +4,13 @@ import {
   useState,
 } from 'react';
 
+import { Switch } from '@components/Switch';
+
 import { CodecParam } from './CodecParam';
+import styles from './styles.module.css';
 
 import type { ICallArgs } from '.';
 import type { OptionVar } from '@polkadot-api/metadata-builders';
-
 interface IOptionParam extends ICallArgs {
   option: OptionVar;
 }
@@ -31,16 +33,12 @@ export const OptionParam = ({ option, onChange }: IOptionParam) => {
   }, [value, includeOption]);
 
   return (
-    <div className="flex flex-col gap-2">
-      <label className="flex gap-2">
-        <span>Include option</span>
-        <input
-          id="fileUpload"
-          type="checkbox"
-          checked={includeOption}
-          onChange={handleIncludeOptionToggle}
-        />
-      </label>
+    <div className={styles.codecGroup}>
+      <Switch
+        title="Include Option"
+        checked={includeOption}
+        onChange={handleIncludeOptionToggle}
+      />
       {
         includeOption
         && <CodecParam variable={option.value} onChange={handleOnChange} />

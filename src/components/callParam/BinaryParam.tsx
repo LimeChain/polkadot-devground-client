@@ -6,6 +6,7 @@ import React, {
 } from 'react';
 
 import { FileUpload } from '@components/FileUpload';
+import { Switch } from '@components/Switch';
 import { cn } from '@utils/helpers';
 
 import styles from './styles.module.css';
@@ -25,16 +26,12 @@ export const BinaryParam = ({ onChange, minLength }: IBinaryParam) => {
   }, []);
 
   return (
-    <div className="flex flex-col gap-2">
-      <label className="flex w-fit gap-2">
-        <span>Upload File</span>
-        <input
-          id="fileUpload"
-          type="checkbox"
-          checked={useFileUpload}
-          onChange={handleFileUploadToggle}
-        />
-      </label>
+    <div className={styles.codecGroup}>
+      <Switch
+        title="File Upload"
+        checked={useFileUpload}
+        onChange={handleFileUploadToggle}
+      />
       {
         useFileUpload
           ? <FileUploadBinaryParam onChange={onChange} minLength={minLength} />
@@ -63,12 +60,12 @@ export const TextBinaryParam = ({ onChange, minLength }: IBinaryParam) => {
       const _value = Binary.fromHex(value);
       onChange(_value);
 
-      setIsError(_value.asHex().length !== requiredBinaryLength);
+      setIsError(minLength ? _value.asHex().length !== requiredBinaryLength : false);
     } else {
       const _value = Binary.fromHex(value);
       onChange(_value);
 
-      setIsError(_value.asHex().length !== requiredBinaryLength);
+      setIsError(minLength ? _value.asHex().length !== requiredBinaryLength : false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
