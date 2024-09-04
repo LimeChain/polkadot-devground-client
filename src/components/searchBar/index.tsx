@@ -11,14 +11,15 @@ import { ModalShowJson } from '@components/modals/modalShowJson';
 import { useStoreChain } from '@stores';
 import {
   cn,
+  debounce,
   findBlockByNumber,
   findExtrinsicById,
+  getBlockNumberByHash,
 } from '@utils/helpers';
 
-import { Results } from './results';
+import { Results } from './Results';
 
 import type { IMappedBlockExtrinsic } from '@custom-types/block';
-
 interface SearchBarProps {
   label: string;
   classNames?: string;
@@ -28,55 +29,78 @@ interface SearchBarProps {
 
 export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
   const blocksData = useStoreChain?.use?.blocksData?.();
-  const [blockNumber, setBlockNumber] = useState<string | null>(null);
-  const [extrinsics, setExtrinsics] = useState<IMappedBlockExtrinsic[]>([]);
   const [searchInput, setSearchInput] = useState('');
   const [isResultsVisible, setIsResultsVisible] = useState(false);
+  const [results, setResults] = useState<{
+    blockNumber: number | null;
+    extrinsics: IMappedBlockExtrinsic[] | null;
+  }>({
+    blockNumber: null,
+    extrinsics: null,
+  });
 
   const refSelectedExtrinsic = useRef<IMappedBlockExtrinsic | undefined>();
   const searchBarRef = useRef<HTMLDivElement>(null);
 
   const [ShowJsonModal, toggleVisibility] = useToggleVisibility(ModalShowJson);
 
-  const handleOpenModal = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
-    const extrinsicId = e.currentTarget.getAttribute('data-extrinsic-id');
-    refSelectedExtrinsic.current = extrinsics.find(extrinsic => extrinsic.id === extrinsicId) as IMappedBlockExtrinsic | undefined;
-    toggleVisibility();
-  }, [extrinsics, toggleVisibility]);
-
-  const handleSearchInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value;
-
-    value = value.replace(/,/g, '');
-    setSearchInput(value);
+  const debounceSearch = debounce((input) => {
     setIsResultsVisible(true);
 
-    setTimeout(() => {
-      const block = findBlockByNumber(blocksData, value);
-      const extrinsicMatch = /^([0-9]+)-[0-9]+$/.test(value);
+    let searchValue = input as string;
+    const startsWith0x = searchValue.startsWith('0x');
 
-      if (extrinsicMatch) {
-        const extrinsic = findExtrinsicById(blocksData, value);
-        setExtrinsics([extrinsic]);
-      } else {
-        setBlockNumber(block?.header.number ?? null);
-        setExtrinsics(block?.body?.extrinsics ?? null);
-      }
-    }, 500);
-  }, [blocksData]);
-
-  const handleClickOutside = useCallback((event: MouseEvent) => {
-    if (searchBarRef.current && !searchBarRef.current.contains(event.target as Node)) {
-      setIsResultsVisible(false);
+    if (startsWith0x) {
+      searchValue = getBlockNumberByHash(blocksData, searchValue);
+    } else {
+      searchValue = searchValue.replace(/,/g, '');
     }
-  }, []);
+
+    const block = findBlockByNumber(blocksData, searchValue);
+    const extrinsicMatch = /^([0-9]+)-[0-9]+$/.test(searchValue);
+
+    if (extrinsicMatch) {
+      const extrinsic = findExtrinsicById(blocksData, searchValue);
+
+      extrinsic
+      && setResults({
+        blockNumber: null,
+        extrinsics: [extrinsic],
+      });
+    } else {
+      setResults({
+        blockNumber: block?.header.number ?? null,
+        extrinsics: block?.body?.extrinsics ?? null,
+      });
+    }
+
+  }, 500);
+
+  const handleOpenModal = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const extrinsicId = e.currentTarget.getAttribute('data-extrinsic-id');
+    if (results.extrinsics) {
+      refSelectedExtrinsic.current = results.extrinsics.find(extrinsic => extrinsic.id === extrinsicId);
+    }
+    toggleVisibility();
+  }, [results, toggleVisibility]);
+
+  const handleSearchInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(e.target.value);
+    debounceSearch(e.target.value);
+  }, [debounceSearch]);
 
   useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchBarRef.current && !searchBarRef.current.contains(event.target as Node)) {
+        setIsResultsVisible(false);
+      }
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [handleClickOutside]);
+  }, []);
 
   return (
     <div ref={searchBarRef} className="w-[38rem]">
@@ -119,8 +143,7 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
       </div>
       {isResultsVisible && (
         <Results
-          blockNumber={blockNumber}
-          extrinsics={extrinsics}
+          results={results}
           handleOpenModal={handleOpenModal}
           type={type}
           classNames={cn(

@@ -134,3 +134,11 @@ export const findExtrinsicById = (blocksData: Map<number, any>, value: string) =
     .flatMap((block) => block?.body?.extrinsics ?? [])
     .find((extrinsic) => extrinsic.id === value);
 };
+
+export const getBlockNumberByHash = (blocksData: Map<number, any>, hash: string): any => {
+  const block = Array.from(blocksData.values()).find(
+    (block) => block.header.hash === hash,
+  );
+
+  return block?.header.number;
+};
