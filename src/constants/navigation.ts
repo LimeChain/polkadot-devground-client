@@ -28,6 +28,11 @@ export const NAVIGATION_ITEMS: TNavItem[] = [
           icon: 'icon-github',
         },
         {
+          title: 'Runtime Calls',
+          to: '/runtime-calls',
+          icon: 'icon-github',
+        },
+        {
           title: 'Extrinsics',
           to: '/extrinsics',
           icon: 'icon-github',

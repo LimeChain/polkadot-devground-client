@@ -16,6 +16,7 @@ const Forks = lazy(() => import('../views/forks'));
 const Extrinsics = lazy(() => import('../views/Extrinsics'));
 const ChainState = lazy(() => import('../views/ChainState'));
 const Constants = lazy(() => import('../views/Constants'));
+const RuntimeCalls = lazy(() => import('../views/RuntimeCalls'));
 
 export const routes = () => ([
   {
@@ -108,6 +109,16 @@ export const routes = () => ([
           {
             path: '',
             element: <Constants />,
+          },
+        ],
+      },
+      {
+        path: 'runtime-calls',
+        element: <LayoutBasic hasFooter classNames="lg:pb-8" />,
+        children: [
+          {
+            path: '',
+            element: <RuntimeCalls />,
           },
         ],
       },
