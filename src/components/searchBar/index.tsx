@@ -29,7 +29,7 @@ interface SearchBarProps {
 export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
   const blocksData = useStoreChain?.use?.blocksData?.();
   const [blockNumber, setBlockNumber] = useState<string | null>(null);
-  const [extrinsics, setExtrinsics] = useState<string[]>([]);
+  const [extrinsics, setExtrinsics] = useState<IMappedBlockExtrinsic[]>([]);
   const [searchInput, setSearchInput] = useState('');
   const [isResultsVisible, setIsResultsVisible] = useState(false);
 
@@ -40,41 +40,9 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
 
   const handleOpenModal = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
     const extrinsicId = e.currentTarget.getAttribute('data-extrinsic-id');
-    console.log(extrinsicId);
-    refSelectedExtrinsic.current = extrinsics.find(extrinsic => extrinsic.id === extrinsicId);
+    refSelectedExtrinsic.current = extrinsics.find(extrinsic => extrinsic.id === extrinsicId) as IMappedBlockExtrinsic | undefined;
     toggleVisibility();
   }, [extrinsics, toggleVisibility]);
-
-  const searchAll = useCallback((value: string) => {
-    const block = findBlockByNumber(blocksData, value);
-    const extrinsicMatch = /^([0-9]+)-[0-9]+$/.test(value);
-
-    if (extrinsicMatch) {
-      const extrinsic = findExtrinsicById(blocksData, value);
-      setExtrinsics([extrinsic]);
-    } else {
-      setBlockNumber(block?.header.number ?? null);
-      setExtrinsics(block?.body?.extrinsics ?? null);
-    }
-  },
-  [blocksData],
-  );
-
-  const searchBlock = useCallback((value: string) => {
-    if (value.startsWith('0x')) {
-      console.log('Hexadecimal input detected');
-    }
-
-    const block = findBlockByNumber(blocksData, value);
-    setBlockNumber(block?.header.number ?? null);
-  }, [blocksData]);
-
-  const searchExtrinsic = useCallback((value: string) => {
-    if (/^([0-9]+)-[0-9]+$/.test(value)) {
-      const extrinsic = findExtrinsicById(blocksData, value);
-      setExtrinsics([extrinsic]);
-    }
-  }, [blocksData]);
 
   const handleSearchInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
@@ -84,22 +52,18 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
     setIsResultsVisible(true);
 
     setTimeout(() => {
-      switch (type) {
-        case 'all':
-          searchAll(value);
-          break;
-        case 'block':
-          searchBlock(value);
-          break;
-        case 'extrinsics':
-          searchExtrinsic(value);
-          break;
-        default:
-          break;
+      const block = findBlockByNumber(blocksData, value);
+      const extrinsicMatch = /^([0-9]+)-[0-9]+$/.test(value);
+
+      if (extrinsicMatch) {
+        const extrinsic = findExtrinsicById(blocksData, value);
+        setExtrinsics([extrinsic]);
+      } else {
+        setBlockNumber(block?.header.number ?? null);
+        setExtrinsics(block?.body?.extrinsics ?? null);
       }
     }, 500);
-
-  }, [searchAll, searchBlock, searchExtrinsic, type]);
+  }, [blocksData]);
 
   const handleClickOutside = useCallback((event: MouseEvent) => {
     if (searchBarRef.current && !searchBarRef.current.contains(event.target as Node)) {
@@ -158,6 +122,7 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
           blockNumber={blockNumber}
           extrinsics={extrinsics}
           handleOpenModal={handleOpenModal}
+          type={type}
           classNames={cn(
             'opacity-0 transition-all',
             {

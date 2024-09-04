@@ -1,21 +1,33 @@
+import { useState } from 'react';
+
 import { PDLink } from '@components/pdLink';
 import { PDScrollArea } from '@components/pdScrollArea';
 import { cn } from '@utils/helpers';
 
-const Button = ({ children }) => (
+const Button = ({ children, onClick, isActive }) => (
   <button
+    onClick={onClick}
     className={cn(
       'px-2 py-2.5 font-body2-regular hover:border-dev-pink-500',
       'text-dev-white-400 hover:text-dev-white-200 dark:text-dev-black-800 dark:hover:text-dev-black-1000',
       'border-b-2 border-b-transparent hover:border-b-dev-pink-500',
       'duration-300 ease-in',
+      isActive && 'border-b-dev-pink-500',
     )}
   >
     {children}
   </button>
 );
 
-export const Results = ({ blockNumber, extrinsics = [], handleOpenModal, classNames }) => {
+export const Results = ({ blockNumber, extrinsics = [], handleOpenModal, type, classNames }) => {
+  const [filter, setFilter] = useState(type);
+
+  const handleFilterChange = (newFilter) => {
+    setFilter(newFilter);
+  };
+
+  const filteredExtrinsics = filter === 'all' || filter === 'extrinsics' ? extrinsics : [];
+  const showBlock = filter === 'all' || filter === 'block';
 
   return (
     <div className={cn(
@@ -25,18 +37,18 @@ export const Results = ({ blockNumber, extrinsics = [], handleOpenModal, classNa
       classNames,
     )}
     >
-      {/* <div className="mb-4 flex gap-2 border-b border-dev-purple-700 px-2 font-geist dark:border-dev-purple-300 dark:text-dev-black-800">
-        <Button>All</Button>
-        <Button>Blocks</Button>
-        <Button>Extrinsics</Button>
-      </div> */}
+      <div className="mb-4 flex gap-2 border-b border-dev-purple-700 px-2 font-geist dark:border-dev-purple-300 dark:text-dev-black-800">
+        <Button onClick={() => handleFilterChange('all')} isActive={filter === 'all'}>All</Button>
+        <Button onClick={() => handleFilterChange('block')} isActive={filter === 'block'}>Blocks ({blockNumber ? 1 : 0})</Button>
+        <Button onClick={() => handleFilterChange('extrinsics')} isActive={filter === 'extrinsics'}>Extrinsics ({extrinsics?.length || 0})</Button>
+      </div>
       <PDScrollArea
         verticalScrollClassNames="py-4"
         verticalScrollThumbClassNames="before:bg-dev-purple-700 dark:before:bg-dev-purple-300"
         className="h-80 lg:h-full"
       >
         <div className="flex flex-col gap-4">
-          {blockNumber && (
+          {showBlock && (
             <>
               <div className={cn(
                 'border-b p-1',
@@ -65,17 +77,17 @@ export const Results = ({ blockNumber, extrinsics = [], handleOpenModal, classNa
             </>
           )}
 
-          {extrinsics?.length > 0 && (
+          {filteredExtrinsics?.length > 0 && (
             <>
               <div className={cn(
                 'border-b p-1',
                 'font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000',
               )}
               >
-                Extrinsics ({extrinsics?.length})
+                Extrinsics ({filteredExtrinsics?.length})
               </div>
 
-              {extrinsics.map(({ id }) => (
+              {filteredExtrinsics?.map(({ id }) => (
                 <div
                   key={id}
                   data-extrinsic-id={id}
@@ -99,7 +111,7 @@ export const Results = ({ blockNumber, extrinsics = [], handleOpenModal, classNa
             </>
           )}
 
-          {blockNumber || extrinsics?.length > 0 ? null : (
+          {blockNumber || filteredExtrinsics?.length > 0 ? null : (
             <div className={cn(
               'p-4',
               'font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000',
@@ -112,5 +124,4 @@ export const Results = ({ blockNumber, extrinsics = [], handleOpenModal, classNa
       </PDScrollArea>
     </div>
   );
-
 };
