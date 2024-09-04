@@ -5,6 +5,7 @@ import React, {
   useState,
 } from 'react';
 
+import { FileUpload } from '@components/FileUpload';
 import { cn } from '@utils/helpers';
 
 import styles from './styles.module.css';
@@ -85,18 +86,5 @@ export const TextBinaryParam = ({ onChange, minLength }: IBinaryParam) => {
 };
 
 export const FileUploadBinaryParam = ({ onChange }: IBinaryParam) => {
-
-  const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-
-    const file = e.target.files?.item(0);
-    if (file) {
-      const buffer = await file.arrayBuffer();
-      const val = Binary.fromBytes(new Uint8Array(buffer));
-      onChange(val);
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return <input type="file" onChange={handleFileUpload} />;
+  return <FileUpload onChange={onChange} />;
 };
