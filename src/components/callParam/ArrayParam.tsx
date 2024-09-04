@@ -5,10 +5,10 @@ import {
 
 import { BinaryParam } from './BinaryParam';
 import { CodecParam } from './CodecParam';
+import styles from './styles.module.css';
 
 import type { ICallArgs } from '.';
 import type { ArrayVar } from '@polkadot-api/metadata-builders';
-
 export interface IArrayParam extends ICallArgs {
   array: ArrayVar;
 }
@@ -34,7 +34,7 @@ const _ArrayParam = ({ array, onChange }: IArrayParam) => {
   }, [arrayProps]);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className={styles.codecGroup}>
       {
         arrayProps.map((_, index) => {
           return (

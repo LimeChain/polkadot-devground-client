@@ -3,9 +3,19 @@
 }
 
 .codecInput {
-  @apply w-full p-2 border border-transparent outline-none
+  @apply w-full border dark:border-dev-purple-700 border-dev-white-900 outline-none;
+    @apply w-full outline-none;
+    @apply p-4 bg-transparent;
 }
 
+.codecInputError {
+  @apply transition-[border];
+  @apply !border-dev-red-700
+}
 .codecSelect {
   @apply w-full p-2
+}
+
+.codecGroup {
+  @apply flex flex-col gap-2
 }

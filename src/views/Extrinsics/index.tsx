@@ -53,8 +53,6 @@ const Extrinsics = () => {
 
   const [callArgs, setCallArgs] = useState<unknown>();
 
-  // console.log(callArgs.remark.asHex());
-
   const [encodedCall, setEncodedCall] = useState<Binary | undefined>(Binary.fromHex('0x'));
   const decodedCall = useMemo(() => {
     if (viewBuilder && encodedCall) {
