@@ -26,7 +26,7 @@ export const BinaryParam = ({ onChange, minLength }: IBinaryParam) => {
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="flex gap-2">
+      <label className="flex w-fit gap-2">
         <span>Upload File</span>
         <input
           id="fileUpload"
@@ -44,12 +44,11 @@ export const BinaryParam = ({ onChange, minLength }: IBinaryParam) => {
   );
 };
 
-// const defaultBinaryValue = '0x0000000000000000000000000000000000000000000000000000000000000000';
 export const TextBinaryParam = ({ onChange, minLength }: IBinaryParam) => {
-  const binaryMinLength = minLength * 2;
-  const encodedValue = String().padEnd(binaryMinLength, '0');
+  const requiredBinaryLength = minLength * 2;
+  const encodedValue = String().padEnd(requiredBinaryLength, '0');
 
-  const [value, setValue] = useState(binaryMinLength ? `0x${encodedValue}` : '');
+  const [value, setValue] = useState(requiredBinaryLength ? `0x${encodedValue}` : '');
   const [isError, setIsError] = useState(false);
 
   const handleOnChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,14 +59,16 @@ export const TextBinaryParam = ({ onChange, minLength }: IBinaryParam) => {
   useEffect(() => {
     const isHex = value.startsWith('0x');
 
-    const isMinLengthError = binaryMinLength ? value.length < binaryMinLength + 1 : false;
-    const isMaxLengthError = binaryMinLength ? value.length > binaryMinLength + 2 : false;
-    setIsError(isMinLengthError || isMaxLengthError);
     if (isHex) {
-      onChange(Binary.fromHex(value));
+      const _value = Binary.fromHex(value);
+      onChange(_value);
 
+      setIsError(_value.asHex().length !== requiredBinaryLength);
     } else {
-      onChange(Binary.fromText(value));
+      const _value = Binary.fromHex(value);
+      onChange(_value);
+
+      setIsError(_value.asHex().length !== requiredBinaryLength);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
@@ -76,11 +77,12 @@ export const TextBinaryParam = ({ onChange, minLength }: IBinaryParam) => {
     <input
       type="text"
       placeholder="Binary hex or string"
-      className={cn(styles.codecInput, { ['!border-dev-red-700']: isError })}
       value={value}
-      // minLength={minLength ? minLength * 2 + 2 : 0}
-      required
       onChange={handleOnChange}
+      className={cn(
+        styles.codecInput,
+        { [styles.codecInputError]: isError },
+      )}
     />
   );
 };
