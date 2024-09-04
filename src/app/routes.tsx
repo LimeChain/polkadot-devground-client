@@ -14,6 +14,7 @@ const Explorer = lazy(() => import('../views/explorer'));
 const Forks = lazy(() => import('../views/forks'));
 const Extrinsics = lazy(() => import('../views/Extrinsics'));
 const ChainState = lazy(() => import('../views/ChainState'));
+const Constants = lazy(() => import('../views/Constants'));
 
 export const routes = () => ([
   {
@@ -88,6 +89,16 @@ export const routes = () => ([
           {
             path: '',
             element: <ChainState />,
+          },
+        ],
+      },
+      {
+        path: 'constants',
+        element: <LayoutBasic hasFooter classNames="lg:pb-8" />,
+        children: [
+          {
+            path: '',
+            element: <Constants />,
           },
         ],
       },
