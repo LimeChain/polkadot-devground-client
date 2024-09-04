@@ -67,7 +67,7 @@ export const Results = (props: IResultProps) => {
       classNames,
     )}
     >
-      <div className="mb-4 flex gap-2 border-b border-dev-purple-700 px-2 font-geist dark:border-dev-purple-300 dark:text-dev-black-800">
+      <div className="flex gap-2 border-b border-dev-purple-700 px-2 font-geist dark:border-dev-purple-300 dark:text-dev-black-800">
         <Button
           isActive={filter === 'all'}
           type="all"
@@ -97,13 +97,13 @@ export const Results = (props: IResultProps) => {
       >
         {showBlock && blockNumber && (
           <>
-            <div className={cn(
-              'border-b p-1',
-              'font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000',
+            <p className={cn(
+              'my-4 border-b p-1',
+              'font-geist text-dev-white-1000 font-body2-regular dark:text-dev-black-1000',
             )}
             >
                 Blocks ({blockNumber ? 1 : 0})
-            </div>
+            </p>
             <PDLink
               to={`/explorer/${blockNumber}`}
               className={cn(
@@ -117,7 +117,7 @@ export const Results = (props: IResultProps) => {
                   Block#
                 <span className="font-body2-bold"> {blockNumber}</span>
               </p>
-              <p className="font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000">
+              <p className="font-geist text-dev-white-1000 font-body2-regular dark:text-dev-black-1000">
                   Block
               </p>
             </PDLink>
@@ -126,13 +126,13 @@ export const Results = (props: IResultProps) => {
 
         {filteredExtrinsics && (
           <>
-            <div className={cn(
-              'border-b p-1',
-              'font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000',
+            <p className={cn(
+              'my-4 border-b p-1',
+              'font-geist text-dev-white-1000 font-body2-regular dark:text-dev-black-1000',
             )}
             >
                 Extrinsics ({filteredExtrinsics?.length})
-            </div>
+            </p>
 
             {filteredExtrinsics?.map((extrinsic) => (
               <div
@@ -150,7 +150,7 @@ export const Results = (props: IResultProps) => {
                   Extrinsic#
                   <span className="font-body2-bold"> {extrinsic?.id}</span>
                 </p>
-                <p className="font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000">
+                <p className="font-geist text-dev-white-1000 font-body2-regular dark:text-dev-black-1000">
                   Extrinsic
                 </p>
               </div>
