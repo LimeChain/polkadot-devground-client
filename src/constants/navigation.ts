@@ -23,6 +23,11 @@ export const NAVIGATION_ITEMS: TNavItem[] = [
           icon: 'icon-github',
         },
         {
+          title: 'Constants',
+          to: '/constants',
+          icon: 'icon-github',
+        },
+        {
           title: 'Extrinsics',
           to: '/extrinsics',
           icon: 'icon-github',
