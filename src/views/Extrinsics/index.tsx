@@ -21,7 +21,6 @@ import { useViewBuilder } from 'src/hooks/useViewBuilder';
 import { useStoreWallet } from 'src/stores/wallet';
 
 const Extrinsics = () => {
-
   const dynamicBulder = useDynamicBuilder();
   const viewBuilder = useViewBuilder();
 
@@ -53,8 +52,8 @@ const Extrinsics = () => {
   const [callSelected, setCallSelected] = useState(calls.at(0));
 
   const [callArgs, setCallArgs] = useState<unknown>();
-  // const [callShape, setCallShape] = useState<ReturnType<NonNullable<typeof viewBuilder.buildCall>> | undefined>(undefined);
-  // console.log(callShape);
+
+  // console.log(callArgs.remark.asHex());
 
   const [encodedCall, setEncodedCall] = useState<Binary | undefined>(Binary.fromHex('0x'));
   const decodedCall = useMemo(() => {
@@ -73,7 +72,6 @@ const Extrinsics = () => {
     if (dynamicBulder && palletSelected?.name && callSelected?.name && viewBuilder) {
       try {
         const callCodec = dynamicBulder.buildCall(palletSelected.name, callSelected.name);
-        // setCallShape(viewBuilder.buildCall(palletSelected.name, callSelected.name));
 
         const _encodedCall = Binary.fromBytes(
           mergeUint8(
@@ -96,10 +94,6 @@ const Extrinsics = () => {
     const toastId = 'toast-extrinsic-result';
     if (api) {
       try {
-        // const testCall = api.tx.System.remark({ remark: Binary.fromHex('0x00000') }).signAndSubmit();
-        // console.log(testCall.decodedCall);
-        // console.log((await testCall.getEncodedData()).asHex());
-
         toast.loading('Loading...', { position: 'top-right', id: toastId, duration: 99999 });
         const res = api.tx[palletSelected.name][callSelected?.name](callArgs);
         console.log(res);
@@ -175,7 +169,6 @@ const Extrinsics = () => {
               name={callSelected.name}
               param={callSelected.param}
               onChange={setCallArgs}
-            // call={callShape}
             />
           </div>
         )

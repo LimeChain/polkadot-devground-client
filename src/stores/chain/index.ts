@@ -198,8 +198,8 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         // build metadata registry for decoding
         await getMetadata(api)
           .then(metadataRaw => {
-            const metadata = new Metadata(registry, metadataRaw.asBytes());
-            const decodededMetadata = metadataCodec.dec(metadataRaw.asBytes());
+            const metadata = new Metadata(registry, metadataRaw!.asBytes());
+            const decodededMetadata = metadataCodec.dec(metadataRaw!.asBytes());
             const metadataVersion = decodededMetadata.metadata.tag;
 
             if (metadataVersion === 'v14' || metadataVersion === 'v15') {
