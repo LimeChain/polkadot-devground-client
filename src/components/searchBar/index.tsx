@@ -1,6 +1,7 @@
 import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import React, {
   useCallback,
+  useEffect,
   useRef,
   useState,
 } from 'react';
@@ -30,8 +31,10 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
   const [blockNumber, setBlockNumber] = useState<string | null>(null);
   const [extrinsics, setExtrinsics] = useState<string[]>([]);
   const [searchInput, setSearchInput] = useState('');
+  const [isResultsVisible, setIsResultsVisible] = useState(false);
 
   const refSelectedExtrinsic = useRef<IMappedBlockExtrinsic | undefined>();
+  const searchBarRef = useRef<HTMLDivElement>(null);
 
   const [ShowJsonModal, toggleVisibility] = useToggleVisibility(ModalShowJson);
 
@@ -78,6 +81,7 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
 
     value = value.replace(/,/g, '');
     setSearchInput(value);
+    setIsResultsVisible(true);
 
     setTimeout(() => {
       switch (type) {
@@ -97,8 +101,21 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
 
   }, [searchAll, searchBlock, searchExtrinsic, type]);
 
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (searchBarRef.current && !searchBarRef.current.contains(event.target as Node)) {
+      setIsResultsVisible(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [handleClickOutside]);
+
   return (
-    <div className="w-[38rem]">
+    <div ref={searchBarRef} className="w-[38rem]">
       <div className={cn(
         'flex items-center gap-4',
         classNames,
@@ -136,17 +153,19 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
           <span className="font-geist font-body2-bold">Search</span>
         </button>
       </div>
-      <Results
-        blockNumber={blockNumber}
-        extrinsics={extrinsics}
-        handleOpenModal={handleOpenModal}
-        classNames={cn(
-          'opacity-0 transition-all',
-          {
-            'opacity-100 translate-y-0 pointer-events-auto': searchInput,
-          })
-        }
-      />
+      {isResultsVisible && (
+        <Results
+          blockNumber={blockNumber}
+          extrinsics={extrinsics}
+          handleOpenModal={handleOpenModal}
+          classNames={cn(
+            'opacity-0 transition-all',
+            {
+              'opacity-100 translate-y-0 pointer-events-auto': searchInput,
+            })
+          }
+        />
+      )}
 
       {
         refSelectedExtrinsic.current && (
