@@ -50,9 +50,9 @@ const LatestBlocks = () => {
   }, [navigate]);
 
   return (
-    <div className="grid h-full grid-rows-[40px_46px_1fr] gap-8">
+    <div className="grid h-full grid-rows-[40px_46px_1fr] gap-6">
       <PageHeader title="Latest Blocks" />
-      <SearchBar label="Search by Block" type="block" />
+      <SearchBar label="Search by Block" />
       <PDScrollArea
         className="table-container"
         verticalScrollClassNames="pt-8"

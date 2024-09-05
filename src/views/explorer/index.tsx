@@ -1,4 +1,3 @@
-import { SearchBar } from '@components/searchBar';
 import { cn } from '@utils/helpers';
 
 import { ChainDataList } from './components/chainDataList';
@@ -9,7 +8,9 @@ import { LatestBlocksList } from './components/latestBlocksList';
 const Explorer = () => {
   return (
     <div className="flex flex-col gap-12 overflow-hidden lg:h-full">
-      <SearchBar label="Search block/extrinsic" type="all" />
+      <div>
+        search
+      </div>
 
       <div className={cn(
         'grid gap-4',

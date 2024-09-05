@@ -46,9 +46,9 @@ const SignedExtrinsics = () => {
   }, [blocksData, latestBlock]);
 
   return (
-    <div className="grid h-full grid-rows-[40px_46px_1fr] gap-8">
+    <div className="grid h-full grid-rows-[40px_46px_1fr] gap-6">
       <PageHeader title="Extrinsics" />
-      <SearchBar label="Search by Block" type="extrinsics"/>
+      <SearchBar label="Search by Block" />
       <PDScrollArea
         className="h-full"
         verticalScrollClassNames="pt-8"
