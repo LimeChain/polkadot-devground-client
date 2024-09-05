@@ -1,11 +1,14 @@
+import { getSs58AddressInfo } from 'polkadot-api';
 import { type InjectedPolkadotAccount } from 'polkadot-api/pjs-signer';
 import React, {
+  type ChangeEvent,
   useCallback,
   useEffect,
   useState,
 } from 'react';
 
 import { Switch } from '@components/Switch';
+import { cn } from '@utils/helpers';
 import { useStoreWallet } from 'src/stores/wallet';
 
 import styles from './styles.module.css';
@@ -128,20 +131,30 @@ const CustomAccountParam = ({
   onChange,
 }: ICustomAccount) => {
   const [value, setValue] = useState('');
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
+    const isValidAddress = getSs58AddressInfo(value).isValid;
+
+    setIsError(!isValidAddress);
     onChange(value);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
+
+  const handleOnChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+  }, []);
 
   return (
     <input
       type="text"
       placeholder={accountId.type}
       value={value}
-      className={styles.codecInput}
-      // eslint-disable-next-line react/jsx-no-bind
-      onChange={(event) => setValue(event.target.value)}
+      onChange={handleOnChange}
+      className={cn(
+        styles.codecInput,
+        { [styles.codecInputError]: isError },
+      )}
     />
   );
 };

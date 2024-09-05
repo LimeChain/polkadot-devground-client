@@ -35,7 +35,9 @@ export function StructParam({ struct, onChange }: IStructParam) {
   return Object.entries(struct.value).map(([key, value], index) => {
     return (
       <div key={`${key}-${index}-${value.id}`}>
-        {key}
+        <span className="block pb-1 font-geist font-body1-regular">
+          {key}
+        </span>
         <div className={styles.codecContainer}>
           <CodecParam
             variable={value}

@@ -1,5 +1,6 @@
 import { AccountParam } from './AccountParam';
 import { ArrayParam } from './ArrayParam';
+import { BinaryParam } from './BinaryParam';
 import { CompactParam } from './CompactParam';
 import { EnumParam } from './EnumParam';
 import { OptionParam } from './OptionParam';
@@ -39,6 +40,8 @@ export const CodecParam = ({ variable, onChange }: ICodecParam) => {
       return <VoidParam onChange={onChange} />;
     case 'option':
       return <OptionParam option={variable} onChange={onChange} />;
+    case 'bitSequence':
+      return <BinaryParam onChange={onChange} minLength={0} />;
     default:
       return (
         <div>

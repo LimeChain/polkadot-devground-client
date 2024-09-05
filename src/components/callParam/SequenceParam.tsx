@@ -1,9 +1,11 @@
 import {
-  Fragment,
   useCallback,
   useEffect,
   useState,
 } from 'react';
+
+import { Icon } from '@components/icon';
+import { cn } from '@utils/helpers';
 
 import { BinaryParam } from './BinaryParam';
 import { CodecParam } from './CodecParam';
@@ -45,11 +47,6 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
   }, [params]);
 
   const handleOnChange = useCallback((args: unknown, id: string) => {
-    // setParams(params => params.with(index, {
-    //   id: params[index].id,
-    //   value: args as undefined,
-    // }));
-
     setParams(params => {
       const item = params.find(p => p.id === id);
       if (item) {
@@ -69,55 +66,66 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
     setParams(params => ([...params, { id: crypto.randomUUID(), value: undefined }]));
   }, []);
 
-  const handleRemoveItem = useCallback((idToRemove: string) => {
+  const handleRemoveItem = useCallback(() => {
     setLength((length) => length - 1);
-    setParams(params => params.filter(p => p.id !== idToRemove));
+    setParams(params => params.slice(0, -1));
   }, []);
 
   return (
     <>
-      <div className="flex flex-col content-start gap-4">
+      <div className="flex flex-col gap-6">
+        <div className="-mb-4 flex justify-end gap-4">
+          <button
+            type="button"
+            className={cn(
+              'mb-2 flex gap-1 font-geist font-body1-bold'
+              , 'text-dev-pink-500 transition-colors hover:text-dev-pink-300',
+            )}
+            onClick={handleAddItem}
+          >
+            <Icon
+              name="icon-add"
+              size={[24]}
+            />
+            Add Item
+          </button>
+          <button
+            type="button"
+            disabled={params.length === 0}
+            className={cn(
+              'mb-2 flex gap-1 font-geist font-body1-bold'
+              , 'text-dev-pink-500 transition-colors hover:text-dev-pink-300',
+              'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-dev-pink-500',
+            )}
+            onClick={handleRemoveItem}
+          >
+            <Icon
+              name="icon-remove"
+              size={[24]}
+            />
+            Remove Item
+          </button>
+        </div>
         {
-          params.map((param) => {
-            const showRemoveButton = params.length > 1;
+          params.map((param, index) => {
             return (
-              <Fragment key={param.id}>
-                <div className="grid grid-cols-[1fr_48px] gap-2">
+              <div
+                key={param.id}
+                className="flex w-full gap-2"
+              >
+                <span className="pt-2 font-geist font-h5-regular">{index}:</span>
+                <div className="flex w-full flex-col gap-6">
                   <CodecParam
                     variable={sequence.value}
                     // eslint-disable-next-line react/jsx-no-bind
                     onChange={args => handleOnChange(args, param.id)}
                   />
-                  {
-                    showRemoveButton
-                    && (
-                      <button
-                        type="button"
-                        className="ml-4 h-fit border p-2"
-                        // eslint-disable-next-line react/jsx-no-bind
-                        onClick={() => handleRemoveItem(param.id)}
-                      >
-                        -
-                      </button>
-                    )
-                  }
                 </div>
-                {/* {
-                  index !== params.length
-                  && <br />
-                } */}
-              </Fragment>
+              </div>
             );
           })
         }
 
-        <button
-          type="button"
-          className="w-fit border p-2"
-          onClick={handleAddItem}
-        >
-          add item
-        </button>
       </div>
     </>
   );

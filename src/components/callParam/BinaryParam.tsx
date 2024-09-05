@@ -23,6 +23,8 @@ export const BinaryParam = ({ onChange, minLength }: IBinaryParam) => {
 
   const handleFileUploadToggle = useCallback(() => {
     setUseFileUpload(upload => !upload);
+    onChange(Binary.fromText(''));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -42,10 +44,11 @@ export const BinaryParam = ({ onChange, minLength }: IBinaryParam) => {
 };
 
 export const TextBinaryParam = ({ onChange, minLength }: IBinaryParam) => {
-  const requiredBinaryLength = minLength * 2;
-  const encodedValue = String().padEnd(requiredBinaryLength, '0');
+  const requiredHexLength = minLength * 2;
+  const requiredBinaryLength = minLength;
+  const encodedValue = String().padEnd(requiredHexLength, '0');
 
-  const [value, setValue] = useState(requiredBinaryLength ? `0x${encodedValue}` : '');
+  const [value, setValue] = useState(requiredHexLength ? `0x${encodedValue}` : '');
   const [isError, setIsError] = useState(false);
 
   const handleOnChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,12 +63,14 @@ export const TextBinaryParam = ({ onChange, minLength }: IBinaryParam) => {
       const _value = Binary.fromHex(value);
       onChange(_value);
 
-      setIsError(minLength ? _value.asHex().length !== requiredBinaryLength : false);
+      const valueLength = _value.asBytes().length;
+      setIsError(minLength ? valueLength !== requiredBinaryLength : false);
     } else {
       const _value = Binary.fromHex(value);
       onChange(_value);
 
-      setIsError(minLength ? _value.asHex().length !== requiredBinaryLength : false);
+      const valueLength = _value.asBytes().length;
+      setIsError(minLength ? valueLength !== requiredBinaryLength : false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
