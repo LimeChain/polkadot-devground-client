@@ -25,6 +25,7 @@
     "@polkadot/types": "12.2.3",
     "@polkadot/util": "13.0.2",
     "@radix-ui/react-scroll-area": "1.1.0",
+    "@radix-ui/react-select": "2.1.1",
     "@radix-ui/react-switch": "1.1.0",
     "@shikijs/monaco": "1.10.0",
     "@tanstack/react-virtual": "3.8.2",

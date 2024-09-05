@@ -11,7 +11,7 @@ interface ISwitch {
 export const Switch = ({ title, checked, onChange }: ISwitch) => {
   const switchId = crypto.randomUUID();
   return (
-    <label className="flex w-fit cursor-pointer gap-2" htmlFor={switchId}>
+    <label className="flex w-fit cursor-pointer items-center gap-2" htmlFor={switchId}>
       <_Switch.Root
         className={cn(
           'group h-7 w-11 rounded-[50px]',

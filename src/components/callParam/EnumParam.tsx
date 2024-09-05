@@ -1,7 +1,10 @@
 import {
   useCallback,
+  useMemo,
   useState,
 } from 'react';
+
+import { Select } from '@components/Select';
 
 import { CodecParam } from './CodecParam';
 import styles from './styles.module.css';
@@ -15,6 +18,14 @@ export interface IEnumParam extends ICallArgs {
 export const EnumParam = ({ onChange, ...props }: IEnumParam) => {
   const enumVar = props.enum;
   const enumKeys = Object.keys(enumVar.value);
+
+  const enumItems = useMemo(() => {
+    return enumKeys.map((key, index) => ({
+      label: key,
+      value: key,
+      key: `enum-select-${key}-${index}`,
+    }));
+  }, [enumKeys]);
 
   const [key, setKey] = useState(enumKeys.at(0)!);
 
@@ -31,26 +42,12 @@ export const EnumParam = ({ onChange, ...props }: IEnumParam) => {
     : undefined;
 
   return (
-    <div>
-      <select
+    <div className={styles.codecGroup}>
+      <Select
+        items={enumItems}
+        onChange={setKey}
         value={key}
-        // eslint-disable-next-line react/jsx-no-bind
-        onChange={(e) => setKey(e.target.value)}
-        className={styles.codecSelect}
-      >
-        {
-          enumKeys.map((e, i) => {
-            return (
-              <option
-                key={`enum-${i}-${e}`}
-                value={e}
-              >
-                {e}
-              </option>
-            );
-          })
-        }
-      </select>
+      />
       {
         variable
         && (

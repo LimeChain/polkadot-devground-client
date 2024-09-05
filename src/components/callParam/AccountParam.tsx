@@ -4,9 +4,11 @@ import React, {
   type ChangeEvent,
   useCallback,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 
+import { Select } from '@components/Select';
 import { Switch } from '@components/Switch';
 import { cn } from '@utils/helpers';
 import { useStoreWallet } from 'src/stores/wallet';
@@ -51,7 +53,7 @@ export const AccountParam = ({ accountId, onChange }: IAccountParam) => {
   return (
     <div className={styles.codecGroup}>
       <Switch
-        title="Use Custom Accoun"
+        title="Use Custom Account"
         checked={useCustomAccount}
         onChange={handleUseCustomAccount}
       />
@@ -83,42 +85,45 @@ interface IAccountSelectParam extends ICallArgs {
 }
 
 const AccountSelectParam = ({ accounts, onChange }: IAccountSelectParam) => {
+  const [selectedAccount, setSelectedAccount] = useState(accounts.at(0));
 
-  const handleOnAccountSelect = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    const accAddress = e.target.value;
-    const selectedAccount = accounts.find(ac => ac.address === accAddress);
+  useEffect(() => {
+    if (accounts.length > 0) {
+      if (!selectedAccount) {
+        setSelectedAccount(accounts.at(0));
+      }
+    } else {
+      setSelectedAccount(undefined);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accounts]);
 
+  const handleOnAccountSelect = useCallback((accountSelected: string) => {
+    const selectedAccount = accounts.find(ac => ac.address === accountSelected);
+    console.log(accountSelected);
+    console.log(selectedAccount);
+
+    setSelectedAccount(selectedAccount);
     onChange(selectedAccount);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accounts]);
 
+  const selectItems = useMemo(() => {
+    return accounts?.map(account => ({
+      label: account.address,
+      value: account.address,
+      key: `account-select-${account.address}`,
+    })) || [];
+  }, [accounts]);
+
   return (
-    <select
+    <Select
+      placeholder="Select an Account"
+      emptyPlaceHolder="No Connected Accounts"
       onChange={handleOnAccountSelect}
-      className={styles.codecSelect}
-    >
-      {
-        accounts.length > 0
-          ? (
-            <>
-              {
-                accounts.map(acc => {
-                  return (
-                    <option
-                      key={`account-select-${acc.address}`}
-                      value={acc.address}
-                    >
-                      {acc.address}
-                    </option>
-                  );
-                },
-                )
-              }
-            </>
-          )
-          : <option value="">No accounts connected</option>
-      }
-    </select>
+      items={selectItems}
+      value={selectedAccount?.address || ''}
+    />
   );
 };
 
