@@ -155,7 +155,7 @@ const BlockDetails = () => {
           <p>{blockData.blockHash}</p>
 
           <CopyToClipboard
-            text="0x7d6af371a0c713ec38b8a95dca3ba8b5a7f3eda2b3c81697b585a0facddcff77"
+            text={blockData.blockHash}
             toastMessage="block hash"
           >
             {

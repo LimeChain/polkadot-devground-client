@@ -80,7 +80,7 @@ export const PDScrollArea = polymorphicComponent<'div', IPDScrollAreaProps>(
             className={cn(
               'limechain-scroll-horizontal',
               'group/scroll',
-              'peer z-50',
+              'peer z-20',
               'touch-none select-none rounded-full',
               'data-[state=hidden]:z-0 data-[state=hidden]:opacity-0 data-[state=visible]:opacity-100',
               'transition-all duration-300',
@@ -120,7 +120,7 @@ export const PDScrollArea = polymorphicComponent<'div', IPDScrollAreaProps>(
             className={cn(
               'limechain-scroll-vertical',
               'group/scroll',
-              'peer z-[100]',
+              'peer z-20',
               'touch-none select-none rounded-full',
               'data-[state=hidden]:z-0 data-[state=hidden]:opacity-0 data-[state=visible]:opacity-100',
               'transition-all duration-300',
