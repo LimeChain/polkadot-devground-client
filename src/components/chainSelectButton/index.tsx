@@ -31,7 +31,7 @@ const ChainSelectButton = () => {
         <h5 className="ml-[6px] mr-3 font-h5-bold">
           {currentChain.name}
         </h5>
-        <Icon name="icon-dropdownArrow" size={[16]}/>
+        <Icon name="icon-dropdownArrow" size={[24]} />
       </button>
       <ChainSelectModal onClose={toggleVisibility}/>
     </>
