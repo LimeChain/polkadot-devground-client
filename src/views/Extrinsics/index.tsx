@@ -52,6 +52,7 @@ const Extrinsics = () => {
   const [callSelected, setCallSelected] = useState(calls.at(0));
 
   const [callArgs, setCallArgs] = useState<unknown>();
+  console.log(callArgs);
 
   const [encodedCall, setEncodedCall] = useState<Binary | undefined>(Binary.fromHex('0x'));
   const decodedCall = useMemo(() => {
@@ -137,9 +138,9 @@ const Extrinsics = () => {
   if (!metadata || !lookup || !palletsWithCalls) {
     return 'Loading...';
   }
-
   return (
-    <>
+
+    <div className="flex w-full flex-col gap-6">
       <div className="grid w-full grid-cols-2 gap-4">
         <PalletSelect
           pallets={palletsWithCalls}
@@ -149,7 +150,7 @@ const Extrinsics = () => {
           calls.length > 0
           && (
             <CallSelect
-              key={`call-select-${palletSelected!.name}`}
+              key={`call-select-${palletSelected?.name}`}
               calls={calls}
               onCallSelect={handleCallSelect}
             />
@@ -160,7 +161,7 @@ const Extrinsics = () => {
         palletSelected
         && callSelected
         && (
-          <div className="mt-4 flex flex-col gap-4">
+          <div className="flex flex-col gap-6">
             <CallParam
               key={`call-param-${callSelected.name}`}
               pallet={palletSelected}
@@ -171,7 +172,6 @@ const Extrinsics = () => {
           </div>
         )
       }
-      <br />
       <button
         type="button"
         disabled={!signer}
@@ -184,12 +184,11 @@ const Extrinsics = () => {
         encodedCall && decodedCall
         && (
           <>
-            <br />
             <p className="break-words">Encoded Call {encodedCall.asHex()}</p>
           </>
         )
       }
-    </>
+    </div>
   );
 };
 

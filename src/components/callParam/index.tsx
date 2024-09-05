@@ -34,7 +34,6 @@ export function CallParam({ param, onChange }: ICallParam) {
 
   const variable =
     param.type === 'lookupEntry' ? lookup(param.value.id) : param;
-  // console.log('call param', variable);
 
   return <CodecParam variable={variable} onChange={onChange} />;
 }
