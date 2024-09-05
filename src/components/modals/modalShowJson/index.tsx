@@ -21,7 +21,7 @@ export const ModalShowJson = (props: IModalShowJson) => {
       onClose={onClose}
       className={cn(
         'z-[999] w-5/6',
-        'flex max-h-screen flex-col gap-8 overflow-auto p-6',
+        'flex flex-col gap-8 overflow-auto p-6',
         'border border-dev-purple-300',
         'dark:border-dev-purple-700',
         'transition-all duration-300 ease-in-out',
