@@ -7,7 +7,7 @@
 .codecInput {
   @apply w-full border dark:border-dev-purple-700 border-dev-white-900 outline-none;
     @apply w-full outline-none;
-    @apply p-4 bg-transparent;
+    @apply p-3 bg-transparent;
     @apply font-geist font-body1-regular
 }
 

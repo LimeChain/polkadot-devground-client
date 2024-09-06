@@ -6,12 +6,13 @@ import { cn } from '@utils/helpers';
 import type React from 'react';
 
 export interface ISelect {
-  items: {
+  items?: {
     label: string;
     value: string;
     key: string;
   }[];
-  value: string;
+  value?: string;
+  label?: string;
   onChange: (value: string) => void;
   emptyPlaceHolder?: string;
   placeholder?: string;
@@ -22,29 +23,55 @@ export const Select = ({
   items,
   value,
   onChange,
+  label,
   placeholder,
   emptyPlaceHolder = 'No Items',
   disabled = false,
 }: ISelect) => {
-  const hasItems = items.length > 0;
+  const hasItems = items ? items.length > 0 : false;
   return (
     <_Select.Root
       onValueChange={onChange}
-      value={value}
+      value={value || ''}
     >
       <_Select.Trigger
         disabled={disabled || !hasItems}
         className={cn(
           'w-full max-w-full border border-dev-white-900 dark:border-dev-purple-700',
-          'flex items-center justify-between gap-4 p-4',
+          'flex items-center justify-between gap-4 p-3',
           'font-geist font-body1-regular',
           'transition-colors disabled:cursor-not-allowed disabled:border-dev-red-700',
           '*:truncate',
         )}
       >
         <_Select.Value
+          asChild
           placeholder={hasItems ? placeholder : emptyPlaceHolder}
-        />
+        >
+          {
+            value
+              ? (
+                <div className="flex flex-col items-start gap-1">
+                  {
+                    label
+                    && (
+                      <span className="font-geist opacity-70 font-body2-regular">
+                        {label}
+                      </span>
+                    )
+                  }
+                  <span>
+                    {value}
+                  </span>
+                </div>
+              )
+              : (
+                <span>
+                  {emptyPlaceHolder}
+                </span>
+              )
+          }
+        </_Select.Value>
         <_Select.Icon className="shrink-0">
           <Icon name="icon-dropdownArrow" size={[24]} />
         </_Select.Icon>
@@ -67,7 +94,7 @@ export const Select = ({
           {/* select options */}
           <_Select.Viewport >
             {
-              items.map(item => {
+              items?.map(item => {
                 return (
                   <SelectItem
                     key={item.key}
@@ -100,8 +127,9 @@ const SelectItem = ({ children, value }: ISelectItem) => {
     <_Select.Item
       value={value}
       className={cn(
+        'p-3 pl-8',
         'relative select-none items-center ',
-        'cursor-pointer p-3 transition-colors',
+        'cursor-pointer transition-colors',
         'data-[highlighted]:bg-dev-black-400',
         'data-[highlighted]:dark:bg-dev-white-800',
         'data-[highlighted]:outline-none',
@@ -109,10 +137,10 @@ const SelectItem = ({ children, value }: ISelectItem) => {
         'truncate',
       )}
     >
+      <_Select.ItemIndicator className="absolute left-2 top-1/2 -translate-y-1/2">
+        <Icon name="icon-check" size={[16]} />
+      </_Select.ItemIndicator>
       <_Select.ItemText>{children}</_Select.ItemText>
-      {/* <_Select.ItemIndicator className="">
-        <CheckIcon />
-      </_Select.ItemIndicator> */}
     </_Select.Item>
   );
 };
