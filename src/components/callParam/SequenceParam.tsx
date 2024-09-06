@@ -113,7 +113,16 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
                 key={param.id}
                 className="flex w-full gap-2"
               >
-                <span className="pt-2 font-geist font-h5-regular">{index}:</span>
+                <span className={cn(
+                  'font-geist font-h5-regular',
+                  {
+                    ['pt-1']: sequence.value.type === 'sequence',
+                    ['pt-3']: sequence.value.type === 'enum',
+                  },
+                )
+                }
+                >{index}:
+                </span>
                 <div className="flex w-full flex-col gap-6">
                   <CodecParam
                     variable={sequence.value}
