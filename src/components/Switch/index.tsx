@@ -3,7 +3,7 @@ import * as _Switch from '@radix-ui/react-switch';
 import { cn } from '@utils/helpers';
 
 interface ISwitch {
-  title: string;
+  title?: string;
   checked: boolean;
   onChange: () => void;
 }
