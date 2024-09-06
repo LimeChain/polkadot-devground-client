@@ -3,6 +3,8 @@ import {
   useState,
 } from 'react';
 
+import { Switch } from '@components/Switch';
+
 import styles from './styles.module.css';
 
 import type { ICallArgs } from '.';
@@ -62,12 +64,10 @@ export const PrimitiveParam = ({ primitive, onChange }: IPrimitiveParam) => {
   switch (primitive.value) {
     case 'bool':
       return (
-        <input
-          type="checkbox"
+        <Switch
           checked={Boolean(value)}
-          className="w-fit"
           // eslint-disable-next-line react/jsx-no-bind
-          onChange={(event) => setValue(event.target.checked ? `${event.target.checked}` : '')}
+          onChange={() => setValue(val => Boolean(val) ? '' : 'true')}
         />
       );
     case 'char':
