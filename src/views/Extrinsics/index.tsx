@@ -13,8 +13,7 @@ import {
   CallParam,
   type ICallParam,
 } from '@components/callParam';
-import { CallSelect } from '@components/callSelect';
-import { PalletSelect } from '@components/palletSelect';
+import { Select } from '@components/Select';
 import { useStoreChain } from '@stores';
 import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 import { useViewBuilder } from 'src/hooks/useViewBuilder';
@@ -32,6 +31,7 @@ const Extrinsics = () => {
   const signer = accounts.at(0)?.polkadotSigner;
 
   const palletsWithCalls = useMemo(() => metadata?.pallets?.filter(p => p.calls), [metadata]);
+  const palletSelectItems = useMemo(() => palletsWithCalls?.map(pallet => ({ label: pallet.name, value: pallet.name, key: `extrinsic-pallet-${pallet.name}` })) || [], [palletsWithCalls]);
   const [palletSelected, setPalledSelected] = useState(palletsWithCalls?.[0]);
 
   useEffect(() => {
@@ -49,6 +49,7 @@ const Extrinsics = () => {
   }, [palletsWithCalls, lookup]);
 
   const [calls, setCalls] = useState<Omit<ICallParam, 'pallet' | 'onChange'>[]>([]);
+  const callSelectItems = useMemo(() => calls?.map(call => ({ label: call.name, value: call.name, key: `extrinsic-call-${call.name}` })) || [], [calls]);
   const [callSelected, setCallSelected] = useState(calls.at(0));
 
   const [callArgs, setCallArgs] = useState<unknown>();
@@ -109,12 +110,13 @@ const Extrinsics = () => {
     }
   }, [api, callArgs, palletSelected, callSelected, signer]);
 
-  const handlePalletSelect = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handlePalletSelect = useCallback((palletSelectedName: string) => {
     if (palletsWithCalls && lookup) {
-      const palletSelected = palletsWithCalls[Number(e.target.value)];
+      const palletSelected = palletsWithCalls.find(pallet => pallet.name === palletSelectedName);
+
       setPalledSelected(palletSelected);
 
-      const palletCalls = lookup(palletSelected.calls!) as EnumVar;
+      const palletCalls = lookup(palletSelected!.calls!) as EnumVar;
       const calls = Object.entries(palletCalls?.value || {}).map(([name, param]) => ({
         name,
         param,
@@ -127,12 +129,12 @@ const Extrinsics = () => {
     }
   }, [palletsWithCalls, lookup]);
 
-  const handleCallSelect = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    if (calls.length > 0) {
-      setCallSelected(calls.at(Number(e.target.value)));
-      setEncodedCall(undefined);
-      setCallArgs({});
-    }
+  const handleCallSelect = useCallback((callSelectedName: string) => {
+    const selectedCall = calls.find(call => call.name === callSelectedName);
+
+    setCallSelected(selectedCall);
+    setEncodedCall(undefined);
+    setCallArgs({});
   }, [calls]);
 
   if (!metadata || !lookup || !palletsWithCalls) {
@@ -142,17 +144,25 @@ const Extrinsics = () => {
 
     <div className="flex w-full flex-col gap-6">
       <div className="grid w-full grid-cols-2 gap-4">
-        <PalletSelect
-          pallets={palletsWithCalls}
-          onPalletSelect={handlePalletSelect}
+        <Select
+          label="Select Pallet"
+          placeholder="Select a Pallet"
+          emptyPlaceHolder="No Pallets Available"
+          items={palletSelectItems}
+          value={palletSelected?.name}
+          onChange={handlePalletSelect}
         />
         {
-          calls.length > 0
+          callSelectItems.length > 0
           && (
-            <CallSelect
+            <Select
               key={`call-select-${palletSelected?.name}`}
-              calls={calls}
-              onCallSelect={handleCallSelect}
+              placeholder="Select a Call"
+              emptyPlaceHolder="No Calls Available"
+              label="Select Call"
+              items={callSelectItems}
+              value={callSelected?.name}
+              onChange={handleCallSelect}
             />
           )
         }

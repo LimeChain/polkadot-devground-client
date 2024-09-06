@@ -33,18 +33,18 @@ export const AccountParam = ({ accountId, onChange }: IAccountParam) => {
   useEffect(() => {
     setUseCustomAccount(false);
     setAccount(accounts[0]);
+    onChange(accounts[0]?.address);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accounts]);
 
   useEffect(() => {
     if (!useCustomAccount && accounts.length) {
       onChange(accounts[0].address);
     }
-  }, [useCustomAccount, onChange, accounts]);
 
-  useEffect(() => {
-    onChange(account?.address);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account]);
+  }, [useCustomAccount, accounts]);
 
   const handleUseCustomAccount = useCallback(() => {
     setUseCustomAccount(use => !use);
