@@ -78,12 +78,12 @@ export const Select = ({
       </_Select.Trigger>
       <_Select.Portal>
         <_Select.Content className={cn(
-          'z-50 flex max-w-[80vw] flex-col gap-1 p-2',
+          'z-50 flex max-w-[80vw] flex-col gap-1',
           ' bg-dev-black-1000 dark:bg-white',
           'text-white dark:text-black',
         )}
         >
-          <_Select.ScrollUpButton className="flex items-center justify-center">
+          <_Select.ScrollUpButton className="flex items-center justify-center shadow-[black_-2px_-3px_20px_0]">
             <Icon
               name="icon-dropdownArrow"
               className="rotate-180"
@@ -92,7 +92,7 @@ export const Select = ({
           </_Select.ScrollUpButton>
 
           {/* select options */}
-          <_Select.Viewport >
+          <_Select.Viewport className="p-2" >
             {
               items?.map(item => {
                 return (
@@ -108,7 +108,7 @@ export const Select = ({
           </_Select.Viewport>
           {/* select options */}
 
-          <_Select.ScrollDownButton className="flex items-center justify-center">
+          <_Select.ScrollDownButton className="flex items-center justify-center shadow-[black_2px_3px_20px_0]">
             <Icon name="icon-dropdownArrow" size={[24]} />
           </_Select.ScrollDownButton>
         </_Select.Content>
