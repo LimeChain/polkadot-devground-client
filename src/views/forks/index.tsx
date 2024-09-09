@@ -107,11 +107,9 @@ const Forks = () => {
   ]);
 
   return (
-    <section className="relative flex h-full flex-col items-center justify-center">
-      <VirtualizedList
-        items={items}
-      />
-    </section>
+    <VirtualizedList
+      items={items}
+    />
   );
 };
 
