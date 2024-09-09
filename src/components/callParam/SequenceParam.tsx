@@ -119,9 +119,9 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
                     ['pt-1']: sequence.value.type === 'sequence',
                     ['pt-3']: sequence.value.type === 'enum',
                   },
-                )
-                }
-                >{index}:
+                )}
+                >
+                  {index}:
                 </span>
                 <div className="flex w-full flex-col gap-6">
                   <CodecParam
