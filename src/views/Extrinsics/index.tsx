@@ -1,7 +1,7 @@
 import { type EnumVar } from '@polkadot-api/metadata-builders';
 import { mergeUint8 } from '@polkadot-api/utils';
 import { Binary } from 'polkadot-api';
-import React, {
+import {
   useCallback,
   useEffect,
   useMemo,
@@ -31,7 +31,11 @@ const Extrinsics = () => {
   const signer = accounts.at(0)?.polkadotSigner;
 
   const palletsWithCalls = useMemo(() => metadata?.pallets?.filter(p => p.calls), [metadata]);
-  const palletSelectItems = useMemo(() => palletsWithCalls?.map(pallet => ({ label: pallet.name, value: pallet.name, key: `extrinsic-pallet-${pallet.name}` })) || [], [palletsWithCalls]);
+  const palletSelectItems = useMemo(() => palletsWithCalls?.map(pallet => ({
+    label: pallet.name,
+    value: pallet.name,
+    key: `extrinsic-pallet-${pallet.name}`,
+  })) || [], [palletsWithCalls]);
   const [palletSelected, setPalledSelected] = useState(palletsWithCalls?.[0]);
 
   useEffect(() => {
@@ -49,11 +53,14 @@ const Extrinsics = () => {
   }, [palletsWithCalls, lookup]);
 
   const [calls, setCalls] = useState<Omit<ICallParam, 'pallet' | 'onChange'>[]>([]);
-  const callSelectItems = useMemo(() => calls?.map(call => ({ label: call.name, value: call.name, key: `extrinsic-call-${call.name}` })) || [], [calls]);
+  const callSelectItems = useMemo(() => calls?.map(call => ({
+    label: call.name,
+    value: call.name,
+    key: `extrinsic-call-${call.name}`,
+  })) || [], [calls]);
   const [callSelected, setCallSelected] = useState(calls.at(0));
 
   const [callArgs, setCallArgs] = useState<unknown>();
-  console.log(callArgs);
 
   const [encodedCall, setEncodedCall] = useState<Binary | undefined>(Binary.fromHex('0x'));
   const decodedCall = useMemo(() => {
