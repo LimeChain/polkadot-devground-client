@@ -108,6 +108,9 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
         </div>
         {
           params.map((param, index) => {
+
+            const nextType = sequence.value.type;
+
             return (
               <div
                 key={param.id}
@@ -116,8 +119,8 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
                 <span className={cn(
                   'font-geist font-h5-regular',
                   {
-                    ['pt-1']: sequence.value.type === 'sequence',
-                    ['pt-3']: sequence.value.type === 'enum',
+                    ['pt-1']: nextType === 'sequence',
+                    ['pt-3']: nextType === 'enum' || nextType === 'primitive',
                   },
                 )}
                 >

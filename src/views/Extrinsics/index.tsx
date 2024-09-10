@@ -13,7 +13,8 @@ import {
   CallParam,
   type ICallParam,
 } from '@components/callParam';
-import { Select } from '@components/Select';
+import { QueryButton } from '@components/callParam/QueryButton';
+import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
 import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 import { useViewBuilder } from 'src/hooks/useViewBuilder';
@@ -30,7 +31,8 @@ const Extrinsics = () => {
   const accounts = useStoreWallet?.use?.accounts?.();
   const signer = accounts.at(0)?.polkadotSigner;
 
-  const palletsWithCalls = useMemo(() => metadata?.pallets?.filter(p => p.calls), [metadata]);
+  const palletsWithCalls = useMemo(() => metadata?.pallets?.filter(p => p.calls)
+    ?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
   const palletSelectItems = useMemo(() => palletsWithCalls?.map(pallet => ({
     label: pallet.name,
     value: pallet.name,
@@ -42,17 +44,19 @@ const Extrinsics = () => {
     if (palletsWithCalls && lookup) {
       setPalledSelected(palletsWithCalls[0]);
       const palletCalls = lookup(palletsWithCalls[0].calls!) as EnumVar;
-      const calls = Object.entries(palletCalls?.value || {}).map(([name, param]) => ({
-        name,
-        param,
-      }));
+      const calls = Object.entries(palletCalls?.value || {})
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .map(([name, param]) => ({
+          name,
+          param,
+        }));
 
       setCalls(calls);
       setCallSelected(calls.at(0));
     }
   }, [palletsWithCalls, lookup]);
 
-  const [calls, setCalls] = useState<Omit<ICallParam, 'pallet' | 'onChange'>[]>([]);
+  const [calls, setCalls] = useState<Pick<ICallParam, 'name' | 'param'>[]>([]);
   const callSelectItems = useMemo(() => calls?.map(call => ({
     label: call.name,
     value: call.name,
@@ -124,10 +128,12 @@ const Extrinsics = () => {
       setPalledSelected(palletSelected);
 
       const palletCalls = lookup(palletSelected!.calls!) as EnumVar;
-      const calls = Object.entries(palletCalls?.value || {}).map(([name, param]) => ({
-        name,
-        param,
-      }));
+      const calls = Object.entries(palletCalls?.value || {})
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .map(([name, param]) => ({
+          name,
+          param,
+        }));
 
       setCalls(calls);
       setCallSelected(calls.at(0));
@@ -144,17 +150,16 @@ const Extrinsics = () => {
     setCallArgs({});
   }, [calls]);
 
-  if (!metadata || !lookup || !palletsWithCalls) {
+  if (!palletsWithCalls) {
     return 'Loading...';
   }
-  return (
 
+  return (
     <div className="flex w-full flex-col gap-6">
       <div className="grid w-full grid-cols-2 gap-4">
-        <Select
+        <PDSelect
           label="Select Pallet"
-          placeholder="Select a Pallet"
-          emptyPlaceHolder="No Pallets Available"
+          emptyPlaceHolder="No pallets available"
           items={palletSelectItems}
           value={palletSelected?.name}
           onChange={handlePalletSelect}
@@ -162,11 +167,10 @@ const Extrinsics = () => {
         {
           callSelectItems.length > 0
           && (
-            <Select
+            <PDSelect
               key={`call-select-${palletSelected?.name}`}
-              placeholder="Select a Call"
-              emptyPlaceHolder="No Calls Available"
               label="Select Call"
+              emptyPlaceHolder="No calls available"
               items={callSelectItems}
               value={callSelected?.name}
               onChange={handleCallSelect}
@@ -178,7 +182,7 @@ const Extrinsics = () => {
         palletSelected
         && callSelected
         && (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6 empty:hidden">
             <CallParam
               key={`call-param-${callSelected.name}`}
               pallet={palletSelected}
@@ -189,14 +193,12 @@ const Extrinsics = () => {
           </div>
         )
       }
-      <button
-        type="button"
+      <QueryButton
         disabled={!signer}
-        className="block w-fit cursor-pointer border p-2 disabled:cursor-not-allowed disabled:opacity-30"
         onClick={submitTx}
       >
         Sign and Submit
-      </button>
+      </QueryButton>
       {
         encodedCall && decodedCall
         && (

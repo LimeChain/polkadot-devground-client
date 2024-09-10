@@ -5,13 +5,14 @@ import {
   useState,
 } from 'react';
 
+import { CallDocs } from '@components/callParam/CallDocs';
 import { CodecParam } from '@components/callParam/CodecParam';
-import { PalletSelect } from '@components/palletSelect';
+import { QueryButton } from '@components/callParam/QueryButton';
+import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
-import { useViewBuilder } from 'src/hooks/useViewBuilder';
 
 import type { TRelayApi } from '@custom-types/chain';
-import type { V14 } from '@polkadot-api/view-builder';
+import type { TMetaDataStorageItem } from '@custom-types/papi';
 
 interface ISubscription {
   unsubscribe: () => void;
@@ -22,22 +23,30 @@ const ChainState = () => {
   const metadata = useStoreChain?.use?.metadata?.();
   const lookup = useStoreChain?.use?.lookup?.();
 
-  const palletsWithStorage = useMemo(() => metadata?.pallets?.filter(p => p.storage), [metadata]);
+  const palletsWithStorage = useMemo(() => metadata?.pallets?.filter(p => p.storage)
+    ?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
+  const palletSelectItems = useMemo(() => palletsWithStorage?.map(pallet => ({
+    label: pallet.name,
+    value: pallet.name,
+    key: `chainState-pallet-${pallet.name}`,
+  })), [palletsWithStorage]);
   const [palletSelected, setPalletSelected] = useState(palletsWithStorage?.at(0));
 
-  const calls = useMemo(() => {
+  const storageCalls = useMemo(() => palletSelected?.storage?.items
+    ?.sort((a, b) => a.name.localeCompare(b.name)), [palletSelected]);
+  const storageCallItems = useMemo(() => {
     if (palletSelected) {
-      return palletSelected.storage?.items.map(item => ({
+      return storageCalls?.map(item => ({
         label: item.name,
         value: item.name,
+        key: `chainState-call-${item.name}`,
       }));
     }
     return undefined;
-  }, [palletSelected]);
+  }, [palletSelected, storageCalls]);
   const [storageSelected, setStorageSelected] = useState(palletSelected?.storage?.items?.at?.(0));
 
   const [callArgs, setCallArgs] = useState<unknown>(undefined);
-  console.log('args', callArgs);
 
   const [queries, setQueries] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
   const [subscriptions, setSubscriptions] = useState<ISubscription[]>([]);
@@ -63,19 +72,18 @@ const ChainState = () => {
     }
   }, [palletsWithStorage]);
 
-  const handlePalletSelect = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handlePalletSelect = useCallback((selectedPalletName: string) => {
     if (palletsWithStorage) {
-      const selectedPallet = palletsWithStorage[Number(e.target.value)];
+      const selectedPallet = palletsWithStorage.find(pallet => pallet.name === selectedPalletName);
       setPalletSelected(selectedPallet);
-      setStorageSelected(selectedPallet.storage?.items.at(0));
+      setStorageSelected(selectedPallet!.storage?.items.at(0));
       setCallArgs(undefined);
     }
   }, [palletsWithStorage]);
 
-  const handleCallSelect = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleStorageSelect = useCallback((selectedCallName: string) => {
     if (palletSelected) {
-      const selectedStoragelName = e.target.value;
-      const selectedStorage = palletSelected.storage?.items.find(item => item.name === selectedStoragelName);
+      const selectedStorage = palletSelected.storage?.items.find(item => item.name === selectedCallName);
       setStorageSelected(selectedStorage);
       setCallArgs(undefined);
     }
@@ -105,42 +113,54 @@ const ChainState = () => {
     }
   }, [subscriptions]);
 
-  if (!metadata || !lookup || !palletsWithStorage) {
+  if (!palletsWithStorage) {
     return 'Loading...';
   }
 
   return (
-    <>
+    <div className="flex w-full flex-col gap-6">
       <div className="grid w-full grid-cols-2 gap-4">
-        <PalletSelect pallets={palletsWithStorage} onPalletSelect={handlePalletSelect} />
+        <PDSelect
+          label="Select Pallet"
+          emptyPlaceHolder="No pallets available"
+          placeholder="Please select a pallet"
+          items={palletSelectItems}
+          onChange={handlePalletSelect}
+          value={palletSelected?.name}
+        />
+
         {
-          calls
-          && <StorageSelect calls={calls} onStorageSelect={handleCallSelect} />
+          storageCallItems
+          && (
+            <PDSelect
+              label="Select Storage"
+              emptyPlaceHolder="No storages available"
+              placeholder="Please select a storage"
+              items={storageCallItems}
+              onChange={handleStorageSelect}
+              value={storageSelected?.name}
+            />
+          )
         }
       </div>
-      <br />
+
       {
         storageSelected
-        && <StorageArgs storage={storageSelected} onChange={setCallArgs} />
+        && (
+          <StorageArgs
+            storage={storageSelected}
+            onChange={setCallArgs}
+          />
+        )
       }
 
-      <br />
-      <button
-        type="button"
-        className="block w-fit cursor-pointer border p-2 disabled:cursor-not-allowed disabled:opacity-30"
-        onClick={handleStorageQuerySubmit}
-      >
-        Query Storage
-      </button>
-      <br />
-      <div className="rounded-xl border p-2 empty:hidden">
-        {
-          storageSelected?.docs?.map((doc, i) => <p key={`doc-${i}`} className="pb-2 last:pb-0">{doc}</p>)
-        }
-      </div>
-      <br />
+      <QueryButton onClick={handleStorageQuerySubmit}>
+        Subscribe to {palletSelected?.name}/{storageSelected?.name}
+      </QueryButton>
+
+      <CallDocs docs={storageSelected?.docs?.filter(d => d) || []} />
+
       <p>Results</p>
-      <br />
       <div className="flex flex-col gap-4">
         {
           queries.map((query) => (
@@ -153,80 +173,33 @@ const ChainState = () => {
           ))
         }
       </div>
-    </>
+    </div>
   );
 };
 
 export default ChainState;
-
-const StorageSelect = ({
-  calls,
-  onStorageSelect,
-}: {
-  calls: { label: string; value: string }[] | undefined;
-  onStorageSelect: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-}) => {
-
-  return (
-    <div>
-      <label className="flex flex-col gap-2">
-        <span className="pl-2">
-          Storage
-        </span>
-        <select
-          className="w-full p-2"
-          onChange={onStorageSelect}
-        >
-          {
-            calls?.map(call => {
-              return (
-                <option
-                  key={`${call.label}-storage-select`}
-                  value={call.label}
-                >
-                  {call.value}
-                </option>
-              );
-            })
-          }
-        </select>
-      </label>
-    </div>
-  );
-};
 
 const StorageArgs = (
   {
     storage,
     onChange,
   }: {
-    storage: NonNullable<V14['pallets'][number]['storage']>['items'][number];
+      storage: TMetaDataStorageItem;
     onChange: (args: unknown) => void;
   },
 ) => {
   const lookup = useStoreChain?.use?.lookup?.();
-  const viewBuilder = useViewBuilder();
 
   const storageType = storage.type;
 
-  console.log(storageType);
-
   if (storageType.tag === 'plain') {
-    // console.log('plain value', lookup?.(storageType.value));
-    // const plainVarialbe = lookup!(storageType.value);
-    // return <CodecParam variable={plainVarialbe} onChange={onChange} />;
     return null;
   }
 
   const keyVariable = lookup!(storageType.value.key);
-  console.log('key', lookup?.(storageType.value.key));
-  console.log('key builder', viewBuilder?.buildDefinition(storageType.value.key));
-  // console.log('value', lookup?.(storageType.value.value));
 
   return (
-    <div>
-      <CodecParam variable={keyVariable} onChange={onChange} />
-    </div>
+    <CodecParam variable={keyVariable} onChange={onChange} />
   );
 };
 
@@ -250,7 +223,7 @@ const QueryResult = (
   useEffect(() => {
     if (api) {
       try {
-        // api.query.Referenda.ReferendumInfoFor.watchValue()
+        // api.query.Babe.GenesisSlot.watchValue()
         const subscription = api.query[querie.pallet][querie.storage].watchValue(querie.args || 'best').subscribe((res: undefined) => {
           console.log('subscription', querie);
           console.log('res', res);

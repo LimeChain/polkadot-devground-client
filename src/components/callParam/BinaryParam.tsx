@@ -5,8 +5,8 @@ import React, {
   useState,
 } from 'react';
 
-import { FileUpload } from '@components/FileUpload';
-import { Switch } from '@components/Switch';
+import { PDFileUpload } from '@components/pdFileUpload';
+import { PDSwitch } from '@components/pdSwitch';
 import { cn } from '@utils/helpers';
 
 import styles from './styles.module.css';
@@ -29,7 +29,7 @@ export const BinaryParam = ({ onChange, minLength }: IBinaryParam) => {
 
   return (
     <div className={styles.codecGroup}>
-      <Switch
+      <PDSwitch
         title="File Upload"
         checked={useFileUpload}
         onChange={handleFileUploadToggle}
@@ -90,5 +90,5 @@ export const TextBinaryParam = ({ onChange, minLength }: IBinaryParam) => {
 };
 
 export const FileUploadBinaryParam = ({ onChange }: IBinaryParam) => {
-  return <FileUpload onChange={onChange} />;
+  return <PDFileUpload onChange={onChange} />;
 };

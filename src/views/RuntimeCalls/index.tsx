@@ -5,13 +5,13 @@ import React, {
   useState,
 } from 'react';
 
-import { CodecParam } from '@components/callParam/CodecParam';
-import { PalletSelect } from '@components/palletSelect';
+import { MethodArgs } from '@components/callParam/ApiMethodArgs';
+import { CallDocs } from '@components/callParam/CallDocs';
+import { QueryButton } from '@components/callParam/QueryButton';
+import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
-import { useViewBuilder } from 'src/hooks/useViewBuilder';
 
 import type { TRelayApi } from '@custom-types/chain';
-import type { V14 } from '@polkadot-api/view-builder';
 
 interface ISubscription {
   unsubscribe: () => void;
@@ -20,24 +20,24 @@ interface ISubscription {
 
 const RuntimeCalls = () => {
   const metadata = useStoreChain?.use?.metadata?.();
-  const lookup = useStoreChain?.use?.lookup?.();
 
-  const apis = useMemo(() => metadata?.apis, [metadata]);
+  const apis = useMemo(() => metadata?.apis?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
+  const apiItems = useMemo(() => apis?.map(api => ({
+    label: api.name,
+    value: api.name,
+    key: `api-select-${api.name}`,
+  })), [apis]);
   const [apiSelected, setApiSelected] = useState(apis?.at(0));
 
-  const calls = useMemo(() => {
-    if (apiSelected) {
-      return apiSelected.methods.map(item => ({
-        label: item.name,
-        value: item.name,
-      }));
-    }
-    return undefined;
-  }, [apiSelected]);
+  const apiMethods = useMemo(() => apiSelected?.methods?.sort((a, b) => a.name.localeCompare(b.name)) || [], [apiSelected]);
+  const methodItems = useMemo(() => apiMethods?.map(item => ({
+    label: item.name,
+    value: item.name,
+    key: `method-select-${item.name}`,
+  })), [apiMethods]);
   const [methodSelected, setMethodSelected] = useState(apiSelected?.methods.at(0));
 
   const [callArgs, setCallArgs] = useState<unknown>(undefined);
-  console.log('args', callArgs);
 
   const [queries, setQueries] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
   const [subscriptions, setSubscriptions] = useState<ISubscription[]>([]);
@@ -63,19 +63,18 @@ const RuntimeCalls = () => {
     }
   }, [apis]);
 
-  const handlePalletSelect = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handlePalletSelect = useCallback((palletSelectedName: string) => {
     if (apis) {
-      const selectedMethod = apis[Number(e.target.value)];
+      const selectedMethod = apis.find(api => api.name === palletSelectedName);
       setApiSelected(selectedMethod);
-      setMethodSelected(selectedMethod.methods.at(0));
+      setMethodSelected(selectedMethod!.methods.at(0));
       setCallArgs(undefined);
     }
   }, [apis]);
 
-  const handleCallSelect = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleCallSelect = useCallback((callSelectedName: string) => {
     if (apiSelected) {
-      const selectedStoragelName = e.target.value;
-      const selectedStorage = apiSelected.methods.find(item => item.name === selectedStoragelName);
+      const selectedStorage = apiSelected.methods.find(item => item.name === callSelectedName);
       setMethodSelected(selectedStorage);
       setCallArgs(undefined);
     }
@@ -91,10 +90,6 @@ const RuntimeCalls = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiSelected, methodSelected, callArgs]);
 
-  const handleStorageSubscribe = useCallback((subscription: ISubscription) => {
-    setSubscriptions(subs => ([...subs, subscription]));
-  }, []);
-
   const handleStorageUnsubscribe = useCallback((id: string) => {
     setQueries(queries => queries.filter(query => query.id !== id));
 
@@ -105,168 +100,88 @@ const RuntimeCalls = () => {
     }
   }, [subscriptions]);
 
-  if (!metadata || !lookup || !apis) {
+  if (!apis) {
     return 'Loading...';
   }
 
-  console.log(apiSelected, methodSelected);
-
   return (
-    <>
+    <div className="flex w-full flex-col gap-6">
       <div className="grid w-full grid-cols-2 gap-4">
-        <PalletSelect pallets={apis} onPalletSelect={handlePalletSelect} />
+        <PDSelect
+          label="Select Api"
+          emptyPlaceHolder="No apis available"
+          items={apiItems}
+          value={apiSelected?.name}
+          onChange={handlePalletSelect}
+        />
+
         {
-          calls
-          && <StorageSelect calls={calls} onStorageSelect={handleCallSelect} />
+          methodItems
+          && (
+            <PDSelect
+              key={`method-select-${methodSelected?.name}`}
+              label="Select Method"
+              emptyPlaceHolder="No methods available"
+              items={methodItems}
+              value={methodSelected?.name}
+              onChange={handleCallSelect}
+            />
+          )
         }
       </div>
-      <br />
+
       {
         methodSelected
-        && <StorageArgs storage={methodSelected} onChange={setCallArgs} />
+        && (
+          <MethodArgs
+            key={`method-select-${methodSelected?.name}`}
+            method={methodSelected}
+            onChange={setCallArgs}
+          />
+        )
       }
 
-      <br />
-      <button
-        type="button"
-        className="block w-fit cursor-pointer border p-2 disabled:cursor-not-allowed disabled:opacity-30"
-        onClick={handleStorageQuerySubmit}
-      >
-        Call Api
-      </button>
-      <br />
-      <div className="rounded-xl border p-2 empty:hidden">
-        {
-          methodSelected?.docs?.map((doc, i) => <p key={`doc-${i}`} className="pb-2 last:pb-0">{doc}</p>)
-        }
-      </div>
-      <br />
-      <p>Results</p>
-      <br />
+      <CallDocs docs={methodSelected?.docs?.filter(d => d) || []} />
+
+      <QueryButton onClick={handleStorageQuerySubmit}>
+        Call {apiSelected?.name}::{methodSelected?.name}
+      </QueryButton>
+
       <div className="flex flex-col gap-4">
+        <p>Results</p>
         {
           queries.map((query) => (
             <QueryResult
               key={`query-result-${query.pallet}-${query.storage}-${query.id}`}
               querie={query}
-              onSubscribe={handleStorageSubscribe}
               onUnsubscribe={handleStorageUnsubscribe}
             />
           ))
         }
       </div>
-    </>
+    </div>
   );
 };
 
 export default RuntimeCalls;
 
-const StorageSelect = ({
-  calls,
-  onStorageSelect,
-}: {
-  calls: { label: string; value: string }[] | undefined;
-  onStorageSelect: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-}) => {
-
-  return (
-    <div>
-      <label className="flex flex-col gap-2">
-        <span className="pl-2">
-          Storage
-        </span>
-        <select
-          className="w-full p-2"
-          onChange={onStorageSelect}
-        >
-          {
-            calls?.map(call => {
-              return (
-                <option
-                  key={`${call.label}-storage-select`}
-                  value={call.label}
-                >
-                  {call.value}
-                </option>
-              );
-            })
-          }
-        </select>
-      </label>
-    </div>
-  );
-};
-
-const StorageArgs = (
-  {
-    storage,
-    onChange,
-  }: {
-    storage: NonNullable<V14['apis'][number]['methods'][number]>;
-    onChange: (args: unknown) => void;
-  },
-) => {
-  const lookup = useStoreChain?.use?.lookup?.();
-  const viewBuilder = useViewBuilder();
-
-  const storageType = storage.inputs;
-
-  const result: React.ReactElement[] = [];
-
-  storageType.forEach(type => {
-    console.log(type);
-    const apiType = lookup!(type.type);
-
-    result.push(<CodecParam variable={apiType} onChange={onChange} />);
-  });
-
-  return result.map(item => item);
-
-  // console.log(storageType);
-
-  // if (storageType.tag === 'plain') {
-  //   // console.log('plain value', lookup?.(storageType.value));
-  //   // const plainVarialbe = lookup!(storageType.value);
-  //   // return <CodecParam variable={plainVarialbe} onChange={onChange} />;
-  //   return null;
-  // }
-
-  // const keyVariable = lookup!(storageType.value.key);
-  // console.log('key', lookup?.(storageType.value.key));
-  // console.log('key builder', viewBuilder?.buildDefinition(storageType.value.key));
-  // // console.log('value', lookup?.(storageType.value.value));
-
-  // return (
-  //   <div>
-  //     <CodecParam variable={keyVariable} onChange={onChange} />
-  //   </div>
-  // );
-};
-
 const QueryResult = (
   {
     querie,
-    onSubscribe,
     onUnsubscribe,
   }: {
-    querie: { pallet: string; storage: string; id: string; args: unknown };
-    onSubscribe: (subscription: ISubscription) => void;
+      querie: { pallet: string; storage: string; id: string; args: unknown };
     onUnsubscribe: (id: string) => void;
   }) => {
   const api = useStoreChain?.use?.api?.() as TRelayApi;
-
   const [result, setResult] = useState();
   const [isLoading, setIsLoading] = useState(true);
 
-  console.log('query', querie);
-
   useEffect(() => {
     if (api) {
-      // api.apis.BabeApi.configuration({})
-      api.apis[querie.pallet][querie.storage](querie.args || {}).then(res => {
-        console.log('subscription', querie);
-        console.log('res', res);
-        console.log('res', typeof res);
+      // api.apis.MmrApi.verify_proof([],{})
+      api.apis[querie.pallet][querie.storage](...Object.values(querie.args)).then(res => {
+        console.log('response', res);
         setResult(res);
         setIsLoading(false);
       })

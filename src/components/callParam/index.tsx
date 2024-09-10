@@ -3,21 +3,17 @@ import { useStoreChain } from '@stores';
 import { CodecParam } from './CodecParam';
 
 import type {
-  LookupEntry,
-  Var,
-} from '@polkadot-api/metadata-builders';
-import type { V14 } from '@polkadot-api/substrate-bindings';
+  TMetaDataCallParam,
+  TMetaDataPallet,
+} from '@custom-types/papi';
 export interface ICallArgs {
   onChange: (args: unknown) => void;
 }
 
 export interface ICallParam extends ICallArgs {
-  pallet: V14['pallets'][number];
+  pallet: TMetaDataPallet;
   name: string;
-  param: Var | {
-    type: 'lookupEntry';
-    value: LookupEntry;
-  };
+  param: TMetaDataCallParam;
 }
 
 export function CallParam({ param, onChange }: ICallParam) {

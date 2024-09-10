@@ -11,10 +11,9 @@ import { cn } from '@utils/helpers';
 
 import type { ICallArgs } from '@components/callParam';
 
-interface IFileUpload extends ICallArgs {
-}
+interface IPDFileUpload extends ICallArgs {}
 
-export const FileUpload = ({ onChange }: IFileUpload) => {
+export const PDFileUpload = ({ onChange }: IPDFileUpload) => {
 
   const inputRef = useRef<HTMLLabelElement>(null);
   const inputId = crypto.randomUUID();

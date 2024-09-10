@@ -3,7 +3,7 @@ import {
   useState,
 } from 'react';
 
-import { Switch } from '@components/Switch';
+import { PDSwitch } from '@components/pdSwitch';
 
 import styles from './styles.module.css';
 
@@ -64,7 +64,7 @@ export const PrimitiveParam = ({ primitive, onChange }: IPrimitiveParam) => {
   switch (primitive.value) {
     case 'bool':
       return (
-        <Switch
+        <PDSwitch
           checked={Boolean(value)}
           // eslint-disable-next-line react/jsx-no-bind
           onChange={() => setValue(val => Boolean(val) ? '' : 'true')}

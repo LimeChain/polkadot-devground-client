@@ -5,7 +5,7 @@ import { cn } from '@utils/helpers';
 
 import type React from 'react';
 
-export interface ISelect {
+export interface IPDSelect {
   items?: {
     label: string;
     value: string;
@@ -19,7 +19,7 @@ export interface ISelect {
   disabled?: boolean;
 }
 
-export const Select = ({
+export const PDSelect = ({
   items,
   value,
   onChange,
@@ -27,12 +27,12 @@ export const Select = ({
   placeholder,
   emptyPlaceHolder = 'No Items',
   disabled = false,
-}: ISelect) => {
+}: IPDSelect) => {
   const hasItems = items ? items.length > 0 : false;
   return (
     <_Select.Root
       onValueChange={onChange}
-      value={value || ''}
+      value={hasItems ? value : undefined}
     >
       <_Select.Trigger
         disabled={disabled || !hasItems}
@@ -46,31 +46,35 @@ export const Select = ({
       >
         <_Select.Value
           asChild
-          placeholder={hasItems ? placeholder : emptyPlaceHolder}
+          placeholder={(
+            <SelectPlaceholder
+              label={label}
+              value={
+                hasItems
+                  ? placeholder || emptyPlaceHolder
+                  : emptyPlaceHolder || placeholder
+              }
+            />
+          )}
         >
-          {
-            value
-              ? (
-                <div className="flex flex-col items-start gap-1">
-                  {
-                    label
-                    && (
-                      <span className="font-geist opacity-70 font-body2-regular">
-                        {label}
-                      </span>
-                    )
-                  }
-                  <span>
-                    {value}
-                  </span>
-                </div>
-              )
-              : (
-                <span>
-                  {emptyPlaceHolder}
+          <div className="flex flex-col items-start gap-1">
+            {
+              label
+              && (
+                <span className="font-geist opacity-70 font-body2-regular">
+                  {label}
                 </span>
               )
-          }
+            }
+            {
+              value
+              && (
+                <span>
+                  {value}
+                </span>
+              )
+            }
+          </div>
         </_Select.Value>
         <_Select.Icon className="shrink-0">
           <Icon name="icon-dropdownArrow" size={[24]} />
@@ -142,5 +146,34 @@ const SelectItem = ({ children, value }: ISelectItem) => {
       </_Select.ItemIndicator>
       <_Select.ItemText>{children}</_Select.ItemText>
     </_Select.Item>
+  );
+};
+
+const SelectPlaceholder = ({
+  value,
+  label,
+}: {
+  value?: string;
+  label?: string;
+}) => {
+  return (
+    <div className="flex flex-col items-start gap-1">
+      {
+        label
+        && (
+          <span className="font-geist opacity-70 font-body2-regular">
+            {label}
+          </span>
+        )
+      }
+      {
+        value
+        && (
+          <span>
+            {value}
+          </span>
+        )
+      }
+    </div>
   );
 };

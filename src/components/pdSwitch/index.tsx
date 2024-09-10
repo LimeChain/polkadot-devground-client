@@ -2,13 +2,13 @@ import * as _Switch from '@radix-ui/react-switch';
 
 import { cn } from '@utils/helpers';
 
-interface ISwitch {
+interface IPDSwitch {
   title?: string;
   checked: boolean;
   onChange: () => void;
 }
 
-export const Switch = ({ title, checked, onChange }: ISwitch) => {
+export const PDSwitch = ({ title, checked, onChange }: IPDSwitch) => {
   const switchId = crypto.randomUUID();
   return (
     <label className="flex w-fit cursor-pointer items-center gap-2" htmlFor={switchId}>
