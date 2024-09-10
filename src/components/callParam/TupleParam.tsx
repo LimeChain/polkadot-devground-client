@@ -38,7 +38,6 @@ export const _TupleParam = ({
   onChange,
 }: ISequence) => {
   const [params, setParams] = useState(Array.from({ length: tuple.value.length }).fill(undefined));
-  console.log('TUPLE');
 
   useEffect(() => {
     onChange(params);

@@ -8,8 +8,8 @@ import React, {
   useState,
 } from 'react';
 
-import { Select } from '@components/Select';
-import { Switch } from '@components/Switch';
+import { PDSelect } from '@components/pdSelect';
+import { PDSwitch } from '@components/pdSwitch';
 import { cn } from '@utils/helpers';
 import { useStoreWallet } from 'src/stores/wallet';
 
@@ -52,7 +52,7 @@ export const AccountParam = ({ accountId, onChange }: IAccountParam) => {
 
   return (
     <div className={styles.codecGroup}>
-      <Switch
+      <PDSwitch
         title="Use Custom Account"
         checked={useCustomAccount}
         onChange={handleUseCustomAccount}
@@ -117,9 +117,9 @@ const AccountSelectParam = ({ accounts, onChange }: IAccountSelectParam) => {
   }, [accounts]);
 
   return (
-    <Select
-      placeholder="Select an Account"
-      emptyPlaceHolder="No Connected Accounts"
+    <PDSelect
+      emptyPlaceHolder="No connected accounts"
+      placeholder="Please select an account"
       onChange={handleOnAccountSelect}
       items={selectItems}
       value={selectedAccount?.address || ''}

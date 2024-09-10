@@ -5,27 +5,38 @@ import {
   useState,
 } from 'react';
 
-import { PalletSelect } from '@components/palletSelect';
+import { CallDocs } from '@components/callParam/CallDocs';
+import { QueryButton } from '@components/callParam/QueryButton';
+import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
 
 import type { TRelayApi } from '@custom-types/chain';
 
 const Constants = () => {
   const metadata = useStoreChain?.use?.metadata?.();
-  const lookup = useStoreChain?.use?.lookup?.();
 
-  const palletsWithConstants = useMemo(() => metadata?.pallets?.filter(p => p.constants.length > 0), [metadata]);
+  const palletsWithConstants = useMemo(() => metadata?.pallets?.filter(p => p.constants.length > 0)
+    ?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
+  const palletSelectItems = useMemo(() => palletsWithConstants?.map(pallet => ({
+    label: pallet.name,
+    value: pallet.name,
+    key: `pallet-select-${pallet.name}`,
+  })), [palletsWithConstants]);
+
   const [palletSelected, setPalletSelected] = useState(palletsWithConstants?.at(0));
 
-  const calls = useMemo(() => {
+  const constants = useMemo(() => palletSelected?.constants
+    ?.sort((a, b) => a.name.localeCompare(b.name)), [palletSelected]);
+  const constantItems = useMemo(() => {
     if (palletSelected) {
-      return palletSelected.constants?.map(item => ({
+      return constants?.map(item => ({
         label: item.name,
         value: item.name,
+        key: `constant-select-${item.name}`,
       }));
     }
     return undefined;
-  }, [palletSelected]);
+  }, [constants, palletSelected]);
   const [constantSelected, setConstantSelected] = useState(palletSelected?.constants?.at?.(0));
 
   const [queries, setQueries] = useState<{ pallet: string; storage: string; id: string }[]>([]);
@@ -38,18 +49,17 @@ const Constants = () => {
     }
   }, [palletsWithConstants]);
 
-  const handlePalletSelect = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handlePalletSelect = useCallback((selectedPalletName: string) => {
     if (palletsWithConstants) {
-      const selectedPallet = palletsWithConstants[Number(e.target.value)];
+      const selectedPallet = palletsWithConstants.find(pallet => pallet.name === selectedPalletName);
       setPalletSelected(selectedPallet);
-      setConstantSelected(selectedPallet.constants.at(0));
+      setConstantSelected(selectedPallet!.constants.at(0));
     }
   }, [palletsWithConstants]);
 
-  const handleCallSelect = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleConstantSelect = useCallback((constantSelectedName: string) => {
     if (palletSelected) {
-      const selectedStoragelName = e.target.value;
-      const selectedStorage = palletSelected.constants.find(item => item.name === selectedStoragelName);
+      const selectedStorage = palletSelected.constants.find(constant => constant.name === constantSelectedName);
       setConstantSelected(selectedStorage);
     }
   }, [palletSelected]);
@@ -66,36 +76,43 @@ const Constants = () => {
     setQueries(queries => queries.filter(query => query.id !== id));
   }, []);
 
-  if (!metadata || !lookup || !palletsWithConstants) {
+  if (!palletsWithConstants) {
     return 'Loading...';
   }
 
   return (
-    <>
+    <div className="flex w-full flex-col gap-6">
       <div className="grid w-full grid-cols-2 gap-4">
-        <PalletSelect pallets={palletsWithConstants} onPalletSelect={handlePalletSelect} />
+        <PDSelect
+          label="Select Pallet"
+          emptyPlaceHolder="No pallets available"
+          placeholder="Please select a pallet"
+          items={palletSelectItems}
+          onChange={handlePalletSelect}
+          value={palletSelected?.name}
+        />
         {
-          calls
-          && <StorageSelect calls={calls} onStorageSelect={handleCallSelect} />
+          constantItems
+          && (
+            <PDSelect
+              label="Select Constant"
+              emptyPlaceHolder="No constants available"
+              placeholder="Please select constant"
+              items={constantItems}
+              value={constantSelected?.name}
+              onChange={handleConstantSelect}
+            />
+          )
         }
       </div>
-      <br />
-      <button
-        type="button"
-        className="block w-fit cursor-pointer border p-2 disabled:cursor-not-allowed disabled:opacity-30"
-        onClick={handleStorageQuerySubmit}
-      >
-        Query Constant
-      </button>
-      <br />
-      <div className="rounded-xl border p-2 empty:hidden">
-        {
-          constantSelected?.docs?.map((doc, i) => <p key={`doc-${i}`} className="pb-2 last:pb-0">{doc}</p>)
-        }
-      </div>
-      <br />
+
+      <CallDocs docs={constantSelected?.docs?.filter(d => d) || []} />
+
+      <QueryButton onClick={handleStorageQuerySubmit}>
+        Query {palletSelected?.name}::{constantSelected?.name}
+      </QueryButton>
+
       <p>Results</p>
-      <br />
       <div className="flex flex-col gap-4">
         {
           queries.map((query) => (
@@ -107,47 +124,11 @@ const Constants = () => {
           ))
         }
       </div>
-    </>
+    </div>
   );
 };
 
 export default Constants;
-
-const StorageSelect = ({
-  calls,
-  onStorageSelect,
-}: {
-  calls: { label: string; value: string }[] | undefined;
-  onStorageSelect: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-}) => {
-
-  return (
-    <div>
-      <label className="flex flex-col gap-2">
-        <span className="pl-2">
-          Storage
-        </span>
-        <select
-          className="w-full p-2"
-          onChange={onStorageSelect}
-        >
-          {
-            calls?.map(call => {
-              return (
-                <option
-                  key={`${call.label}-storage-select`}
-                  value={call.label}
-                >
-                  {call.value}
-                </option>
-              );
-            })
-          }
-        </select>
-      </label>
-    </div>
-  );
-};
 
 const QueryResult = (
   {
@@ -161,8 +142,6 @@ const QueryResult = (
 
   const [result, setResult] = useState();
   const [isLoading, setIsLoading] = useState(true);
-
-  console.log('query', querie);
 
   useEffect(() => {
     if (api) {

@@ -4,7 +4,7 @@ import {
   useState,
 } from 'react';
 
-import { Switch } from '@components/Switch';
+import { PDSwitch } from '@components/pdSwitch';
 
 import { CodecParam } from './CodecParam';
 import styles from './styles.module.css';
@@ -34,7 +34,7 @@ export const OptionParam = ({ option, onChange }: IOptionParam) => {
 
   return (
     <div className={styles.codecGroup}>
-      <Switch
+      <PDSwitch
         title="Include Option"
         checked={includeOption}
         onChange={handleIncludeOptionToggle}

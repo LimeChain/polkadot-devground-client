@@ -4,7 +4,7 @@ import {
   useState,
 } from 'react';
 
-import { Select } from '@components/Select';
+import { PDSelect } from '@components/pdSelect';
 
 import { CodecParam } from './CodecParam';
 import styles from './styles.module.css';
@@ -43,7 +43,7 @@ export const EnumParam = ({ onChange, ...props }: IEnumParam) => {
 
   return (
     <div className={styles.codecGroup}>
-      <Select
+      <PDSelect
         items={enumItems}
         onChange={setKey}
         value={key}
@@ -53,7 +53,7 @@ export const EnumParam = ({ onChange, ...props }: IEnumParam) => {
         && (
           <div className={styles.codecContainer}>
             <CodecParam
-              key={`${variable.type}-${variable?.id}`}
+              key={`${variable.type}-${variable?.id}`} /* used to fix state on enum change */
               variable={variable}
               onChange={handleSetValue}
             />
