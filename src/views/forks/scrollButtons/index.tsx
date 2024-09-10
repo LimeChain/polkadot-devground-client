@@ -6,10 +6,16 @@ import React, {
 } from 'react';
 
 import { Icon } from '@components/icon';
+import { cn } from '@utils/helpers';
 
 import { smoothScroll } from '../helpers';
 
-export const ScrollButtons = ({ scrollAreaRef, blockNumbers }) => {
+interface IScrollButtons {
+  scrollAreaRef: React.RefObject<HTMLDivElement>;
+  blockNumbers: number[];
+}
+
+export const ScrollButtons = ({ scrollAreaRef, blockNumbers } : IScrollButtons) => {
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
   const lastBlockNumberRef = useRef([]);
@@ -21,7 +27,6 @@ export const ScrollButtons = ({ scrollAreaRef, blockNumbers }) => {
   }, [scrollAreaRef]);
 
   const scrollToRight = useCallback(() => {
-    console.log('scrollToRight');
     if (scrollAreaRef.current) {
       smoothScroll(scrollAreaRef.current, scrollAreaRef.current.scrollWidth).catch(console.error);
     }
@@ -39,10 +44,7 @@ export const ScrollButtons = ({ scrollAreaRef, blockNumbers }) => {
       if (scrollAreaRef.current) {
         const currentScrollLeft = scrollAreaRef.current.scrollLeft;
         setIsAtStart(currentScrollLeft === 0);
-        setIsAtEnd(
-          currentScrollLeft + scrollAreaRef.current.clientWidth
-          >= scrollAreaRef.current.scrollWidth,
-        );
+        setIsAtEnd(currentScrollLeft + scrollAreaRef.current.clientWidth >= scrollAreaRef.current.scrollWidth);
       }
     };
 
@@ -62,18 +64,22 @@ export const ScrollButtons = ({ scrollAreaRef, blockNumbers }) => {
   return (
     <div className="flex items-center gap-2">
       <button
-        className={`cursor-pointer ${isAtStart ? 'cursor-not-allowed opacity-50' : ''}`}
         onClick={scrollToLeft}
         disabled={isAtStart}
+        className={cn(
+          isAtStart ? 'text-dev-black-200' : 'cursor-pointer text-dev-pink-500',
+        )}
       >
-        <Icon name="icon-arrowCircle" className="-rotate-90 text-dev-pink-500" />
+        <Icon name="icon-arrowCircle" className="-rotate-90" />
       </button>
       <button
-        className={`cursor-pointer ${isAtEnd ? 'cursor-not-allowed opacity-50' : ''}`}
         onClick={scrollToRight}
         disabled={isAtEnd}
+        className={cn(
+          isAtEnd ? 'text-dev-black-200' : 'cursor-pointer text-dev-pink-500',
+        )}
       >
-        <Icon name="icon-arrowCircle" className="rotate-90 text-dev-pink-500" />
+        <Icon name="icon-arrowCircle" className="rotate-90" />
       </button>
     </div>
   );

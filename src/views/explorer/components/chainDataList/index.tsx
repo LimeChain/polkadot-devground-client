@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -19,28 +20,30 @@ interface TChainDataList {
 export const ChainDataList = ({ title, link, linkText, children }: TChainDataList) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [isAtTop, setIsAtTop] = useState(true);
+  const [isAtBottom, setIsAtBottom] = useState(false);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTo({
         top: scrollAreaRef.current.scrollHeight,
         behavior: 'smooth',
       });
     }
-  };
+  }, [scrollAreaRef]);
 
-  const scrollToTop = () => {
+  const scrollToTop = useCallback(() => {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTo({
         top: 0,
         behavior: 'smooth',
       });
     }
-  };
+  }, [scrollAreaRef]);
 
   const handleScroll = () => {
     if (scrollAreaRef.current) {
       setIsAtTop(scrollAreaRef.current.scrollTop === 0);
+      setIsAtBottom(scrollAreaRef.current.scrollTop + scrollAreaRef.current.clientHeight === scrollAreaRef.current.scrollHeight);
     }
   };
 
@@ -52,7 +55,6 @@ export const ChainDataList = ({ title, link, linkText, children }: TChainDataLis
         scrollArea.removeEventListener('scroll', handleScroll);
       };
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scrollAreaRef]);
 
   return (
@@ -72,12 +74,24 @@ export const ChainDataList = ({ title, link, linkText, children }: TChainDataLis
         </div>
 
         <div className="flex items-center gap-2">
-          <span className={`cursor-pointer ${isAtTop ? 'cursor-not-allowed opacity-50' : ''}`} onClick={!isAtTop ? scrollToTop : undefined}>
-            <Icon name="icon-arrowCircle" className="text-dev-pink-500" />
-          </span>
-          <span className="cursor-pointer" onClick={scrollToBottom}>
-            <Icon name="icon-arrowCircle" className="rotate-180 text-dev-pink-500" />
-          </span>
+          <button
+            onClick={scrollToTop}
+            disabled={isAtTop}
+            className={cn(
+              isAtTop ? 'text-dev-black-200' : 'cursor-pointer text-dev-pink-500',
+            )}
+          >
+            <Icon name="icon-arrowCircle" />
+          </button>
+          <button
+            onClick={scrollToBottom}
+            disabled={isAtBottom}
+            className={cn(
+              isAtBottom ? 'text-dev-black-200' : 'cursor-pointer text-dev-pink-500',
+            )}
+          >
+            <Icon name="icon-arrowCircle" className="rotate-180" />
+          </button>
         </div>
       </div>
 
