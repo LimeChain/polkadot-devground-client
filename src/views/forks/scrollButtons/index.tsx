@@ -1,5 +1,7 @@
 import React, {
+  useCallback,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 
@@ -10,68 +12,69 @@ import { smoothScroll } from '../helpers';
 export const ScrollButtons = ({ scrollAreaRef, blockNumbers }) => {
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [prevScrollLeft, setPrevScrollLeft] = useState(0);
+  const lastBlockNumberRef = useRef([]);
 
-  // Scroll to the left (start) of the container
-  const scrollToLeft = () => {
+  const scrollToLeft = useCallback(() => {
     if (scrollAreaRef.current) {
-      smoothScroll(scrollAreaRef.current, 0);
-      setIsFollowing(false); // Stop following when scrolling left
+      smoothScroll(scrollAreaRef.current, 0).catch(console.error);
     }
-  };
+  }, [scrollAreaRef]);
 
-  // Scroll to the right (end) of the container
-  const scrollToRight = () => {
+  const scrollToRight = useCallback(() => {
+    console.log('scrollToRight');
     if (scrollAreaRef.current) {
-      smoothScroll(scrollAreaRef.current, scrollAreaRef.current.scrollWidth);
-      setIsFollowing(true); // Start following when scrolling right
+      smoothScroll(scrollAreaRef.current, scrollAreaRef.current.scrollWidth).catch(console.error);
     }
-  };
+  }, [scrollAreaRef]);
 
-  // Handle scroll events to update button states
-  const handleScroll = () => {
-
-    if (scrollAreaRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollAreaRef.current;
-      setIsAtStart(scrollLeft === 0);
-      setIsAtEnd(scrollLeft + clientWidth === scrollWidth);
-      setIsFollowing(scrollLeft + clientWidth === scrollWidth);
-    }
-  };
-
-  // Add scroll event listener
   useEffect(() => {
-    const currentRef = scrollAreaRef.current;
-    if (currentRef) {
-      currentRef.addEventListener('scroll', handleScroll);
-      handleScroll(); // Initial check to set correct button states
-      return () => currentRef.removeEventListener('scroll', handleScroll);
+    if (blockNumbers.length > lastBlockNumberRef.current.length && isAtEnd) {
+      scrollToRight();
     }
-  }, [scrollAreaRef, prevScrollLeft]);
+    lastBlockNumberRef.current = blockNumbers;
+  }, [blockNumbers, isAtEnd, scrollToRight]);
 
-  // Auto-scroll to the right when new blocks are added and following
   useEffect(() => {
-    if (isFollowing && scrollAreaRef.current) {
-      smoothScroll(scrollAreaRef.current, scrollAreaRef.current.scrollWidth);
+    const handleScroll = () => {
+      if (scrollAreaRef.current) {
+        const currentScrollLeft = scrollAreaRef.current.scrollLeft;
+        setIsAtStart(currentScrollLeft === 0);
+        setIsAtEnd(
+          currentScrollLeft + scrollAreaRef.current.clientWidth
+          >= scrollAreaRef.current.scrollWidth,
+        );
+      }
+    };
+
+    const scrollArea = scrollAreaRef.current;
+    if (scrollArea) {
+      scrollArea.addEventListener('scroll', handleScroll);
+      handleScroll();
     }
 
-  }, [blockNumbers, isFollowing]);
+    return () => {
+      if (scrollArea) {
+        scrollArea.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [scrollAreaRef]);
 
   return (
     <div className="flex items-center gap-2">
-      <span
+      <button
         className={`cursor-pointer ${isAtStart ? 'cursor-not-allowed opacity-50' : ''}`}
-        onClick={isAtStart ? undefined : scrollToLeft}
+        onClick={scrollToLeft}
+        disabled={isAtStart}
       >
         <Icon name="icon-arrowCircle" className="-rotate-90 text-dev-pink-500" />
-      </span>
-      <span
+      </button>
+      <button
         className={`cursor-pointer ${isAtEnd ? 'cursor-not-allowed opacity-50' : ''}`}
-        onClick={isAtEnd ? undefined : scrollToRight}
+        onClick={scrollToRight}
+        disabled={isAtEnd}
       >
         <Icon name="icon-arrowCircle" className="rotate-90 text-dev-pink-500" />
-      </span>
+      </button>
     </div>
   );
 };
