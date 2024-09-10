@@ -1,9 +1,6 @@
-import { useEventBus } from '@pivanov/event-bus';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { nanoid } from 'nanoid';
 import {
   Fragment,
-  useCallback,
   useEffect,
   useRef,
 } from 'react';
@@ -15,11 +12,9 @@ import { PDScrollArea } from '@components/pdScrollArea';
 import { cn } from '@utils/helpers';
 
 import { CurvedLineWithArrow } from './curvedLineWithArrow';
-import { smoothScroll } from './helpers';
 import { ScrollButtons } from './scrollButtons';
 
 import type { BlockItem } from './forks';
-import type { IEventBusForksScrollToBlock } from '@custom-types/eventBus';
 
 interface IVirtualizedListProps {
   items: Record<string, BlockItem[]>;
@@ -34,11 +29,7 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
   const { items } = props;
   const blockNumbers = Object.keys(items);
 
-  const refTimeout = useRef<NodeJS.Timeout>();
-  const refKey = useRef(nanoid());
-
   const refScrollArea = useRef<HTMLDivElement>(null);
-  const refScrollAreaScrollLeft = useRef(0);
   const refContent = useRef<HTMLDivElement>(null);
   const refScrollable = useRef<HTMLDivElement>(null);
 
@@ -59,38 +50,6 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
       return 240 + paddingLeft;
     },
   });
-
-  // Expose the scrollToIndex function to be used outside of this component
-  useEventBus<IEventBusForksScrollToBlock>('@@-forks-scroll-to-block', ({ data }) => {
-    clearTimeout(refTimeout.current);
-
-    const { scrollToIndex, scrollToBlockHash } = data;
-    refLatestBlockHash.current = scrollToBlockHash;
-
-    refTimeout.current = setTimeout(async () => {
-      refKey.current = nanoid();
-
-      const offset = rowVirtualizer.getOffsetForIndex(scrollToIndex);
-      if (offset?.[0]) {
-        await smoothScroll(refScrollArea.current as HTMLElement, offset[0]);
-      }
-
-      document.getElementById(`block-hash-${scrollToBlockHash}`)?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'center',
-      });
-    }, 400);
-  });
-
-  const handleOnScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    refScrollAreaScrollLeft.current = e.currentTarget.scrollLeft;
-    if ((refScrollable.current?.scrollHeight || 0) > (refScrollArea.current?.clientHeight || 0)) {
-      refContent.current?.style.setProperty('--min-height', `${refContent.current?.scrollHeight}px`);
-    } else {
-      refContent.current?.style.setProperty('--min-height', `${(refScrollArea.current?.clientHeight || 0) - 80}px`);
-    }
-  }, []);
 
   useEffect(() => {
     const htmlTag = document.documentElement;
@@ -113,7 +72,6 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
         type="always"
         ref={refScrollArea}
         className="w-full"
-        onScroll={handleOnScroll}
         viewportClassNames={cn(
           'mask-horizontal-and-vertical',
           'px-8 py-20',
@@ -191,10 +149,10 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
                               'flex items-center gap-x-2',
                               'px-6',
                               'min-h-full w-60',
-                              'border-2 border-dev-green-700',
+                              'border-2 border-dev-green-700 text-dev-black-1000 dark:text-white',
                               'bg-green-600/10',
                               {
-                                ['bg-dev-black-900 border-transparent']: !item.isFinalized,
+                                ['bg-dev-black-900 border-transparent text-white']: !item.isFinalized,
                                 ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: refLatestBlockHash.current === item.blockHash,
                               },
                             )}
