@@ -19,7 +19,7 @@ interface IButtonProps {
 interface IResultProps {
   results: {
     blockNumber: number | null;
-    extrinsics: IMappedBlockExtrinsic[] | null;
+    extrinsics: IMappedBlockExtrinsic[];
   };
   handleOpenModal: (e: React.MouseEvent<HTMLDivElement>) => void;
   type: string;
@@ -50,7 +50,7 @@ export const Results = (props: IResultProps) => {
   const { blockNumber, extrinsics } = results;
   const [filter, setFilter] = useState<string>(type ?? '');
 
-  const filteredExtrinsics = filter === 'all' || filter === 'extrinsics' ? extrinsics : null;
+  const showExtrinsics = filter === 'all' || filter === 'extrinsics';
   const showBlock = filter === 'all' || filter === 'block';
 
   const handleFilter = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
@@ -102,7 +102,7 @@ export const Results = (props: IResultProps) => {
               'font-geist text-dev-white-1000 font-body2-regular dark:text-dev-black-1000',
             )}
             >
-                Blocks ({blockNumber ? 1 : 0})
+              Blocks ({blockNumber ? 1 : 0})
             </p>
             <PDLink
               to={`/explorer/${blockNumber}`}
@@ -114,27 +114,27 @@ export const Results = (props: IResultProps) => {
               )}
             >
               <p className="font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000">
-                  Block#
+                Block#
                 <span className="font-body2-bold"> {blockNumber}</span>
               </p>
               <p className="font-geist text-dev-white-1000 font-body2-regular dark:text-dev-black-1000">
-                  Block
+                Block
               </p>
             </PDLink>
           </>
         )}
 
-        {filteredExtrinsics && (
+        {showExtrinsics && extrinsics && (
           <>
             <p className={cn(
               'my-4 border-b p-1',
               'font-geist text-dev-white-1000 font-body2-regular dark:text-dev-black-1000',
             )}
             >
-                Extrinsics ({filteredExtrinsics?.length})
+              Extrinsics ({extrinsics?.length})
             </p>
 
-            {filteredExtrinsics?.map((extrinsic) => (
+            {extrinsics?.map((extrinsic) => (
               <div
                 key={extrinsic?.id}
                 data-extrinsic-id={extrinsic?.id}
@@ -158,13 +158,13 @@ export const Results = (props: IResultProps) => {
           </>
         )}
 
-        {blockNumber || filteredExtrinsics ? null : (
+        {!(blockNumber || extrinsics) && (
           <div className={cn(
             'p-4',
             'font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000',
           )}
           >
-              No results found
+            No results found
           </div>
         )}
       </PDScrollArea>

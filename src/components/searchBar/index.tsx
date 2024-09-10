@@ -31,12 +31,9 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
   const blocksData = useStoreChain?.use?.blocksData?.();
   const [searchInput, setSearchInput] = useState('');
   const [isResultsVisible, setIsResultsVisible] = useState(false);
-  const [results, setResults] = useState<{
-    blockNumber: number | null;
-    extrinsics: IMappedBlockExtrinsic[] | null;
-  }>({
+  const [results, setResults] = useState({
     blockNumber: null,
-    extrinsics: null,
+    extrinsics: [] as IMappedBlockExtrinsic[],
   });
 
   const refSelectedExtrinsic = useRef<IMappedBlockExtrinsic | undefined>();
@@ -44,13 +41,15 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
 
   const [ShowJsonModal, toggleVisibility] = useToggleVisibility(ModalShowJson);
 
-  const debounceSearch = debounce((input) => {
+  const debounceSearch = debounce((props) => {
+    const e = props as React.ChangeEvent<HTMLInputElement>;
+
+    setSearchInput(e.target.value);
     setIsResultsVisible(true);
+    let searchValue = e.target.value;
+    const isHash = searchValue.startsWith('0x');
 
-    let searchValue = input as string;
-    const startsWith0x = searchValue.startsWith('0x');
-
-    if (startsWith0x) {
+    if (isHash) {
       searchValue = getBlockNumberByHash(blocksData, searchValue);
     } else {
       searchValue = searchValue.replace(/,/g, '');
@@ -61,19 +60,18 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
 
     if (extrinsicMatch) {
       const extrinsic = findExtrinsicById(blocksData, searchValue);
-
-      extrinsic
-      && setResults({
-        blockNumber: null,
-        extrinsics: [extrinsic],
-      });
-    } else {
       setResults({
-        blockNumber: block?.header.number ?? null,
-        extrinsics: block?.body?.extrinsics ?? null,
+        blockNumber: block?.header.number,
+        extrinsics: extrinsic ? [extrinsic] : [],
       });
+
+      return;
     }
 
+    setResults({
+      blockNumber: block?.header.number,
+      extrinsics: block?.body?.extrinsics,
+    });
   }, 500);
 
   const handleOpenModal = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
@@ -84,10 +82,11 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
     toggleVisibility();
   }, [results, toggleVisibility]);
 
-  const handleSearchInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(e.target.value);
-    debounceSearch(e.target.value);
-  }, [debounceSearch]);
+  const handleShowResults = useCallback(() => {
+    if (searchInput.length > 0) {
+      setIsResultsVisible(true);
+    }
+  }, [searchInput.length]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -110,6 +109,7 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
       )}
       >
         <div
+          onClick={handleShowResults}
           className={cn(
             'flex w-full items-center gap-1 p-3',
             'border-b border-gray-300',
@@ -121,8 +121,7 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
           <input
             type="text"
             placeholder={label}
-            value={searchInput}
-            onChange={handleSearchInputChange}
+            onChange={debounceSearch}
             className={cn(
               'w-full dark:bg-transparent',
               'caret-dev-pink-500 focus-visible:outline-none',
@@ -131,6 +130,7 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
           />
         </div>
         <button
+          onClick={handleShowResults}
           className={cn(
             'px-6 py-2',
             'bg-dev-purple-700 text-dev-purple-300',
@@ -141,19 +141,17 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
           <span className="font-geist font-body2-bold">Search</span>
         </button>
       </div>
-      {isResultsVisible && (
-        <Results
-          results={results}
-          handleOpenModal={handleOpenModal}
-          type={type}
-          classNames={cn(
-            'opacity-0 transition-all',
-            {
-              'opacity-100 translate-y-0 pointer-events-auto': searchInput,
-            })
-          }
-        />
-      )}
+      <Results
+        results={results}
+        handleOpenModal={handleOpenModal}
+        type={type}
+        classNames={cn(
+          'opacity-0 transition-all duration-300',
+          {
+            'opacity-100 translate-y-0 pointer-events-auto': isResultsVisible,
+          })
+        }
+      />
 
       {
         refSelectedExtrinsic.current && (
