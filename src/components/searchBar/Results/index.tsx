@@ -158,7 +158,7 @@ export const Results = (props: IResultProps) => {
           </>
         )}
 
-        {!(blockNumber || extrinsics?.length > 0) && (
+        {!(showBlock && blockNumber) && !(showExtrinsics && extrinsics?.length) && (
           <div className={cn(
             'p-4',
             'font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000',
