@@ -6,13 +6,12 @@ import {
 } from 'react';
 
 import { CallDocs } from '@components/callParam/CallDocs';
-import { CodecParam } from '@components/callParam/CodecParam';
 import { QueryButton } from '@components/callParam/QueryButton';
+import { StorageArgs } from '@components/callParam/StorageArgs';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
 
 import type { TRelayApi } from '@custom-types/chain';
-import type { TMetaDataStorageItem } from '@custom-types/papi';
 
 interface ISubscription {
   unsubscribe: () => void;
@@ -178,30 +177,6 @@ const ChainState = () => {
 };
 
 export default ChainState;
-
-const StorageArgs = (
-  {
-    storage,
-    onChange,
-  }: {
-      storage: TMetaDataStorageItem;
-    onChange: (args: unknown) => void;
-  },
-) => {
-  const lookup = useStoreChain?.use?.lookup?.();
-
-  const storageType = storage.type;
-
-  if (storageType.tag === 'plain') {
-    return null;
-  }
-
-  const keyVariable = lookup!(storageType.value.key);
-
-  return (
-    <CodecParam variable={keyVariable} onChange={onChange} />
-  );
-};
 
 const QueryResult = (
   {
