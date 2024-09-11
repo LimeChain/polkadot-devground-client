@@ -7,6 +7,9 @@ import {
 
 import { CallDocs } from '@components/callParam/CallDocs';
 import { QueryButton } from '@components/callParam/QueryButton';
+import { QueryFormContainer } from '@components/callParam/QueryFormContainer';
+import { QueryResultContainer } from '@components/callParam/QueryResultContainer';
+import { QueryViewContainer } from '@components/callParam/QueryViewContainer';
 import { StorageArgs } from '@components/callParam/StorageArgs';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
@@ -117,19 +120,20 @@ const ChainState = () => {
   }
 
   return (
-    <div className="flex w-full flex-col gap-6">
-      <div className="grid w-full grid-cols-2 gap-4">
-        <PDSelect
-          label="Select Pallet"
-          emptyPlaceHolder="No pallets available"
-          placeholder="Please select a pallet"
-          items={palletSelectItems}
-          onChange={handlePalletSelect}
-          value={palletSelected?.name}
-        />
+    <QueryViewContainer>
+      <QueryFormContainer>
+        <div className="grid w-full grid-cols-2 gap-4">
+          <PDSelect
+            label="Select Pallet"
+            emptyPlaceHolder="No pallets available"
+            placeholder="Please select a pallet"
+            items={palletSelectItems}
+            onChange={handlePalletSelect}
+            value={palletSelected?.name}
+          />
 
-        {
-          storageCallItems
+          {
+            storageCallItems
           && (
             <PDSelect
               label="Select Storage"
@@ -140,27 +144,27 @@ const ChainState = () => {
               value={storageSelected?.name}
             />
           )
-        }
-      </div>
+          }
+        </div>
 
-      {
-        storageSelected
+        {
+          storageSelected
         && (
           <StorageArgs
             storage={storageSelected}
             onChange={setCallArgs}
           />
         )
-      }
+        }
 
-      <QueryButton onClick={handleStorageQuerySubmit}>
+        <QueryButton onClick={handleStorageQuerySubmit}>
         Subscribe to {palletSelected?.name}/{storageSelected?.name}
-      </QueryButton>
+        </QueryButton>
 
-      <CallDocs docs={storageSelected?.docs?.filter(d => d) || []} />
+        <CallDocs docs={storageSelected?.docs?.filter(d => d) || []} />
 
-      <p>Results</p>
-      <div className="flex flex-col gap-4">
+      </QueryFormContainer>
+      <QueryResultContainer>
         {
           queries.map((query) => (
             <QueryResult
@@ -171,8 +175,8 @@ const ChainState = () => {
             />
           ))
         }
-      </div>
-    </div>
+      </QueryResultContainer>
+    </QueryViewContainer>
   );
 };
 
