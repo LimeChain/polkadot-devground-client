@@ -8,7 +8,10 @@ export interface IQueryFormContainer {
 
 export const QueryFormContainer = ({ children }: IQueryFormContainer) => {
   return (
-    <PDScrollArea className="pr-2" /* add space for the scrollbar */ >
+    <PDScrollArea
+      className="pb-2 pr-2 first:only:border " /* add space for the scrollbar */
+      viewportClassNames="max-w-full w-full"
+    >
       <div className="flex w-full flex-col gap-6">
         {children}
       </div>
