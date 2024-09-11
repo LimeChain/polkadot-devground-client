@@ -197,7 +197,7 @@ const Extrinsics = () => {
         disabled={!signer}
         onClick={submitTx}
       >
-        Sign and Submit
+        Sign and Submit {palletSelected?.name}/{callSelected?.name}
       </QueryButton>
       {
         encodedCall && decodedCall

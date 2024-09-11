@@ -144,7 +144,7 @@ const RuntimeCalls = () => {
       <CallDocs docs={methodSelected?.docs?.filter(d => d) || []} />
 
       <QueryButton onClick={handleStorageQuerySubmit}>
-        Call {apiSelected?.name}::{methodSelected?.name}
+        Call {apiSelected?.name}/{methodSelected?.name}
       </QueryButton>
 
       <div className="flex flex-col gap-4">
