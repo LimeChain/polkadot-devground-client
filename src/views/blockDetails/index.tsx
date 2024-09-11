@@ -1,4 +1,3 @@
-import { format } from 'date-fns';
 import {
   type ChangeEvent,
   useCallback,
@@ -48,19 +47,11 @@ const BlockDetails = () => {
   useEffect(() => {
     if (blockNumber && blocksData.size > 0) {
       const block = blocksData.get(Number(blockNumber));
+      console.log('block', block);
       if (!block) {
         return;
       }
-      setBlockData({
-        number: block.header.number,
-        blockHash: block.header.hash,
-        extrinsicsRoot: block.header.extrinsicRoot,
-        parentHash: block.header.parentHash,
-        stateRoot: block.header.stateRoot,
-        specVersion: block.header.runtime?.spec_version || 0,
-        validatorId: block.header.identity.toString(),
-        timeStamp: format(new Date(block.header.timestamp), 'yyyy-MM-dd HH:mm:ss'),
-      });
+      setBlockData(block);
     }
   }, [blockNumber, blocksData]);
 
@@ -80,7 +71,7 @@ const BlockDetails = () => {
   return (
     <>
       <div className="mb-12 flex items-center justify-between">
-        <PageHeader title="Block" blockNumber={formatNumber(blockData.number)} />
+        <PageHeader title="Block" blockNumber={formatNumber(blockData.header.number)} />
         <div className="flex gap-6">
           <PDLink
             to={`https://polkadot.subscan.io/block/${blockData.number}`}
@@ -109,7 +100,7 @@ const BlockDetails = () => {
         <p>Time stamp</p>
 
         <div>
-          {isChecked ? new Date(blockData.timeStamp).toUTCString() : blockData.timeStamp}
+          {isChecked ? new Date(blockData.header.timestamp).toUTCString() : blockData.header.timestamp}
           <ToggleButton
             isChecked={isChecked}
             handleSetCheck={handleSetCheck}
@@ -153,10 +144,10 @@ const BlockDetails = () => {
         <p>Block Hash</p>
 
         <div className="gap-x-1">
-          <p>{blockData.blockHash}</p>
+          <p>{blockData.header.hash}</p>
 
           <CopyToClipboard
-            text={blockData.blockHash}
+            text={blockData.header.hash}
             toastMessage="block hash"
           >
             {
@@ -175,10 +166,10 @@ const BlockDetails = () => {
         <p>Parent Hash</p>
 
         <div>
-          {blockData.parentHash}
+          {blockData.header.parentHash}
 
           <CopyToClipboard
-            text={blockData.parentHash}
+            text={blockData.header.parentHash}
             toastMessage="Parent Hash"
           >
             {
@@ -197,10 +188,10 @@ const BlockDetails = () => {
         <p>State Root</p>
 
         <div>
-          {blockData.stateRoot}
+          {blockData.header.stateRoot}
 
           <CopyToClipboard
-            text={blockData.stateRoot}
+            text={blockData.header.stateRoot}
             toastMessage="State Root"
           >
             {
@@ -219,10 +210,10 @@ const BlockDetails = () => {
         <p>Extrinsic Root</p>
 
         <div>
-          {blockData.extrinsicsRoot}
+          {blockData.header.extrinsicRoot}
 
           <CopyToClipboard
-            text={blockData.extrinsicsRoot}
+            text={blockData.header.extrinsicRoot}
             toastMessage="Extrinsic Root"
           >
             {
@@ -265,7 +256,7 @@ const BlockDetails = () => {
       <div className={styles['pd-block-details']}>
         <p>Spec Version</p>
 
-        <div>{blockData.specVersion}</div>
+        <div>{blockData.header.runtime.spec_version}</div>
       </div>
     </>
   );
