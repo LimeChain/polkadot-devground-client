@@ -14,6 +14,8 @@ import {
   type ICallParam,
 } from '@components/callParam';
 import { QueryButton } from '@components/callParam/QueryButton';
+import { QueryFormContainer } from '@components/callParam/QueryFormContainer';
+import { QueryViewContainer } from '@components/callParam/QueryViewContainer';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
 import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
@@ -155,17 +157,19 @@ const Extrinsics = () => {
   }
 
   return (
-    <div className="flex w-full flex-col gap-6">
-      <div className="grid w-full grid-cols-2 gap-4">
-        <PDSelect
-          label="Select Pallet"
-          emptyPlaceHolder="No pallets available"
-          items={palletSelectItems}
-          value={palletSelected?.name}
-          onChange={handlePalletSelect}
-        />
-        {
-          callSelectItems.length > 0
+    <QueryViewContainer>
+      <QueryFormContainer>
+
+        <div className="grid w-full grid-cols-2 gap-4">
+          <PDSelect
+            label="Select Pallet"
+            emptyPlaceHolder="No pallets available"
+            items={palletSelectItems}
+            value={palletSelected?.name}
+            onChange={handlePalletSelect}
+          />
+          {
+            callSelectItems.length > 0
           && (
             <PDSelect
               key={`call-select-${palletSelected?.name}`}
@@ -176,10 +180,10 @@ const Extrinsics = () => {
               onChange={handleCallSelect}
             />
           )
-        }
-      </div >
-      {
-        palletSelected
+          }
+        </div >
+        {
+          palletSelected
         && callSelected
         && (
           <div className="flex flex-col gap-6 empty:hidden">
@@ -192,22 +196,24 @@ const Extrinsics = () => {
             />
           </div>
         )
-      }
-      <QueryButton
-        disabled={!signer}
-        onClick={submitTx}
-      >
-        Sign and Submit {palletSelected?.name}/{callSelected?.name}
-      </QueryButton>
-      {
-        encodedCall && decodedCall
-        && (
-          <>
-            <p className="break-words">Encoded Call {encodedCall.asHex()}</p>
-          </>
-        )
-      }
-    </div>
+        }
+        <QueryButton
+          disabled={!signer}
+          onClick={submitTx}
+        >
+          Sign and Submit {palletSelected?.name}/{callSelected?.name}
+        </QueryButton>
+        {
+          encodedCall
+          && decodedCall
+          && (
+            <p className="break-all">
+              Encoded Call {encodedCall.asHex()}
+            </p>
+          )
+        }
+      </QueryFormContainer>
+    </QueryViewContainer>
   );
 };
 

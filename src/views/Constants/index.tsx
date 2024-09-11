@@ -7,6 +7,9 @@ import {
 
 import { CallDocs } from '@components/callParam/CallDocs';
 import { QueryButton } from '@components/callParam/QueryButton';
+import { QueryFormContainer } from '@components/callParam/QueryFormContainer';
+import { QueryResultContainer } from '@components/callParam/QueryResultContainer';
+import { QueryViewContainer } from '@components/callParam/QueryViewContainer';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
 
@@ -81,18 +84,19 @@ const Constants = () => {
   }
 
   return (
-    <div className="flex w-full flex-col gap-6">
-      <div className="grid w-full grid-cols-2 gap-4">
-        <PDSelect
-          label="Select Pallet"
-          emptyPlaceHolder="No pallets available"
-          placeholder="Please select a pallet"
-          items={palletSelectItems}
-          onChange={handlePalletSelect}
-          value={palletSelected?.name}
-        />
-        {
-          constantItems
+    <QueryViewContainer>
+      <QueryFormContainer>
+        <div className="grid w-full grid-cols-2 gap-4">
+          <PDSelect
+            label="Select Pallet"
+            emptyPlaceHolder="No pallets available"
+            placeholder="Please select a pallet"
+            items={palletSelectItems}
+            onChange={handlePalletSelect}
+            value={palletSelected?.name}
+          />
+          {
+            constantItems
           && (
             <PDSelect
               label="Select Constant"
@@ -103,17 +107,17 @@ const Constants = () => {
               onChange={handleConstantSelect}
             />
           )
-        }
-      </div>
+          }
+        </div>
 
-      <CallDocs docs={constantSelected?.docs?.filter(d => d) || []} />
+        <CallDocs docs={constantSelected?.docs?.filter(d => d) || []} />
 
-      <QueryButton onClick={handleStorageQuerySubmit}>
-        Query {palletSelected?.name}/{constantSelected?.name}
-      </QueryButton>
+        <QueryButton onClick={handleStorageQuerySubmit}>
+          Query {palletSelected?.name}/{constantSelected?.name}
+        </QueryButton>
 
-      <p>Results</p>
-      <div className="flex flex-col gap-4">
+      </QueryFormContainer>
+      <QueryResultContainer>
         {
           queries.map((query) => (
             <QueryResult
@@ -123,8 +127,8 @@ const Constants = () => {
             />
           ))
         }
-      </div>
-    </div>
+      </QueryResultContainer>
+    </QueryViewContainer>
   );
 };
 

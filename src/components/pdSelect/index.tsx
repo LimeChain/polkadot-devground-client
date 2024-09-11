@@ -61,7 +61,7 @@ export const PDSelect = ({
             {
               label
               && (
-                <span className="font-geist opacity-70 font-body2-regular">
+                <span className="w-full truncate text-left font-geist opacity-70 font-body2-regular">
                   {label}
                 </span>
               )
@@ -69,7 +69,7 @@ export const PDSelect = ({
             {
               value
               && (
-                <span>
+                <span className="w-full truncate text-left">
                   {value}
                 </span>
               )
@@ -137,7 +137,6 @@ const SelectItem = ({ children, value }: ISelectItem) => {
         'data-[highlighted]:bg-dev-black-400',
         'data-[highlighted]:dark:bg-dev-white-800',
         'data-[highlighted]:outline-none',
-        'overflow-hidden text-ellipsis',
         'truncate',
       )}
     >

@@ -8,6 +8,9 @@ import React, {
 import { MethodArgs } from '@components/callParam/ApiMethodArgs';
 import { CallDocs } from '@components/callParam/CallDocs';
 import { QueryButton } from '@components/callParam/QueryButton';
+import { QueryFormContainer } from '@components/callParam/QueryFormContainer';
+import { QueryResultContainer } from '@components/callParam/QueryResultContainer';
+import { QueryViewContainer } from '@components/callParam/QueryViewContainer';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
 
@@ -105,50 +108,51 @@ const RuntimeCalls = () => {
   }
 
   return (
-    <div className="flex w-full flex-col gap-6">
-      <div className="grid w-full grid-cols-2 gap-4">
-        <PDSelect
-          label="Select Api"
-          emptyPlaceHolder="No apis available"
-          items={apiItems}
-          value={apiSelected?.name}
-          onChange={handlePalletSelect}
-        />
+    <QueryViewContainer>
+      <QueryFormContainer>
+        <div className="grid w-full grid-cols-2 gap-4">
+          <PDSelect
+            label="Select Api"
+            emptyPlaceHolder="No apis available"
+            items={apiItems}
+            value={apiSelected?.name}
+            onChange={handlePalletSelect}
+          />
+
+          {
+            methodItems
+            && (
+              <PDSelect
+                key={`method-select-${methodSelected?.name}`}
+                label="Select Method"
+                emptyPlaceHolder="No methods available"
+                items={methodItems}
+                value={methodSelected?.name}
+                onChange={handleCallSelect}
+              />
+            )
+          }
+        </div>
 
         {
-          methodItems
+          methodSelected
           && (
-            <PDSelect
+            <MethodArgs
               key={`method-select-${methodSelected?.name}`}
-              label="Select Method"
-              emptyPlaceHolder="No methods available"
-              items={methodItems}
-              value={methodSelected?.name}
-              onChange={handleCallSelect}
+              method={methodSelected}
+              onChange={setCallArgs}
             />
           )
         }
-      </div>
 
-      {
-        methodSelected
-        && (
-          <MethodArgs
-            key={`method-select-${methodSelected?.name}`}
-            method={methodSelected}
-            onChange={setCallArgs}
-          />
-        )
-      }
+        <CallDocs docs={methodSelected?.docs?.filter(d => d) || []} />
 
-      <CallDocs docs={methodSelected?.docs?.filter(d => d) || []} />
+        <QueryButton onClick={handleStorageQuerySubmit}>
+          Call {apiSelected?.name}/{methodSelected?.name}
+        </QueryButton>
 
-      <QueryButton onClick={handleStorageQuerySubmit}>
-        Call {apiSelected?.name}/{methodSelected?.name}
-      </QueryButton>
-
-      <div className="flex flex-col gap-4">
-        <p>Results</p>
+      </QueryFormContainer>
+      <QueryResultContainer>
         {
           queries.map((query) => (
             <QueryResult
@@ -158,21 +162,20 @@ const RuntimeCalls = () => {
             />
           ))
         }
-      </div>
-    </div>
+      </QueryResultContainer>
+    </QueryViewContainer>
   );
 };
 
 export default RuntimeCalls;
 
-const QueryResult = (
-  {
-    querie,
-    onUnsubscribe,
-  }: {
-      querie: { pallet: string; storage: string; id: string; args: unknown };
-    onUnsubscribe: (id: string) => void;
-  }) => {
+const QueryResult = ({
+  querie,
+  onUnsubscribe,
+}: {
+  querie: { pallet: string; storage: string; id: string; args: unknown };
+  onUnsubscribe: (id: string) => void;
+}) => {
   const api = useStoreChain?.use?.api?.() as TRelayApi;
   const [result, setResult] = useState();
   const [isLoading, setIsLoading] = useState(true);
