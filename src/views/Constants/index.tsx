@@ -109,7 +109,7 @@ const Constants = () => {
       <CallDocs docs={constantSelected?.docs?.filter(d => d) || []} />
 
       <QueryButton onClick={handleStorageQuerySubmit}>
-        Query {palletSelected?.name}::{constantSelected?.name}
+        Query {palletSelected?.name}/{constantSelected?.name}
       </QueryButton>
 
       <p>Results</p>

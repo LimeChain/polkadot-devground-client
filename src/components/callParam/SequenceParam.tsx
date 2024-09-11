@@ -114,7 +114,7 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
             return (
               <div
                 key={param.id}
-                className="flex w-full gap-2"
+                className="grid w-full grid-cols-[16px_1fr] gap-2"
               >
                 <span className={cn(
                   'font-geist font-h5-regular',
