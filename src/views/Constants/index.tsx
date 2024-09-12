@@ -8,6 +8,7 @@ import {
 import { CallDocs } from '@components/callParam/CallDocs';
 import { QueryButton } from '@components/callParam/QueryButton';
 import { QueryFormContainer } from '@components/callParam/QueryFormContainer';
+import { QueryResult } from '@components/callParam/QueryResult';
 import { QueryResultContainer } from '@components/callParam/QueryResultContainer';
 import { QueryViewContainer } from '@components/callParam/QueryViewContainer';
 import { PDSelect } from '@components/pdSelect';
@@ -17,6 +18,7 @@ import type { TRelayApi } from '@custom-types/chain';
 
 const Constants = () => {
   const metadata = useStoreChain?.use?.metadata?.();
+  const chain = useStoreChain?.use?.chain?.();
 
   const palletsWithConstants = useMemo(() => metadata?.pallets?.filter(p => p.constants.length > 0)
     ?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
@@ -43,6 +45,10 @@ const Constants = () => {
   const [constantSelected, setConstantSelected] = useState(palletSelected?.constants?.at?.(0));
 
   const [queries, setQueries] = useState<{ pallet: string; storage: string; id: string }[]>([]);
+
+  useEffect(() => {
+    setQueries([]);
+  }, [chain.id]);
 
   useEffect(() => {
     if (palletsWithConstants) {
@@ -120,7 +126,7 @@ const Constants = () => {
       <QueryResultContainer>
         {
           queries.map((query) => (
-            <QueryResult
+            <Query
               key={`query-result-${query.pallet}-${query.storage}-${query.id}`}
               querie={query}
               onUnsubscribe={handleStorageUnsubscribe}
@@ -134,7 +140,7 @@ const Constants = () => {
 
 export default Constants;
 
-const QueryResult = (
+const Query = (
   {
     querie,
     onUnsubscribe,
@@ -169,39 +175,16 @@ const QueryResult = (
   }, [querie, api]);
 
   const handleUnsubscribe = useCallback(() => {
-    console.log('unsub', querie.id);
-
     onUnsubscribe(querie.id);
   }, [querie, onUnsubscribe]);
 
   return (
-    <div className="relative rounded-2xl border p-6">
-      <button
-        type="button"
-        className="absolute right-2 top-2 border p-2 font-h5-bold"
-        onClick={handleUnsubscribe}
-      >
-        X
-      </button>
-      <p>Path: {querie.pallet}::{querie.storage}</p>
-      <br />
-      {
-        isLoading ? 'Loading...'
-          : (
-            <div>
-              {
-                result
-                  ? JSON.stringify(result, (key, value) => {
-                    if (typeof value === 'bigint') {
-                      return Number(value);
-                    }
-                    return value;
-                  }, 2)
-                  : String(result)
-              }
-            </div>
-          )
-      }
-    </div>
+    <QueryResult
+      title="Constant"
+      path={`${querie.pallet}/${querie.storage}`}
+      isLoading={isLoading}
+      result={result}
+      onRemove={handleUnsubscribe}
+    />
   );
 };

@@ -9,6 +9,7 @@ import { MethodArgs } from '@components/callParam/ApiMethodArgs';
 import { CallDocs } from '@components/callParam/CallDocs';
 import { QueryButton } from '@components/callParam/QueryButton';
 import { QueryFormContainer } from '@components/callParam/QueryFormContainer';
+import { QueryResult } from '@components/callParam/QueryResult';
 import { QueryResultContainer } from '@components/callParam/QueryResultContainer';
 import { QueryViewContainer } from '@components/callParam/QueryViewContainer';
 import { PDSelect } from '@components/pdSelect';
@@ -16,13 +17,9 @@ import { useStoreChain } from '@stores';
 
 import type { TRelayApi } from '@custom-types/chain';
 
-interface ISubscription {
-  unsubscribe: () => void;
-  id?: string;
-}
-
 const RuntimeCalls = () => {
   const metadata = useStoreChain?.use?.metadata?.();
+  const chain = useStoreChain?.use?.chain?.();
 
   const apis = useMemo(() => metadata?.apis?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
   const apiItems = useMemo(() => apis?.map(api => ({
@@ -43,20 +40,10 @@ const RuntimeCalls = () => {
   const [callArgs, setCallArgs] = useState<unknown>(undefined);
 
   const [queries, setQueries] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
-  const [subscriptions, setSubscriptions] = useState<ISubscription[]>([]);
 
   useEffect(() => {
-    subscriptions.forEach(sub => {
-      sub?.unsubscribe?.();
-    });
-
-    return () => {
-      subscriptions.forEach(sub => {
-        sub?.unsubscribe?.();
-      });
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setQueries([]);
+  }, [chain.id]);
 
   useEffect(() => {
     if (apis) {
@@ -95,13 +82,7 @@ const RuntimeCalls = () => {
 
   const handleStorageUnsubscribe = useCallback((id: string) => {
     setQueries(queries => queries.filter(query => query.id !== id));
-
-    const subscriptionToCancel = subscriptions.find(sub => sub.id === id);
-    if (subscriptionToCancel) {
-      subscriptionToCancel.unsubscribe();
-      setSubscriptions(subs => subs.filter(sub => sub.id !== id));
-    }
-  }, [subscriptions]);
+  }, []);
 
   if (!apis) {
     return 'Loading...';
@@ -155,7 +136,7 @@ const RuntimeCalls = () => {
       <QueryResultContainer>
         {
           queries.map((query) => (
-            <QueryResult
+            <Query
               key={`query-result-${query.pallet}-${query.storage}-${query.id}`}
               querie={query}
               onUnsubscribe={handleStorageUnsubscribe}
@@ -169,7 +150,7 @@ const RuntimeCalls = () => {
 
 export default RuntimeCalls;
 
-const QueryResult = ({
+const Query = ({
   querie,
   onUnsubscribe,
 }: {
@@ -197,39 +178,16 @@ const QueryResult = ({
   }, [querie, api]);
 
   const handleUnsubscribe = useCallback(() => {
-    console.log('unsub', querie.id);
-
     onUnsubscribe(querie.id);
   }, [querie, onUnsubscribe]);
 
   return (
-    <div className="relative rounded-2xl border p-6">
-      <button
-        type="button"
-        className="absolute right-2 top-2 border p-2 font-h5-bold"
-        onClick={handleUnsubscribe}
-      >
-        X
-      </button>
-      <p>Path: {querie.pallet}::{querie.storage}</p>
-      <br />
-      {
-        isLoading ? 'Loading...'
-          : (
-            <div>
-              {
-                result
-                  ? JSON.stringify(result, (key, value) => {
-                    if (typeof value === 'bigint') {
-                      return Number(value);
-                    }
-                    return value;
-                  }, 2)
-                  : String(result)
-              }
-            </div>
-          )
-      }
-    </div>
+    <QueryResult
+      title="Runtime Call"
+      path={`${querie.pallet}/${querie.storage}`}
+      isLoading={isLoading}
+      result={result}
+      onRemove={handleUnsubscribe}
+    />
   );
 };

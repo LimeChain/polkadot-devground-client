@@ -96,7 +96,7 @@ export const PDSelect = ({
           </_Select.ScrollUpButton>
 
           {/* select options */}
-          <_Select.Viewport className="p-2" >
+          <_Select.Viewport className="max-h-[1000px] p-2" >
             {
               items?.map(item => {
                 return (
