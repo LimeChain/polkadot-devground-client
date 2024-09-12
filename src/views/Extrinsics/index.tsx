@@ -7,7 +7,6 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { toast } from 'react-hot-toast';
 
 import {
   CallParam,
@@ -15,6 +14,8 @@ import {
 } from '@components/callParam';
 import { QueryButton } from '@components/callParam/QueryButton';
 import { QueryFormContainer } from '@components/callParam/QueryFormContainer';
+import { QueryResult } from '@components/callParam/QueryResult';
+import { QueryResultContainer } from '@components/callParam/QueryResultContainer';
 import { QueryViewContainer } from '@components/callParam/QueryViewContainer';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
@@ -22,14 +23,16 @@ import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 import { useViewBuilder } from 'src/hooks/useViewBuilder';
 import { useStoreWallet } from 'src/stores/wallet';
 
+import type { TRelayApi } from '@custom-types/chain';
+
 const Extrinsics = () => {
   const dynamicBulder = useDynamicBuilder();
   const viewBuilder = useViewBuilder();
 
   const metadata = useStoreChain?.use?.metadata?.();
   const lookup = useStoreChain?.use?.lookup?.();
+  const chain = useStoreChain?.use?.chain?.();
 
-  const api = useStoreChain?.use?.api?.();
   const accounts = useStoreWallet?.use?.accounts?.();
   const signer = accounts.at(0)?.polkadotSigner;
 
@@ -103,25 +106,20 @@ const Extrinsics = () => {
 
   }, [palletSelected, callSelected, callArgs, dynamicBulder, viewBuilder]);
 
+  const [queries, setQueries] = useState<{ pallet: string; storage: string; id: string }[]>([]);
+
+  useEffect(() => {
+    setQueries([]);
+  }, [chain.id]);
+
   const submitTx = useCallback(async () => {
-    const toastId = 'toast-extrinsic-result';
-    if (api) {
-      try {
-        toast.loading('Loading...', { position: 'top-right', id: toastId, duration: 99999 });
-        const res = api.tx[palletSelected.name][callSelected?.name](callArgs);
-        console.log(res);
-
-        const submited = await res.signAndSubmit(signer);
-        toast.success('Success', { position: 'top-right', id: toastId, duration: 4000 });
-        console.log(submited);
-
-      } catch (error) {
-        console.log('error', error);
-        toast.error(`Error, ${error?.message}`, { position: 'top-right', id: toastId, duration: 4000 });
-
-      }
-    }
-  }, [api, callArgs, palletSelected, callSelected, signer]);
+    setQueries(queries => ([{
+      pallet: palletSelected!.name,
+      storage: callSelected!.name,
+      id: crypto.randomUUID(),
+      args: callArgs,
+    }, ...queries]));
+  }, [callArgs, palletSelected, callSelected]);
 
   const handlePalletSelect = useCallback((palletSelectedName: string) => {
     if (palletsWithCalls && lookup) {
@@ -151,6 +149,10 @@ const Extrinsics = () => {
     setEncodedCall(undefined);
     setCallArgs({});
   }, [calls]);
+
+  const handleStorageUnsubscribe = useCallback((id: string) => {
+    setQueries(queries => queries.filter(query => query.id !== id));
+  }, []);
 
   if (!palletsWithCalls) {
     return 'Loading...';
@@ -213,8 +215,74 @@ const Extrinsics = () => {
           )
         }
       </QueryFormContainer>
+      <QueryResultContainer>
+        {
+          queries.map((query) => (
+            <Query
+              key={`query-result-${query.pallet}-${query.storage}-${query.id}`}
+              querie={query}
+              onUnsubscribe={handleStorageUnsubscribe}
+            />
+          ))
+        }
+      </QueryResultContainer>
     </QueryViewContainer>
   );
 };
 
 export default Extrinsics;
+
+const Query = ({
+  querie,
+  onUnsubscribe,
+}: {
+  querie: { pallet: string; storage: string; id: string; args: unknown };
+  onUnsubscribe: (id: string) => void;
+}) => {
+  const api = useStoreChain?.use?.api?.() as TRelayApi;
+  const [result, setResult] = useState();
+  const [isLoading, setIsLoading] = useState(true);
+
+  const accounts = useStoreWallet?.use?.accounts?.();
+  const signer = accounts.at(0)?.polkadotSigner;
+
+  useEffect(() => {
+    if (api) {
+      try {
+        const res = api.tx[querie.pallet][querie.storage](querie.args);
+        console.log(res);
+
+        res.signAndSubmit(signer).then(res => {
+          console.log(res);
+          setResult(res);
+          setIsLoading(false);
+        })
+          .catch(error => {
+            console.log('error', error);
+            setResult(error?.message);
+            setIsLoading(false);
+          });
+
+      } catch (error) {
+        console.log('error', error);
+        setResult(error?.message);
+        setIsLoading(false);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [querie, api]);
+
+  const handleUnsubscribe = useCallback(() => {
+    onUnsubscribe(querie.id);
+  }, [querie, onUnsubscribe]);
+
+  return (
+    <QueryResult
+      title="Extrinsic"
+      path={`${querie.pallet}/${querie.storage}`}
+      isLoading={isLoading}
+      result={result}
+      onRemove={handleUnsubscribe}
+    />
+  );
+};

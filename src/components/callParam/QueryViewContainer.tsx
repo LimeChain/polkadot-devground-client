@@ -9,8 +9,8 @@ export interface IQueryViewContainer {
 export const QueryViewContainer = ({ children }: IQueryViewContainer) => {
   return (
     <div className={cn(
-      'grid h-full grid-cols-1 gap-4',
-      'lg:grid-cols-[4fr_5fr]',
+      'grid gap-4',
+      'grid-cols-1 lg:grid-cols-[4fr_5fr]',
     )}
     >
       {children}

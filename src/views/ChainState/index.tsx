@@ -8,6 +8,7 @@ import {
 import { CallDocs } from '@components/callParam/CallDocs';
 import { QueryButton } from '@components/callParam/QueryButton';
 import { QueryFormContainer } from '@components/callParam/QueryFormContainer';
+import { QueryResult } from '@components/callParam/QueryResult';
 import { QueryResultContainer } from '@components/callParam/QueryResultContainer';
 import { QueryViewContainer } from '@components/callParam/QueryViewContainer';
 import { StorageArgs } from '@components/callParam/StorageArgs';
@@ -23,7 +24,7 @@ interface ISubscription {
 
 const ChainState = () => {
   const metadata = useStoreChain?.use?.metadata?.();
-  const lookup = useStoreChain?.use?.lookup?.();
+  const chain = useStoreChain?.use?.chain?.();
 
   const palletsWithStorage = useMemo(() => metadata?.pallets?.filter(p => p.storage)
     ?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
@@ -54,17 +55,19 @@ const ChainState = () => {
   const [subscriptions, setSubscriptions] = useState<ISubscription[]>([]);
 
   useEffect(() => {
+    setQueries([]);
     subscriptions.forEach(sub => {
       sub?.unsubscribe?.();
     });
 
     return () => {
+      setQueries([]);
       subscriptions.forEach(sub => {
         sub?.unsubscribe?.();
       });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [chain.id]);
 
   useEffect(() => {
     if (palletsWithStorage) {
@@ -134,31 +137,31 @@ const ChainState = () => {
 
           {
             storageCallItems
-          && (
-            <PDSelect
-              label="Select Storage"
-              emptyPlaceHolder="No storages available"
-              placeholder="Please select a storage"
-              items={storageCallItems}
-              onChange={handleStorageSelect}
-              value={storageSelected?.name}
-            />
-          )
+            && (
+              <PDSelect
+                label="Select Storage"
+                emptyPlaceHolder="No storages available"
+                placeholder="Please select a storage"
+                items={storageCallItems}
+                onChange={handleStorageSelect}
+                value={storageSelected?.name}
+              />
+            )
           }
         </div>
 
         {
           storageSelected
-        && (
-          <StorageArgs
-            storage={storageSelected}
-            onChange={setCallArgs}
-          />
-        )
+          && (
+            <StorageArgs
+              storage={storageSelected}
+              onChange={setCallArgs}
+            />
+          )
         }
 
         <QueryButton onClick={handleStorageQuerySubmit}>
-        Subscribe to {palletSelected?.name}/{storageSelected?.name}
+          Subscribe to {palletSelected?.name}/{storageSelected?.name}
         </QueryButton>
 
         <CallDocs docs={storageSelected?.docs?.filter(d => d) || []} />
@@ -167,7 +170,7 @@ const ChainState = () => {
       <QueryResultContainer>
         {
           queries.map((query) => (
-            <QueryResult
+            <Query
               key={`query-result-${query.pallet}-${query.storage}-${query.id}`}
               querie={query}
               onSubscribe={handleStorageSubscribe}
@@ -182,7 +185,7 @@ const ChainState = () => {
 
 export default ChainState;
 
-const QueryResult = (
+const Query = (
   {
     querie,
     onSubscribe,
@@ -196,8 +199,6 @@ const QueryResult = (
 
   const [result, setResult] = useState();
   const [isLoading, setIsLoading] = useState(true);
-
-  console.log('query', querie);
 
   useEffect(() => {
     if (api) {
@@ -223,39 +224,16 @@ const QueryResult = (
   }, [querie, api]);
 
   const handleUnsubscribe = useCallback(() => {
-    console.log('unsub', querie.id);
-
     onUnsubscribe(querie.id);
   }, [querie, onUnsubscribe]);
 
   return (
-    <div className="relative rounded-2xl border p-6">
-      <button
-        type="button"
-        className="absolute right-2 top-2 border p-2 font-h5-bold"
-        onClick={handleUnsubscribe}
-      >
-        X
-      </button>
-      <p>Path: {querie.pallet}::{querie.storage}</p>
-      <br />
-      {
-        isLoading ? 'Loading...'
-          : (
-            <div>
-              {
-                result
-                  ? JSON.stringify(result, (key, value) => {
-                    if (typeof value === 'bigint') {
-                      return Number(value);
-                    }
-                    return value;
-                  }, 2)
-                  : String(result)
-              }
-            </div>
-          )
-      }
-    </div>
+    <QueryResult
+      title="Storage"
+      path={`${querie.pallet}/${querie.storage}`}
+      isLoading={isLoading}
+      result={result}
+      onRemove={handleUnsubscribe}
+    />
   );
 };
