@@ -106,7 +106,7 @@ const Extrinsics = () => {
 
   }, [palletSelected, callSelected, callArgs, dynamicBulder, viewBuilder]);
 
-  const [queries, setQueries] = useState<{ pallet: string; storage: string; id: string }[]>([]);
+  const [queries, setQueries] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
 
   useEffect(() => {
     setQueries([]);
@@ -240,33 +240,30 @@ const Query = ({
   onUnsubscribe: (id: string) => void;
 }) => {
   const api = useStoreChain?.use?.api?.() as TRelayApi;
-  const [result, setResult] = useState();
+  const [result, setResult] = useState<unknown>();
   const [isLoading, setIsLoading] = useState(true);
 
   const accounts = useStoreWallet?.use?.accounts?.();
   const signer = accounts.at(0)?.polkadotSigner;
 
   useEffect(() => {
+    const catchError = (err: Error) => {
+      setIsLoading(false);
+      setResult(err?.message || 'Unexpected Error');
+    };
+
     if (api) {
       try {
         const res = api.tx[querie.pallet][querie.storage](querie.args);
-        console.log(res);
 
-        res.signAndSubmit(signer).then(res => {
-          console.log(res);
+        res.signAndSubmit(signer).then((res: unknown) => {
           setResult(res);
           setIsLoading(false);
         })
-          .catch(error => {
-            console.log('error', error);
-            setResult(error?.message);
-            setIsLoading(false);
-          });
+          .catch(catchError);
 
       } catch (error) {
-        console.log('error', error);
-        setResult(error?.message);
-        setIsLoading(false);
+        catchError(error as Error);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

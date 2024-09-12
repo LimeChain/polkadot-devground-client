@@ -197,26 +197,27 @@ const Query = (
   }) => {
   const api = useStoreChain?.use?.api?.() as TRelayApi;
 
-  const [result, setResult] = useState();
+  const [result, setResult] = useState<unknown>();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const catchError = (err: Error) => {
+      setIsLoading(false);
+      setResult(err?.message || 'Unexpected Error');
+    };
+
     if (api) {
       try {
-        // api.query.Babe.GenesisSlot.watchValue()
-        const subscription = api.query[querie.pallet][querie.storage].watchValue(querie.args || 'best').subscribe((res: undefined) => {
-          console.log('subscription', querie);
-          console.log('res', res);
-          console.log('res', typeof res);
+        const subscription = api.query[querie.pallet][querie.storage].watchValue(querie.args || 'best').subscribe((res: unknown) => {
           setResult(res);
           setIsLoading(false);
         });
 
         subscription.id = querie.id;
         onSubscribe(subscription);
+
       } catch (error) {
-        setIsLoading(false);
-        console.log('ERROR', error);
+        catchError(error as Error);
       }
     }
 
@@ -229,7 +230,7 @@ const Query = (
 
   return (
     <QueryResult
-      title="Storage"
+      title="Storage Subscription"
       path={`${querie.pallet}/${querie.storage}`}
       isLoading={isLoading}
       result={result}
