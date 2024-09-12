@@ -23,10 +23,9 @@ export const QueryButton = ({
       onClick={onClick}
       className={cn(
         'block w-full cursor-pointer',
-        'p-4',
+        'p-4 text-dev-white-200',
         'font-geist font-body2-bold',
-        'bg-dev-pink-500 transition-[colors_opacity] active:bg-dev-pink-400',
-        'hov',
+        'bg-dev-pink-500 transition-[colors_opacity] hover:bg-dev-pink-400',
         {
           ['cursor-not-allowed opacity-30 hover:bg-dev-pink-500']: disabled,
         },
