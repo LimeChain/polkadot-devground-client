@@ -158,21 +158,26 @@ const Query = ({
   onUnsubscribe: (id: string) => void;
 }) => {
   const api = useStoreChain?.use?.api?.() as TRelayApi;
-  const [result, setResult] = useState();
+  const [result, setResult] = useState<unknown>();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const catchError = (err: Error) => {
+      setIsLoading(false);
+      setResult(err?.message || 'Unexpected Error');
+    };
+
     if (api) {
-      // api.apis.MmrApi.verify_proof([],{})
-      api.apis[querie.pallet][querie.storage](...Object.values(querie.args)).then(res => {
-        console.log('response', res);
-        setResult(res);
-        setIsLoading(false);
-      })
-        .catch(error => {
+      try {
+        api.apis[querie.pallet][querie.storage](...Object.values(querie.args as object)).then((res: unknown) => {
+          setResult(res);
           setIsLoading(false);
-          console.log('ERROR', error);
-        });
+        })
+          .catch(catchError);
+
+      } catch (error) {
+        catchError(error as Error);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [querie, api]);

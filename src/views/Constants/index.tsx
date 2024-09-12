@@ -150,27 +150,27 @@ const Query = (
   }) => {
   const api = useStoreChain?.use?.api?.() as TRelayApi;
 
-  const [result, setResult] = useState();
+  const [result, setResult] = useState<unknown>();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const catchError = (err: Error) => {
+      setIsLoading(false);
+      setResult(err?.message || 'Unexpected Error');
+    };
+
     if (api) {
-      // api.constants.Babe.EpochDuration()
-      api.constants[querie.pallet][querie.storage]?.().then(res => {
-        console.log('res', res);
-        console.log('res', typeof res);
-        setResult(res);
-        setIsLoading(false);
-      })
-        .catch(err => {
+      try {
+        api.constants[querie.pallet][querie.storage]?.().then((res: unknown) => {
+          setResult(res);
           setIsLoading(false);
-          console.log('ERROR', err);
-        });
-      // subscription.id = querie.id;
-      // onSubscribe(subscription);
+        })
+          .catch(catchError);
 
+      } catch (error) {
+        catchError(error as Error);
+      }
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [querie, api]);
 
