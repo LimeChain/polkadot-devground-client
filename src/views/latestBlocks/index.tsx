@@ -60,7 +60,7 @@ const LatestBlocks = () => {
         className="h-full"
         verticalScrollClassNames="pt-8"
       >
-        <table>
+        <table className="w-full">
           <colgroup>
             <col style={{ width: '10%', minWidth: '9rem' }} />
             <col style={{ width: '10%', minWidth: '4rem' }} />
