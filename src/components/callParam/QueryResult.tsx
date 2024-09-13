@@ -35,8 +35,8 @@ export const QueryResult = ({
   const theme = useStoreUI?.use?.theme?.();
 
   useEffect(() => {
-
     (async () => {
+      // used to prevent a flickering feel when the result loads too quickly
       await sleep(500);
       setResultIsLoading(isLoading ? true : false);
     })()

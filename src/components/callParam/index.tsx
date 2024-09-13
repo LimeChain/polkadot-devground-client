@@ -18,7 +18,11 @@ export interface ICallParam extends ICallArgs {
 
 export function CallParam({ param, onChange }: ICallParam) {
   // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-  const lookup = useStoreChain?.use?.lookup?.()!;
+  const lookup = useStoreChain?.use?.lookup?.();
+
+  if (!lookup) {
+    return null;
+  }
 
   if (!param?.type) {
     return (

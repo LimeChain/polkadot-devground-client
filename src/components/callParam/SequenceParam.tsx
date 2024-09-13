@@ -89,6 +89,7 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
             />
             Add Item
           </button>
+
           <button
             type="button"
             disabled={params.length === 0}
@@ -105,10 +106,10 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
             />
             Remove Item
           </button>
+
         </div>
         {
           params.map((param, index) => {
-
             const nextType = sequence.value.type;
 
             return (

@@ -81,9 +81,12 @@ const ChainState = () => {
   const handlePalletSelect = useCallback((selectedPalletName: string) => {
     if (palletsWithStorage) {
       const selectedPallet = palletsWithStorage.find(pallet => pallet.name === selectedPalletName);
-      setPalletSelected(selectedPallet);
-      setStorageSelected(selectedPallet!.storage?.items.at(0));
-      setCallArgs(undefined);
+
+      if (selectedPallet) {
+        setPalletSelected(selectedPallet);
+        setStorageSelected(selectedPallet.storage?.items.at(0));
+        setCallArgs(undefined);
+      }
     }
   }, [palletsWithStorage]);
 
@@ -96,12 +99,14 @@ const ChainState = () => {
   }, [palletSelected]);
 
   const handleStorageQuerySubmit = useCallback(() => {
-    setQueries(queries => ([{
-      pallet: palletSelected!.name,
-      storage: storageSelected!.name,
-      id: crypto.randomUUID(),
-      args: callArgs,
-    }, ...queries]));
+    if (palletSelected?.name && storageSelected?.name) {
+      setQueries(queries => ([{
+        pallet: palletSelected.name,
+        storage: storageSelected.name,
+        id: crypto.randomUUID(),
+        args: callArgs,
+      }, ...queries]));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [palletSelected, storageSelected, callArgs]);
 

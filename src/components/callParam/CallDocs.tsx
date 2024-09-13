@@ -25,7 +25,6 @@ export const CallDocs = ({
       className,
     )}
     >
-
       <Icon name="icon-info" size={[24]} />
       <div className="flex flex-col gap-2">
         {

@@ -117,32 +117,36 @@ const Extrinsics = () => {
   }, [palletSelected, callSelected, callArgs, dynamicBulder, viewBuilder]);
 
   const submitTx = useCallback(async () => {
-    setQueries(queries => ([{
-      pallet: palletSelected!.name,
-      storage: callSelected!.name,
-      id: crypto.randomUUID(),
-      args: callArgs,
-    }, ...queries]));
+    if (palletSelected?.name && callSelected?.name) {
+      setQueries(queries => ([{
+        pallet: palletSelected.name,
+        storage: callSelected.name,
+        id: crypto.randomUUID(),
+        args: callArgs,
+      }, ...queries]));
+    }
   }, [callArgs, palletSelected, callSelected]);
 
   const handlePalletSelect = useCallback((palletSelectedName: string) => {
     if (palletsWithCalls && lookup) {
       const palletSelected = palletsWithCalls.find(pallet => pallet.name === palletSelectedName);
 
-      setPalledSelected(palletSelected);
+      if (palletSelected) {
+        setPalledSelected(palletSelected);
 
-      const palletCalls = lookup(palletSelected!.calls!) as EnumVar;
-      const calls = Object.entries(palletCalls?.value || {})
-        .sort((a, b) => a[0].localeCompare(b[0]))
-        .map(([name, param]) => ({
-          name,
-          param,
-        }));
+        const palletCalls = lookup(palletSelected.calls!) as EnumVar;
+        const calls = Object.entries(palletCalls?.value || {})
+          .sort((a, b) => a[0].localeCompare(b[0]))
+          .map(([name, param]) => ({
+            name,
+            param,
+          }));
 
-      setCalls(calls);
-      setCallSelected(calls.at(0));
+        setCalls(calls);
+        setCallSelected(calls.at(0));
 
-      setCallArgs({});
+        setCallArgs({});
+      }
     }
   }, [palletsWithCalls, lookup]);
 
@@ -190,18 +194,18 @@ const Extrinsics = () => {
         </div >
         {
           palletSelected
-        && callSelected
-        && (
-          <div className="flex flex-col gap-6 empty:hidden">
-            <CallParam
-              key={`call-param-${callSelected.name}`}
-              pallet={palletSelected}
-              name={callSelected.name}
-              param={callSelected.param}
-              onChange={setCallArgs}
-            />
-          </div>
-        )
+          && callSelected
+          && (
+            <div className="flex flex-col gap-6 empty:hidden">
+              <CallParam
+                key={`call-param-${callSelected.name}`}
+                pallet={palletSelected}
+                name={callSelected.name}
+                param={callSelected.param}
+                onChange={setCallArgs}
+              />
+            </div>
+          )
         }
         <QueryButton
           disabled={!signer}
