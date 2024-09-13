@@ -144,3 +144,7 @@ html[data-color-scheme="dark"] #icon-checked {
 html[data-color-scheme="light"] #icon-checked {
   --svg-icon-fill: white;
 }
+
+.json-view--string {
+  word-break: break-all;
+}

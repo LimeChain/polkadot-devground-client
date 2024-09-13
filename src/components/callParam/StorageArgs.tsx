@@ -17,7 +17,7 @@ export const StorageArgs = (
 
   const storageType = storage.type;
 
-  if (storageType.tag === 'plain') {
+  if (storageType.tag === 'plain' || !lookup) {
     return null;
   }
 

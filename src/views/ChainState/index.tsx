@@ -12,6 +12,7 @@ import { QueryResult } from '@components/callParam/QueryResult';
 import { QueryResultContainer } from '@components/callParam/QueryResultContainer';
 import { QueryViewContainer } from '@components/callParam/QueryViewContainer';
 import { StorageArgs } from '@components/callParam/StorageArgs';
+import { Loader } from '@components/loader';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
 
@@ -26,17 +27,16 @@ const ChainState = () => {
   const metadata = useStoreChain?.use?.metadata?.();
   const chain = useStoreChain?.use?.chain?.();
 
-  const palletsWithStorage = useMemo(() => metadata?.pallets?.filter(p => p.storage)
-    ?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
+  const palletsWithStorage = useMemo(() => metadata?.pallets?.filter(p => p.storage)?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
   const palletSelectItems = useMemo(() => palletsWithStorage?.map(pallet => ({
     label: pallet.name,
     value: pallet.name,
     key: `chainState-pallet-${pallet.name}`,
   })), [palletsWithStorage]);
+
   const [palletSelected, setPalletSelected] = useState(palletsWithStorage?.at(0));
 
-  const storageCalls = useMemo(() => palletSelected?.storage?.items
-    ?.sort((a, b) => a.name.localeCompare(b.name)), [palletSelected]);
+  const storageCalls = useMemo(() => palletSelected?.storage?.items?.sort((a, b) => a.name.localeCompare(b.name)), [palletSelected]);
   const storageCallItems = useMemo(() => {
     if (palletSelected) {
       return storageCalls?.map(item => ({
@@ -47,15 +47,16 @@ const ChainState = () => {
     }
     return undefined;
   }, [palletSelected, storageCalls]);
+
   const [storageSelected, setStorageSelected] = useState(palletSelected?.storage?.items?.at?.(0));
 
   const [callArgs, setCallArgs] = useState<unknown>(undefined);
-
   const [queries, setQueries] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
   const [subscriptions, setSubscriptions] = useState<ISubscription[]>([]);
 
   useEffect(() => {
     setQueries([]);
+    setPalletSelected(undefined);
     subscriptions.forEach(sub => {
       sub?.unsubscribe?.();
     });
@@ -118,8 +119,8 @@ const ChainState = () => {
     }
   }, [subscriptions]);
 
-  if (!palletsWithStorage) {
-    return 'Loading...';
+  if (!palletSelected) {
+    return <Loader />;
   }
 
   return (
@@ -208,7 +209,7 @@ const Query = (
 
     if (api) {
       try {
-        const subscription = api.query[querie.pallet][querie.storage].watchValue(querie.args || 'best').subscribe((res: unknown) => {
+        const subscription = api.query[querie.pallet][querie.storage].watchValue(querie.args || 'finalized').subscribe((res: unknown) => {
           setResult(res);
           setIsLoading(false);
         });

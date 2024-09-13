@@ -11,6 +11,7 @@ import { QueryFormContainer } from '@components/callParam/QueryFormContainer';
 import { QueryResult } from '@components/callParam/QueryResult';
 import { QueryResultContainer } from '@components/callParam/QueryResultContainer';
 import { QueryViewContainer } from '@components/callParam/QueryViewContainer';
+import { Loader } from '@components/loader';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
 
@@ -20,8 +21,7 @@ const Constants = () => {
   const metadata = useStoreChain?.use?.metadata?.();
   const chain = useStoreChain?.use?.chain?.();
 
-  const palletsWithConstants = useMemo(() => metadata?.pallets?.filter(p => p.constants.length > 0)
-    ?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
+  const palletsWithConstants = useMemo(() => metadata?.pallets?.filter(p => p.constants.length > 0)?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
   const palletSelectItems = useMemo(() => palletsWithConstants?.map(pallet => ({
     label: pallet.name,
     value: pallet.name,
@@ -30,8 +30,7 @@ const Constants = () => {
 
   const [palletSelected, setPalletSelected] = useState(palletsWithConstants?.at(0));
 
-  const constants = useMemo(() => palletSelected?.constants
-    ?.sort((a, b) => a.name.localeCompare(b.name)), [palletSelected]);
+  const constants = useMemo(() => palletSelected?.constants?.sort((a, b) => a.name.localeCompare(b.name)), [palletSelected]);
   const constantItems = useMemo(() => {
     if (palletSelected) {
       return constants?.map(item => ({
@@ -42,12 +41,13 @@ const Constants = () => {
     }
     return undefined;
   }, [constants, palletSelected]);
-  const [constantSelected, setConstantSelected] = useState(palletSelected?.constants?.at?.(0));
 
+  const [constantSelected, setConstantSelected] = useState(palletSelected?.constants?.at?.(0));
   const [queries, setQueries] = useState<{ pallet: string; storage: string; id: string }[]>([]);
 
   useEffect(() => {
     setQueries([]);
+    setPalletSelected(undefined);
   }, [chain.id]);
 
   useEffect(() => {
@@ -85,8 +85,8 @@ const Constants = () => {
     setQueries(queries => queries.filter(query => query.id !== id));
   }, []);
 
-  if (!palletsWithConstants) {
-    return 'Loading...';
+  if (!palletSelected) {
+    return <Loader />;
   }
 
   return (
