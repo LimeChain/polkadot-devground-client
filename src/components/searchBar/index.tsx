@@ -123,7 +123,7 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
             placeholder={label}
             onChange={debounceSearch}
             className={cn(
-              'w-full dark:bg-transparent',
+              'w-full bg-transparent',
               'caret-dev-pink-500 focus-visible:outline-none',
               'placeholder:font-geist placeholder:font-body2-regular dark:placeholder-dev-purple-300',
             )}
