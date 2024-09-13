@@ -74,7 +74,7 @@ const ChainState = () => {
     if (palletsWithStorage) {
       const defaultPalletSelected = palletsWithStorage[0];
       setPalletSelected(defaultPalletSelected);
-      setStorageSelected(defaultPalletSelected?.storage?.items?.at?.(0));
+      setStorageSelected(defaultPalletSelected?.storage?.items?.sort((a, b) => a.name.localeCompare(b.name)).at?.(0));
     }
   }, [palletsWithStorage]);
 
@@ -84,7 +84,7 @@ const ChainState = () => {
 
       if (selectedPallet) {
         setPalletSelected(selectedPallet);
-        setStorageSelected(selectedPallet.storage?.items.at(0));
+        setStorageSelected(selectedPallet.storage?.items?.sort((a, b) => a.name.localeCompare(b.name)).at(0));
         setCallArgs(undefined);
       }
     }

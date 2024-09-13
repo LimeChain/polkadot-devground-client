@@ -54,7 +54,7 @@ const Constants = () => {
     if (palletsWithConstants) {
       const defaultPalletSelected = palletsWithConstants[0];
       setPalletSelected(defaultPalletSelected);
-      setConstantSelected(defaultPalletSelected?.constants.at?.(0));
+      setConstantSelected(defaultPalletSelected?.constants?.sort((a, b) => a.name.localeCompare(b.name)).at?.(0));
     }
   }, [palletsWithConstants]);
 
@@ -64,7 +64,7 @@ const Constants = () => {
 
       if (selectedPallet) {
         setPalletSelected(selectedPallet);
-        setConstantSelected(selectedPallet.constants.at(0));
+        setConstantSelected(selectedPallet.constants?.sort((a, b) => a.name.localeCompare(b.name)).at(0));
       }
     }
   }, [palletsWithConstants]);
