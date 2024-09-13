@@ -23,7 +23,7 @@ export const LayoutBasic = (props: ILayoutBasic) => {
         <div className={cn(
           'lg:px-14 lg:pb-16 lg:pt-8',
           'px-6 pb-8 pt-4',
-          'overflow-auto',
+          'overflow-hidden',
           classNames,
         )}
         >

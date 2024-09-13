@@ -9,6 +9,7 @@ import { useParams } from 'react-router-dom';
 import { Icon } from '@components/icon';
 import { PageHeader } from '@components/pageHeader';
 import { PDLink } from '@components/pdLink';
+import { PDScrollArea } from '@components/pdScrollArea';
 import { useStoreChain } from '@stores';
 import { formatNumber } from '@utils/helpers';
 
@@ -68,37 +69,42 @@ const BlockDetails = () => {
   }
 
   return (
-    <>
-      <div className="mb-12 flex items-center justify-between">
-        <PageHeader title="Block" blockNumber={formatNumber(blockData.header.number)} />
-        <div className="flex gap-6">
-          <PDLink
-            to={`https://polkadot.subscan.io/block/${blockData.number}`}
-            className={styles['pd-link-btn']}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+    <PDScrollArea viewportClassNames="pr-8">
+      <div className="grid gap-12">
+        <div className="flex items-center justify-between">
+          <PageHeader title="Block" blockNumber={formatNumber(blockData.header.number)} />
+          <div className="flex gap-6">
+            <PDLink
+              to={`https://polkadot.subscan.io/block/${blockData.number}`}
+              className={styles['pd-link-btn']}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
           Polkadot Subscan
-            <Icon name="icon-openLink" size={[16]} />
-          </PDLink>
-          <PDLink
-            to={`https://polkadot.statescan.io/#/blocks/${blockData.number}`}
-            className={styles['pd-link-btn']}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+              <Icon name="icon-openLink" size={[16]} />
+            </PDLink>
+            <PDLink
+              to={`https://polkadot.statescan.io/#/blocks/${blockData.number}`}
+              className={styles['pd-link-btn']}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
           Polkadot Statescan
-            <Icon name="icon-openLink" size={[16]} />
-          </PDLink>
+              <Icon name="icon-openLink" size={[16]} />
+            </PDLink>
+          </div>
         </div>
+        <BlockInfo
+          blockInfo={blockData.header}
+          isFinalized={isFinalized}
+        />
+        <Test
+          blockDetails={blockData.body}
+          isFinalized={isFinalized}
+          blockNumber={blockNumber}
+        />
       </div>
-      <BlockInfo blockInfo={blockData.header} isFinalized={isFinalized}/>
-      <Test
-        blockDetails={blockData.body}
-        isFinalized={isFinalized}
-        blockNumber={blockNumber}
-      />
-    </>
+    </PDScrollArea>
   );
 };
 

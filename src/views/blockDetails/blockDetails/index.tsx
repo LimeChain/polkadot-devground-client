@@ -15,7 +15,7 @@ const Button = (props: IButtonProps) => {
       onClick={onClick}
       className={cn(
         'px-2 py-2.5 font-body2-regular hover:border-dev-pink-500',
-        'text-dev-white-400 ',
+        'text-dev-white-200',
         'border-b-2 border-b-transparent hover:border-b-dev-pink-500',
         'duration-300 ease-in',
         isActive && 'border-b-dev-pink-500',
@@ -33,20 +33,17 @@ export const Test = (props) => {
   const [filter, setFilter] = useState('extrinsics');
 
   const handleExtrinsicClick = (extrinsic) => {
-    const data = JSON.stringify(extrinsic, null, 2);
-    console.log(data);
-    // setSelectedExtrinsic(extrinsic);
-    // toggleVisibility();
+    setSelectedExtrinsic(extrinsic);
+    toggleVisibility();
   };
 
   const handleFilter = (type) => {
     setFilter(type);
   };
 
-  console.log(blockDetails);
   return (
-    <>
-      <div className="flex gap-2 border-b border-dev-purple-700 px-2 font-geist dark:border-dev-purple-300 dark:text-dev-black-800">
+    <div className="grid gap-4">
+      <div className="flex gap-6 px-2 font-geist dark:text-dev-black-800">
         <Button
           isActive={filter === 'extrinsics'}
           type="extrinsics"
@@ -63,7 +60,7 @@ export const Test = (props) => {
         </Button>
       </div>
       <PDScrollArea
-        className="table-container"
+        className="table-container h-96"
         verticalScrollClassNames="pt-8"
       >
         {filter === 'extrinsics' && (
@@ -84,6 +81,7 @@ export const Test = (props) => {
             </tr>
             {
               blockDetails.extrinsics.map((extrinsic, extrinsicIndex) => {
+                console.log(extrinsic);
                 const timeAgo = extrinsic.timestamp && formatDistanceToNowStrict(
                   new Date(extrinsic.timestamp),
                   { addSuffix: true },
@@ -99,7 +97,7 @@ export const Test = (props) => {
                     <td>{timeAgo}</td>
                     <td>
                       {
-                        isFinalized
+                        extrinsic.isSuccess
                           ? (
                             <Icon
                               size={[16]}
@@ -137,6 +135,7 @@ export const Test = (props) => {
               <th>Extrinsic ID</th>
               <th>Action</th>
               <th>Type</th>
+              <th />
             </tr>
             {
               blockDetails.events.map((event, eventIndex) => {
@@ -154,6 +153,13 @@ export const Test = (props) => {
                     <td>12312 </td>
                     <td>{event.event.type} ({event.event.value.type})</td>
                     <td>{event.phase.type}</td>
+                    <td>
+                      <Icon
+                        size={[18]}
+                        name="icon-dropdownArrow"
+                        className="text-dev-black-1000 dark:text-dev-purple-50"
+                      />
+                    </td>
                   </tr>
                 );
               })
@@ -167,6 +173,6 @@ export const Test = (props) => {
           extrinsic={selectedExtrinsic}
         />
       )}
-    </>
+    </div>
   );
 };

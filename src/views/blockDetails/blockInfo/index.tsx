@@ -22,7 +22,7 @@ export const BlockInfo = (props) => {
   }, []);
 
   return (
-    <>
+    <div>
       {/* Time stamp */}
 
       <div className={styles['pd-block-details']}>
@@ -60,7 +60,7 @@ export const BlockInfo = (props) => {
                 <Icon
                   size={[16]}
                   name="icon-clock"
-                  className="text-dev-yellow-700"
+                  className="animate-rotate text-dev-yellow-700"
                 />
                 <p>Unfinalized</p>
               </div>
@@ -187,6 +187,6 @@ export const BlockInfo = (props) => {
 
         <div>{blockInfo.runtime.spec_version}</div>
       </div>
-    </>
+    </div>
   );
 };
