@@ -54,12 +54,12 @@ const LatestBlocks = () => {
       <PageHeader title="Latest Blocks" />
       <SearchBar label="Search by Block" type="block" />
       <PDScrollArea
-        className="table-container"
+        className="h-full"
         verticalScrollClassNames="pt-8"
       >
         <table>
           <colgroup>
-            <col style={{ width: '10%', minWidth: '8rem' }} />
+            <col style={{ width: '10%', minWidth: '9rem' }} />
             <col style={{ width: '10%', minWidth: '4rem' }} />
             <col style={{ width: '20%', minWidth: '8rem' }} />
             <col style={{ width: '10%', minWidth: '6rem' }} />

@@ -9,7 +9,6 @@ import {
 
 import { Icon } from '@components/icon';
 import { ModalShowJson } from '@components/modals/modalShowJson';
-import { PDScrollArea } from '@components/pdScrollArea';
 import { useStoreChain } from '@stores';
 import { cn } from '@utils/helpers';
 
@@ -43,70 +42,64 @@ export const ExtrinsicsList = () => {
 
   return (
     <>
-      <PDScrollArea
-        className="h-80 lg:h-full"
-        viewportClassNames="py-3"
-        verticalScrollClassNames="py-3"
-      >
-        {
-          signedExtrinsics.map((extrinsic, extrinsicIndex) => (
-            <div
-              key={`latest-signed-extrinsic-${extrinsic.id}-${chain.id}`}
-              data-extrinsic-id={extrinsic.id}
-              className={cn(
-                styles['pd-explorer-list'],
-                {
-                  ['opacity-0 animate-fade-in']: extrinsicIndex === 0,
-                },
-              )}
-              onClick={handleOpenModal}
-            >
-              <div>
-                <span>
-                  <span className="text-dev-black-300 dark:text-dev-purple-300">
+      {
+        signedExtrinsics.map((extrinsic, extrinsicIndex) => (
+          <div
+            key={`latest-signed-extrinsic-${extrinsic.id}-${chain.id}`}
+            data-extrinsic-id={extrinsic.id}
+            className={cn(
+              styles['pd-explorer-list'],
+              {
+                ['opacity-0 animate-fade-in']: extrinsicIndex === 0,
+              },
+            )}
+            onClick={handleOpenModal}
+          >
+            <div>
+              <span>
+                <span className="text-dev-black-300 dark:text-dev-purple-300">
                   Extrinsic#
-                  </span>
-                  <strong className="font-body1-bold">
-                    {' '}{extrinsic.id}
-                  </strong>
                 </span>
-                <span className="flex items-center">
-                  {
-                    extrinsic.isSuccess
-                      ? (
-                        <Icon
-                          size={[16]}
-                          name="icon-checked"
-                          className="text-dev-green-600"
-                        />
-                      )
-                      : (
-                        <Icon
-                          size={[16]}
-                          name="icon-failed"
-                          className="text-dev-red-800"
-                        />
-                      )
-                  }
-                </span>
-              </div>
-              <div>
-                <span>
-                  <span className="text-dev-black-300 dark:text-dev-purple-300">Action: </span>
-                  {extrinsic.method.section}.{extrinsic.method.method}
-                </span>
-                <span>
-                  {formatDistanceToNowStrict(extrinsic.timestamp, { addSuffix: true })}
-                </span>
-              </div>
+                <strong className="font-body1-bold">
+                  {' '}{extrinsic.id}
+                </strong>
+              </span>
+              <span className="flex items-center">
+                {
+                  extrinsic.isSuccess
+                    ? (
+                      <Icon
+                        size={[16]}
+                        name="icon-checked"
+                        className="text-dev-green-600"
+                      />
+                    )
+                    : (
+                      <Icon
+                        size={[16]}
+                        name="icon-failed"
+                        className="text-dev-red-800"
+                      />
+                    )
+                }
+              </span>
             </div>
-          ))
-        }
-        {
-          !latestBlock
+            <div>
+              <span>
+                <span className="text-dev-black-300 dark:text-dev-purple-300">Action: </span>
+                {extrinsic.method.section}.{extrinsic.method.method}
+              </span>
+              <span>
+                {formatDistanceToNowStrict(extrinsic.timestamp, { addSuffix: true })}
+              </span>
+            </div>
+          </div>
+        ))
+      }
+      {
+        !latestBlock
           && 'Loading...'
-        }
-      </PDScrollArea>
+      }
       {
         refSelectedExtrinsic.current && (
           <ShowJsonModal

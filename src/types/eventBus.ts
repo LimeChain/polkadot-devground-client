@@ -56,11 +56,3 @@ export interface IEventBusSearchChain {
   type: '@@-search-chain';
   data: string;
 }
-
-export interface IEventBusForksScrollToBlock {
-  type: '@@-forks-scroll-to-block';
-  data: {
-    scrollToIndex: number;
-    scrollToBlockHash: string;
-  };
-}

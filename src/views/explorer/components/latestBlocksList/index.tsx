@@ -6,7 +6,6 @@ import {
 
 import { Icon } from '@components/icon';
 import { PDLink } from '@components/pdLink';
-import { PDScrollArea } from '@components/pdScrollArea';
 import { useStoreChain } from '@stores';
 import {
   cn,
@@ -41,11 +40,7 @@ export const LatestBlocksList = () => {
   }, [blocksData, bestBlock, chain, latestFinalizedBlock]);
 
   return (
-    <PDScrollArea
-      className="h-80 lg:h-full"
-      viewportClassNames="py-3"
-      verticalScrollClassNames="py-3"
-    >
+    <>
       {
         blocks.map((block, blockIndex) => {
           const timeAgo = block.header.timestamp && formatDistanceToNowStrict(
@@ -102,6 +97,6 @@ export const LatestBlocksList = () => {
         })
       }
       {isLoading && 'Loading...'}
-    </PDScrollArea>
+    </>
   );
 };
