@@ -18,7 +18,6 @@
     "start": "vite"
   },
   "dependencies": {
-    "@microlink/react-json-view": "1.23.1",
     "@pivanov/event-bus": "1.0.0",
     "@pivanov/use-toggle-visibility": "0.0.1",
     "@polkadot-api/descriptors": "file:.papi/descriptors",
@@ -48,6 +47,7 @@
     "react-hot-toast": "2.4.1",
     "react-resizable-panels": "2.0.19",
     "react-router-dom": "6.24.0",
+    "react18-json-view": "0.2.8",
     "scale-ts": "1.6.0",
     "shiki": "1.10.0",
     "styled-components": "6.1.12",

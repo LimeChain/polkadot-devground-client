@@ -1,4 +1,5 @@
-import ReactJson from '@microlink/react-json-view';
+import JsonView from 'react18-json-view';
+import 'react18-json-view/src/style.css';
 
 import { PDScrollArea } from '@components/pdScrollArea';
 import { useStoreUI } from '@stores';
@@ -13,13 +14,9 @@ export const JsonViewer = (props: IJsonViewer) => {
 
   return (
     <PDScrollArea className="h-[30rem]">
-      <ReactJson
+      <JsonView
         src={json}
-        iconStyle="circle"
-        theme={theme === 'dark' ? 'monokai' : 'rjv-default'}
-        style={{
-          backgroundColor: 'transparent',
-        }}
+        theme="atom"
       />
     </PDScrollArea>
   );
