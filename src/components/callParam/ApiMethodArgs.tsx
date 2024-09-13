@@ -42,7 +42,7 @@ export const MethodArgs = (
     setArgs(args => ({ ...args, [key]: value } as typeof args));
   }, []);
 
-  if (inputs.length <= 0) {
+  if (inputs.length <= 0 || !lookup) {
     return null;
   }
 
@@ -50,7 +50,7 @@ export const MethodArgs = (
     <div className="flex flex-col gap-6">
       {
         inputs.map(type => {
-          const apiType = lookup!(type.type);
+          const apiType = lookup(type.type);
 
           return (
             <div key={`method-args-${type.name}`}>

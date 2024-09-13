@@ -4,7 +4,7 @@ export const CallSelect = ({
   calls,
   onCallSelect,
 }: {
-  calls: Omit<ICallParam, 'pallet' | 'onChange'>[];
+  calls: Pick<ICallParam, 'name' | 'param'>[];
   onCallSelect: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 },
 ) => {

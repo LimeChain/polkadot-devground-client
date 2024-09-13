@@ -17,6 +17,7 @@ import { QueryFormContainer } from '@components/callParam/QueryFormContainer';
 import { QueryResult } from '@components/callParam/QueryResult';
 import { QueryResultContainer } from '@components/callParam/QueryResultContainer';
 import { QueryViewContainer } from '@components/callParam/QueryViewContainer';
+import { Loader } from '@components/loader';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
 import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
@@ -34,16 +35,25 @@ const Extrinsics = () => {
   const chain = useStoreChain?.use?.chain?.();
 
   const accounts = useStoreWallet?.use?.accounts?.();
+
+  // TODO: FIX AFTER REFACTORING THE WALLET CONNECTOR
   const signer = accounts.at(0)?.polkadotSigner;
 
-  const palletsWithCalls = useMemo(() => metadata?.pallets?.filter(p => p.calls)
-    ?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
+  const palletsWithCalls = useMemo(() => metadata?.pallets?.filter(p => p.calls)?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
   const palletSelectItems = useMemo(() => palletsWithCalls?.map(pallet => ({
     label: pallet.name,
     value: pallet.name,
     key: `extrinsic-pallet-${pallet.name}`,
   })) || [], [palletsWithCalls]);
+
   const [palletSelected, setPalledSelected] = useState(palletsWithCalls?.[0]);
+
+  const [queries, setQueries] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
+
+  useEffect(() => {
+    setQueries([]);
+    setPalledSelected(undefined);
+  }, [chain.id]);
 
   useEffect(() => {
     if (palletsWithCalls && lookup) {
@@ -106,12 +116,6 @@ const Extrinsics = () => {
 
   }, [palletSelected, callSelected, callArgs, dynamicBulder, viewBuilder]);
 
-  const [queries, setQueries] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
-
-  useEffect(() => {
-    setQueries([]);
-  }, [chain.id]);
-
   const submitTx = useCallback(async () => {
     setQueries(queries => ([{
       pallet: palletSelected!.name,
@@ -154,8 +158,8 @@ const Extrinsics = () => {
     setQueries(queries => queries.filter(query => query.id !== id));
   }, []);
 
-  if (!palletsWithCalls) {
-    return 'Loading...';
+  if (!palletSelected) {
+    return <Loader />;
   }
 
   return (
@@ -210,7 +214,7 @@ const Extrinsics = () => {
           && decodedCall
           && (
             <p className="break-all">
-              Encoded Call {encodedCall.asHex()}
+              Encoded Call: <br /> {encodedCall.asHex()}
             </p>
           )
         }
@@ -244,6 +248,8 @@ const Query = ({
   const [isLoading, setIsLoading] = useState(true);
 
   const accounts = useStoreWallet?.use?.accounts?.();
+
+  // TODO: FIX AFTER REFACTORING THE WALLET CONNECTOR
   const signer = accounts.at(0)?.polkadotSigner;
 
   useEffect(() => {

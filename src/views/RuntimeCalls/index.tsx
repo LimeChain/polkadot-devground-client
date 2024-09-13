@@ -12,6 +12,7 @@ import { QueryFormContainer } from '@components/callParam/QueryFormContainer';
 import { QueryResult } from '@components/callParam/QueryResult';
 import { QueryResultContainer } from '@components/callParam/QueryResultContainer';
 import { QueryViewContainer } from '@components/callParam/QueryViewContainer';
+import { Loader } from '@components/loader';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
 
@@ -27,6 +28,7 @@ const RuntimeCalls = () => {
     value: api.name,
     key: `api-select-${api.name}`,
   })), [apis]);
+
   const [apiSelected, setApiSelected] = useState(apis?.at(0));
 
   const apiMethods = useMemo(() => apiSelected?.methods?.sort((a, b) => a.name.localeCompare(b.name)) || [], [apiSelected]);
@@ -35,21 +37,21 @@ const RuntimeCalls = () => {
     value: item.name,
     key: `method-select-${item.name}`,
   })), [apiMethods]);
+
   const [methodSelected, setMethodSelected] = useState(apiSelected?.methods.at(0));
-
   const [callArgs, setCallArgs] = useState<unknown>(undefined);
-
   const [queries, setQueries] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
 
   useEffect(() => {
     setQueries([]);
+    setApiSelected(undefined);
   }, [chain.id]);
 
   useEffect(() => {
     if (apis) {
       const defaultApiSelected = apis[0];
       setApiSelected(defaultApiSelected);
-      setMethodSelected(defaultApiSelected?.methods.at?.(0));
+      setMethodSelected(defaultApiSelected?.methods?.sort((a, b) => a.name.localeCompare(b.name)).at?.(0));
     }
   }, [apis]);
 
@@ -57,7 +59,7 @@ const RuntimeCalls = () => {
     if (apis) {
       const selectedMethod = apis.find(api => api.name === palletSelectedName);
       setApiSelected(selectedMethod);
-      setMethodSelected(selectedMethod!.methods.at(0));
+      setMethodSelected(selectedMethod!.methods?.sort((a, b) => a.name.localeCompare(b.name)).at(0));
       setCallArgs(undefined);
     }
   }, [apis]);
@@ -84,8 +86,8 @@ const RuntimeCalls = () => {
     setQueries(queries => queries.filter(query => query.id !== id));
   }, []);
 
-  if (!apis) {
-    return 'Loading...';
+  if (!apiSelected) {
+    return <Loader />;
   }
 
   return (
