@@ -61,8 +61,11 @@ const Constants = () => {
   const handlePalletSelect = useCallback((selectedPalletName: string) => {
     if (palletsWithConstants) {
       const selectedPallet = palletsWithConstants.find(pallet => pallet.name === selectedPalletName);
-      setPalletSelected(selectedPallet);
-      setConstantSelected(selectedPallet!.constants.at(0));
+
+      if (selectedPallet) {
+        setPalletSelected(selectedPallet);
+        setConstantSelected(selectedPallet.constants.at(0));
+      }
     }
   }, [palletsWithConstants]);
 
@@ -74,11 +77,13 @@ const Constants = () => {
   }, [palletSelected]);
 
   const handleStorageQuerySubmit = useCallback(() => {
-    setQueries(queries => ([{
-      pallet: palletSelected!.name,
-      storage: constantSelected!.name,
-      id: crypto.randomUUID(),
-    }, ...queries]));
+    if (palletSelected?.name && constantSelected?.name) {
+      setQueries(queries => ([{
+        pallet: palletSelected.name,
+        storage: constantSelected.name,
+        id: crypto.randomUUID(),
+      }, ...queries]));
+    }
   }, [palletSelected, constantSelected]);
 
   const handleStorageUnsubscribe = useCallback((id: string) => {

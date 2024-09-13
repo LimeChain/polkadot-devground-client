@@ -58,9 +58,12 @@ const RuntimeCalls = () => {
   const handlePalletSelect = useCallback((palletSelectedName: string) => {
     if (apis) {
       const selectedMethod = apis.find(api => api.name === palletSelectedName);
-      setApiSelected(selectedMethod);
-      setMethodSelected(selectedMethod!.methods?.sort((a, b) => a.name.localeCompare(b.name)).at(0));
-      setCallArgs(undefined);
+
+      if (selectedMethod) {
+        setApiSelected(selectedMethod);
+        setMethodSelected(selectedMethod.methods?.sort((a, b) => a.name.localeCompare(b.name)).at(0));
+        setCallArgs(undefined);
+      }
     }
   }, [apis]);
 
@@ -73,12 +76,14 @@ const RuntimeCalls = () => {
   }, [apiSelected]);
 
   const handleStorageQuerySubmit = useCallback(() => {
-    setQueries(queries => ([{
-      pallet: apiSelected!.name,
-      storage: methodSelected!.name,
-      id: crypto.randomUUID(),
-      args: callArgs,
-    }, ...queries]));
+    if (apiSelected?.name && methodSelected?.name) {
+      setQueries(queries => ([{
+        pallet: apiSelected.name,
+        storage: methodSelected.name,
+        id: crypto.randomUUID(),
+        args: callArgs,
+      }, ...queries]));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiSelected, methodSelected, callArgs]);
 

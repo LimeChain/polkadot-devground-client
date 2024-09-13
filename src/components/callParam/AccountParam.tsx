@@ -50,6 +50,10 @@ export const AccountParam = ({ accountId, onChange }: IAccountParam) => {
     setUseCustomAccount(use => !use);
   }, []);
 
+  const handleAccountSelect = useCallback((account: unknown) => {
+    setAccount(account as InjectedPolkadotAccount);
+  }, []);
+
   return (
     <div className={styles.codecGroup}>
       <PDSwitch
@@ -69,8 +73,7 @@ export const AccountParam = ({ accountId, onChange }: IAccountParam) => {
               <AccountSelectParam
                 account={account!}
                 accounts={accounts}
-                // eslint-disable-next-line react/jsx-no-bind
-                onChange={(account) => setAccount(account as InjectedPolkadotAccount)}
+                onChange={handleAccountSelect}
               />
             )
         }
@@ -88,20 +91,20 @@ const AccountSelectParam = ({ accounts, onChange }: IAccountSelectParam) => {
   const [selectedAccount, setSelectedAccount] = useState(accounts.at(0));
 
   useEffect(() => {
-    if (accounts.length > 0) {
-      if (!selectedAccount) {
-        setSelectedAccount(accounts.at(0));
-      }
-    } else {
+    if (accounts.length === 0) {
       setSelectedAccount(undefined);
+      return;
     }
+
+    if (!selectedAccount) {
+      setSelectedAccount(accounts.at(0));
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accounts]);
 
   const handleOnAccountSelect = useCallback((accountSelected: string) => {
     const selectedAccount = accounts.find(ac => ac.address === accountSelected);
-    console.log(accountSelected);
-    console.log(selectedAccount);
 
     setSelectedAccount(selectedAccount);
     onChange(selectedAccount);

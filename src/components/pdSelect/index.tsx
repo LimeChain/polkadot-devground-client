@@ -87,7 +87,7 @@ export const PDSelect = ({
           'text-white dark:text-black',
         )}
         >
-          <_Select.ScrollUpButton className="flex items-center justify-center shadow-[black_-2px_-3px_20px_0]">
+          <_Select.ScrollUpButton className="flex items-center justify-center shadow-[white_-2px_-3px_15px_0] dark:shadow-[black_-2px_-3px_20px_0]">
             <Icon
               name="icon-dropdownArrow"
               className="rotate-180"
@@ -112,7 +112,7 @@ export const PDSelect = ({
           </_Select.Viewport>
           {/* select options */}
 
-          <_Select.ScrollDownButton className="flex items-center justify-center shadow-[black_2px_3px_20px_0]">
+          <_Select.ScrollDownButton className="flex items-center justify-center shadow-[white_2px_3px_15px_0] dark:shadow-[black_2px_3px_15px_0]">
             <Icon name="icon-dropdownArrow" size={[24]} />
           </_Select.ScrollDownButton>
         </_Select.Content>
