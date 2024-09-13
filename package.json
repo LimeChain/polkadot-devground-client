@@ -21,6 +21,7 @@
     "@pivanov/event-bus": "1.0.0",
     "@pivanov/use-toggle-visibility": "0.0.1",
     "@polkadot-api/descriptors": "file:.papi/descriptors",
+    "@polkadot-api/metadata-builders": "0.7.0",
     "@polkadot-api/view-builder": "0.3.3",
     "@polkadot/types": "12.2.3",
     "@polkadot/util": "13.0.2",
