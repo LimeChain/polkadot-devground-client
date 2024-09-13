@@ -83,16 +83,6 @@ export const routes = () => ([
         ],
       },
       {
-        path: 'rpc-calls',
-        element: <LayoutBasic hasFooter classNames="lg:pb-8" />,
-        children: [
-          {
-            path: '',
-            element: <RpcCalls />,
-          },
-        ],
-      },
-      {
         path: 'chain-state',
         element: <LayoutBasic hasFooter classNames="lg:pb-8" />,
         children: [
