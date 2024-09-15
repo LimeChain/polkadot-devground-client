@@ -49,9 +49,11 @@ const Extrinsics = () => {
   const [palletSelected, setPalledSelected] = useState(palletsWithCalls?.[0]);
 
   const [queries, setQueries] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
+  const [callArgs, setCallArgs] = useState<unknown>();
 
   useEffect(() => {
     setQueries([]);
+    setCallArgs({});
     setPalledSelected(undefined);
   }, [chain.id]);
 
@@ -78,8 +80,6 @@ const Extrinsics = () => {
     key: `extrinsic-call-${call.name}`,
   })) || [], [calls]);
   const [callSelected, setCallSelected] = useState(calls.at(0));
-
-  const [callArgs, setCallArgs] = useState<unknown>();
 
   const [encodedCall, setEncodedCall] = useState<Binary | undefined>(Binary.fromHex('0x'));
   const decodedCall = useMemo(() => {

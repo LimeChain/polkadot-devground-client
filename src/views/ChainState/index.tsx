@@ -56,6 +56,7 @@ const ChainState = () => {
 
   useEffect(() => {
     setQueries([]);
+    setCallArgs(undefined);
     setPalletSelected(undefined);
     subscriptions.forEach(sub => {
       sub?.unsubscribe?.();

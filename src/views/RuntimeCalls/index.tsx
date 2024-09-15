@@ -45,6 +45,7 @@ const RuntimeCalls = () => {
   useEffect(() => {
     setQueries([]);
     setApiSelected(undefined);
+    setCallArgs(undefined);
   }, [chain.id]);
 
   useEffect(() => {
