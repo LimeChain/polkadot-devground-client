@@ -162,7 +162,7 @@ html[data-color-scheme="light"] #icon-checked {
       @apply hover:bg-dev-purple-100 dark:hover:bg-dev-purple-900;
 
       >td {
-        @apply pb-2 pt-4 pl-1 font-body2-regular font-geist;
+        @apply pb-2 pt-4 pl-1 font-body2-regular font-geist break-words;
       }
 
   }

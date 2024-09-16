@@ -67,15 +67,14 @@ const BlockDetails = () => {
   if (!blockData) {
     return 'Loading...';
   }
-
   return (
-    <PDScrollArea viewportClassNames="pr-8">
-      <div className="grid gap-12">
+    <PDScrollArea viewportClassNames="pr-12">
+      <div className="grid gap-8">
         <div className="flex items-center justify-between">
           <PageHeader title="Block" blockNumber={formatNumber(blockData.header.number)} />
           <div className="flex gap-6">
             <PDLink
-              to={`https://polkadot.subscan.io/block/${blockData.number}`}
+              to={`https://polkadot.subscan.io/block/${blockData.header.number}`}
               className={styles['pd-link-btn']}
               target="_blank"
               rel="noopener noreferrer"
@@ -84,7 +83,7 @@ const BlockDetails = () => {
               <Icon name="icon-openLink" size={[16]} />
             </PDLink>
             <PDLink
-              to={`https://polkadot.statescan.io/#/blocks/${blockData.number}`}
+              to={`https://polkadot.statescan.io/#/blocks/${blockData.header.number}`}
               className={styles['pd-link-btn']}
               target="_blank"
               rel="noopener noreferrer"

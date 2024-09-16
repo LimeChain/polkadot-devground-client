@@ -1,3 +1,4 @@
+import { format } from 'date-fns/format';
 import {
   useCallback,
   useState,
@@ -29,7 +30,7 @@ export const BlockInfo = (props) => {
         <p>Time stamp</p>
 
         <div>
-          {isChecked ? new Date(blockInfo.timestamp).toUTCString() : blockInfo.timestamp}
+          {isChecked ? new Date(blockInfo.timestamp).toUTCString() : format(new Date(blockInfo.timestamp), 'yyyy-MM-dd HH:mm:ss')}
           <ToggleButton
             isChecked={isChecked}
             handleSetCheck={handleSetCheck}
@@ -157,16 +158,15 @@ export const BlockInfo = (props) => {
       </div>
 
       {
-        blockInfo.validatorId && (
+        blockInfo.identity && (
           <div className={styles['pd-block-details']}>
             <p>Validator</p>
 
             <div>
-              <Icon name="logo-polkadotBlockDetails" />
-              {blockInfo.validatorId}
+              {blockInfo.identity}
 
               <CopyToClipboard
-                text={blockInfo.validatorId}
+                text={blockInfo.identity}
                 toastMessage="Validator"
               >
                 {
@@ -185,7 +185,10 @@ export const BlockInfo = (props) => {
       <div className={styles['pd-block-details']}>
         <p>Spec Version</p>
 
-        <div>{blockInfo.runtime.spec_version}</div>
+        <div>
+          <Icon name="logo-polkadotBlockDetails" />
+          {blockInfo.runtime.spec_version}
+        </div>
       </div>
     </div>
   );
