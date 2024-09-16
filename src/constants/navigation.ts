@@ -13,18 +13,28 @@ export const NAVIGATION_ITEMS: TNavItem[] = [
       title: 'Developer',
       items: [
         {
-          title: 'Chain State',
+          title: 'Explorer',
           to: '/explorer',
           icon: 'icon-github',
         },
         {
-          title: 'RPC Calls',
-          to: '/rpc-calls',
+          title: 'Chain State',
+          to: '/chain-state',
+          icon: 'icon-github',
+        },
+        {
+          title: 'Constants',
+          to: '/constants',
           icon: 'icon-github',
         },
         {
           title: 'Runtime Calls',
           to: '/runtime-calls',
+          icon: 'icon-github',
+        },
+        {
+          title: 'Extrinsics',
+          to: '/extrinsics',
           icon: 'icon-github',
         },
         {

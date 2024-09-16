@@ -2,6 +2,16 @@ import {
   Metadata,
   TypeRegistry,
 } from '@polkadot/types';
+import {
+  getLookupFn,
+  type MetadataLookup,
+} from '@polkadot-api/metadata-builders';
+import {
+  type Binary,
+  metadata as metadataCodec,
+  type V14,
+  type V15,
+} from '@polkadot-api/substrate-bindings';
 import { createClient as createSubstrateClient } from '@polkadot-api/substrate-client';
 import { type PolkadotClient } from 'polkadot-api';
 import { createClient } from 'polkadot-api';
@@ -41,7 +51,10 @@ import type {
   TStakingApi,
   TStakingChainDecsriptor,
 } from '@custom-types/chain';
-import type { SubstrateClient } from '@polkadot-api/substrate-client';
+import type {
+  ChainSpecData,
+  SubstrateClient,
+} from '@polkadot-api/substrate-client';
 
 export interface StoreInterface {
   chain: TChain;
@@ -65,6 +78,8 @@ export interface StoreInterface {
 
   chainSpecs: TChainSpecs | null;
   runtime: IRuntime | null;
+  metadata: V14 | V15 | null;
+  lookup: MetadataLookup | null;
 
   registry: TypeRegistry;
 
@@ -95,6 +110,8 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   registry: new TypeRegistry(),
   chainSpecs: null,
   runtime: null,
+  metadata: null,
+  lookup: null,
 };
 
 const baseStore = create<StoreInterface>()((set, get) => ({
@@ -167,7 +184,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         const peopleApi = newPeopleClient.getTypedApi(CHAIN_DESCRIPTORS[chain.peopleChainId]);
         set({ peopleApi });
 
-        // check if chain has staking pallet (rococo doesn't have)
+        // check if the chain has staking pallet (rococo doesn't have)
         const hasStakingInformation = chain.hasStaking && stakingChain;
         if (hasStakingInformation) {
           const stakingClient = createClient(getSmProvider(stakingChain));
@@ -176,24 +193,44 @@ const baseStore = create<StoreInterface>()((set, get) => ({
           set({ stakingApi });
         }
 
-        await newClient.getChainSpecData()
-          .then(chainSpecs => {
-            set({ chainSpecs });
-          })
-          .catch(console.error);
+        await Promise.allSettled([
+          { type: 'chainSpecs', data: await newClient.getChainSpecData() },
+          { type: 'metadata', data: await getMetadata(api) },
+          { type: 'runtime', data: await getRuntime(api) },
+        ])
+          .then(results => {
+            results.forEach(result => {
+              if (result.status === 'fulfilled') {
+                switch (result.value.type) {
+                  case 'chainSpecs':
+                    set({ chainSpecs: result.value.data as ChainSpecData });
+                    break;
 
-        // build metadata registry for decoding
-        await getMetadata(api)
-          .then(metadataRaw => {
-            const metadata = new Metadata(registry, metadataRaw.asBytes());
-            registry.setMetadata(metadata);
-          })
-          .catch(console.error);
+                  // build metadata registry for decoding
+                  case 'metadata': {
+                    const metadataRaw = result.value.data as Binary;
+                    const metadata = new Metadata(registry, metadataRaw!.asBytes());
+                    const decodededMetadata = metadataCodec.dec(metadataRaw!.asBytes());
+                    const metadataVersion = decodededMetadata.metadata.tag;
 
-        // get spec_version from runtime
-        await getRuntime(api)
-          .then(runtime => {
-            set({ runtime });
+                    if (metadataVersion === 'v14' || metadataVersion === 'v15') {
+                      set({
+                        metadata: decodededMetadata.metadata.value,
+                        lookup: getLookupFn(decodededMetadata.metadata.value),
+                      });
+                    }
+                    registry.setMetadata(metadata);
+                    break;
+                  }
+
+                  case 'runtime':
+                    set({ runtime: result.value.data as Awaited<ReturnType<typeof getRuntime>> });
+                    break;
+                  default:
+                    break;
+                }
+              }
+            });
           })
           .catch(console.error);
 

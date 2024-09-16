@@ -1,0 +1,21 @@
+.codecContainer {
+  @apply border-l border-dashed pl-4 pt-2;
+    @apply empty:hidden flex flex-col gap-4;
+    @apply border-dev-purple-300 dark:border-dev-purple-700;
+}
+
+.codecInput {
+  @apply w-full border dark:border-dev-purple-700 border-dev-white-900 outline-none;
+    @apply w-full outline-none;
+    @apply p-3 bg-transparent;
+    @apply font-geist font-body1-regular
+}
+
+.codecInputError {
+  @apply transition-[border];
+  @apply !border-dev-red-700
+}
+
+.codecGroup {
+  @apply flex flex-col gap-2
+}

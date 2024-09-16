@@ -12,8 +12,11 @@ const Callback = lazy(() => import('../components/login/callback'));
 const BlockDetails = lazy(() => import('../views/blockDetails'));
 const Explorer = lazy(() => import('../views/explorer'));
 const SignedExtrinsics = lazy(() => import('../views/signedExtrinsics'));
-
 const Forks = lazy(() => import('../views/forks'));
+const Extrinsics = lazy(() => import('../views/Extrinsics'));
+const ChainState = lazy(() => import('../views/ChainState'));
+const Constants = lazy(() => import('../views/Constants'));
+const RuntimeCalls = lazy(() => import('../views/RuntimeCalls'));
 
 export const routes = () => ([
   {
@@ -76,6 +79,46 @@ export const routes = () => ([
           {
             path: 'extrinsics',
             element: <SignedExtrinsics />,
+          },
+        ],
+      },
+      {
+        path: 'chain-state',
+        element: <LayoutBasic hasFooter classNames="lg:pb-8" />,
+        children: [
+          {
+            path: '',
+            element: <ChainState />,
+          },
+        ],
+      },
+      {
+        path: 'constants',
+        element: <LayoutBasic hasFooter classNames="lg:pb-8" />,
+        children: [
+          {
+            path: '',
+            element: <Constants />,
+          },
+        ],
+      },
+      {
+        path: 'runtime-calls',
+        element: <LayoutBasic hasFooter classNames="lg:pb-8" />,
+        children: [
+          {
+            path: '',
+            element: <RuntimeCalls />,
+          },
+        ],
+      },
+      {
+        path: 'extrinsics',
+        element: <LayoutBasic hasFooter classNames="lg:pb-8" />,
+        children: [
+          {
+            path: '',
+            element: <Extrinsics />,
           },
         ],
       },

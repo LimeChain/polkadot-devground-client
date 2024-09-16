@@ -118,7 +118,10 @@ export const getChainSpecData = (client: PolkadotClient, chainId: TSupportedPara
 export const getMetadata = async (api: TApi) => {
   assert(api, 'Api prop is not defined');
 
-  return await api.apis.Metadata.metadata();
+  const v14 = await api.apis.Metadata.metadata_at_version(14);
+  const v15 = await api.apis.Metadata.metadata_at_version(15);
+
+  return v15 || v14;
 };
 
 export const getRuntime = async (api: TApi) => {
