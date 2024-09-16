@@ -1,3 +1,4 @@
+import Identicon from '@polkadot/react-identicon';
 import { format } from 'date-fns/format';
 import {
   useCallback,
@@ -162,21 +163,31 @@ export const BlockInfo = (props) => {
           <div className={styles['pd-block-details']}>
             <p>Validator</p>
 
-            <div>
-              {blockInfo.identity}
+            <div className={styles['validator']}>
+              <Identicon
+                value={blockInfo.identity.address}
+                size={32}
+                theme="polkadot"
+              />
+              <span>
+                {blockInfo.identity.name}
+                <div className="flex gap-2">
+                  {blockInfo.identity.address}
 
-              <CopyToClipboard
-                text={blockInfo.identity}
-                toastMessage="Validator"
-              >
-                {
-                  ({ ClipboardIcon }) => (
-                    <>
-                      {ClipboardIcon}
-                    </>
-                  )
-                }
-              </CopyToClipboard>
+                  <CopyToClipboard
+                    text={blockInfo.identity.address}
+                    toastMessage="Validator Address"
+                  >
+                    {
+                      ({ ClipboardIcon }) => (
+                        <>
+                          {ClipboardIcon}
+                        </>
+                      )
+                    }
+                  </CopyToClipboard>
+                </div>
+              </span>
             </div>
           </div>
         )
@@ -186,7 +197,6 @@ export const BlockInfo = (props) => {
         <p>Spec Version</p>
 
         <div>
-          <Icon name="logo-polkadotBlockDetails" />
           {blockInfo.runtime.spec_version}
         </div>
       </div>

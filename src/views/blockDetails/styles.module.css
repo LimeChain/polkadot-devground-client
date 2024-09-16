@@ -14,7 +14,7 @@
   }
 
   > div {
-    @apply gap-2 font-body2-regular font-geist;
+    @apply gap-2 font-body2-bold font-geist;
   }
 }
 

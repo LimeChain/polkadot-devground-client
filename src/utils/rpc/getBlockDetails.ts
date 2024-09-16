@@ -83,11 +83,12 @@ const getBlockValidator = async ({
     }
   }
 
-  if (!identity) {
-    identity = address.toString();
-  }
+  const data = {
+    name: identity,
+    address: address.toString(),
+  };
 
-  return identity as string;
+  return data;
 };
 
 export const getBlockDetailsWithPAPI = async ({
