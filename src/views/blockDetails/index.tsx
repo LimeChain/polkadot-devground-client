@@ -1,6 +1,4 @@
 import {
-  type ChangeEvent,
-  useCallback,
   useEffect,
   useState,
 } from 'react';
@@ -13,37 +11,18 @@ import { PDScrollArea } from '@components/pdScrollArea';
 import { useStoreChain } from '@stores';
 import { formatNumber } from '@utils/helpers';
 
-import { Test } from './blockDetails';
-import { BlockInfo } from './blockInfo';
+import { BlockBody } from './blockBody';
+import { BlockHeader } from './blockHeader';
 import styles from './styles.module.css';
 
-interface IBlockData {
-  number: number;
-  blockHash: string;
-  extrinsicsRoot: string;
-  parentHash: string;
-  stateRoot: string;
-  specVersion: number;
-  validatorId: string;
-  timeStamp: string;
-}
+import type { IMappedBlock } from '@custom-types/block';
 
 const BlockDetails = () => {
   const { blockNumber } = useParams();
   const data = useStoreChain?.use?.blocksData?.();
   const latestFinalizedBlock = useStoreChain.use.finalizedBlock?.();
 
-  const [blockData, setBlockData] = useState<IBlockData | undefined>();
-  const [isFinalized, setIsFinalized] = useState<boolean>(false);
-  const blocksData = useStoreChain?.use?.blocksData?.();
-
-  const handleSetCheck = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const target = e.currentTarget.parentNode as HTMLDivElement;
-    const format = target.getAttribute('data-format');
-    target.setAttribute('data-format', format === 'utc' ? 'local' : 'utc');
-
-    setIsChecked(state => !state);
-  }, []);
+  const [blockData, setBlockData] = useState<IMappedBlock | undefined>(undefined);
 
   useEffect(() => {
     if (blockNumber && data.size > 0) {
@@ -51,22 +30,32 @@ const BlockDetails = () => {
       if (!block) {
         return;
       }
-      setBlockData({ ...block, isFinalized: false });
+
+      if (block.header.number <= latestFinalizedBlock) {
+        setBlockData({
+          ...block,
+          header: {
+            ...block.header,
+            isFinalized: true,
+          },
+        });
+        return;
+      }
+
+      setBlockData({
+        ...block,
+        header: {
+          ...block.header,
+          isFinalized: false,
+        },
+      });
     }
   }, [blockNumber, data]);
-
-  useEffect(() => {
-    if (latestFinalizedBlock && blockData) {
-      const blockNumber = blockData.header.number || 0;
-      const isBlockFinalized = blockNumber <= latestFinalizedBlock;
-
-      setIsFinalized(isBlockFinalized);
-    }
-  }, [latestFinalizedBlock, blockData]);
 
   if (!blockData) {
     return 'Loading...';
   }
+
   return (
     <PDScrollArea viewportClassNames="pr-12">
       <div className="grid gap-8">
@@ -93,15 +82,8 @@ const BlockDetails = () => {
             </PDLink>
           </div>
         </div>
-        <BlockInfo
-          blockInfo={blockData.header}
-          isFinalized={isFinalized}
-        />
-        <Test
-          blockDetails={blockData.body}
-          isFinalized={isFinalized}
-          blockNumber={blockNumber}
-        />
+        <BlockHeader headerData={blockData.header}/>
+        <BlockBody bodyData={blockData.body}/>
       </div>
     </PDScrollArea>
   );

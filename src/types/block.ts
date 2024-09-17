@@ -14,6 +14,7 @@ export interface IMappedBlockExtrinsic extends IBlockExtrinsic {
   blockNumber: number;
   timestamp: number;
   isSuccess: boolean;
+  hash: string;
 }
 
 interface IGenericExtrinsicMethod {
@@ -34,4 +35,37 @@ export interface ITransferExtrinsicMethod extends IGenericExtrinsicMethod {
     };
     value: string;
   };
+}
+
+export interface IMappedBlockHeader {
+  number: number;
+  hash: string;
+  timestamp: number;
+  runtime?: {
+    spec_name: string;
+    spec_version: number;
+  } | null;
+  identity: {
+    name: undefined | string | any;
+    address?: string;
+  };
+  parentHash: string;
+  stateRoot: string;
+  extrinsicRoot: string;
+  isFinalized?: boolean;
+}
+
+export interface IMappedBlockBody {
+  events: Array<{
+    // Define the structure of an event if known
+    // For example:
+    // type: string;
+    // data: any;
+  }>;
+  extrinsics: Array<IMappedBlockExtrinsic>;
+}
+
+export interface IMappedBlock {
+  header: IMappedBlockHeader;
+  body: IMappedBlockBody;
 }
