@@ -7,7 +7,7 @@ import {
 
 type PossibleRef<T> = Ref<T> | undefined;
 
-export const assignRef = <T>(ref: PossibleRef<T>, value: T) => {
+const assignRef = <T>(ref: PossibleRef<T>, value: T) => {
   if (typeof ref === 'function') {
     ref(value);
   } else if (ref !== null) {
@@ -15,7 +15,7 @@ export const assignRef = <T>(ref: PossibleRef<T>, value: T) => {
   }
 };
 
-export const mergeRefs = <T>(...refs: PossibleRef<T>[]) => {
+const mergeRefs = <T>(...refs: PossibleRef<T>[]) => {
   return (node: T) => {
     return refs.forEach((ref) => ref && assignRef(ref, node));
   };

@@ -85,14 +85,14 @@ export const CHAIN_SPECS: {
   'rococo-people': rococoPeopleChainSpec,
 };
 
-export const RELAY_CHAIN_DESCRIPTORS: {
+const RELAY_CHAIN_DESCRIPTORS: {
   [key in TSupportedRelayChain]: TRelayChainDecsriptor
 } = {
   polkadot: dot,
   rococo,
 };
 
-export const PARA_CHAIN_DESCRIPTORS: {
+const PARA_CHAIN_DESCRIPTORS: {
   [key in TSupportedParaChain]: TParaChainDecsriptor
 } = {
   'polkadot-people': dotpeople,

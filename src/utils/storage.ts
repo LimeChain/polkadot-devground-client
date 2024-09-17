@@ -14,7 +14,9 @@ export async function storageSetItem(
   const cache = await caches.open(cacheName);
   const serializedValue = JSON.stringify(value, formatConsoleMessage);
   const response = new Response(serializedValue, {
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+    },
   });
   await cache.put(key, response);
 }

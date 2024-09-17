@@ -35,7 +35,9 @@ export const NavigationDropdownItem = ({
         'transition-colors',
         '!text-dev-white-200 dark:!text-dev-black-1000',
         'hover:bg-dev-black-800 dark:hover:bg-dev-purple-300',
-        { 'dark:bg-dev-purple-200 bg-dev-black-900': pathname === to },
+        {
+          ['dark:bg-dev-purple-200 bg-dev-black-900']: pathname === to,
+        },
         className,
       )}
     >

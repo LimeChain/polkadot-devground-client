@@ -1,0 +1,13 @@
+.pd-explorer-list {
+  @apply absolute top-0 left-0 w-full;
+  @apply grid gap-y-1 content-center;
+  @apply h-16 px-3;
+  @apply font-geist font-body2-regular text-dev-black-1000 dark:text-dev-purple-50;
+  @apply hover:bg-dev-purple-100 dark:hover:bg-dev-purple-900;
+  @apply transition-[background] duration-300;
+  @apply cursor-pointer;
+
+  >div {
+    @apply flex justify-between items-center gap-x-4;
+  }
+}

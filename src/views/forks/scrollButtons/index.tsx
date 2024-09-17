@@ -1,7 +1,7 @@
+import { useEventBus } from '@pivanov/event-bus';
 import React, {
+  type RefObject,
   useCallback,
-  useEffect,
-  useRef,
   useState,
 } from 'react';
 
@@ -10,73 +10,64 @@ import { cn } from '@utils/helpers';
 
 import { smoothScroll } from '../helpers';
 
+import type { IEventBusForksReceiveUpdate } from '@custom-types/eventBus';
+
 interface IScrollButtons {
-  scrollAreaRef: React.RefObject<HTMLDivElement>;
-  blockNumbers: number[];
+  refScrollArea: RefObject<HTMLDivElement>;
 }
 
-export const ScrollButtons = ({ scrollAreaRef, blockNumbers } : IScrollButtons) => {
-  const [isAtStart, setIsAtStart] = useState(true);
-  const [isAtEnd, setIsAtEnd] = useState(false);
-  const lastBlockNumberRef = useRef([]);
+export const ScrollButtons = ({ refScrollArea }: IScrollButtons) => {
+  const [buttonState, setButtonState] = useState({
+    canGoToStart: false,
+    canGoToEnd: false,
+  });
 
   const scrollToLeft = useCallback(() => {
-    if (scrollAreaRef.current) {
-      smoothScroll(scrollAreaRef.current, 0).catch(console.error);
+    if (refScrollArea.current) {
+      void smoothScroll(refScrollArea.current, 'left', 0);
     }
-  }, [scrollAreaRef]);
+  }, [refScrollArea]);
 
   const scrollToRight = useCallback(() => {
-    if (scrollAreaRef.current) {
-      smoothScroll(scrollAreaRef.current, scrollAreaRef.current.scrollWidth).catch(console.error);
+    if (refScrollArea.current) {
+      void smoothScroll(refScrollArea.current, 'left', refScrollArea.current.scrollWidth);
     }
-  }, [scrollAreaRef]);
+  }, [refScrollArea]);
 
-  useEffect(() => {
-    if (blockNumbers.length > lastBlockNumberRef.current.length && isAtEnd) {
-      scrollToRight();
-    }
-    lastBlockNumberRef.current = blockNumbers;
-  }, [blockNumbers, isAtEnd, scrollToRight]);
+  useEventBus<IEventBusForksReceiveUpdate>('@@-forks-receive-update', ({ data }) => {
+    if (refScrollArea.current) {
+      setButtonState(data);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (scrollAreaRef.current) {
-        const currentScrollLeft = scrollAreaRef.current.scrollLeft;
-        setIsAtStart(currentScrollLeft === 0);
-        setIsAtEnd(currentScrollLeft + scrollAreaRef.current.clientWidth >= scrollAreaRef.current.scrollWidth);
+      if (data.keepScrollToEnd) {
+        void smoothScroll(refScrollArea.current, 'left', refScrollArea.current.scrollWidth);
       }
-    };
-
-    const scrollArea = scrollAreaRef.current;
-    if (scrollArea) {
-      scrollArea.addEventListener('scroll', handleScroll);
-      handleScroll();
     }
-
-    return () => {
-      if (scrollArea) {
-        scrollArea.removeEventListener('scroll', handleScroll);
-      }
-    };
-  }, [scrollAreaRef]);
+  });
 
   return (
     <div className="flex items-center gap-2">
       <button
         onClick={scrollToLeft}
-        disabled={isAtStart}
+        disabled={!buttonState.canGoToStart}
         className={cn(
-          isAtStart ? 'text-dev-black-200' : 'cursor-pointer text-dev-pink-500',
+          'cursor-pointer text-dev-pink-500',
+          'transition-colors duration-300',
+          {
+            ['text-dev-black-200']: !buttonState.canGoToStart,
+          },
         )}
       >
         <Icon name="icon-arrowCircle" className="-rotate-90" />
       </button>
       <button
         onClick={scrollToRight}
-        disabled={isAtEnd}
+        disabled={!buttonState.canGoToEnd}
         className={cn(
-          isAtEnd ? 'text-dev-black-200' : 'cursor-pointer text-dev-pink-500',
+          'cursor-pointer text-dev-pink-500',
+          'transition-colors delay-300 duration-300',
+          {
+            ['text-dev-black-200 delay-0']: !buttonState.canGoToEnd,
+          },
         )}
       >
         <Icon name="icon-arrowCircle" className="rotate-90" />

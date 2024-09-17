@@ -96,7 +96,7 @@ export const ChainSelector = () => {
                       'w-full p-4 text-left',
                       'font-geist font-body2-regular',
                       'transition-colors',
-                      ' hover:bg-dev-purple-200 dark:hover:bg-dev-purple-400/20',
+                      'hover:bg-dev-purple-200 dark:hover:bg-dev-purple-400/20',
                       {
                         ['text-dev-pink-500']: chainGroup === selectedChainGroup,
                       },
@@ -122,49 +122,44 @@ export const ChainSelector = () => {
           {
             filteredChains.length > 0
               ? (
-                <>
-                  <ul className={cn(
+                <ul
+                  className={cn(
                     'grid gap-2 [&>li]:h-[64px]',
                     'lg:grid-cols-4',
                     'md:grid-cols-2',
                     'grid-cols-1',
                   )}
-                  >
-                    {
-                      filteredChains.map(chain => {
-                        return (
-                          <li
-                            key={`chain-list-${chain.name}`}
+                >
+                  {
+                    filteredChains.map(chain => {
+                      return (
+                        <li key={`chain-list-${chain.name}`}>
+                          <button
+                            type="button"
+                            data-chain-id={chain.id}
+                            onClick={handleSetChain}
+                            className={cn(
+                              'flex w-full items-center gap-3 p-4',
+                              'transition-colors',
+                              'hover:bg-dev-purple-200 dark:hover:bg-dev-black-800',
+                            )}
                           >
-                            <button
-                              type="button"
-                              data-chain-id={chain.id}
-                              onClick={handleSetChain}
-                              className={cn(
-                                'flex w-full items-center gap-3 p-4',
-                                'transition-colors',
-                                'hover:bg-dev-purple-200 dark:hover:bg-dev-black-800',
-                              )}
-                            >
-                              <Icon
-                                name={chain.icon}
-                                size={[28]}
-                                className="shrink-0"
-                              />
-                              <span>
-                                {chain.name}
-                              </span>
-                            </button>
-                          </li>
-                        );
-                      })
-                    }
-                  </ul>
-                </>
+                            <Icon
+                              name={chain.icon}
+                              size={[28]}
+                              className="shrink-0"
+                            />
+                            <span>
+                              {chain.name}
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    })
+                  }
+                </ul>
               )
-              : (
-                <span className="my-5 flex flex-1 items-center justify-center">No Results</span>
-              )
+              : <span className="my-5 flex flex-1 items-center justify-center">No Results</span>
           }
         </div>
       </PDScrollArea>

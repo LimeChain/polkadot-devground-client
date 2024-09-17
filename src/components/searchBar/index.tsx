@@ -1,58 +1,63 @@
 import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import React, {
   useCallback,
-  useEffect,
   useRef,
   useState,
 } from 'react';
 
 import { Icon } from '@components/icon';
-import { ModalShowJson } from '@components/modals/modalShowJson';
+import { ModalJSONViewer } from '@components/modals/modalJSONViewer';
 import { useStoreChain } from '@stores';
 import {
   cn,
-  debounce,
   findBlockByNumber,
   findExtrinsicById,
   getBlockNumberByHash,
 } from '@utils/helpers';
+import { useDebounce } from '@utils/hooks/useDebounce';
+import { useOnClickOutside } from '@utils/hooks/useOnClickOutside';
 
-import { Results } from './Results';
+import { Results } from './results';
 
 import type { IMappedBlockExtrinsic } from '@custom-types/block';
-interface SearchBarProps {
+interface ISearchBarProps {
   label: string;
-  classNames?: string;
   type: 'all' | 'block' | 'extrinsics';
   onSearch?: (query: string) => void;
 }
 
-export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
+export const SearchBar = (props: ISearchBarProps) => {
+  const {
+    label,
+    type,
+  } = props;
+
+  const refContainer = useRef<HTMLDivElement>(null);
+  const refInput = useRef<HTMLInputElement>(null);
+  const refSelectedExtrinsic = useRef<IMappedBlockExtrinsic | undefined>();
+
   const blocksData = useStoreChain?.use?.blocksData?.();
-  const [searchInput, setSearchInput] = useState('');
-  const [isResultsVisible, setIsResultsVisible] = useState(false);
+
+  const [showResults, setShowResults] = useState(false);
+
   const [results, setResults] = useState({
     blockNumber: null,
     extrinsics: [] as IMappedBlockExtrinsic[],
   });
 
-  const refSelectedExtrinsic = useRef<IMappedBlockExtrinsic | undefined>();
-  const searchBarRef = useRef<HTMLDivElement>(null);
+  const [JSONViewerModal, toggleVisibility, isOpen] = useToggleVisibility(ModalJSONViewer);
 
-  const [ShowJsonModal, toggleVisibility] = useToggleVisibility(ModalShowJson);
+  const handleSearch = useCallback(() => {
+    let searchValue = refInput.current?.value || '';
 
-  const debounceSearch = debounce((props) => {
-    const e = props as React.ChangeEvent<HTMLInputElement>;
+    setShowResults(!!searchValue.length);
 
-    setSearchInput(e.target.value);
-    setIsResultsVisible(true);
-    let searchValue = e.target.value;
     const isHash = searchValue.startsWith('0x');
 
     if (isHash) {
       searchValue = getBlockNumberByHash(blocksData, searchValue);
     } else {
-      searchValue = searchValue.replace(/,/g, '');
+      searchValue = searchValue.replace(/[.,]/g, '');
     }
 
     const block = findBlockByNumber(blocksData, searchValue);
@@ -72,95 +77,91 @@ export const SearchBar = ({ label, classNames, type }: SearchBarProps) => {
       blockNumber: block?.header.number,
       extrinsics: block?.body?.extrinsics,
     });
-  }, 500);
+  }, [blocksData]);
 
-  const handleOpenModal = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const extrinsicId = e.currentTarget.getAttribute('data-extrinsic-id');
-    if (results.extrinsics) {
-      refSelectedExtrinsic.current = results.extrinsics.find(extrinsic => extrinsic.id === extrinsicId);
+  const debouncedHandleSearch = useDebounce(handleSearch, 40);
+
+  const handleShowResults = useCallback(() => {
+    if (refInput.current?.value) {
+      setShowResults(true);
     }
+  }, []);
+
+  const handleClickOutside = useCallback(() => {
+    if (!isOpen) {
+      setShowResults(false);
+    }
+  }, [isOpen]);
+
+  useOnClickOutside(refContainer, handleClickOutside);
+
+  const handleOpenModal = useCallback((e?: React.MouseEvent<HTMLDivElement>) => {
+    const extrinsicId = e?.currentTarget.getAttribute('data-extrinsic-id');
+    refSelectedExtrinsic.current = results.extrinsics?.find(extrinsic => extrinsic.id === extrinsicId);
+
     toggleVisibility();
   }, [results, toggleVisibility]);
 
-  const handleShowResults = useCallback(() => {
-    if (searchInput.length > 0) {
-      setIsResultsVisible(true);
-    }
-  }, [searchInput.length]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (searchBarRef.current && !searchBarRef.current.contains(event.target as Node)) {
-        setIsResultsVisible(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
   return (
-    <div ref={searchBarRef} className="w-[38rem]">
-      <div className={cn(
-        'flex items-center gap-4',
-        classNames,
-      )}
+    <div
+      ref={refContainer}
+      onClick={handleShowResults}
+      className="relative z-50 flex w-1/2 items-end gap-4"
+    >
+      <div
+        className={cn(
+          'flex w-full items-center gap-3 pl-3',
+          'h-12',
+          'border-b border-gray-300',
+          'dark:border-dev-purple-700 dark:bg-transparent',
+          'duration-300 ease-out hover:border-dev-pink-500',
+        )}
       >
-        <div
-          onClick={handleShowResults}
+        <Icon name="icon-search" />
+        <input
+          type="text"
+          ref={refInput}
+          placeholder={label}
+          onChange={debouncedHandleSearch}
           className={cn(
-            'flex w-full items-center gap-1 p-3',
-            'border-b border-gray-300',
-            'dark:border-dev-purple-700 dark:bg-transparent',
-            'duration-300 ease-out hover:border-dev-pink-500',
+            'w-full bg-transparent',
+            'caret-dev-pink-500 focus-visible:outline-none',
+            'placeholder:font-geist placeholder:font-body2-regular dark:placeholder-dev-purple-300',
           )}
-        >
-          <Icon name="icon-search" />
-          <input
-            type="text"
-            placeholder={label}
-            onChange={debounceSearch}
-            className={cn(
-              'w-full bg-transparent',
-              'caret-dev-pink-500 focus-visible:outline-none',
-              'placeholder:font-geist placeholder:font-body2-regular dark:placeholder-dev-purple-300',
-            )}
-          />
-        </div>
-        <button
-          onClick={handleShowResults}
-          className={cn(
-            'px-6 py-2',
-            'bg-dev-purple-700 text-dev-purple-300',
-            'transition-all duration-300 hover:bg-dev-purple-900',
-            'dark:bg-dev-purple-50 dark:text-dev-black-1000 dark:hover:bg-dev-purple-200',
-          )}
-        >
-          <span className="font-geist font-body2-bold">Search</span>
-        </button>
+        />
       </div>
+      <button
+        onClick={handleShowResults}
+        disabled={!refInput.current?.value}
+        className={cn(
+          'px-6',
+          'h-10',
+          'bg-dev-purple-700 text-dev-purple-300',
+          'font-geist font-body2-bold',
+          'transition-all duration-300 hover:bg-dev-purple-900',
+          'dark:bg-dev-purple-50 dark:text-dev-black-1000 dark:hover:bg-dev-purple-200',
+          'disabled:cursor-not-allowed disabled:opacity-50',
+        )}
+      >
+        Search
+      </button>
+
       <Results
+        type={type}
         results={results}
         handleOpenModal={handleOpenModal}
-        type={type}
         classNames={cn(
           'opacity-0 transition-all duration-300',
           {
-            'opacity-100 translate-y-0 pointer-events-auto': isResultsVisible,
-          })
-        }
+            ['opacity-100 translate-y-2 pointer-events-auto']: showResults,
+          },
+        )}
       />
 
-      {
-        refSelectedExtrinsic.current && (
-          <ShowJsonModal
-            onClose={toggleVisibility}
-            extrinsic={refSelectedExtrinsic.current}
-          />
-        )
-      }
+      <JSONViewerModal
+        onClose={toggleVisibility}
+        extrinsic={refSelectedExtrinsic.current}
+      />
     </div>
   );
 };

@@ -29,8 +29,8 @@ export default {
         'width': 'width',
       },
       gridTemplateRows: {
-        'layout': '64px 1fr fit-content(100%)',
-        'code-layout': '64px 1fr',
+        'layout': '4rem 1fr fit-content(100%)',
+        'code-layout': '4rem 1fr',
       },
       gridTemplateColumns: {
         'chainSelect': '276fr 708fr',
@@ -109,6 +109,9 @@ export default {
       fontFamily: {
         popins: ['"Poppins"', ...defaultTheme.fontFamily.sans],
         geist: ['"Geist"', ...defaultTheme.fontFamily.sans],
+      },
+      zIndex: {
+        100: '100',
       },
     },
   },

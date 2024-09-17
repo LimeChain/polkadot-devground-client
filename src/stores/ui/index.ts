@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 import { createSelectors } from '../createSelectors';
+import { sizeMiddleware } from '../sizeMiddleware';
 
 import {
   type ColorScheme,
@@ -20,7 +21,7 @@ const initialState = {
   theme: preferedTheme(),
 };
 
-const baseStore = create<StoreInterface>()((set, get) => ({
+const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('ui', (set, get) => ({
   ...initialState,
   actions: {
     resetStore: () => {
@@ -39,7 +40,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
     window.localStorage.setItem(LOCAL_STORAGE_THEME_KEY, theme);
     set({ theme });
   },
-}));
+})));
 
 export const baseStoreUI = baseStore;
 export const useStoreUI = createSelectors(baseStore);

@@ -1,7 +1,7 @@
 /* eslint-disable import/default */
-import Snippet1Code from './snippet1?raw';
-import Snippet2Code from './snippet2?raw';
-import Snippet3Code from './snippet3?raw';
+import Snippet1Code from './snippet1.txt?raw';
+import Snippet2Code from './snippet2.txt?raw';
+import Snippet3Code from './snippet3.txt?raw';
 
 import type { ICodeSnippet } from '@custom-types/codeSnippet';
 // type ChainClient = 'polkadot' | 'rococo';

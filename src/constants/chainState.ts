@@ -1,10 +1,4 @@
-import type { TChainSubscription } from '@components/chainStateBlock';
-
-export const chainStateBlockData: {
-  [key in TChainSubscription]: {
-    name: string;
-    icon: `icon-${string}`;
-  } } = {
+export const chainStateBlockData = {
   'bestBlock': {
     name: 'Latest Block',
     icon: 'icon-newBlock',

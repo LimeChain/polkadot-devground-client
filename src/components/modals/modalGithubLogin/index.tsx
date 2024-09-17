@@ -24,7 +24,7 @@ export const ModalGithubLogin = ({ onClose }: IModalGithubLogin) => {
     >
       <h5 className="self-start font-h5-bold">Log in</h5>
       <Icon
-        name="icon-github"
+        name="logo-github"
         size={[96]}
         className={cn(
           'self-center text-dev-white-1000',
@@ -41,7 +41,7 @@ export const ModalGithubLogin = ({ onClose }: IModalGithubLogin) => {
           className={cn(
             'mb-2 mt-6 p-4 transition-colors',
             'font-geist text-white font-body2-bold',
-            'bg-dev-pink-500 ',
+            'bg-dev-pink-500',
             'hover:bg-dev-pink-400',
           )}
         >

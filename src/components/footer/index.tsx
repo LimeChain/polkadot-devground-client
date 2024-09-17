@@ -25,7 +25,7 @@ export const Footer = () => {
       >
         <span className="font-body2-regular">Made by</span>
         <Icon
-          name="icon-limeChain"
+          name="logo-limeChain"
           size={[94, 28]}
         />
       </PDLink>
@@ -45,4 +45,4 @@ export const Footer = () => {
   );
 };
 
-export default Footer;
+Footer.displayName = 'Footer';

@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 import {
+  type ChangeEvent,
   useCallback,
   useEffect,
   useState,
@@ -36,7 +37,7 @@ const BlockDetails = () => {
   const [isFinalized, setIsFinalized] = useState<boolean>(false);
   const blocksData = useStoreChain?.use?.blocksData?.();
 
-  const handleSetCheck = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSetCheck = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const target = e.currentTarget.parentNode as HTMLDivElement;
     const format = target.getAttribute('data-format');
     target.setAttribute('data-format', format === 'utc' ? 'local' : 'utc');
@@ -73,7 +74,7 @@ const BlockDetails = () => {
   }, [latestFinalizedBlock, blockData]);
 
   if (!blockData) {
-    return <>loading</>;
+    return 'Loading...';
   }
 
   return (

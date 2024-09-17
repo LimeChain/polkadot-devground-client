@@ -19,13 +19,7 @@ export const NavigationItem = ({
   linkProps,
   type,
 }: TNavItem) => {
-  return (
-    <>
-      {
-        type === 'link'
-          ? <NavigationLink {...linkProps} />
-          : <NavigationDropdown {...linkProps} />
-      }
-    </>
-  );
+  return type === 'link'
+    ? <NavigationLink {...linkProps} />
+    : <NavigationDropdown {...linkProps} />;
 };

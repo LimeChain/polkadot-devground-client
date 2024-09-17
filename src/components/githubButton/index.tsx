@@ -27,7 +27,7 @@ export const GithubButton = () => {
           'font-geist font-body1-bold',
         )}
       >
-        <Icon name="icon-github" />
+        <Icon name="logo-github" />
         {
           isAuthenticated
             ? 'Logout'

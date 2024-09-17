@@ -1,6 +1,6 @@
 import { useStoreChain } from '@stores';
 
-import { CodecParam } from './CodecParam';
+import { CodecParam } from './codecParam';
 
 import type {
   TMetaDataCallParam,
@@ -17,7 +17,6 @@ export interface ICallParam extends ICallArgs {
 }
 
 export function CallParam({ param, onChange }: ICallParam) {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
   const lookup = useStoreChain?.use?.lookup?.();
 
   if (!lookup) {
@@ -32,8 +31,7 @@ export function CallParam({ param, onChange }: ICallParam) {
     );
   }
 
-  const variable =
-    param.type === 'lookupEntry' ? lookup(param.value.id) : param;
+  const variable = param.type === 'lookupEntry' ? lookup(param.value.id) : param;
 
   return <CodecParam variable={variable} onChange={onChange} />;
 }

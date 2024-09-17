@@ -16,7 +16,7 @@ import {
   formatTokenValue,
 } from '@utils/helpers';
 
-export type TChainSubscription = keyof Pick<StoreInterface, 'bestBlock' | 'finalizedBlock' | 'totalIssuance' | 'totalStake' | 'blockTime'>;
+type TChainSubscription = keyof Pick<StoreInterface, 'bestBlock' | 'finalizedBlock' | 'totalIssuance' | 'totalStake' | 'blockTime'>;
 interface TChainStateBlockProps {
   type: TChainSubscription;
 }
