@@ -1,6 +1,7 @@
 import {
   type MouseEventHandler,
   type ReactElement,
+  type RefObject,
   useCallback,
   useEffect,
   useState,
@@ -14,7 +15,7 @@ type ChipProps = {
 };
 
 type TabsProps = {
-  refContainer?: React.RefObject<HTMLDivElement>;
+  refContainer?: RefObject<HTMLDivElement>;
   children?: ReactElement | (ReactElement | null)[];
   initialTab?: number;
   className?: string;

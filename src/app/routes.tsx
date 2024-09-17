@@ -13,10 +13,10 @@ const BlockDetails = lazy(() => import('../views/blockDetails'));
 const Explorer = lazy(() => import('../views/explorer'));
 const SignedExtrinsics = lazy(() => import('../views/signedExtrinsics'));
 const Forks = lazy(() => import('../views/forks'));
-const Extrinsics = lazy(() => import('../views/Extrinsics'));
-const ChainState = lazy(() => import('../views/ChainState'));
-const Constants = lazy(() => import('../views/Constants'));
-const RuntimeCalls = lazy(() => import('../views/RuntimeCalls'));
+const Extrinsics = lazy(() => import('../views/extrinsics'));
+const ChainState = lazy(() => import('../views/chainState'));
+const Constants = lazy(() => import('../views/constants'));
+const RuntimeCalls = lazy(() => import('../views/runtimeCalls'));
 
 export const routes = () => ([
   {

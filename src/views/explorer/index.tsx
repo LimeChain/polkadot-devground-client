@@ -3,13 +3,14 @@ import { cn } from '@utils/helpers';
 
 import { ChainDataList } from './components/chainDataList';
 import { ChainStateBlock } from './components/chainStateBlock';
-import { ExtrinsicsList } from './components/extrinsicsList';
-import { LatestBlocksList } from './components/latestBlocksList';
 
 const Explorer = () => {
   return (
     <div className="flex flex-col gap-12 overflow-hidden lg:h-full">
-      <SearchBar label="Search block/extrinsic" type="all" />
+      <SearchBar
+        type="all"
+        label="Search block/extrinsic"
+      />
 
       <div className={cn(
         'grid gap-4',
@@ -28,19 +29,13 @@ const Explorer = () => {
       <div className="flex size-full flex-col gap-8 overflow-hidden lg:flex-row">
         <ChainDataList
           title="Latest Blocks"
-          link="latest-blocks"
-          linkText="View All"
-        >
-          <LatestBlocksList />
-        </ChainDataList>
+          urlPath="latest-blocks"
+        />
 
         <ChainDataList
           title="Extrinsics"
-          link="extrinsics"
-          linkText="View All"
-        >
-          <ExtrinsicsList />
-        </ChainDataList>
+          urlPath="extrinsics"
+        />
       </div>
     </div>
   );

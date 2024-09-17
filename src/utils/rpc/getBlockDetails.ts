@@ -1,10 +1,3 @@
-import { Twox128 } from '@polkadot-api/substrate-bindings';
-import {
-  mergeUint8,
-  toHex,
-} from '@polkadot-api/utils';
-import { u32 } from 'scale-ts';
-
 import {
   baseStoreChain,
   type StoreInterface,
@@ -25,86 +18,9 @@ import {
 } from '@utils/papi';
 import { assert } from '@utils/papi/helpers';
 
-import type {
-  IBlock,
-  IBlockExtrinsic,
-  IMappedBlockExtrinsic,
-} from '@custom-types/block';
+import type { IMappedBlockExtrinsic } from '@custom-types/block';
 
-const textEncoder = new TextEncoder();
-export const getBlockDetails = async ({
-  rawClient,
-  blockNumber,
-  registry,
-}: {
-  rawClient: StoreInterface['rawClient'];
-  blockNumber: StoreInterface['bestBlock'];
-  registry: StoreInterface['registry'];
-}) => {
-
-  if (!rawClient) {
-    throw new Error('Raw Client is not defined');
-  }
-
-  if (!blockNumber) {
-    throw new Error('Block Number is not defined');
-  }
-
-  // Fetch block hash via blockNumbe
-  const blockHash: string = await rawClient.request('chain_getBlockHash', [blockNumber]);
-
-  // Fetch the block details using the block hash
-  const blockData: { block: IBlock } = await rawClient.request('chain_getBlock', [blockHash]);
-
-  // Initialize timestamp variable
-  let blockTimestamp: number | null = null;
-
-  // Decode extrinsics to find the timestamp
-  for (const extrinsicHex of blockData.block.extrinsics) {
-    const extrinsic = registry.createType('Extrinsic', extrinsicHex).toHuman() as unknown as IBlockExtrinsic;
-
-    const {
-      method: {
-        method,
-        section,
-        args,
-      },
-    } = extrinsic;
-
-    const isTimeStampExtrinsic = method === 'set' && section === 'timestamp';
-    if (isTimeStampExtrinsic) {
-      const _args = args as { now: string };
-      // turn the time string of type "1,451,313,413,21" into a number
-      blockTimestamp = formatPrettyNumberString(_args?.now);
-      // only the timestamp is needed so we break the loop
-      break;
-    }
-  }
-
-  // Get storage hash for pallet::System method::EventsCount
-  const systemHash = Twox128(textEncoder.encode('System'));
-  const eventCountHash = Twox128(textEncoder.encode('EventCount'));
-  const merged = mergeUint8(systemHash, eventCountHash);
-  const storageHash = toHex(merged);
-
-  const eventsCountHash: string = await rawClient.request(
-    'state_getStorage',
-    [storageHash, blockHash],
-  );
-
-  if (blockTimestamp === null) {
-    console.warn('Timestamp not found in the block extrinsics.');
-  }
-
-  return {
-    ...blockData.block,
-    hash: blockHash,
-    timestamp: blockTimestamp ? new Date(blockTimestamp) : null,
-    eventsCount: u32.dec(eventsCountHash),
-  };
-};
-
-export const getBlockValidator = async ({
+const getBlockValidator = async ({
   blockHash,
 }: {
   blockHash: string;

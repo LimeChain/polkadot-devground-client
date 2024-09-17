@@ -7,55 +7,56 @@ import {
 
 import { Icon } from '@components/icon';
 import { PDLink } from '@components/pdLink';
-import { PDScrollArea } from '@components/pdScrollArea';
 import { cn } from '@utils/helpers';
+import { smoothScroll } from '@views/forks/helpers';
 
-interface TChainDataList {
+import { ExtrinsicsList } from '../extrinsicsList';
+import { LatestBlocksList } from '../latestBlocksList';
+
+interface IChainDataList {
   title: string;
-  link: string;
-  linkText: string;
-  children: React.ReactNode;
+  urlPath: 'latest-blocks' | 'extrinsics';
 }
 
-export const ChainDataList = ({ title, link, linkText, children }: TChainDataList) => {
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const [isAtTop, setIsAtTop] = useState(true);
-  const [isAtBottom, setIsAtBottom] = useState(false);
+export const ChainDataList = (props: IChainDataList) => {
+  const {
+    title,
+    urlPath,
+  } = props;
+
+  const refScrollArea = useRef<HTMLDivElement>(null);
+
+  const [isAtStart, setIsAtStart] = useState(true);
 
   const scrollToBottom = useCallback(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTo({
-        top: scrollAreaRef.current.scrollHeight,
-        behavior: 'smooth',
-      });
+    if (refScrollArea.current) {
+      void smoothScroll(refScrollArea.current, 'top', refScrollArea.current.scrollHeight);
     }
-  }, [scrollAreaRef]);
+  }, [refScrollArea]);
 
   const scrollToTop = useCallback(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTo({
-        top: 0,
-        behavior: 'smooth',
-      });
+    if (refScrollArea.current) {
+      void smoothScroll(refScrollArea.current, 'top', 0);
     }
-  }, [scrollAreaRef]);
+  }, [refScrollArea]);
 
-  const handleScroll = () => {
-    if (scrollAreaRef.current) {
-      setIsAtTop(scrollAreaRef.current.scrollTop === 0);
-      setIsAtBottom(scrollAreaRef.current.scrollTop + scrollAreaRef.current.clientHeight === scrollAreaRef.current.scrollHeight);
+  const handleScroll = useCallback(() => {
+    if (refScrollArea.current) {
+      setIsAtStart(refScrollArea.current.scrollTop === 0);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    const scrollArea = scrollAreaRef.current;
+    const scrollArea = refScrollArea.current;
     if (scrollArea) {
       scrollArea.addEventListener('scroll', handleScroll);
       return () => {
         scrollArea.removeEventListener('scroll', handleScroll);
       };
     }
-  }, [scrollAreaRef]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="flex flex-1 flex-col gap-y-3 overflow-hidden">
@@ -63,31 +64,39 @@ export const ChainDataList = ({ title, link, linkText, children }: TChainDataLis
         <div className="flex items-center gap-3">
           <h5 className="font-h5-bold">{title}</h5>
           <PDLink
-            to={link}
+            to={urlPath}
             className={cn(
               'font-geist font-body2-regular',
               'text-dev-pink-500 transition-colors hover:text-dev-pink-400',
             )}
           >
-            {linkText}
+            View All
           </PDLink>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={scrollToTop}
-            disabled={isAtTop}
+            disabled={isAtStart}
             className={cn(
-              isAtTop ? 'text-dev-black-200' : 'cursor-pointer text-dev-pink-500',
+              'text-dev-black-200',
+              'transition-colors duration-300',
+              {
+                ['cursor-pointer text-dev-pink-500']: !isAtStart,
+              },
             )}
           >
             <Icon name="icon-arrowCircle" />
           </button>
           <button
             onClick={scrollToBottom}
-            disabled={isAtBottom}
+            disabled={!isAtStart}
             className={cn(
-              isAtBottom ? 'text-dev-black-200' : 'cursor-pointer text-dev-pink-500',
+              'text-dev-black-200',
+              'transition-colors duration-300',
+              {
+                ['cursor-pointer text-dev-pink-500']: isAtStart,
+              },
             )}
           >
             <Icon name="icon-arrowCircle" className="rotate-180" />
@@ -95,14 +104,8 @@ export const ChainDataList = ({ title, link, linkText, children }: TChainDataLis
         </div>
       </div>
 
-      <PDScrollArea
-        ref={scrollAreaRef}
-        className="h-80 lg:h-full"
-        viewportClassNames="py-3"
-        verticalScrollClassNames=""
-      >
-        {children}
-      </PDScrollArea>
+      {urlPath === 'latest-blocks' && <LatestBlocksList ref={refScrollArea} />}
+      {urlPath === 'extrinsics' && <ExtrinsicsList ref={refScrollArea} />}
     </div>
   );
 };

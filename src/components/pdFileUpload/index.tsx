@@ -1,6 +1,7 @@
 import { formatNumber } from '@polkadot/util';
 import { Binary } from 'polkadot-api';
 import {
+  type ChangeEvent,
   useCallback,
   useEffect,
   useRef,
@@ -14,12 +15,11 @@ import type { ICallArgs } from '@components/callParam';
 interface IPDFileUpload extends ICallArgs {}
 
 export const PDFileUpload = ({ onChange }: IPDFileUpload) => {
-
   const inputRef = useRef<HTMLLabelElement>(null);
   const inputId = crypto.randomUUID();
   const [fileUploaded, setFileUploaded] = useState<File | undefined>(undefined);
 
-  const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.item(0);
     if (file) {
       setFileUploaded(file);

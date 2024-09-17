@@ -33,17 +33,15 @@ const CodePreview = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [previewId]);
   return (
-    <>
-      <iframe
-        src={blobUrl}
-        className={cn(
-          'size-full flex-1 border-0',
-          {
-            ['hidden']: blobUrl === '',
-          },
-        )}
-      />
-    </>
+    <iframe
+      src={blobUrl}
+      className={cn(
+        'size-full flex-1 border-0',
+        {
+          ['hidden']: blobUrl === '',
+        },
+      )}
+    />
   );
 };
 

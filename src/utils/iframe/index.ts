@@ -6,7 +6,7 @@ import { transform } from 'sucrase';
 
 import iframe from './iframe.html?raw';
 
-export interface ImportMap {
+interface ImportMap {
   imports?: Record<string, string>;
   scopes?: Record<string, string>;
 }
@@ -59,7 +59,7 @@ export function mergeImportMap(...maps: ImportMap[]): ImportMap {
   return importMap;
 }
 
-export const compressCode = (code: string): string => {
+const compressCode = (code: string): string => {
   const compressed = deflate(new TextEncoder().encode(code));
   return window.btoa(String.fromCharCode(...compressed));
 };
@@ -71,11 +71,11 @@ export const encodeCodeToBase64 = (code: string): string => {
     .replace(/=+$/, '');
 };
 
-export const getIframeContent = (script: string, importMap: string) => {
+const getIframeContent = (script: string, importMap: string) => {
   return iframe.replace('<!-- IMPORT_MAP -->', importMap).replace('<!-- SCRIPT -->', script);
 };
 
-export const decompressCode = (compressed: string): string => {
+const decompressCode = (compressed: string): string => {
   const decoded = Uint8Array.from(atob(compressed), c => c.charCodeAt(0));
   const decompressed = inflate(decoded, { to: 'string' });
   return decompressed;
@@ -90,7 +90,7 @@ export const decodeCodeFromBase64 = (base64: string): string | undefined => {
   }
 };
 
-export const removeNamedImports = (code: string, namedImportsToRemove: string[]): string => {
+const removeNamedImports = (code: string, namedImportsToRemove: string[]): string => {
   // Regular expression to find import statements
   const importRegex = /^import\s*{([^}]*)}\s*from\s*['"]([^'"]*)['"]\s*;?$/gm;
 

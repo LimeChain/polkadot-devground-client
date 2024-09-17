@@ -10,15 +10,16 @@ import { useStoreChain } from '@stores';
 import { groupData } from './helpers';
 import { VirtualizedList } from './virtualizedList';
 
-import type { BlockItem } from './forks';
+import type { IBlockItem } from '@custom-types/block';
+import type { Subscription } from 'rxjs';
 
 const Forks = () => {
   const chain = useStoreChain?.use?.chain?.();
   const client = useStoreChain?.use?.client?.();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const refSubscription = useRef<any>();
 
-  const [items, setItems] = useState<Record<string, BlockItem[]>>({});
+  const refSubscription = useRef<Subscription | null>(null);
+
+  const [items, setItems] = useState<Record<string, IBlockItem[]>>({});
 
   const resetState = useCallback(() => {
     refSubscription.current?.unsubscribe?.();
@@ -100,17 +101,9 @@ const Forks = () => {
       resetState();
     };
 
-  }, [
-    client,
-    chain,
-    resetState,
-  ]);
+  }, [client, chain, resetState]);
 
-  return (
-    <VirtualizedList
-      items={items}
-    />
-  );
+  return <VirtualizedList items={items} />;
 };
 
 export default Forks;

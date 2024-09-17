@@ -7,7 +7,7 @@ export const Logo = () => {
       to="/"
       className="-mt-2 text-current hover:text-current"
     >
-      <Icon name="logo-polkadot" size={[128, 40]} />
+      <Icon name="logo-devground" size={[128, 40]} />
     </PDLink>
   );
 };

@@ -56,7 +56,6 @@ export default defineConfig(({ mode }) => {
         ],
       }),
       isVisualizer && visualizer({ filename: './dist/stats.html', open: false }),
-
     ],
     build: {
       rollupOptions: {

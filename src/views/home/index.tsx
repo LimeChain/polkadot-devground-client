@@ -53,7 +53,7 @@ const Home = () => {
               )}
             />
             <Icon
-              name="icon-github"
+              name="logo-github"
               className="mb-8 text-dev-pink-500"
               size={[40]}
             />

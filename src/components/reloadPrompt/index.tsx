@@ -2,7 +2,7 @@ import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import { useEffect } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
-import { ModalReloadPrompt } from './ModalReloadPrompt';
+import { ModalReloadPrompt } from './modalReloadPrompt';
 
 export const ReloadPrompt = () => {
   const {

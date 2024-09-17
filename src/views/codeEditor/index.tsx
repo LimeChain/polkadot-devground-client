@@ -70,9 +70,9 @@ const TypeScriptEditor = () => {
   }, []);
 
   return (
-    <div className="max-w-screen flex h-full flex-col overflow-hidden px-8 pt-8">
+    <div className="max-w-screen flex h-full flex-col gap-y-4 overflow-hidden px-8 pb-4 pt-8">
       <SnippetsSwitcher />
-      <div className="relative flex flex-1 pb-4">
+      <div className="relative flex flex-1">
         <PanelGroup
           autoSaveId="persistence"
           direction="horizontal"
@@ -114,7 +114,7 @@ const TypeScriptEditor = () => {
                 data-title="Read me"
                 className="flex h-full p-4 dark:bg-dev-black-800"
               >
-                <>Readme.md</>
+                Readme.md
               </div>
             </Tabs>
           </Panel>

@@ -3,6 +3,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { format } from 'date-fns';
 import { highlightAllUnder } from 'prismjs';
 import {
+  type UIEvent,
   useCallback,
   useEffect,
   useRef,
@@ -71,7 +72,7 @@ export const Console = () => {
     setMessages([]);
   });
 
-  const handleOnScroll = useCallback((event: React.UIEvent<HTMLDivElement>) => {
+  const handleOnScroll = useCallback((event: UIEvent<HTMLDivElement>) => {
     if (event.currentTarget.scrollTop + event.currentTarget.clientHeight >= event.currentTarget.scrollHeight) {
       refIsUserScrolling.current = false;
     } else {

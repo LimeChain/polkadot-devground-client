@@ -1,8 +1,3 @@
-export interface IArrowPoints {
-  startPoint: ITPoint;
-  endPoint: ITPoint;
-}
-
 export interface ITPoint {
   x: number;
   y: number;
@@ -36,7 +31,7 @@ export const calculateCanvasDimensions = ({
   canvasHeight: absDy + 2 * boundingBoxBuffer.vertical,
 });
 
-export interface ICalculateControlPoints {
+interface ICalculateControlPoints {
   absDx: number;
   absDy: number;
   curveRadius: number; // New property to control the radius

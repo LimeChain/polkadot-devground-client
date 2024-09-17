@@ -2,16 +2,12 @@ import {
   type Binary,
   CompatibilityLevel,
   type FixedSizeBinary,
-  type PolkadotClient,
   type SS58String,
   type TypedApi,
 } from 'polkadot-api';
 import { type Client } from 'polkadot-api/smoldot';
 
-import {
-  CHAIN_DESCRIPTORS,
-  CHAIN_SPECS,
-} from '@constants/chain';
+import { CHAIN_SPECS } from '@constants/chain';
 
 import {
   assert,
@@ -27,8 +23,6 @@ import type {
   TRelayChainDecsriptor,
   TSmoldotChain,
   TStakingApi,
-  TSupportedParaChain,
-  TSupportedRelayChain,
 } from '@custom-types/chain';
 
 export const initSmoldotChains = async ({
@@ -109,10 +103,6 @@ export const initSmoldotChains = async ({
     peopleChain,
     stakingChain,
   };
-};
-
-export const getChainSpecData = (client: PolkadotClient, chainId: TSupportedParaChain | TSupportedRelayChain) => {
-  return client.getTypedApi(CHAIN_DESCRIPTORS[chainId]);
 };
 
 export const getMetadata = async (api: TApi) => {

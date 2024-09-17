@@ -41,6 +41,7 @@ import { assert } from '@utils/papi/helpers';
 import { getBlockDetailsWithPAPI } from '@utils/rpc/getBlockDetails';
 
 import { createSelectors } from '../createSelectors';
+import { sizeMiddleware } from '../sizeMiddleware';
 
 import type {
   IRuntime,
@@ -114,7 +115,7 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   lookup: null,
 };
 
-const baseStore = create<StoreInterface>()((set, get) => ({
+const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain', (set, get) => ({
   ...initialState,
   actions: {
     resetStore: async () => {
@@ -281,7 +282,6 @@ const baseStore = create<StoreInterface>()((set, get) => ({
               }
             });
             set({ bestBlock: bestBlock?.number, finalizedBlock: finalizedBlock?.number });
-
           })
             // prevent state crash on random smoldot error
             .catch(err => {
@@ -311,7 +311,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
       console.error(err);
     }
   },
-}));
+})));
 
 export const baseStoreChain = baseStore;
 export const useStoreChain = createSelectors(baseStore);

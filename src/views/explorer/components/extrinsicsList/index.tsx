@@ -1,5 +1,5 @@
 import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
-import { formatDistanceToNowStrict } from 'date-fns';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import {
   useCallback,
   useEffect,
@@ -7,22 +7,29 @@ import {
   useState,
 } from 'react';
 
-import { Icon } from '@components/icon';
-import { ModalShowJson } from '@components/modals/modalShowJson';
+import { ModalJSONViewer } from '@components/modals/modalJSONViewer';
+import { PDScrollArea } from '@components/pdScrollArea';
 import { useStoreChain } from '@stores';
+import { polymorphicComponent } from '@utils/components';
 import { cn } from '@utils/helpers';
+import { useMergedRefs } from '@utils/hooks/useMergedRefs';
 
-import styles from '../../styles.module.css';
+import styles from '../styles.module.css';
+
+import { Row } from './row';
 
 import type { IMappedBlockExtrinsic } from '@custom-types/block';
 
-export const ExtrinsicsList = () => {
+export const ExtrinsicsList = polymorphicComponent<'div'>((_props, ref) => {
+  const refScrollArea = useRef<HTMLDivElement>(null);
+  const refs = useMergedRefs(ref, refScrollArea);
+
   const refSelectedExtrinsic = useRef<IMappedBlockExtrinsic | undefined>();
 
   const blocksData = useStoreChain?.use?.blocksData?.();
-  const chain = useStoreChain?.use?.chain?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
-  const [ShowJsonModal, toggleVisibility] = useToggleVisibility(ModalShowJson);
+
+  const [JSONViewerModal, toggleVisibility] = useToggleVisibility(ModalJSONViewer);
 
   const [signedExtrinsics, setSignedExtrinsics] = useState<IMappedBlockExtrinsic[]>([]);
 
@@ -40,69 +47,59 @@ export const ExtrinsicsList = () => {
     setSignedExtrinsics(extrinsics);
   }, [blocksData, latestBlock]);
 
+  const rowVirtualizer = useVirtualizer({
+    count: signedExtrinsics.length,
+    getScrollElement: () => refScrollArea?.current,
+    estimateSize: () => 64,
+    overscan: 5,
+  });
+
   return (
     <>
-      {
-        signedExtrinsics.map((extrinsic, extrinsicIndex) => (
-          <div
-            key={`latest-signed-extrinsic-${extrinsic.id}-${chain.id}`}
-            data-extrinsic-id={extrinsic.id}
-            className={cn(
-              styles['pd-explorer-list'],
-              {
-                ['opacity-0 animate-fade-in']: extrinsicIndex === 0,
-              },
-            )}
-            onClick={handleOpenModal}
-          >
-            <div>
-              <span>
-                <span className="text-dev-black-300 dark:text-dev-purple-300">
-                  Extrinsic#
-                </span>
-                <strong className="font-body1-bold">
-                  {' '}{extrinsic.id}
-                </strong>
-              </span>
-              <span className="flex items-center">
-                {
-                  extrinsic.isSuccess
-                    ? (
-                      <Icon
-                        size={[16]}
-                        name="icon-checked"
-                        className="text-dev-green-600"
-                      />
-                    )
-                    : (
-                      <Icon
-                        size={[16]}
-                        name="icon-failed"
-                        className="text-dev-red-800"
-                      />
-                    )
-                }
-              </span>
-            </div>
-            <div>
-              <span>
-                <span className="text-dev-black-300 dark:text-dev-purple-300">Action: </span>
-                {extrinsic.method.section}.{extrinsic.method.method}
-              </span>
-              <span>
-                {formatDistanceToNowStrict(extrinsic.timestamp, { addSuffix: true })}
-              </span>
-            </div>
-          </div>
-        ))
-      }
-      {
-        !latestBlock
-          && 'Loading...'
-      }
+      <PDScrollArea
+        ref={refs}
+        className="h-80 lg:h-full"
+        viewportClassNames="pr-3"
+      >
+        <div
+          className="relative"
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+          }}
+        >
+          {
+            (!!signedExtrinsics.length)
+              ? (
+                rowVirtualizer.getVirtualItems().map((virtualRow, virtualIndex) => {
+                  const extrinsic = signedExtrinsics[virtualRow.index];
+                  return (
+                    <Row
+                      key={virtualIndex}
+                      handleOpenModal={handleOpenModal}
+                      extrinsicId={extrinsic.id}
+                      action={`${extrinsic.method.section}.${extrinsic.method.method}`}
+                      isSuccess={extrinsic.isSuccess}
+                      timestamp={extrinsic.timestamp}
+                      className={cn(
+                        styles['pd-explorer-list'],
+                        {
+                          ['opacity-0 animate-fade-in animation-duration-500']: virtualRow.index === 0,
+                        },
+                      )}
+                      style={{
+                        transform: `translateY(${virtualRow.start}px)`,
+                      }}
+                    />
+                  );
+                })
+              )
+              : 'Loading...'
+          }
+        </div>
+      </PDScrollArea>
       {
         refSelectedExtrinsic.current && (
-          <ShowJsonModal
+          <JSONViewerModal
             onClose={toggleVisibility}
             extrinsic={refSelectedExtrinsic.current}
           />
@@ -110,4 +107,6 @@ export const ExtrinsicsList = () => {
       }
     </>
   );
-};
+});
+
+ExtrinsicsList.displayName = 'ExtrinsicsList';

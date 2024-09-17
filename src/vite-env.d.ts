@@ -8,6 +8,7 @@ import type { PolkadotClient } from 'polkadot-api';
 declare global {
   interface Window {
     pivanov?: unknown; // for testing purposes
+    PDStoreSizes: Record<string, number>;
     papiDescriptors: typeof papiDescriptors;
     pdCreateClient: (provider: JsonRpcProvider) => PolkadotClient;
     customPackages: Record<string, unknown>;

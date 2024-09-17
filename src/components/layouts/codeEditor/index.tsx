@@ -6,7 +6,7 @@ import { Header } from '@components/header';
 export const LayoutCodeEditor = () => {
   return (
     <Suspense>
-      <div className="grid min-h-screen w-full grid-rows-code-layout">
+      <div className="grid max-h-screen min-h-screen w-full grid-rows-code-layout overflow-hidden">
         <Header />
         <Outlet />
       </div>

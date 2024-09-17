@@ -1,6 +1,8 @@
+import { busDispatch } from '@pivanov/event-bus';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import {
   Fragment,
+  useCallback,
   useEffect,
   useRef,
 } from 'react';
@@ -14,10 +16,11 @@ import { cn } from '@utils/helpers';
 import { CurvedLineWithArrow } from './curvedLineWithArrow';
 import { ScrollButtons } from './scrollButtons';
 
-import type { BlockItem } from './forks';
+import type { IBlockItem } from '@custom-types/block';
+import type { IEventBusForksReceiveUpdate } from '@custom-types/eventBus';
 
 interface IVirtualizedListProps {
-  items: Record<string, BlockItem[]>;
+  items: Record<string, IBlockItem[]>;
 }
 
 // 64 is the height of each block item
@@ -26,12 +29,14 @@ interface IVirtualizedListProps {
 const arrowOffset = 160;
 
 export const VirtualizedList = (props: IVirtualizedListProps) => {
+
   const { items } = props;
   const blockNumbers = Object.keys(items);
 
+  const refTimeout = useRef<NodeJS.Timeout>();
   const refScrollArea = useRef<HTMLDivElement>(null);
   const refContent = useRef<HTMLDivElement>(null);
-  const refScrollable = useRef<HTMLDivElement>(null);
+  const refExtraElementWidth = useRef(0);
 
   const refLatestBlockHash = useRef<string>();
 
@@ -45,6 +50,7 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
       // 40 is the fixed width of the item
       // 96 is the left padding of the item when there are more than 1 item
       const paddingLeft = item.length > 1 ? 96 : 40;
+      refExtraElementWidth.current = 240 + paddingLeft;
 
       // Fixed width + dynamic padding
       return 240 + paddingLeft;
@@ -62,36 +68,67 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
     };
   }, []);
 
+  const handleScroll = useCallback(() => {
+    clearTimeout(refTimeout.current);
+
+    refTimeout.current = setTimeout(() => {
+      if (refScrollArea.current) {
+        const {
+          scrollLeft,
+          scrollWidth,
+          clientWidth,
+        } = refScrollArea.current;
+
+        const canGoToStart = scrollLeft > 0 && scrollWidth > clientWidth;
+        const canGoToEnd = scrollWidth - clientWidth >= scrollLeft + refExtraElementWidth.current;
+        const keepScrollToEnd = scrollWidth - clientWidth === scrollLeft + refExtraElementWidth.current;
+
+        busDispatch<IEventBusForksReceiveUpdate>({
+          type: '@@-forks-receive-update',
+          data: {
+            canGoToStart,
+            canGoToEnd,
+            keepScrollToEnd,
+          },
+        });
+      }
+    }, 40);
+  }, []);
+
+  useEffect(() => {
+    handleScroll();
+
+    return () => {
+      clearTimeout(refTimeout.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items]);
+
   return (
-    <>
+    <div className="flex h-full flex-col">
       <div className="flex justify-between">
         <PageHeader title="Forks" />
-        <ScrollButtons scrollAreaRef={refScrollArea} blockNumbers={blockNumbers}/>
+        <ScrollButtons refScrollArea={refScrollArea} />
       </div>
       <PDScrollArea
         type="always"
         ref={refScrollArea}
-        className="w-full"
+        onScroll={handleScroll}
         viewportClassNames={cn(
           'mask-horizontal-and-vertical',
           'px-8 py-20',
           'font-geist text-dev-purple-50 font-body2-regular',
-          'transition-none',
         )}
       >
         <div
           ref={refContent}
-          className="pivanov relative h-full"
+          className="relative py-20"
           style={{
             height: 'var(--min-height, auto)',
             width: `${rowVirtualizer.getTotalSize()}px`,
           }}
         >
-          <div
-          // key={refKey.current}
-            ref={refScrollable}
-            className="relative"
-          >
+          <div className="relative">
             {
               rowVirtualizer.getVirtualItems().map((virtualCol, virtualIndex) => {
                 const blockNumber = blockNumbers[virtualCol.index];
@@ -131,7 +168,7 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
                                   },
                                 )}
                                 startPoint={{
-                                // related to the padding above
+                                  // related to the padding above
                                   x: (blockItems.length > 1 ? -96 : -40),
                                   y: 0,
                                 }}
@@ -206,7 +243,6 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
                                 )
                               }
                             </CopyToClipboard>
-                            {/* <div className="truncate">Hash: {item.blockHash}</div> */}
                           </div>
                         </Fragment>
                       ))
@@ -218,6 +254,6 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
           </div>
         </div>
       </PDScrollArea>
-    </>
+    </div>
   );
 };

@@ -12,10 +12,11 @@
     "add-rococo-people": "npx papi add rococo_people -n rococo_v2_2_people",
     "add-descriptors": "npm run add-polkadot && npm run add-polkadot-people && npm run add-rococo && npm run add-rococo-people",
     "remove-descriptors": "rm -rf node_modules .papi",
-    "lint": "eslint . --ext .ts,.tsx",
+    "lint": "npm run tsc && eslint . --ext .ts,.tsx --no-cache",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "preview": "vite preview",
-    "start": "vite"
+    "start": "vite",
+    "tsc": "tsc --noEmit"
   },
   "dependencies": {
     "@pivanov/event-bus": "1.0.0",
@@ -37,7 +38,6 @@
     "date-fns": "^3.6.0",
     "file-saver": "2.0.5",
     "jszip": "3.10.1",
-    "lodash.debounce": "4.0.8",
     "monaco-editor": "0.50.0",
     "nanoid": "5.0.7",
     "pako": "2.1.0",
@@ -64,7 +64,6 @@
   },
   "devDependencies": {
     "@types/file-saver": "2.0.7",
-    "@types/lodash.debounce": "4.0.9",
     "@types/pako": "2.0.3",
     "@types/prismjs": "1.26.4",
     "@types/react": "18.3.3",

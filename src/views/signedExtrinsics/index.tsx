@@ -8,7 +8,7 @@ import {
 } from 'react';
 
 import { Icon } from '@components/icon';
-import { ModalShowJson } from '@components/modals/modalShowJson';
+import { ModalJSONViewer } from '@components/modals/modalJSONViewer';
 import { PageHeader } from '@components/pageHeader';
 import { PDScrollArea } from '@components/pdScrollArea';
 import { SearchBar } from '@components/searchBar';
@@ -26,7 +26,7 @@ const SignedExtrinsics = () => {
 
   const blocksData = useStoreChain?.use?.blocksData?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
-  const [ShowJsonModal, toggleVisibility] = useToggleVisibility(ModalShowJson);
+  const [JSONViewerModal, toggleVisibility] = useToggleVisibility(ModalJSONViewer);
 
   const [signedExtrinsics, setSignedExtrinsics] = useState<IMappedBlockExtrinsic[]>([]);
   const isLoading = blocksData.size === 0;
@@ -48,7 +48,10 @@ const SignedExtrinsics = () => {
   return (
     <div className="grid h-full grid-rows-[40px_46px_1fr] gap-8">
       <PageHeader title="Extrinsics" />
-      <SearchBar label="Search by Block" type="extrinsics"/>
+      <SearchBar
+        type="extrinsics"
+        label="Search by Block"
+      />
       <PDScrollArea
         className="h-full"
         verticalScrollClassNames="pt-8"
@@ -96,7 +99,7 @@ const SignedExtrinsics = () => {
                     >
                       <td>{extrinsic.id}</td>
                       <td>{extrinsic.blockNumber}</td>
-                      <td>{truncateAddress(extrinsic.signer.Id, 6)}</td>
+                      <td>{truncateAddress(extrinsic.signer?.Id, 6)}</td>
                       <td>{timeAgo}</td>
                       <td>{
                         extrinsic.isSuccess
@@ -133,7 +136,7 @@ const SignedExtrinsics = () => {
 
       {
         refSelectedExtrinsic.current && (
-          <ShowJsonModal
+          <JSONViewerModal
             onClose={toggleVisibility}
             extrinsic={refSelectedExtrinsic.current}
           />

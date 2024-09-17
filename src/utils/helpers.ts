@@ -123,18 +123,24 @@ export const formatTokenValue = (
   return (value / 10 ** tokenDecimals).toFixed(precision);
 };
 
+// @TODO: fix types
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const findBlockByNumber = (blocksData: Map<number, any>, value: string) => {
   return Array.from(blocksData.values()).find(
     (block) => block.header.number === Number(value),
   );
 };
 
+// @TODO: fix types
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const findExtrinsicById = (blocksData: Map<number, any>, value: string) => {
   return Array.from(blocksData.values())
     .flatMap((block) => block?.body?.extrinsics ?? [])
     .find((extrinsic) => extrinsic.id === value);
 };
 
+// @TODO: fix types
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getBlockNumberByHash = (blocksData: Map<number, any>, hash: string): any => {
   const block = Array.from(blocksData.values()).find(
     (block) => block.header.hash === hash,

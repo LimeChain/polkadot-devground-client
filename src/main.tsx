@@ -8,6 +8,7 @@ import { Toaster } from 'react-hot-toast';
 
 import { ReactPortal } from '@components/reactPortal';
 import { ReloadPrompt } from '@components/reloadPrompt';
+import { StoreSizeViewer } from '@components/storeSizeViewer';
 
 import { App } from './app';
 
@@ -22,6 +23,7 @@ createRoot(document.getElementById('pd-root')!).render(
   <HelmetProvider>
     <Helmet defaultTitle="Polkadot Devground" titleTemplate="%s - Polkadot Devground" />
     <App />
+    <StoreSizeViewer />
     <ReactPortal id="pd-extras">
       <Toaster
         toastOptions={{

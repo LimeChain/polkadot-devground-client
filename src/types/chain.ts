@@ -22,35 +22,35 @@ export type TSupportedChains = {
   [key in TSupportedChain]: TChain
 };
 
+type TSupportedStakingChain = 'polkadot';
 export type TSupportedRelayChain = 'polkadot' | 'rococo';
-export type TSupportedStakingChain = 'polkadot';
 export type TSupportedParaChain = 'polkadot-people' | 'rococo-people';
 export type TSupportedChain = TSupportedRelayChain | TSupportedParaChain;
 
 export type TRelayChainDecsriptor = typeof dot | typeof rococo;
 export type TStakingChainDecsriptor = typeof dot;
 export type TParaChainDecsriptor = typeof dotpeople | typeof rococo_people;
-export type TChainDescriptor = TRelayChainDecsriptor | TParaChainDecsriptor;
 
-export type TApi = TypedApi<TChainDescriptor>;
+export type TApi = TypedApi<TRelayChainDecsriptor | TParaChainDecsriptor>;
 export type TPeopleApi = TypedApi<TParaChainDecsriptor>;
 export type TRelayApi = TypedApi<TRelayChainDecsriptor>;
 export type TStakingApi = TypedApi<TStakingChainDecsriptor>;
 
 export type TChain = TRelayChain | TParaChain;
-export type TRelayChain = TChainBase & TStakingChain & {
+type TRelayChain = TChainBase & TStakingChain & {
   isRelayChain: true;
   isParaChain?: false;
   peopleChainId: TSupportedParaChain;
 };
-export type TParaChain = TChainBase & TStakingChain & {
+
+type TParaChain = TChainBase & TStakingChain & {
   isParaChain: true;
   isRelayChain?: false;
   relayChainId: TSupportedRelayChain;
   peopleChainId: TSupportedParaChain;
 };
 
-export type TStakingChain = {
+type TStakingChain = {
   hasStaking: true;
   stakingChainId: TSupportedStakingChain;
 } | {

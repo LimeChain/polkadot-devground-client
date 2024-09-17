@@ -2,7 +2,6 @@ import JsonView from 'react18-json-view';
 import 'react18-json-view/src/style.css';
 
 import { PDScrollArea } from '@components/pdScrollArea';
-import { useStoreUI } from '@stores';
 
 interface IJsonViewer {
   json: object;
@@ -10,7 +9,6 @@ interface IJsonViewer {
 
 export const JsonViewer = (props: IJsonViewer) => {
   const { json } = props;
-  const theme = useStoreUI.use.theme?.();
 
   return (
     <PDScrollArea className="h-[30rem]">

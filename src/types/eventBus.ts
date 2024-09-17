@@ -5,6 +5,10 @@ import type {
 } from './global';
 import type * as monaco from 'monaco-editor';
 
+export interface IEventBusStoreSize {
+  type: '@@-store-size';
+}
+
 export interface IEventBusMonacoEditorShowPreview {
   type: '@@-monaco-editor-show-preview';
   data: boolean;
@@ -55,4 +59,13 @@ export interface IEventBusSetChain {
 export interface IEventBusSearchChain {
   type: '@@-search-chain';
   data: string;
+}
+
+export interface IEventBusForksReceiveUpdate {
+  type: '@@-forks-receive-update';
+  data: {
+    canGoToStart: boolean;
+    canGoToEnd: boolean;
+    keepScrollToEnd: boolean;
+  };
 }
