@@ -18,6 +18,7 @@ import {
   useStoreAuth,
   useStoreChain,
   useStoreUI,
+  useStoreWallet,
 } from '@stores';
 
 import { routes } from './routes';
@@ -40,10 +41,16 @@ export const App = () => {
     resetStore: resetStoreUI,
   } = useStoreUI.use.actions();
 
+  const initStoreWallet = useStoreWallet.use.init?.();
+  const {
+    resetStore: resetStoreWallet,
+  } = useStoreWallet.use.actions();
+
   useEffect(() => {
     initStoreAuth();
     initStoreUI();
     initStoreChainClient();
+    initStoreWallet();
     window.customPackages = {};
     Object.assign(window.customPackages, {
       ...createClient,
@@ -57,6 +64,7 @@ export const App = () => {
       resetStoreAuth();
       resetStoreUI();
       resetStoreChain();
+      resetStoreWallet();
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
