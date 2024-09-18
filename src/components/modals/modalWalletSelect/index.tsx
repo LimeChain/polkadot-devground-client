@@ -18,7 +18,8 @@ export const ModalWalletSelect = ({ onClose }: IModalWalletSelect) => {
   const handleOnConnect = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     const extensionName = e.currentTarget.getAttribute('data-wallet-name') || '';
     connectWallet(extensionName);
-  }, [connectWallet]);
+    onClose();
+  }, [connectWallet, onClose]);
 
   return (
     <Modal
@@ -36,7 +37,7 @@ export const ModalWalletSelect = ({ onClose }: IModalWalletSelect) => {
 
         <div className={cn(
           'flex flex-col items-center',
-          'gap-4 p-4',
+          'gap-6 p-4',
         )}
         >
           {extensions?.map((extension) => (
