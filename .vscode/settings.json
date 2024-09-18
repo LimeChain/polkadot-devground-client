@@ -5,4 +5,7 @@
     "source.fixAll.eslint": "always"
   },
   "prettier.enable": false,
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
 }

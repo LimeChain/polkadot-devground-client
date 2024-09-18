@@ -1,5 +1,5 @@
 import Identicon from '@polkadot/react-identicon';
-import { format } from 'date-fns/format';
+import { format } from 'date-fns';
 import {
   useCallback,
   useState,
@@ -11,39 +11,31 @@ import { ToggleButton } from '@components/toggleButton';
 
 import styles from '../styles.module.css';
 
-import type { IBlockHeader } from '@custom-types/block';
+import type { IMappedBlockHeader } from '@custom-types/block';
 
 interface BlockHeaderProps {
-  headerData: IBlockHeader;
+  headerData: IMappedBlockHeader;
 }
 
-const BlockDetail = (props) => {
-  const { label, value, isCopyable } = props;
+interface DetailRowProps {
+  label: string;
+  value: string | undefined;
+  isCopyable?: boolean;
+}
+
+const DetailRow = (props: DetailRowProps) => {
+  const { label, value, isCopyable = false } = props;
 
   return (
     <div className={styles['pd-block-details']}>
       <p>{label}</p>
-
-      <div className="gap-x-1">
+      <div className="flex items-center gap-x-1">
         <p>{value}</p>
-
-        {
-          isCopyable && (
-            <CopyToClipboard
-              text={value}
-              toastMessage={label}
-            >
-              {
-                ({ ClipboardIcon }) => (
-                  <>
-                    {ClipboardIcon}
-                  </>
-                )
-              }
-            </CopyToClipboard>
-          )
-        }
-
+        {isCopyable && value && (
+          <CopyToClipboard text={value} toastMessage={label}>
+            {({ ClipboardIcon }) => <>{ClipboardIcon}</>}
+          </CopyToClipboard>
+        )}
       </div>
     </div>
   );
@@ -51,119 +43,81 @@ const BlockDetail = (props) => {
 
 export const BlockHeader = (props: BlockHeaderProps) => {
   const { headerData } = props;
+  const [isUTC, setIsUTC] = useState(false);
 
-  const [isChecked, setIsChecked] = useState<boolean>(false);
-
-  const handleSetCheck = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const target = e.currentTarget.parentNode as HTMLDivElement;
-    const format = target.getAttribute('data-format');
-    target.setAttribute('data-format', format === 'utc' ? 'local' : 'utc');
-
-    setIsChecked(state => !state);
+  const handleSetCheck = useCallback(() => {
+    setIsUTC((prevState) => !prevState);
   }, []);
 
+  const formattedTimestamp = isUTC
+    ? new Date(headerData.timestamp).toUTCString()
+    : format(new Date(headerData.timestamp), 'yyyy-MM-dd HH:mm:ss');
+
   return (
-    <div>
+    <div className="space-y-4">
       <div className={styles['pd-block-details']}>
         <p>Time stamp</p>
-
-        <div>
-          {
-            isChecked
-              ? new Date(headerData.timestamp).toUTCString()
-              : format(new Date(headerData.timestamp), 'yyyy-MM-dd HH:mm:ss')}
-          <ToggleButton
-            isChecked={isChecked}
-            handleSetCheck={handleSetCheck}
-            classNames="ml-2"
-          />
-        UTC
+        <div className="flex items-center gap-x-2">
+          <span>{formattedTimestamp}</span>
+          <ToggleButton isChecked={isUTC} handleSetCheck={handleSetCheck} />
+          <span>UTC</span>
         </div>
       </div>
       <div className={styles['pd-block-details']}>
         <p>Status</p>
-
-        {
-          headerData.isFinalized
-            ? (
-              <div>
-                <Icon
-                  size={[16]}
-                  name="icon-checked"
-                  className="text-dev-green-600"
-                />
-                <p>Finalized</p>
-              </div>
-            )
-            : (
-              <div>
-                <Icon
-                  size={[16]}
-                  name="icon-clock"
-                  className="animate-rotate text-dev-yellow-700"
-                />
-                <p>Unfinalized</p>
-              </div>
-            )
-        }
+        <div className="flex items-center gap-x-2">
+          <Icon
+            size={[16]}
+            name={headerData.isFinalized ? 'icon-checked' : 'icon-clock'}
+            className={headerData.isFinalized ? 'text-dev-green-600' : 'animate-rotate text-dev-yellow-700'}
+          />
+          <p>{headerData.isFinalized ? 'Finalized' : 'Unfinalized'}</p>
+        </div>
       </div>
-      <BlockDetail
-        label={'Block Hash'}
+      <DetailRow
+        label="Block Hash"
         value={headerData.hash}
         isCopyable
       />
-      <BlockDetail
-        label={'Parent Hash'}
+      <DetailRow
+        label="Parent Hash"
         value={headerData.parentHash}
         isCopyable
       />
-      <BlockDetail
-        label={'State Root'}
+      <DetailRow
+        label="State Root"
         value={headerData.stateRoot}
         isCopyable
       />
-      <BlockDetail
-        label={'Extrinsic Root'}
+      <DetailRow
+        label="Extrinsic Root"
         value={headerData.extrinsicRoot}
         isCopyable
       />
-      {
-        headerData.identity && (
-          <div className={styles['pd-block-details']}>
-            <p>Validator</p>
-
-            <div className={styles['validator']}>
-              <Identicon
-                value={headerData.identity.address}
-                size={32}
-                theme="polkadot"
-              />
-              <span>
-                {headerData.identity.name}
-                <div className="flex gap-2">
-                  {headerData.identity.address}
-
-                  <CopyToClipboard
-                    text={headerData.identity.address}
-                    toastMessage="Validator Address"
-                  >
-                    {
-                      ({ ClipboardIcon }) => (
-                        <>
-                          {ClipboardIcon}
-                        </>
-                      )
-                    }
-                  </CopyToClipboard>
-                </div>
-              </span>
-            </div>
+      {headerData.identity && (
+        <div className={styles['pd-block-details']}>
+          <p>Validator</p>
+          <div className={styles['validator']}>
+            <Identicon
+              value={headerData.identity.address}
+              size={32}
+              theme="polkadot"
+            />
+            <span>
+              {headerData.identity.name}
+              <div className="flex items-center gap-x-2">
+                <span>{headerData.identity.address}</span>
+                <CopyToClipboard text={headerData.identity.address || ''} toastMessage="Validator Address">
+                  {({ ClipboardIcon }) => <>{ClipboardIcon}</>}
+                </CopyToClipboard>
+              </div>
+            </span>
           </div>
-        )
-      }
-      <BlockDetail
-        label={'Spec Version'}
-        value={headerData.runtime?.spec_version}
+        </div>
+      )}
+      <DetailRow
+        label="Spec Version"
+        value={headerData.runtime?.spec_version?.toString()}
         isCopyable
       />
     </div>

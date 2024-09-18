@@ -22,7 +22,7 @@ const BlockDetails = () => {
   const data = useStoreChain?.use?.blocksData?.();
   const latestFinalizedBlock = useStoreChain.use.finalizedBlock?.();
 
-  const [blockData, setBlockData] = useState<IMappedBlock | undefined>(undefined);
+  const [blockData, setBlockData] = useState<IMappedBlock>();
 
   useEffect(() => {
     if (blockNumber && data.size > 0) {
@@ -31,7 +31,7 @@ const BlockDetails = () => {
         return;
       }
 
-      if (block.header.number <= latestFinalizedBlock) {
+      if (block.header.number <= (latestFinalizedBlock ?? 0)) {
         setBlockData({
           ...block,
           header: {
@@ -50,7 +50,7 @@ const BlockDetails = () => {
         },
       });
     }
-  }, [blockNumber, data]);
+  }, [blockNumber, data, latestFinalizedBlock]);
 
   if (!blockData) {
     return 'Loading...';
@@ -60,7 +60,10 @@ const BlockDetails = () => {
     <PDScrollArea viewportClassNames="pr-12">
       <div className="grid gap-8">
         <div className="flex items-center justify-between">
-          <PageHeader title="Block" blockNumber={formatNumber(blockData.header.number)} />
+          <PageHeader
+            title="Block"
+            blockNumber={formatNumber(blockData.header.number)}
+          />
           <div className="flex gap-6">
             <PDLink
               to={`https://polkadot.subscan.io/block/${blockData.header.number}`}
@@ -68,7 +71,7 @@ const BlockDetails = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-          Polkadot Subscan
+              Polkadot Subscan
               <Icon name="icon-openLink" size={[16]} />
             </PDLink>
             <PDLink
@@ -77,13 +80,13 @@ const BlockDetails = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-          Polkadot Statescan
+              Polkadot Statescan
               <Icon name="icon-openLink" size={[16]} />
             </PDLink>
           </div>
         </div>
-        <BlockHeader headerData={blockData.header}/>
-        <BlockBody bodyData={blockData.body}/>
+        <BlockHeader headerData={blockData.header} />
+        <BlockBody bodyData={blockData.body} blockNumber={blockData.header.number} />
       </div>
     </PDScrollArea>
   );

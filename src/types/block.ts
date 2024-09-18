@@ -6,6 +6,16 @@ export interface IBlockItem {
   index: number;
 }
 
+interface IGenericExtrinsicMethod {
+  method: string;
+  section: string;
+  args: unknown;
+}
+
+export interface IBlockExtrinsic {
+  isSigned: boolean;
+  method: IGenericExtrinsicMethod;
+}
 export interface IMappedBlockExtrinsic extends IBlockExtrinsic {
   signer?: {
     Id: string;
@@ -17,15 +27,18 @@ export interface IMappedBlockExtrinsic extends IBlockExtrinsic {
   hash: string;
 }
 
-interface IGenericExtrinsicMethod {
-  method: string;
-  section: string;
-  args: unknown;
-}
-
-export interface IBlockExtrinsic {
-  isSigned: boolean;
-  method: IGenericExtrinsicMethod;
+export interface IMappedBlockEvent {
+  event: {
+    type: string;
+    value: {
+      type: string;
+      value: unknown;
+    };
+  };
+  phase: {
+    type: string;
+    value: number | undefined;
+  };
 }
 
 export interface ITransferExtrinsicMethod extends IGenericExtrinsicMethod {
@@ -56,12 +69,7 @@ export interface IMappedBlockHeader {
 }
 
 export interface IMappedBlockBody {
-  events: Array<{
-    // Define the structure of an event if known
-    // For example:
-    // type: string;
-    // data: any;
-  }>;
+  events: Array<IMappedBlockEvent>;
   extrinsics: Array<IMappedBlockExtrinsic>;
 }
 
