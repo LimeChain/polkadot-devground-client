@@ -62,18 +62,11 @@ const ChainState = () => {
     setStorageSelected,
   ] = useState(palletSelected?.storage?.items?.at?.(0));
 
-  const [
-    callArgs,
-    setCallArgs,
-  ] = useState<unknown>(undefined);
-  const [
-    queries,
-    setQueries,
-  ] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
-  const [
-    subscriptions,
-    setSubscriptions,
-  ] = useState<ISubscription[]>([]);
+  const [callArgs, setCallArgs] = useState<unknown>(undefined);
+  const [encodedStorageKey, setEncodedStorageKey] = useState<string | undefined>('0x');
+
+  const [queries, setQueries] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
+  const [subscriptions, setSubscriptions] = useState<ISubscription[]>([]);
 
   useEffect(() => {
     setQueries([]);
@@ -100,6 +93,29 @@ const ChainState = () => {
     }
   }, [palletsWithStorage]);
 
+  useEffect(() => {
+    if (palletSelected?.name && storageSelected?.name && dynamicBulder) {
+      try {
+        const storageCodec = dynamicBulder.buildStorage(palletSelected.name, storageSelected.name);
+
+        const encodedKey = storageCodec.enc(...([callArgs].filter(arg => Boolean(arg))));
+        setEncodedStorageKey(encodedKey);
+
+        // const decodedArgs = storageCodec.keyDecoder(encodedKey);
+        // console.log(decodedArgs);
+
+        // const decodedReturnValue = storageCodec.dec('');
+        // console.log(decodedReturnValue);
+      } catch (error) {
+        setEncodedStorageKey(undefined);
+        console.log(error);
+
+      }
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [palletSelected, storageSelected, callArgs]);
+
   const handlePalletSelect = useCallback((selectedPalletName: string) => {
     if (palletsWithStorage) {
       const selectedPallet = palletsWithStorage.find((pallet) => pallet.name === selectedPalletName);
@@ -120,25 +136,8 @@ const ChainState = () => {
     }
   }, [palletSelected]);
 
-  console.log(callArgs);
-
   const handleStorageQuerySubmit = useCallback(() => {
     if (palletSelected?.name && storageSelected?.name && dynamicBulder) {
-      console.log(palletSelected, storageSelected, callArgs);
-
-      const storageCodec = dynamicBulder.buildStorage(palletSelected.name, storageSelected.name);
-      console.log(storageCodec);
-      let encoded = '';
-      if (callArgs) {
-        encoded = storageCodec.enc(callArgs);
-      } else {
-        encoded = storageCodec.enc();
-      }
-      console.log(encoded);
-
-      const decoded = storageCodec.keyDecoder(encoded);
-      console.log(decoded);
-
       setQueries(queries => ([{
         pallet: palletSelected.name,
         storage: storageSelected.name,
@@ -222,7 +221,15 @@ const ChainState = () => {
           {storageSelected?.name}
         </QueryButton>
 
-        <CallDocs docs={storageSelected?.docs?.filter((d) => d) || []} />
+        {
+          (encodedStorageKey) && (
+            <p className="break-all">
+              Encoded Storage Key: <br /> {encodedStorageKey}
+            </p>
+          )
+        }
+
+        <CallDocs docs={storageSelected?.docs?.filter(d => d) || []} />
 
       </QueryFormContainer>
       <QueryResultContainer>
