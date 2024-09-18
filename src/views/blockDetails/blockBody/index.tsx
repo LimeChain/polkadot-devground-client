@@ -1,10 +1,7 @@
 /* eslint-disable react/jsx-no-bind */
 import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import { formatDistanceToNowStrict } from 'date-fns';
-import {
-  type MouseEvent,
-  useState,
-} from 'react';
+import { useState } from 'react';
 
 import { Icon } from '@components/icon';
 import { ModalJSONViewer } from '@components/modals/modalJSONViewer';
@@ -56,8 +53,6 @@ export const BlockBody = (props: BlockBodyProps) => {
   const [modalData, setModalData] = useState<IMappedBlockEvent | IMappedBlockExtrinsic | null>(null);
   const [filter, setFilter] = useState<'extrinsics' | 'events'>('extrinsics');
   const [showMore, setShowMore] = useState(false);
-  const [visibleExtrinsics, setVisibleExtrinsics] = useState(bodyData.extrinsics.slice(0, 3));
-  const [visibleEvents, setVisibleEvents] = useState(bodyData.events.slice(0, 3));
 
   const handleOpenModal = (data: IMappedBlockEvent | IMappedBlockExtrinsic) => {
     setModalData(data);
@@ -68,20 +63,20 @@ export const BlockBody = (props: BlockBodyProps) => {
     const filterType = e.currentTarget.getAttribute('data-filter-type') as 'extrinsics' | 'events';
     if (filterType) {
       setFilter(filterType);
-      // Reset visible data when filter changes
-      setVisibleExtrinsics(bodyData.extrinsics.slice(0, 3));
-      setVisibleEvents(bodyData.events.slice(0, 3));
+      setShowMore(false); // Reset "Show More" when filter changes
     }
   };
 
   const toggleShowMore = () => {
     setShowMore(!showMore);
-    if (filter === 'extrinsics') {
-      setVisibleExtrinsics(showMore ? bodyData.extrinsics : bodyData.extrinsics.slice(0, 3));
-    } else if (filter === 'events') {
-      setVisibleEvents(showMore ? bodyData.events : bodyData.events.slice(0, 3));
-    }
   };
+
+  const visibleExtrinsics = showMore ? bodyData.extrinsics : bodyData.extrinsics.slice(0, 2);
+  const visibleEvents = showMore ? bodyData.events : bodyData.events.slice(0, 3);
+
+  const isMoreContentAvailable =
+    (filter === 'extrinsics' && bodyData.extrinsics.length > 2)
+    || (filter === 'events' && bodyData.events.length > 3);
 
   return (
     <div className="grid gap-4">
@@ -180,13 +175,11 @@ export const BlockBody = (props: BlockBodyProps) => {
           <tbody>
             {visibleEvents.map((event: IMappedBlockEvent, eventIndex: number) => (
               <tr
-                // eslint-disable-next-line react/jsx-no-bind
-                onClick={() => handleOpenModal(event)}
                 key={eventIndex}
                 className={cn('pd-table-row')}
+                onClick={() => handleOpenModal(event)}
               >
                 <td>{blockNumber}-{eventIndex}</td>
-                {/* <td>{event.extrinsicId || 'N/A'}</td> */}
                 <td>{event.event.type} ({event.event.value.type})</td>
                 <td>{event.phase.type}</td>
                 <td>
@@ -201,9 +194,11 @@ export const BlockBody = (props: BlockBodyProps) => {
           </tbody>
         </table>
       )}
-      <button onClick={toggleShowMore} className="mt-4 font-geist font-body2-bold">
-        {showMore ? 'Show Less' : 'Show More'}
-      </button>
+      {isMoreContentAvailable && (
+        <button onClick={toggleShowMore} className="mt-4 font-geist font-body2-bold">
+          {showMore ? 'Show Less' : 'Show More'}
+        </button>
+      )}
       {modalData && (
         <JSONViewerModal
           onClose={toggleVisibility}
