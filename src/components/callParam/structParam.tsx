@@ -48,6 +48,8 @@ export const StructParam = ({ struct, onChange }: IStructParam) => {
         </span>
         <div className={styles.codecContainer}>
           <CodecParam
+            key={`struct-param-${value.id}`}
+            variable={value}
             // eslint-disable-next-line react/jsx-no-bind
             onChange={(args) => handleOnChange(key, args)}
             variable={value}

@@ -25,6 +25,7 @@ export const ArrayParam = ({ array, onChange }: IArrayParam) => {
 
   return (
     <_ArrayParam
+      key={`array-param-${array.len}-${array.value.id}`}
       array={array}
       onChange={onChange}
     />
@@ -55,7 +56,7 @@ const _ArrayParam = ({ array, onChange }: IArrayParam) => {
             <CodecParam
               key={`array-param-${index}`}
               // eslint-disable-next-line react/jsx-no-bind
-              onChange={(args) => setArrayProps((props) => props.with(index, args))}
+              onChange={(args) => setArrayProps((props) => [...props.with(index, args)])}
               variable={array.value}
             />
           );

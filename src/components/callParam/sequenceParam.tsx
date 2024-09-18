@@ -32,7 +32,8 @@ export const SequenceParam = ({ sequence, onChange }: ISequence) => {
 
   return (
     <_SequenceParam
-      key={sequence.value.id}
+      key={`sequence-param-${sequence.value.id}`}
+      sequence={sequence}
       onChange={onChange}
       sequence={sequence}
     />
