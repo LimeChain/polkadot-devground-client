@@ -1,6 +1,7 @@
 import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import { useLocation } from 'react-router-dom';
 
+import { Icon } from '@components/icon';
 import { ModalWalletSelect } from '@components/modals/modalWalletSelect';
 import { useStoreWallet } from '@stores';
 import { cn } from '@utils/helpers';
@@ -30,14 +31,18 @@ const WalletSelectButton = () => {
             type="button"
             onClick={disconnectWallet}
             className={cn(
-              'mb-2 mt-6 p-4 transition-colors',
-              'font-geist text-white font-body2-bold',
-              'bg-dev-pink-500 ',
-              'hover:bg-dev-pink-400',
+              'flex h-10 items-center px-6 py-1 transition-colors',
+              'font-geist text-white font-h5-regular',
+              'bg-dev-purple-700 hover:bg-dev-purple-600',
+              'dark:bg-dev-purple-50 dark:text-dev-black-1000 dark:hover:bg-dev-purple-200',
             )}
           >
+            <Icon
+              name="icon-wallet"
+            />
             <h5 className="ml-[6px] mr-3 font-h5-bold">
-          Disconnect wallet
+
+              {accounts[0].address.slice(0, 6)}...{accounts[0].address.slice(-4)}
             </h5>
           </button>
         ) : (
@@ -45,8 +50,8 @@ const WalletSelectButton = () => {
             type="button"
             onClick={toggleVisibility}
             className={cn(
-              'mb-2 mt-6 p-4 transition-colors',
-              'font-geist text-white font-body2-bold',
+              'h-10 items-center px-6 py-1 transition-colors',
+              'font-geist text-white font-h5-regular',
               'bg-dev-pink-500 ',
               'hover:bg-dev-pink-400',
             )}

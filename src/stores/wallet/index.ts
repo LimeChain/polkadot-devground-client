@@ -53,7 +53,6 @@ const baseStore = create<StoreInterface>()((set, get) => ({
     },
 
     async disconnect() {
-      console.log('selectedExtensions', get().selectedExtensions);
       get().selectedExtensions.at(0)?.disconnect();
       set({ accounts: [] });
       await walletService.setLatestWallet('');
