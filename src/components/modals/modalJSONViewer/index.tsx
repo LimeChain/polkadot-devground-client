@@ -6,20 +6,25 @@ import {
   Modal,
 } from '../modal';
 
-import type { IMappedBlockExtrinsic } from '@custom-types/block';
+import type {
+  IMappedBlockEvent,
+  IMappedBlockExtrinsic,
+} from '@custom-types/block';
 
 interface IModalJSONViewer extends Pick<IModal, 'onClose'> {
-  extrinsic?: IMappedBlockExtrinsic;
+  jsonData?: IMappedBlockExtrinsic | IMappedBlockEvent | unknown;
+  title?: string;
   onClose: () => void;
 }
 
 export const ModalJSONViewer = (props: IModalJSONViewer) => {
   const {
-    extrinsic,
+    jsonData,
     onClose,
+    title,
   } = props;
 
-  if (!extrinsic) {
+  if (!jsonData) {
     return null;
   }
 
@@ -27,15 +32,16 @@ export const ModalJSONViewer = (props: IModalJSONViewer) => {
     <Modal
       onClose={onClose}
       className={cn(
+        'p-6',
         'z-[999] w-5/6',
-        'flex flex-col gap-8 overflow-auto p-6',
+        'flex flex-col gap-8 overflow-auto',
         'border border-dev-purple-300',
         'dark:border-dev-purple-700',
         'transition-all duration-300 ease-in-out',
       )}
     >
-      <h5 className="self-start font-h5-bold">Extrinsics: #{extrinsic.id}</h5>
-      <JsonViewer json={extrinsic} />
+      <h5 className="self-start font-h5-bold">{title}</h5>
+      <JsonViewer json={jsonData} />
     </Modal>
   );
 };

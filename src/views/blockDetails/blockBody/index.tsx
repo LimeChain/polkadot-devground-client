@@ -1,7 +1,8 @@
+/* eslint-disable react/jsx-no-bind */
 import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import { formatDistanceToNowStrict } from 'date-fns';
 import {
-  type ReactMouseEvent,
+  type MouseEvent,
   useState,
 } from 'react';
 
@@ -24,7 +25,7 @@ interface ButtonProps {
   children: React.ReactNode;
   isActive: boolean;
   type: string;
-  onClick: (e: ReactMouseEvent<HTMLButtonElement>) => void;
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 const Button = (props: ButtonProps) => {
@@ -35,10 +36,12 @@ const Button = (props: ButtonProps) => {
       data-filter-type={type}
       onClick={onClick}
       className={cn(
-        'px-2 py-2.5 font-body2-regular hover:border-dev-pink-500',
-        'text-dev-white-200',
-        'border-b-2 border-b-transparent hover:border-b-dev-pink-500',
+        'px-2 py-2.5',
+        'font-geist font-body2-regular',
         'duration-300 ease-in',
+        'border-b-2 border-b-transparent',
+        'hover:border-dev-pink-500 ',
+        'dark:text-dev-white-200',
         isActive && 'border-b-dev-pink-500',
       )}
     >
@@ -50,39 +53,42 @@ const Button = (props: ButtonProps) => {
 export const BlockBody = (props: BlockBodyProps) => {
   const { bodyData, blockNumber } = props;
   const [JSONViewerModal, toggleVisibility] = useToggleVisibility(ModalJSONViewer);
-  const [selectedExtrinsic, setSelectedExtrinsic] = useState<any>(null);
+  const [modalData, setModalData] = useState<IMappedBlockEvent | IMappedBlockExtrinsic | null>(null);
   const [filter, setFilter] = useState<'extrinsics' | 'events'>('extrinsics');
   const [showMore, setShowMore] = useState(false);
-
-  console.log(bodyData);
+  const [visibleExtrinsics, setVisibleExtrinsics] = useState(bodyData.extrinsics.slice(0, 3));
+  const [visibleEvents, setVisibleEvents] = useState(bodyData.events.slice(0, 3));
 
   const handleOpenModal = (data: IMappedBlockEvent | IMappedBlockExtrinsic) => {
-    setSelectedExtrinsic(data);
+    setModalData(data);
     toggleVisibility();
   };
 
-  const handleFilter = (e: ReactMouseEvent<HTMLButtonElement>) => {
+  const handleFilter = (e: React.MouseEvent<HTMLButtonElement>) => {
     const filterType = e.currentTarget.getAttribute('data-filter-type') as 'extrinsics' | 'events';
     if (filterType) {
       setFilter(filterType);
+      // Reset visible data when filter changes
+      setVisibleExtrinsics(bodyData.extrinsics.slice(0, 3));
+      setVisibleEvents(bodyData.events.slice(0, 3));
     }
   };
 
   const toggleShowMore = () => {
     setShowMore(!showMore);
+    if (filter === 'extrinsics') {
+      setVisibleExtrinsics(showMore ? bodyData.extrinsics : bodyData.extrinsics.slice(0, 3));
+    } else if (filter === 'events') {
+      setVisibleEvents(showMore ? bodyData.events : bodyData.events.slice(0, 3));
+    }
   };
-
-  const currentItems = filter === 'extrinsics' ? bodyData.extrinsics : bodyData.events;
-  const displayedItems = showMore ? currentItems : currentItems.slice(0, 3);
-  const showMoreButton = currentItems.length > 3;
 
   return (
     <div className="grid gap-4">
-      <div className="flex gap-6 px-2 font-geist dark:text-dev-black-800">
+      <div className="flex gap-6 px-2">
         <Button
           isActive={filter === 'extrinsics'}
           type="extrinsics"
-          // eslint-disable-next-line react/jsx-no-bind
           onClick={handleFilter}
         >
           Extrinsics
@@ -90,7 +96,6 @@ export const BlockBody = (props: BlockBodyProps) => {
         <Button
           isActive={filter === 'events'}
           type="events"
-          // eslint-disable-next-line react/jsx-no-bind
           onClick={handleFilter}
         >
           Events
@@ -115,7 +120,7 @@ export const BlockBody = (props: BlockBodyProps) => {
             </tr>
           </thead>
           <tbody>
-            {displayedItems.map((extrinsic: any) => {
+            {visibleExtrinsics.map((extrinsic: IMappedBlockExtrinsic) => {
               const timeAgo = extrinsic.timestamp && formatDistanceToNowStrict(
                 new Date(extrinsic.timestamp),
                 { addSuffix: true },
@@ -124,7 +129,6 @@ export const BlockBody = (props: BlockBodyProps) => {
                 <tr
                   key={extrinsic.id}
                   className={cn('pd-table-row')}
-                  // eslint-disable-next-line react/jsx-no-bind
                   onClick={() => handleOpenModal(extrinsic)}
                 >
                   <td>{extrinsic.id}</td>
@@ -174,15 +178,15 @@ export const BlockBody = (props: BlockBodyProps) => {
             </tr>
           </thead>
           <tbody>
-            {displayedItems.map((event: any, eventIndex: number) => (
+            {visibleEvents.map((event: IMappedBlockEvent, eventIndex: number) => (
               <tr
                 // eslint-disable-next-line react/jsx-no-bind
                 onClick={() => handleOpenModal(event)}
-                key={event.id}
+                key={eventIndex}
                 className={cn('pd-table-row')}
               >
                 <td>{blockNumber}-{eventIndex}</td>
-                <td>{event.extrinsicId || 'N/A'}</td>
+                {/* <td>{event.extrinsicId || 'N/A'}</td> */}
                 <td>{event.event.type} ({event.event.value.type})</td>
                 <td>{event.phase.type}</td>
                 <td>
@@ -197,16 +201,14 @@ export const BlockBody = (props: BlockBodyProps) => {
           </tbody>
         </table>
       )}
-      {showMoreButton && (
-        // eslint-disable-next-line react/jsx-no-bind
-        <button onClick={toggleShowMore} className="mt-4 font-geist font-body2-bold">
-          {showMore ? 'Show Less' : 'Show More'}
-        </button>
-      )}
-      {selectedExtrinsic && (
+      <button onClick={toggleShowMore} className="mt-4 font-geist font-body2-bold">
+        {showMore ? 'Show Less' : 'Show More'}
+      </button>
+      {modalData && (
         <JSONViewerModal
           onClose={toggleVisibility}
-          extrinsic={selectedExtrinsic}
+          jsonData={modalData}
+          title={filter === 'extrinsics' ? 'Extrinsic Details' : 'Event Details'}
         />
       )}
     </div>

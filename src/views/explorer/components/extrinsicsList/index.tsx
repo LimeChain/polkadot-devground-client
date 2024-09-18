@@ -101,7 +101,8 @@ export const ExtrinsicsList = polymorphicComponent<'div'>((_props, ref) => {
         refSelectedExtrinsic.current && (
           <JSONViewerModal
             onClose={toggleVisibility}
-            extrinsic={refSelectedExtrinsic.current}
+            jsonData={refSelectedExtrinsic.current}
+            title="Extrinsic Details"
           />
         )
       }
