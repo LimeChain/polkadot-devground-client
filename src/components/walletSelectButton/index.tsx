@@ -31,8 +31,8 @@ const WalletSelectButton = () => {
             type="button"
             onClick={disconnectWallet}
             className={cn(
-              'flex h-10 items-center px-6 py-1 transition-colors',
-              'font-geist text-white font-h5-regular',
+              'flex min-h-10 items-center px-6 py-1 transition-colors',
+              'font-geist text-white',
               'bg-dev-purple-700 hover:bg-dev-purple-600',
               'dark:bg-dev-purple-50 dark:text-dev-black-1000 dark:hover:bg-dev-purple-200',
             )}
@@ -50,7 +50,7 @@ const WalletSelectButton = () => {
             type="button"
             onClick={toggleVisibility}
             className={cn(
-              'h-10 items-center px-6 py-1 transition-colors',
+              'min-h-10 items-center px-6 py-1 transition-colors',
               'font-geist text-white font-h5-regular',
               'bg-dev-pink-500 ',
               'hover:bg-dev-pink-400',
