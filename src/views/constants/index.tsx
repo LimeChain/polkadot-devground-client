@@ -107,17 +107,17 @@ const Constants = () => {
             value={palletSelected?.name}
           />
           {
-            constantItems
-          && (
-            <PDSelect
-              label="Select Constant"
-              emptyPlaceHolder="No constants available"
-              placeholder="Please select constant"
-              items={constantItems}
-              value={constantSelected?.name}
-              onChange={handleConstantSelect}
-            />
-          )
+            constantItems && (
+              <PDSelect
+                key={`storage-select-${palletSelected?.name}`}
+                label="Select Constant"
+                emptyPlaceHolder="No constants available"
+                placeholder="Please select constant"
+                items={constantItems}
+                value={constantSelected?.name}
+                onChange={handleConstantSelect}
+              />
+            )
           }
         </div>
 

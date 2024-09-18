@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useEffect,
   useMemo,
   useState,
 } from 'react';
@@ -41,6 +42,12 @@ export const EnumParam = ({ onChange, ...props }: IEnumParam) => {
       ? enumValue.value
       : enumValue
     : undefined;
+
+  useEffect(() => {
+    if (variable?.type === 'void') {
+      handleSetValue(undefined);
+    }
+  }, [key, variable, handleSetValue]);
 
   return (
     <div className={styles.codecGroup}>

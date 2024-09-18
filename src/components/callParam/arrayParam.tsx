@@ -18,7 +18,13 @@ export const ArrayParam = ({ array, onChange }: IArrayParam) => {
     return <BinaryParam onChange={onChange} minLength={array.len} />;
   }
 
-  return <_ArrayParam array={array} onChange={onChange} />;
+  return (
+    <_ArrayParam
+      key={`array-param-${array.len}-${array.value.id}`}
+      array={array}
+      onChange={onChange}
+    />
+  );
 };
 
 const _ArrayParam = ({ array, onChange }: IArrayParam) => {
@@ -43,7 +49,7 @@ const _ArrayParam = ({ array, onChange }: IArrayParam) => {
               key={`array-param-${index}`}
               variable={array.value}
               // eslint-disable-next-line react/jsx-no-bind
-              onChange={(args) => setArrayProps((props) => props.with(index, args))}
+              onChange={(args) => setArrayProps((props) => [...props.with(index, args)])}
             />
           );
         })

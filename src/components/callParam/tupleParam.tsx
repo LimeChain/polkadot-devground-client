@@ -49,7 +49,7 @@ const _TupleParam = ({
       {
         tuple.value.map((entry, index) => (
           <CodecParam
-            key={`tuple-param-${index}`}
+            key={`tuple-param-${entry.id}-${index}`}
             variable={entry}
             // eslint-disable-next-line react/jsx-no-bind
             onChange={(value) =>

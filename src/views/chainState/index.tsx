@@ -15,6 +15,7 @@ import { StorageArgs } from '@components/callParam/storageArgs';
 import { Loader } from '@components/loader';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
+import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
 import type { TRelayApi } from '@custom-types/chain';
 
@@ -24,6 +25,8 @@ interface ISubscription {
 }
 
 const ChainState = () => {
+  const dynamicBulder = useDynamicBuilder();
+
   const metadata = useStoreChain?.use?.metadata?.();
   const chain = useStoreChain?.use?.chain?.();
 
@@ -99,8 +102,25 @@ const ChainState = () => {
     }
   }, [palletSelected]);
 
+  console.log(callArgs);
+
   const handleStorageQuerySubmit = useCallback(() => {
-    if (palletSelected?.name && storageSelected?.name) {
+    if (palletSelected?.name && storageSelected?.name && dynamicBulder) {
+      console.log(palletSelected, storageSelected, callArgs);
+
+      const storageCodec = dynamicBulder.buildStorage(palletSelected.name, storageSelected.name);
+      console.log(storageCodec);
+      let encoded = '';
+      if (callArgs) {
+        encoded = storageCodec.enc(callArgs);
+      } else {
+        encoded = storageCodec.enc();
+      }
+      console.log(encoded);
+
+      const decoded = storageCodec.keyDecoder(encoded);
+      console.log(decoded);
+
       setQueries(queries => ([{
         pallet: palletSelected.name,
         storage: storageSelected.name,
@@ -145,6 +165,7 @@ const ChainState = () => {
           {
             storageCallItems && (
               <PDSelect
+                key={`storage-select-${palletSelected?.name}`}
                 label="Select Storage"
                 emptyPlaceHolder="No storages available"
                 placeholder="Please select a storage"
@@ -159,6 +180,7 @@ const ChainState = () => {
         {
           storageSelected && (
             <StorageArgs
+              key={`storage-param-${storageSelected.name}`}
               storage={storageSelected}
               onChange={setCallArgs}
             />
