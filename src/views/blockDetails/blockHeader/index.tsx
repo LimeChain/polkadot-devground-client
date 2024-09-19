@@ -1,4 +1,4 @@
-import Identicon from '@polkadot/react-identicon';
+import { Identicon } from '@polkadot/react-identicon';
 import { format } from 'date-fns';
 import {
   useCallback,

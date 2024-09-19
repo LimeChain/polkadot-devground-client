@@ -22,6 +22,7 @@ const BlockDetails = () => {
   const latestFinalizedBlock = useStoreChain.use.finalizedBlock?.();
 
   const [blockData, setBlockData] = useState<IMappedBlock>();
+  console.log(blockData);
 
   useEffect(() => {
     if (blockNumber && data.size > 0) {

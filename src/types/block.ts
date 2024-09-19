@@ -24,7 +24,7 @@ export interface IMappedBlockExtrinsic extends IBlockExtrinsic {
   blockNumber: number;
   timestamp: number;
   isSuccess: boolean;
-  hash: string;
+  hash?: string;
 }
 
 export interface IMappedBlockEvent {
@@ -59,7 +59,7 @@ export interface IMappedBlockHeader {
     spec_version: number;
   } | null;
   identity: {
-    name: undefined | string | any;
+    name?: string;
     address?: string;
   };
   parentHash: string;

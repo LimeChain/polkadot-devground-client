@@ -83,12 +83,10 @@ const getBlockValidator = async ({
     }
   }
 
-  const data = {
-    name: identity,
-    address: address.toString(),
+  return {
+    name: identity?.toString(),
+    address,
   };
-
-  return data;
 };
 
 export const getBlockDetailsWithPAPI = async ({
@@ -148,7 +146,7 @@ export const getBlockDetailsWithPAPI = async ({
       ...extrinsic,
       id: `${blockNumber}-${i}`,
       blockNumber: blockNumber || 0,
-      // assume a success by defaul (updated later)
+      // assume a success by default (updated later)
       isSuccess: true,
       // the timestamp is always the first extrinsic
       // so we can assume the timestamp will be populated
