@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 
 import { Footer } from '@components/footer';
 import { Header } from '@components/header';
+import { PDScrollArea } from '@components/pdScrollArea';
 import { cn } from '@utils/helpers';
 
 interface ILayoutBasic {
@@ -20,7 +21,7 @@ export const LayoutBasic = (props: ILayoutBasic) => {
     <Suspense>
       <div className="grid max-h-screen min-h-screen grid-rows-layout overflow-hidden">
         <Header />
-        <div className={cn(
+        <PDScrollArea className={cn(
           'lg:px-14 lg:pb-16 lg:pt-8',
           'px-6 pb-8 pt-4',
           'overflow-auto',
@@ -28,7 +29,7 @@ export const LayoutBasic = (props: ILayoutBasic) => {
         )}
         >
           <Outlet />
-        </div>
+        </PDScrollArea>
         {
           hasFooter && (
             <Footer />
