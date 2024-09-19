@@ -9,7 +9,8 @@ const Home = () => {
       <div className="flex flex-col items-center">
         <h1
           className={cn(
-            'pb-4 text-center font-h3-bold lg:font-h2-bold',
+            'pb-4',
+            'text-center font-h3-bold lg:font-h2-bold',
             'before:text-dev-pink-500 before:content-["["]',
             'after:text-dev-pink-500 after:content-["]"]',
           )}
