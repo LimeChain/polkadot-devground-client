@@ -44,30 +44,32 @@ export const ModalWalletSelect = ({ onClose }: IModalWalletSelect) => {
       <div className={cn(
       )}
       >
-        {extensions?.map((extension) => (
-          <div
-            key={extension}
-            data-wallet-name={extension}
-            onClick={handleOnConnect}
-            className={cn(
-              'align-center m-1 flex h-16 p-4',
-              'cursor-pointer',
-              'bg-dev-purple-300 text-dev-black-1000 hover:bg-dev-purple-200',
-              'dark:bg-dev-black-600 dark:text-dev-white-200 dark:hover:bg-dev-black-500',
-            )}
-          >
-            <Icon
-              size={[38]}
-              name={walletExtensions[extension].icon || 'icon-wallet'}
-            />
-            <div className="pl-4">
-              <div className="font-body1-bold">
-                {walletExtensions[extension].name}
+        {extensions
+          ?.filter((extension) => walletExtensions[extension])
+          .map((extension) => (
+            <div
+              key={extension}
+              data-wallet-name={extension}
+              onClick={handleOnConnect}
+              className={cn(
+                'align-center m-1 flex h-16 p-4',
+                'cursor-pointer',
+                'bg-dev-purple-300 text-dev-black-1000 hover:bg-dev-purple-200',
+                'dark:bg-dev-black-600 dark:text-dev-white-200 dark:hover:bg-dev-black-500',
+              )}
+            >
+              <Icon
+                size={[38]}
+                name={walletExtensions[extension].icon || 'icon-wallet'}
+              />
+              <div className="pl-4">
+                <div className="font-body1-bold">
+                  {walletExtensions[extension].name}
+                </div>
+                <div className="font-body3-regular">Not connected</div>
               </div>
-              <div className="font-body3-regular">Not connected</div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
 
     </Modal>
