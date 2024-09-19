@@ -1,6 +1,6 @@
 import { Icon } from '@components/icon';
 import { PDLink } from '@components/pdLink';
-import { HOME_LINKS } from '@constants/homeLinks';
+import { HOME_LINKS } from '@constants/links';
 import { cn } from '@utils/helpers';
 
 const Home = () => {
@@ -18,7 +18,12 @@ const Home = () => {
           Empower Your Polkadot Development
         </h1>
 
-        <p className="pb-14 text-center font-body1-regular lg:pb-20 lg:font-h5-regular">
+        <p className={cn(
+          'pb-14',
+          'text-center font-body1-regular',
+          'lg:font-h5-regular" lg:pb-20',
+        )}
+        >
           Elevate your development experience with our next-gen platform for Polkadot developers
         </p>
 
@@ -41,8 +46,11 @@ const Home = () => {
             >
               <Icon
                 name="icon-linkArrow"
-                size={[24]}
-                className="absolute right-4 top-4 transition-transform duration-200 ease-linear group-hover:-translate-y-1 group-hover:translate-x-1"
+                className={cn(
+                  'absolute right-4 top-4',
+                  'group-hover:-translate-y-1 group-hover:translate-x-1',
+                  'transition-transform duration-200 ease-linear',
+                )}
               />
               <Icon
                 name={card.iconName}
@@ -52,7 +60,11 @@ const Home = () => {
               <h4 className="mb-2 font-h4-bold">
                 {card.title}
               </h4>
-              <p className="font-geist text-dev-black-300 font-body2-regular dark:text-dev-purple-300">
+              <p className={cn(
+                'font-geist text-dev-black-300 font-body2-regular',
+                'dark:text-dev-purple-300',
+              )}
+              >
                 {card.description}
               </p>
             </PDLink>
