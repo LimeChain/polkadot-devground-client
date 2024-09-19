@@ -31,15 +31,15 @@ const WalletSelectButton = () => {
             type="button"
             onClick={disconnectWallet}
             className={cn(
-              'flex min-h-10 items-center px-6 py-1 transition-colors',
-              'font-geist text-white',
+              'flex min-h-10 items-center px-6 py-1',
+              'font-geist text-white transition-colors',
               'bg-dev-purple-700 hover:bg-dev-purple-600',
               'dark:bg-dev-purple-50 dark:text-dev-black-1000 dark:hover:bg-dev-purple-200',
             )}
           >
             {accounts.length > 1 ? (
               <>
-                <h5 className="mr-3  font-body2-bold">Connected</h5>
+                <h5 className="mr-3 font-body2-bold">Connected</h5>
                 <h5 className="mr-1 font-body2-bold">{accounts.length}</h5>
                 <Icon
                   name="icon-wallet"
@@ -51,7 +51,7 @@ const WalletSelectButton = () => {
                 <Icon
                   name="icon-wallet"
                 />
-                <h5 className="ml-[6px] mr-3 font-body2-bold">
+                <h5 className=" ml-2 mr-3 font-body2-bold">
                   {accounts[0].address.slice(0, 6)}...{accounts[0].address.slice(-4)}
                 </h5>
               </>
@@ -69,7 +69,7 @@ const WalletSelectButton = () => {
               'hover:bg-dev-pink-400',
             )}
           >
-            <h5 className="ml-[6px] mr-3 font-body2-bold">
+            <h5 className="ml-1 mr-3 font-body2-bold">
           Connect wallet
             </h5>
           </button>
