@@ -27,6 +27,7 @@ export const ChainDataList = (props: IChainDataList) => {
   const refScrollArea = useRef<HTMLDivElement>(null);
 
   const [isAtStart, setIsAtStart] = useState(true);
+  const [isAtEnd, setIsAtEnd] = useState(false);
 
   const scrollToBottom = useCallback(() => {
     if (refScrollArea.current) {
@@ -43,6 +44,7 @@ export const ChainDataList = (props: IChainDataList) => {
   const handleScroll = useCallback(() => {
     if (refScrollArea.current) {
       setIsAtStart(refScrollArea.current.scrollTop === 0);
+      setIsAtEnd(refScrollArea.current.scrollTop + refScrollArea.current.clientHeight === refScrollArea.current.scrollHeight);
     }
   }, []);
 
@@ -90,12 +92,12 @@ export const ChainDataList = (props: IChainDataList) => {
           </button>
           <button
             onClick={scrollToBottom}
-            disabled={!isAtStart}
+            disabled={isAtEnd}
             className={cn(
               'text-dev-black-200',
               'transition-colors duration-300',
               {
-                ['cursor-pointer text-dev-pink-500']: isAtStart,
+                ['cursor-pointer text-dev-pink-500']: !isAtEnd,
               },
             )}
           >

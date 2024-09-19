@@ -2,6 +2,7 @@ import { lazy } from 'react';
 
 import { LayoutBasic } from '@components/layouts/basic';
 import { LayoutCodeEditor } from '@components/layouts/codeEditor';
+import { ScrollLayout } from '@components/layouts/scrollLayout';
 import LatestBlocks from '@views/latestBlocks';
 import { NotFound } from '@views/notFound';
 
@@ -72,10 +73,10 @@ export const routes = () => ([
             path: 'latest-blocks',
             element: <LatestBlocks />,
           },
-          {
-            path: ':blockNumber',
-            element: <BlockDetails />,
-          },
+          // {
+          //   path: ':blockNumber',
+          //   element: <BlockDetails />,
+          // },
           {
             path: 'extrinsics',
             element: <SignedExtrinsics />,
@@ -119,6 +120,16 @@ export const routes = () => ([
           {
             path: '',
             element: <Extrinsics />,
+          },
+        ],
+      },
+      {
+        path: 'explorer/:blockNumber',
+        element: <ScrollLayout hasFooter/>,
+        children: [
+          {
+            path: '',
+            element: <BlockDetails />,
           },
         ],
       },
