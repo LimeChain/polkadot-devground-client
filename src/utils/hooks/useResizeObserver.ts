@@ -10,6 +10,7 @@ import type { RefObject } from 'react';
 interface UseResizeObserverOptions<T extends HTMLElement = HTMLElement> {
   enableScrollListener?: boolean;
   containerRef?: HTMLElement | RefObject<T> | null | undefined;
+  withComputedStyle?: boolean;
 }
 
 interface IVisibilityDetails {
@@ -20,13 +21,12 @@ interface IVisibilityDetails {
   left: boolean;
   middleHorizontal: boolean;
   right: boolean;
-
 }
 
 export const useResizeObserver = <T extends HTMLElement = HTMLElement>(
   ref: HTMLElement | RefObject<T> | null | undefined,
   options?: UseResizeObserverOptions<T>,
-): [DOMRectReadOnly | null, visibilityDetails: IVisibilityDetails] => { // Returns dimensions and visibility state
+): [DOMRectReadOnly | null, visibilityDetails: IVisibilityDetails, computedStyle: CSSStyleDeclaration | null] => {
   const [dimensions, setDimensions] = useState<DOMRectReadOnly | null>(null);
   const frameId = useRef<number | null>(null);
 
@@ -40,7 +40,9 @@ export const useResizeObserver = <T extends HTMLElement = HTMLElement>(
     right: false,
   });
 
-  const { enableScrollListener, containerRef } = options || {};
+  const [computedStyle, setComputedStyle] = useState<CSSStyleDeclaration | null>(null);
+
+  const { enableScrollListener, containerRef, withComputedStyle } = options || {};
 
   const updateDimensionsAndVisibility = useCallback(() => {
     const observeTarget = ref instanceof HTMLElement ? ref : ref?.current;
@@ -93,8 +95,11 @@ export const useResizeObserver = <T extends HTMLElement = HTMLElement>(
 
       setDimensions(rect);
       setVisibilityDetails(detail);
+      if (withComputedStyle) {
+        setComputedStyle(getComputedStyle(observeTarget));
+      }
     });
-  }, [ref, containerRef]);
+  }, [ref, containerRef, withComputedStyle]);
 
   useEffect(() => {
     const observeTarget = ref instanceof HTMLElement ? ref : ref?.current;
@@ -123,5 +128,5 @@ export const useResizeObserver = <T extends HTMLElement = HTMLElement>(
     };
   }, [ref, updateDimensionsAndVisibility, enableScrollListener]);
 
-  return [dimensions, visibilityDetails]; // Return both dimensions and visibility
+  return [dimensions, visibilityDetails, computedStyle];
 };

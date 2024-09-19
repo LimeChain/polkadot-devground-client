@@ -85,6 +85,11 @@ pre {
   }
 }
 
+.disable-vertical-scroll {
+  @apply overflow-hidden;
+  max-height: var(--initial-scroll-arrea-height, 100vh);
+}
+
 @keyframes bounce {
   0% {
     transform: translateY(0);
