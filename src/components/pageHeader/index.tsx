@@ -23,7 +23,7 @@ export const PageHeader = (props: IPageHeader) => {
   }, [location, navigate]);
 
   return (
-    <div className="flex items-center">
+    <div className="sticky flex items-center">
       <div
         className={cn(
           'mr-8 cursor-pointer duration-300 ease-out',

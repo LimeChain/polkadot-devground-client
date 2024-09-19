@@ -1,12 +1,13 @@
 .pd-block-details {
-  @apply font-geist grid grid-cols-[theme(width.56)_1fr];
+  @apply md:grid-cols-[theme(width.56)_1fr] font-geist grid ;
   @apply border-b border-dev-white-600 dark:border-dev-black-900;
   @apply hover:bg-dev-purple-100 dark:hover:bg-dev-purple-900;
   @apply transition-[background] duration-300;
 
   > p,
   > div {
-    @apply flex items-center py-4 pl-6;
+    @apply flex items-center;
+    @apply py-2 px-4 break-all sm:py-4 sm:pl-6;
   }
 
   > p {
@@ -22,35 +23,4 @@
   @apply flex font-body2-bold items-center gap-1 font-geist;
   @apply font-body2-bold font-geist;
   @apply hover:text-dev-black-500 hover:dark:text-dev-purple-200 ease-out duration-300;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .pd-block-details {
-    @apply grid-cols-1;
-  }
-
-  .pd-block-details > p,
-  .pd-block-details > div {
-    @apply py-2 pl-4;
-  }
-
-  .pd-link-btn {
-    @apply text-sm;
-  }
-}
-
-@media (max-width: 480px) {
-  .pd-block-details {
-    @apply grid-cols-1;
-  }
-
-  .pd-block-details > p,
-  .pd-block-details > div {
-    @apply py-1 pl-2;
-  }
-
-  .pd-link-btn {
-    @apply text-xs;
-  }
 }

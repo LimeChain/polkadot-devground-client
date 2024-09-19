@@ -63,7 +63,7 @@ export const BlockBody = (props: BlockBodyProps) => {
     const filterType = e.currentTarget.getAttribute('data-filter-type') as 'extrinsics' | 'events';
     if (filterType) {
       setFilter(filterType);
-      setShowMore(false); // Reset "Show More" when filter changes
+      setShowMore(false);
     }
   };
 
@@ -97,102 +97,127 @@ export const BlockBody = (props: BlockBodyProps) => {
         </Button>
       </div>
       {filter === 'extrinsics' && (
-        <table className="w-full">
-          <colgroup>
-            <col style={{ width: '20%' }} />
-            <col style={{ width: '20%' }} />
-            <col style={{ width: '20%' }} />
-            <col style={{ width: '20%' }} />
-            <col style={{ width: '20%' }} />
-          </colgroup>
-          <thead>
-            <tr className="pd-table-head">
-              <th>Extrinsic ID</th>
-              <th>Hash</th>
-              <th>Time</th>
-              <th>Result</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {visibleExtrinsics.map((extrinsic: IMappedBlockExtrinsic) => {
-              const timeAgo = extrinsic.timestamp && formatDistanceToNowStrict(
-                new Date(extrinsic.timestamp),
-                { addSuffix: true },
-              );
-              return (
-                <tr
-                  key={extrinsic.id}
-                  className={cn('pd-table-row')}
-                  onClick={() => handleOpenModal(extrinsic)}
-                >
-                  <td>{extrinsic.id}</td>
-                  <td>{extrinsic.hash}</td>
-                  <td>{timeAgo}</td>
-                  <td>
-                    {extrinsic.isSuccess
-                      ? (
-                        <Icon
-                          size={[16]}
-                          name="icon-checked"
-                          className="text-dev-green-600"
-                        />
-                      )
-                      : (
-                        <Icon
-                          size={[16]}
-                          name="icon-clock"
-                          className="animate-rotate text-dev-yellow-700"
-                        />
-                      )
-                    }
-                  </td>
-                  <td>{extrinsic.method.section} ({extrinsic.method.method})</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <colgroup>
+              <col className="min-w-28" />
+              <col className="min-w-24" />
+              <col className="min-w-24" />
+              <col className="min-w-20" />
+              <col className="min-w-24" />
+              <col className="min-w-12" />
+            </colgroup>
+            <thead>
+              <tr className={cn(
+                'bg-dev-purple-100 text-left',
+                'dark:bg-dev-black-900',
+              )}
+              >
+                <th className="py-4 pl-2 font-geist font-body2-bold">Extrinsic ID</th>
+                <th className="py-4 pl-2 font-geist font-body2-bold">Height</th>
+                <th className="py-4 pl-2 font-geist font-body2-bold">Time</th>
+                <th className="py-4 pl-2 font-geist font-body2-bold">Result</th>
+                <th className="py-4 pl-2 font-geist font-body2-bold">Action</th>
+                <th className="py-4 pl-2 font-geist font-body2-bold" />
+              </tr>
+            </thead>
+            <tbody>
+              {visibleExtrinsics.map((extrinsic: IMappedBlockExtrinsic) => {
+                const timeAgo = extrinsic.timestamp && formatDistanceToNowStrict(
+                  new Date(extrinsic.timestamp),
+                  { addSuffix: true },
+                );
+                return (
+                  <tr
+                    key={extrinsic.id}
+                    className={cn(
+                      'pd-table-row',
+                      ' text-dev-purple-600 dark:text-dev-purple-550',
+                    )}
+                    onClick={() => handleOpenModal(extrinsic)}
+                  >
+                    <td>{extrinsic.id}</td>
+                    <td>{blockNumber}</td>
+                    <td>{timeAgo}</td>
+                    <td>
+                      {extrinsic.isSuccess
+                        ? (
+                          <Icon
+                            size={[16]}
+                            name="icon-checked"
+                            className="text-dev-green-600"
+                          />
+                        )
+                        : (
+                          <Icon
+                            size={[16]}
+                            name="icon-clock"
+                            className="animate-rotate text-dev-yellow-700"
+                          />
+                        )
+                      }
+                    </td>
+                    <td>{extrinsic.method.section} ({extrinsic.method.method})</td>
+                    <td>
+                      <Icon
+                        size={[18]}
+                        name="icon-dropdownArrow"
+                        className="text-dev-black-1000 dark:text-dev-purple-50"
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
       {filter === 'events' && (
-        <table className="w-full">
-          <colgroup>
-            <col style={{ width: '20%' }} />
-            <col style={{ width: '20%' }} />
-            <col style={{ width: '30%' }} />
-            <col style={{ width: '30%' }} />
-            <col style={{ width: '2%' }} />
-          </colgroup>
-          <thead>
-            <tr className="pd-table-head">
-              <th>Event ID</th>
-              <th>Extrinsic ID</th>
-              <th>Action</th>
-              <th>Type</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {visibleEvents.map((event: IMappedBlockEvent, eventIndex: number) => (
-              <tr
-                key={eventIndex}
-                className={cn('pd-table-row')}
-                onClick={() => handleOpenModal(event)}
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <colgroup>
+              <col className="min-w-28" />
+              <col className="min-w-36" />
+              <col className="min-w-36" />
+              <col className="min-w-10" />
+            </colgroup>
+            <thead>
+              <tr className={cn(
+                'bg-dev-purple-100 text-left',
+                'dark:bg-dev-black-900',
+              )}
               >
-                <td>{blockNumber}-{eventIndex}</td>
-                <td>{event.event.type} ({event.event.value.type})</td>
-                <td>{event.phase.type}</td>
-                <td>
-                  <Icon
-                    size={[18]}
-                    name="icon-dropdownArrow"
-                    className="text-dev-black-1000 dark:text-dev-purple-50"
-                  />
-                </td>
+                <th className="py-4 pl-2 font-geist font-body2-bold">Event ID</th>
+                <th className="py-4 pl-2 font-geist font-body2-bold">Action</th>
+                <th className="py-4 pl-2 font-geist font-body2-bold">Type</th>
+                <th className="py-4 pl-2 font-geist font-body2-bold" />
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {visibleEvents.map((event: IMappedBlockEvent, eventIndex: number) => (
+                <tr
+                  key={eventIndex}
+                  className={cn(
+                    'pd-table-row',
+                    ' text-dev-purple-600 dark:text-dev-purple-550',
+                  )}
+                  onClick={() => handleOpenModal(event)}
+                >
+                  <td>{blockNumber}-{eventIndex}</td>
+                  <td>{event.event.type} ({event.event.value.type})</td>
+                  <td>{event.phase.type}</td>
+                  <td>
+                    <Icon
+                      size={[18]}
+                      name="icon-dropdownArrow"
+                      className="text-dev-black-1000 dark:text-dev-purple-50"
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
       {isMoreContentAvailable && (
         <button onClick={toggleShowMore} className="mt-4 font-geist font-body2-bold">

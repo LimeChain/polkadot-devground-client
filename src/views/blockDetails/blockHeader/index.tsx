@@ -24,14 +24,14 @@ interface DetailRowProps {
 }
 
 const DetailRow = (props: DetailRowProps) => {
-  const { label, value, isCopyable = false } = props;
+  const { label, value } = props;
 
   return (
     <div className={styles['pd-block-details']}>
       <p>{label}</p>
       <div className="flex items-center gap-x-1">
         <p>{value}</p>
-        {isCopyable && value && (
+        {value && (
           <CopyToClipboard text={value} toastMessage={label}>
             {({ ClipboardIcon }) => <>{ClipboardIcon}</>}
           </CopyToClipboard>
@@ -54,7 +54,7 @@ export const BlockHeader = (props: BlockHeaderProps) => {
     : format(new Date(headerData.timestamp), 'yyyy-MM-dd HH:mm:ss');
 
   return (
-    <div className="space-y-4">
+    <div>
       <div className={styles['pd-block-details']}>
         <p>Time stamp</p>
         <div className="flex items-center gap-x-2">
@@ -77,22 +77,18 @@ export const BlockHeader = (props: BlockHeaderProps) => {
       <DetailRow
         label="Block Hash"
         value={headerData.hash}
-        isCopyable
       />
       <DetailRow
         label="Parent Hash"
         value={headerData.parentHash}
-        isCopyable
       />
       <DetailRow
         label="State Root"
         value={headerData.stateRoot}
-        isCopyable
       />
       <DetailRow
         label="Extrinsic Root"
         value={headerData.extrinsicRoot}
-        isCopyable
       />
       {headerData.identity && (
         <div className={styles['pd-block-details']}>
@@ -118,7 +114,6 @@ export const BlockHeader = (props: BlockHeaderProps) => {
       <DetailRow
         label="Spec Version"
         value={headerData.runtime?.spec_version?.toString()}
-        isCopyable
       />
     </div>
   );
