@@ -24,10 +24,6 @@ export const ModalJSONViewer = (props: IModalJSONViewer) => {
     title,
   } = props;
 
-  if (!jsonData) {
-    return null;
-  }
-
   return (
     <Modal
       onClose={onClose}
@@ -41,7 +37,11 @@ export const ModalJSONViewer = (props: IModalJSONViewer) => {
       )}
     >
       <h5 className="self-start font-h5-bold">{title}</h5>
-      <JsonViewer json={jsonData} />
+      <JsonViewer json={jsonData
+      || {
+        Error: 'No JSON data available',
+      }}
+      />
     </Modal>
   );
 };
