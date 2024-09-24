@@ -170,13 +170,6 @@ export const RpcCalls = () => {
 
   const handleRpcSubmit = useCallback(() => {
     if (palletSelected && methodSelected) {
-      console.log({
-        pallet: palletSelected,
-        method: methodSelected,
-        args: callParams,
-        id: crypto.randomUUID(),
-      });
-
       setQueries(queries => ([
         {
           pallet: palletSelected,

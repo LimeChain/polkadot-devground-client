@@ -256,7 +256,6 @@ export const newRpcCalls: IRpcCalls = {
     ],
     link: 'https://paritytech.github.io/json-rpc-interface-spec/api/transactionWatch_v1_submitAndWatch.html',
   },
-
   'transactionWatch_v1_unwatch': {
     params: [
       {
