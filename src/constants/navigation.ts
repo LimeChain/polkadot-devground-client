@@ -10,13 +10,22 @@ export const NAVIGATION_ITEMS: TNavItem[] = [
   },
   {
     linkProps: {
+      title: 'Console',
+      to: '/code',
+    },
+    type: 'link',
+  },
+  {
+    linkProps: {
+      title: 'Forks',
+      to: '/forks',
+    },
+    type: 'link',
+  },
+  {
+    linkProps: {
       title: 'Developer',
       items: [
-        {
-          title: 'Explorer',
-          to: '/explorer',
-          icon: 'logo-github',
-        },
         {
           title: 'Chain State',
           to: '/chain-state',
@@ -35,11 +44,6 @@ export const NAVIGATION_ITEMS: TNavItem[] = [
         {
           title: 'Extrinsics',
           to: '/extrinsics',
-          icon: 'logo-github',
-        },
-        {
-          title: 'Console',
-          to: '/code',
           icon: 'logo-github',
         },
       ],
