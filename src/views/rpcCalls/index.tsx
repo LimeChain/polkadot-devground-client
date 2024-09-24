@@ -6,6 +6,7 @@ import React, {
   useState,
 } from 'react';
 
+import { CallDocs } from '@components/callParam/callDocs';
 import { QueryButton } from '@components/callParam/queryButton';
 import { QueryFormContainer } from '@components/callParam/queryFormContainer';
 import { QueryResult } from '@components/callParam/queryResult';
@@ -227,6 +228,8 @@ export const RpcCalls = () => {
         <QueryButton onClick={handleRpcSubmit}>
           Submit Rpc Call
         </QueryButton>
+
+        <CallDocs docs={newRpcCalls?.[`${palletSelected}_${methodSelected}`]?.docs || []} />
 
       </QueryFormContainer>
       <QueryResultContainer>
