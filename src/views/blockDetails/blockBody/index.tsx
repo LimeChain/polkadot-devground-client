@@ -36,9 +36,9 @@ export const BlockBody = (props: BlockBodyProps) => {
   const visibleExtrinsics = showMoreExtrinsics ? bodyData.extrinsics : bodyData.extrinsics.slice(0, 3);
   const visibleEvents = showMoreEvents ? bodyData.events : bodyData.events.slice(0, 3);
 
-  const handleOpenModal = useCallback((event: React.MouseEvent<HTMLTableRowElement>) => {
-    const type = event.currentTarget.getAttribute('data-type');
-    const index = event.currentTarget.getAttribute('data-index');
+  const handleOpenModal = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
+    const type = e.currentTarget.getAttribute('data-type');
+    const index = e.currentTarget.getAttribute('data-index');
 
     if (type === 'extrinsic' && index !== null) {
       setModalData(bodyData.extrinsics[Number(index)]);
@@ -48,6 +48,16 @@ export const BlockBody = (props: BlockBodyProps) => {
 
     toggleVisibility();
   }, [toggleVisibility, bodyData.extrinsics, bodyData.events]);
+
+  const handleShowMore = useCallback((e: React.MouseEvent) => {
+    const type = e.currentTarget.getAttribute('data-type');
+    if (type === 'extrinsic') {
+      setShowMoreExtrinsics(!showMoreExtrinsics);
+    } else if (type === 'event') {
+      setShowMoreEvents(!showMoreEvents);
+    }
+
+  }, [showMoreEvents, showMoreExtrinsics]);
 
   return (
     <div className="grid gap-4">
@@ -95,13 +105,13 @@ export const BlockBody = (props: BlockBodyProps) => {
                   return (
                     <tr
                       key={extrinsic.id}
+                      data-index={extrinsicIndex}
+                      data-type="extrinsic"
+                      onClick={handleOpenModal}
                       className={cn(
                         'pd-table-row',
                         ' text-dev-purple-600 dark:text-dev-purple-550',
                       )}
-                      data-type="extrinsic"
-                      data-index={extrinsicIndex}
-                      onClick={handleOpenModal}
                     >
                       <td>{extrinsic.id}</td>
                       <td>{blockNumber}</td>
@@ -133,8 +143,8 @@ export const BlockBody = (props: BlockBodyProps) => {
             bodyData.extrinsics.length > 3 && (
               <div className="flex justify-center">
                 <button
-                  // eslint-disable-next-line react/jsx-no-bind
-                  onClick={() => setShowMoreExtrinsics(!showMoreExtrinsics)}
+                  onClick={handleShowMore}
+                  data-type="extrinsic"
                   className="mt-4 font-geist font-body2-bold"
                 >
                   {showMoreExtrinsics ? 'Show Less' : 'Show More'}
@@ -197,9 +207,9 @@ export const BlockBody = (props: BlockBodyProps) => {
           {bodyData.events.length > 3 && (
             <div className="flex justify-center">
               <button
+                onClick={handleShowMore}
+                data-type="event"
                 className="mt-4 font-geist font-body2-bold"
-                // eslint-disable-next-line react/jsx-no-bind
-                onClick={() => setShowMoreEvents(!showMoreEvents)}
               >
                 {showMoreEvents ? 'Show Less' : 'Show More'}
               </button>
