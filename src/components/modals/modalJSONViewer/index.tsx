@@ -12,7 +12,7 @@ import type {
 } from '@custom-types/block';
 
 interface IModalJSONViewer extends Pick<IModal, 'onClose'> {
-  jsonData?: IMappedBlockExtrinsic | IMappedBlockEvent | null;
+  jsonData: IMappedBlockExtrinsic | IMappedBlockEvent | null;
   title?: string;
   onClose: () => void;
 }
@@ -37,11 +37,11 @@ export const ModalJSONViewer = (props: IModalJSONViewer) => {
       )}
     >
       <h5 className="self-start font-h5-bold">{title}</h5>
-      <JsonViewer json={jsonData
-      || {
-        Error: 'No JSON data available',
-      }}
-      />
+      {
+        jsonData
+          ? <JsonViewer json={jsonData} />
+          : <h3 className="p-10 text-center font-body1-bold">No JSON data available!</h3>
+      }
     </Modal>
   );
 };
