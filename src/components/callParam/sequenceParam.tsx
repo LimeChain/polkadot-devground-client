@@ -16,15 +16,18 @@ import { type ICallArgs } from '.';
 import type { SequenceVar } from '@polkadot-api/metadata-builders';
 interface ISequence extends ICallArgs {
   sequence: SequenceVar;
+  placeholder?: string;
+
 }
 
-export const SequenceParam = ({ sequence, onChange }: ISequence) => {
+export const SequenceParam = ({ sequence, onChange, placeholder }: ISequence) => {
   if (sequence.value.type === 'primitive' && sequence.value.value === 'u8') {
     return (
       <div className={styles.codecParam}>
         <BinaryParam
-          minLength={0}
           onChange={onChange}
+          minLength={0}
+          placeholder={placeholder}
         />
       </div>
     );
@@ -35,20 +38,14 @@ export const SequenceParam = ({ sequence, onChange }: ISequence) => {
       key={`sequence-param-${sequence.value.id}`}
       sequence={sequence}
       onChange={onChange}
-      sequence={sequence}
+      placeholder={placeholder}
     />
   );
 };
 
-const _SequenceParam = ({ sequence, onChange }: ISequence) => {
-  const [
-    length,
-    setLength,
-  ] = useState<number>(1);
-  const [
-    params,
-    setParams,
-  ] = useState(Array.from({ length }).map(() => ({ id: crypto.randomUUID(), value: undefined })));
+const _SequenceParam = ({ sequence, onChange, placeholder }: ISequence) => {
+  const [length, setLength] = useState<number>(1);
+  const [params, setParams] = useState(Array.from({ length }).map(() => ({ id: crypto.randomUUID(), value: undefined })));
 
   useEffect(() => {
     const res = params.map((p) => p.value);
@@ -144,8 +141,8 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
               <div className="flex w-full flex-col gap-6">
                 <CodecParam
                   // eslint-disable-next-line react/jsx-no-bind
-                  onChange={(args) => handleOnChange(args, param.id)}
-                  variable={sequence.value}
+                  onChange={args => handleOnChange(args, param.id)}
+                  placeholder={placeholder}
                 />
               </div>
             </div>

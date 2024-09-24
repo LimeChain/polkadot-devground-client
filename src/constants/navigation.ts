@@ -51,6 +51,11 @@ export const NAVIGATION_ITEMS: TNavItem[] = [
           to: '/extrinsics',
           icon: 'logo-github',
         },
+        {
+          title: 'Rpc Calls',
+          to: '/rpc-calls',
+          icon: 'logo-github',
+        },
       ],
     },
     type: 'dropdown',

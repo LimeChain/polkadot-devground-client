@@ -15,9 +15,10 @@ import type { Var } from '@polkadot-api/metadata-builders';
 
 interface ICodecParam extends ICallArgs {
   variable: Var;
+  placeholder?: string;
 }
 
-export const CodecParam = ({ variable, onChange }: ICodecParam) => {
+export const CodecParam = ({ variable, onChange, placeholder }: ICodecParam) => {
   switch (variable.type) {
     case 'struct':
       return (
@@ -43,8 +44,9 @@ export const CodecParam = ({ variable, onChange }: ICodecParam) => {
     case 'primitive':
       return (
         <PrimitiveParam
-          onChange={onChange}
           primitive={variable}
+          onChange={onChange}
+          placeholder={placeholder}
         />
       );
     case 'array':

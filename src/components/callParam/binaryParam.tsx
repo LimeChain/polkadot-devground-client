@@ -16,9 +16,16 @@ import type { ICallArgs } from './index';
 
 interface IBinaryParam extends ICallArgs {
   minLength: number;
+  placeholder?: string;
+  readOnly?: boolean;
 }
 
-export const BinaryParam = ({ onChange, minLength }: IBinaryParam) => {
+export const BinaryParam = ({
+  onChange,
+  minLength,
+  placeholder,
+  readOnly,
+}: IBinaryParam) => {
 
   const [
     useFileUpload,
@@ -40,12 +47,14 @@ export const BinaryParam = ({ onChange, minLength }: IBinaryParam) => {
         title="File Upload"
       />
       {
-        useFileUpload
+        useFileUpload && !readOnly
           ? <PDFileUpload onChange={onChange} />
           : (
             <TextBinaryParam
-              minLength={minLength}
               onChange={onChange}
+              minLength={minLength}
+              placeholder={placeholder}
+              readOnly={readOnly}
             />
           )
       }
@@ -53,8 +62,14 @@ export const BinaryParam = ({ onChange, minLength }: IBinaryParam) => {
   );
 };
 
-const TextBinaryParam = ({ onChange, minLength }: IBinaryParam) => {
+export const TextBinaryParam = ({
+  onChange,
+  minLength,
+  placeholder,
+  readOnly,
+}: IBinaryParam) => {
   const requiredHexLength = minLength * 2;
+
   const requiredBinaryLength = minLength;
   const encodedValue = String().padEnd(requiredHexLength, '0');
 
@@ -93,6 +108,10 @@ const TextBinaryParam = ({ onChange, minLength }: IBinaryParam) => {
 
   return (
     <input
+      type="text"
+      placeholder={placeholder || 'Binary hex or string'}
+      value={value}
+      readOnly={readOnly}
       onChange={handleOnChange}
       placeholder="Binary hex or string"
       type="text"

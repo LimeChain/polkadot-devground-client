@@ -8,7 +8,9 @@
   @apply w-full border dark:border-dev-purple-700 border-dev-white-900 outline-none;
   @apply w-full outline-none;
   @apply p-3 bg-transparent;
-  @apply font-geist font-body1-regular
+  @apply font-geist font-body1-regular;
+  
+    @apply read-only:opacity-60 read-only:cursor-not-allowed
 }
 
 .codecInputError {

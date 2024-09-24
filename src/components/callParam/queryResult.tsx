@@ -98,7 +98,8 @@ export const QueryResult = ({
                   Result
                   <JsonViewer
                     src={result as object}
-                    style={{
+collapseObjectsAfterLength={8}                    
+style={{
                       borderRadius: 8,
                       backgroundColor: theme === 'dark' ? '#252525' : '#FBFCFE',
                       padding: 16,

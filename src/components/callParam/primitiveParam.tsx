@@ -13,20 +13,25 @@ import type { ICallArgs } from '.';
 import type { PrimitiveVar } from '@polkadot-api/metadata-builders';
 interface IPrimitiveParam extends ICallArgs {
   primitive: PrimitiveVar;
+  placeholder?: string;
+  readOnly?: boolean;
 }
 
-export const PrimitiveParam = ({ primitive, onChange }: IPrimitiveParam) => {
-  const [
-    value,
-    setValue,
-  ] = useState('');
+export const PrimitiveParam = ({
+  primitive,
+  onChange,
+  placeholder,
+  readOnly,
+}: IPrimitiveParam) => {
+  const [value, setValue] = useState('');
 
   const commonProps = {
-    placeholder: primitive.value,
+    placeholder: placeholder || primitive.value,
     value,
     className: styles.codecInput,
     onChange: (event: ChangeEvent<HTMLInputElement>) =>
       setValue(event.target.value),
+    readOnly: readOnly ? true : false,
   };
 
   const commonNumberInputProps = {
@@ -59,7 +64,7 @@ export const PrimitiveParam = ({ primitive, onChange }: IPrimitiveParam) => {
       case 'i128':
       case 'u256':
       case 'i256':
-        onChange(BigInt(value));
+        onChange(BigInt(Number(value).toFixed(0)));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
