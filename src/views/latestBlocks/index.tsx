@@ -16,18 +16,7 @@ import {
   truncateAddress,
 } from '@utils/helpers';
 
-interface Block {
-  header: {
-    identity: string | object;
-    hash: string | undefined;
-    number: number;
-    timestamp: number;
-  };
-  body: {
-    extrinsics: unknown[];
-    events: unknown[];
-  };
-}
+import type { IMappedBlock } from '@custom-types/block';
 
 const LatestBlocks = () => {
   const navigate = useNavigate();
@@ -36,7 +25,7 @@ const LatestBlocks = () => {
   const latestFinalizedBlock = useStoreChain?.use?.finalizedBlock?.();
   const chain = useStoreChain?.use?.chain?.();
 
-  const [blocks, setBlocks] = useState<Block[]>([]);
+  const [blocks, setBlocks] = useState<IMappedBlock[]>([]);
   const isLoading = blocksData.size === 0;
 
   useEffect(() => {
@@ -60,7 +49,7 @@ const LatestBlocks = () => {
         className="h-full"
         verticalScrollClassNames="pt-8"
       >
-        <table>
+        <table className="w-full">
           <colgroup>
             <col style={{ width: '10%', minWidth: '9rem' }} />
             <col style={{ width: '10%', minWidth: '4rem' }} />
@@ -125,7 +114,7 @@ const LatestBlocks = () => {
                       <td>{timeAgo}</td>
                       <td>{block.body.extrinsics.length}</td>
                       <td>{block.body.events.length}</td>
-                      <td>{truncateAddress(block.header.identity.toString(), 6)}</td>
+                      <td>{truncateAddress(block.header.identity.address.toString() || '', 6)}</td>
                       <td>{truncateAddress(block.header.hash, 6)}</td>
                     </tr>
                   );

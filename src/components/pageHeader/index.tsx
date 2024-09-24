@@ -38,11 +38,7 @@ export const PageHeader = (props: IPageHeader) => {
         />
       </div>
       <h4 className="mr-2 font-h4-light">{title}</h4>
-      {
-        blockNumber
-        && <h4 className="font-h4-bold">{blockNumber}</h4>
-      }
+      {blockNumber && <h4 className="font-h4-bold">{blockNumber}</h4>}
     </div>
-
   );
 };

@@ -6,7 +6,12 @@ import { ChainStateBlock } from './components/chainStateBlock';
 
 const Explorer = () => {
   return (
-    <div className="flex flex-col gap-12 overflow-hidden lg:h-full">
+    <div
+      className={cn(
+        'disable-vertical-scroll',
+        'flex h-full flex-1 flex-col gap-12',
+      )}
+    >
       <SearchBar
         type="all"
         label="Search block/extrinsic"

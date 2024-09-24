@@ -85,6 +85,11 @@ pre {
   }
 }
 
+.disable-vertical-scroll {
+  @apply overflow-hidden;
+  max-height: var(--initial-scroll-arrea-height, 100vh);
+}
+
 @keyframes bounce {
   0% {
     transform: translateY(0);
@@ -162,7 +167,7 @@ html[data-color-scheme="light"] #icon-checked {
       @apply hover:bg-dev-purple-100 dark:hover:bg-dev-purple-900;
 
       >td {
-        @apply pb-2 pt-4 pl-1 font-body2-regular font-geist;
+        @apply pb-2 pt-4 pl-1 font-body2-regular font-geist break-words;
       }
 
   }
