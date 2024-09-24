@@ -16,14 +16,20 @@ export const checkIfCompatable = (isCompatable: boolean, message: string) => {
 };
 
 export function unwrapApiResult(data: unknown): unknown {
-  if (data instanceof FixedSizeBinary) {
-    return data.asHex();
+  // instanceof Binary doesn't catch Binaries returned from rpc calls
+  if (data && typeof data === 'object' && 'asHex' in data) {
+    return (data as Binary).asHex();
   }
 
   if (data instanceof Binary) {
     return data.asHex();
   }
 
+  if (data instanceof FixedSizeBinary) {
+    return data.asHex();
+  }
+
+  // AuthorityDiscoveryApi_authorities
   if (typeof data !== 'object') {
     return data;
   }
@@ -33,6 +39,7 @@ export function unwrapApiResult(data: unknown): unknown {
   }
 
   if (Array.isArray(data)) {
+
     return data.map(unwrapApiResult);
   }
 

@@ -19,7 +19,7 @@ export function CompactParam({ compact, onChange }: ICompactParam) {
   const [value, setValue] = useState('0');
 
   useEffect(() => {
-    onChange(compact.isBig ? BigInt(value) : Number(value));
+    onChange(compact.isBig ? BigInt(Number(value).toFixed(0)) : Number(value));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 

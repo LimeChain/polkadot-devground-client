@@ -54,6 +54,7 @@ import type {
 } from '@custom-types/chain';
 import type {
   ChainSpecData,
+  FollowResponse,
   SubstrateClient,
 } from '@polkadot-api/substrate-client';
 
@@ -64,7 +65,9 @@ export interface StoreInterface {
   client: PolkadotClient | null;
   peopleClient: PolkadotClient | null;
   stakingClient: PolkadotClient | null;
+
   rawClient: SubstrateClient | null;
+  rawClientSubscription: FollowResponse | null;
 
   api: TApi | null;
   peopleApi: TPeopleApi | null;
@@ -97,6 +100,7 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   client: null,
   peopleClient: null,
   rawClient: null,
+  rawClientSubscription: null,
   stakingClient: null,
   api: null,
   peopleApi: null,
@@ -121,32 +125,34 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
     resetStore: async () => {
       try {
         const client = get()?.client;
-        const peopleClient = get()?.peopleClient;
         const rawClient = get()?.rawClient;
+        const peopleClient = get()?.peopleClient;
         const stakingClient = get()?.stakingClient;
 
         // clean up subscrptions / destroy old clients
         client?.destroy?.();
-        peopleClient?.destroy?.();
         rawClient?.destroy?.();
+        peopleClient?.destroy?.();
         stakingClient?.destroy?.();
-        // dont think there is a need to terminate smoldot
-        // await smoldot?.terminate?.();
 
+      } catch (error) {
+        console.log(error);
+
+      } finally {
+        const smoldot = get()?.smoldot;
         const blocksData = get()?.blocksData;
         const registry = get().registry;
 
         // reset data
-        blocksData?.clear();
-        registry.clearCache();
-        set({ finalizedBlock: undefined, bestBlock: undefined });
+        blocksData?.clear?.();
+        registry?.clearCache?.();
 
-      } catch (error) {
-        console.error(error);
-
-      } finally {
-        const smoldot = get()?.smoldot;
-        set({ ...initialState, smoldot });
+        set({
+          ...initialState,
+          smoldot,
+          finalizedBlock: undefined,
+          bestBlock: undefined,
+        });
 
       }
     },
@@ -275,14 +281,15 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
 
           }
 
-          await Promise.allSettled(promises).then(results => {
-            results.forEach(blockData => {
-              if (blockData.status === 'fulfilled') {
-                blocksData.set(blockData.value.header.number, blockData.value);
-              }
-            });
-            set({ bestBlock: bestBlock?.number, finalizedBlock: finalizedBlock?.number });
-          })
+          Promise.allSettled(promises)
+            .then(results => {
+              results.forEach(blockData => {
+                if (blockData.status === 'fulfilled') {
+                  blocksData.set(blockData.value.header.number, blockData.value);
+                }
+              });
+              set({ bestBlock: bestBlock?.number, finalizedBlock: finalizedBlock?.number });
+            })
             // prevent state crash on random smoldot error
             .catch(err => {
               console.error(err);
@@ -293,22 +300,45 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
         if (wsUrl) {
           const rawClient = createSubstrateClient(getWsProvider(wsUrl));
           set({ rawClient });
+
+          const createSubscription = () => {
+            const rawClientSubscription = rawClient.chainHead(
+              true,
+              () => {},
+              (error) => {
+                console.log(error);
+                createSubscription();
+              },
+            );
+
+            set({ rawClientSubscription });
+
+          };
+
+          createSubscription();
+
         }
 
       } catch (err) {
-        console.error(err);
+        console.log('Unpredicted Error, reseting chain store...', err);
+        get()?.actions?.setChain?.(get()?.chain);
       }
     },
   },
   async init() {
     try {
       const smoldot = startFromWorker(new SmWorker(), {});
-
       set({ smoldot });
 
       get().actions.setChain(get().chain);
+
     } catch (err) {
-      console.error(err);
+      console.log('Smoldot Error, retrying to init...', err);
+
+      get().smoldot?.terminate?.()
+        .catch(console.log);
+
+      get().init();
     }
   },
 })));

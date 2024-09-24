@@ -1,4 +1,7 @@
-import { ScaleEnum } from '@polkadot-api/substrate-bindings';
+import {
+  blockHeader,
+  ScaleEnum,
+} from '@polkadot-api/substrate-bindings';
 import {
   Struct,
   u32,
@@ -16,7 +19,6 @@ export const decodeExtrinsic = (extrinsic: string): IBlockExtrinsic => {
   const registry = baseStoreChain.getState().registry as StoreInterface['registry'];
   return registry.createType('Extrinsic', extrinsic).toHuman() as unknown as IBlockExtrinsic;
 };
-
 export const babeDigestCodec = ScaleEnum({
   authority_index: u32,
   one: u32,
@@ -25,3 +27,4 @@ export const babeDigestCodec = ScaleEnum({
 });
 
 export const auraDigestCodec = Struct({ slotNumber: u64 });
+export const blockHeaderCodec = blockHeader;

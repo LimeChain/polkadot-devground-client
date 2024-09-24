@@ -16,13 +16,19 @@ import { type ICallArgs } from '.';
 import type { SequenceVar } from '@polkadot-api/metadata-builders';
 interface ISequence extends ICallArgs {
   sequence: SequenceVar;
+  placeholder?: string;
+
 }
 
-export const SequenceParam = ({ sequence, onChange }: ISequence) => {
+export const SequenceParam = ({ sequence, onChange, placeholder }: ISequence) => {
   if (sequence.value.type === 'primitive' && sequence.value.value === 'u8') {
     return (
       <div className={styles.codecParam}>
-        <BinaryParam onChange={onChange} minLength={0} />
+        <BinaryParam
+          onChange={onChange}
+          minLength={0}
+          placeholder={placeholder}
+        />
       </div>
     );
   }
@@ -32,11 +38,12 @@ export const SequenceParam = ({ sequence, onChange }: ISequence) => {
       key={`sequence-param-${sequence.value.id}`}
       sequence={sequence}
       onChange={onChange}
+      placeholder={placeholder}
     />
   );
 };
 
-const _SequenceParam = ({ sequence, onChange }: ISequence) => {
+const _SequenceParam = ({ sequence, onChange, placeholder }: ISequence) => {
   const [length, setLength] = useState<number>(1);
   const [params, setParams] = useState(Array.from({ length }).map(() => ({ id: crypto.randomUUID(), value: undefined })));
 
@@ -132,6 +139,7 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
                   variable={sequence.value}
                   // eslint-disable-next-line react/jsx-no-bind
                   onChange={args => handleOnChange(args, param.id)}
+                  placeholder={placeholder}
                 />
               </div>
             </div>

@@ -38,6 +38,11 @@ export const NAVIGATION_ITEMS: TNavItem[] = [
           icon: 'logo-github',
         },
         {
+          title: 'Rpc Calls',
+          to: '/rpc-calls',
+          icon: 'logo-github',
+        },
+        {
           title: 'Console',
           to: '/code',
           icon: 'logo-github',

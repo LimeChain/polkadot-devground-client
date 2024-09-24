@@ -91,6 +91,7 @@ export const QueryResult = ({
                   <JsonViewer
                     src={result as object}
                     enableClipboard
+                    collapseObjectsAfterLength={8}
                     style={{
                       borderRadius: 8,
                       backgroundColor: theme === 'dark' ? '#252525' : '#FBFCFE',
