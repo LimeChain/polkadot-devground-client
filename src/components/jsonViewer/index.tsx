@@ -1,20 +1,16 @@
-import JsonView from 'react18-json-view';
+import JsonView, { type JsonViewProps } from 'react18-json-view';
 import 'react18-json-view/src/style.css';
 
 import { PDScrollArea } from '@components/pdScrollArea';
+import { unwrapApiResult } from '@utils/papi/helpers';
 
-interface IJsonViewer {
-  json: object;
-}
-
-export const JsonViewer = (props: IJsonViewer) => {
-  const { json } = props;
-
+export const JsonViewer = (props: JsonViewProps) => {
   return (
     <PDScrollArea className="h-[30rem]">
       <JsonView
-        src={json}
+        {...props}
         theme="atom"
+        src={unwrapApiResult(props.src)}
       />
     </PDScrollArea>
   );
