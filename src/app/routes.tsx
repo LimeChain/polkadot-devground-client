@@ -137,6 +137,16 @@ export const routes = () => ([
       },
       {
         path: 'extrinsics',
+        element: <LayoutBasic hasFooter classNames="lg:pb-8" />,
+        children: [
+          {
+            path: '',
+            element: <RpcCalls />,
+          },
+        ],
+      },
+      {
+        path: 'extrinsics',
         element: <LayoutBasic
           classNames="lg:pb-8"
           hasFooter
