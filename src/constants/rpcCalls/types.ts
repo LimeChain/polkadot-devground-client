@@ -1,7 +1,6 @@
 export interface IRpcCalls {
   [key: string]: {
     params: IRpcCallParam[];
-    value: string;
     docs?: string[];
     link?: string;
   };
