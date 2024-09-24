@@ -39,7 +39,7 @@ export const ModalJSONViewer = (props: IModalJSONViewer) => {
       <h5 className="self-start font-h5-bold">{title}</h5>
       {
         jsonData
-          ? <JsonViewer json={jsonData} />
+          ? <JsonViewer src={jsonData} />
           : <h3 className="p-10 text-center font-body1-bold">No JSON data available!</h3>
       }
     </Modal>
