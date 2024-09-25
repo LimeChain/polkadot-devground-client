@@ -18,6 +18,7 @@ const Extrinsics = lazy(() => import('../views/extrinsics'));
 const ChainState = lazy(() => import('../views/chainState'));
 const Constants = lazy(() => import('../views/constants'));
 const RuntimeCalls = lazy(() => import('../views/runtimeCalls'));
+const Onboarding = lazy(() => import('../views/onboarding'));
 
 export const routes = () => ([
   {
@@ -34,6 +35,34 @@ export const routes = () => ([
           {
             path: 'forks',
             element: <Forks />,
+          },
+          {
+            path: 'onboarding',
+            element: <Onboarding />,
+          },
+          {
+            path: 'login-callback',
+            element: <Callback />,
+          },
+          {
+            path: 'extrinsics',
+            element: <Extrinsics />,
+          },
+          {
+            path: 'chain-state',
+            element: <ChainState />,
+          },
+          {
+            path: 'contants',
+            element: <Constants />,
+          },
+          {
+            path: 'runtime-calls',
+            element: <RuntimeCalls />,
+          },
+          {
+            path: 'rpc-calls',
+            element: <RpcCalls />,
           },
         ],
       },
@@ -52,21 +81,8 @@ export const routes = () => ([
         ],
       },
       {
-        path: 'login-callback',
-        element: <LayoutBasic hasFooter />,
-        children: [
-          {
-            path: '',
-            element: <Callback />,
-          },
-        ],
-      },
-      {
         path: 'explorer',
-        element: <LayoutBasic
-          classNames="lg:pb-8"
-          hasFooter
-        />,
+        element: <LayoutBasic hasFooter />,
         children: [
           {
             path: '',
@@ -83,71 +99,6 @@ export const routes = () => ([
           {
             path: 'extrinsics',
             element: <SignedExtrinsics />,
-          },
-        ],
-      },
-      {
-        path: 'chain-state',
-        element: <LayoutBasic
-          classNames="lg:pb-8"
-          hasFooter
-        />,
-        children: [
-          {
-            path: '',
-            element: <ChainState />,
-          },
-        ],
-      },
-      {
-        path: 'constants',
-        element: <LayoutBasic
-          classNames="lg:pb-8"
-          hasFooter
-        />,
-        children: [
-          {
-            path: '',
-            element: <Constants />,
-          },
-        ],
-      },
-      {
-        path: 'runtime-calls',
-        element: <LayoutBasic
-          classNames="lg:pb-8"
-          hasFooter
-        />,
-        children: [
-          {
-            path: '',
-            element: <RuntimeCalls />,
-          },
-        ],
-      },
-      {
-        path: 'rpc-calls',
-        element: <LayoutBasic
-          classNames="lg:pb-8"
-          hasFooter
-        />,
-        children: [
-          {
-            path: '',
-            element: <RpcCalls />,
-          },
-        ],
-      },
-      {
-        path: 'extrinsics',
-        element: <LayoutBasic
-          classNames="lg:pb-8"
-          hasFooter
-        />,
-        children: [
-          {
-            path: '',
-            element: <Extrinsics />,
           },
         ],
       },
