@@ -17,7 +17,7 @@ export const Header = () => {
         <Logo />
         <Navigation />
       </div>
-      <div className="hidden gap-5 lg:flex">
+      <div className="hidden gap-5 md:flex">
         {
           accounts.length > 0
             ? (
@@ -40,7 +40,7 @@ export const Header = () => {
         <ChainSelectButton />
         <ToggleTheme />
       </div>
-      <div className="flex lg:hidden">
+      <div className="flex md:hidden">
         <ChainSelectButton />
         <BurgerMenu />
       </div>

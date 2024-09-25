@@ -44,7 +44,7 @@ const BurgerMenu = () => {
         <div className="flex items-center justify-between text-dev-white-200">
           <div className="flex items-center">
             <Icon name={currentChain.icon} size={[28]} />
-            <h5 className="ml-[6px] mr-3 text-dev-white-200 font-h5-bold">
+            <h5 className="ml-1 mr-3 text-dev-white-200 font-h5-bold">
               {currentChain.name}
             </h5>
           </div>
