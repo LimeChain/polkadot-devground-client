@@ -5,7 +5,8 @@ import { cn } from '@utils/helpers';
 
 import { NavigationItem } from './navigationItem';
 
-export const Navigation = () => {
+export const Navigation = (props) => {
+  const { classNames } = props;
   const { pathname } = useLocation();
   const isHomePage = pathname === '/';
 
@@ -15,8 +16,9 @@ export const Navigation = () => {
 
   return (
     <div className={cn(
-      'flex items-center gap-3',
+      'hidden items-center gap-3 sm:flex',
       'font-geist font-body2-regular',
+      classNames,
     )}
     >
       {

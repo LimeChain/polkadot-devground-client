@@ -29,7 +29,7 @@ export const NAVIGATION_ITEMS: TNavItem[] = [
         {
           title: 'Chain State',
           to: '/chain-state',
-          icon: 'logo-github',
+          icon: 'icon-chain',
         },
         {
           title: 'Constants',
@@ -37,9 +37,14 @@ export const NAVIGATION_ITEMS: TNavItem[] = [
           icon: 'logo-github',
         },
         {
+          title: 'RPC Calls',
+          to: '/rpc-calls',
+          icon: 'icon-rpcCalls',
+        },
+        {
           title: 'Runtime Calls',
           to: '/runtime-calls',
-          icon: 'logo-github',
+          icon: 'icon-runtimeCalls',
         },
         {
           title: 'Extrinsics',

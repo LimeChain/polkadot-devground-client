@@ -1,3 +1,4 @@
+import BurgerMenu from '@components/burgerMenu';
 import ChainSelectButton from '@components/chainSelectButton';
 import { Logo } from '@components/logo';
 import { Navigation } from '@components/navigation';
@@ -16,7 +17,7 @@ export const Header = () => {
         <Logo />
         <Navigation />
       </div>
-      <div className="flex gap-5">
+      <div className="hidden gap-5 lg:flex">
         {
           accounts.length > 0
             ? (
@@ -36,9 +37,12 @@ export const Header = () => {
               </button>
             )
         }
-
         <ChainSelectButton />
         <ToggleTheme />
+      </div>
+      <div className="flex lg:hidden">
+        <ChainSelectButton />
+        <BurgerMenu />
       </div>
     </nav>
   );
