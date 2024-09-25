@@ -148,7 +148,7 @@ export const SearchBar = (props: ISearchBarProps) => {
         onClick={handleShowResults}
         className={cn(
           'px-6',
-          'h-10',
+          'hidden h-10 sm:block',
           'bg-dev-purple-700 text-dev-purple-300',
           'font-geist font-body2-bold',
           'transition-all duration-300 hover:bg-dev-purple-900',

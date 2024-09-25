@@ -1,4 +1,5 @@
 import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { formatDistanceToNowStrict } from 'date-fns';
 import {
   useCallback,
@@ -8,6 +9,7 @@ import {
 } from 'react';
 
 import { Icon } from '@components/icon';
+import { Loader } from '@components/loader';
 import { ModalJSONViewer } from '@components/modals/modalJSONViewer';
 import { PageHeader } from '@components/pageHeader';
 import { PDScrollArea } from '@components/pdScrollArea';
@@ -21,8 +23,8 @@ import {
 import type { IMappedBlockExtrinsic } from '@custom-types/block';
 
 const SignedExtrinsics = () => {
-
   const refSelectedExtrinsic = useRef<IMappedBlockExtrinsic | undefined>();
+  const parentRef = useRef<HTMLDivElement>(null);
 
   const blocksData = useStoreChain?.use?.blocksData?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
@@ -57,96 +59,130 @@ const SignedExtrinsics = () => {
     latestBlock,
   ]);
 
+  const rowVirtualizer = useVirtualizer({
+    count: signedExtrinsics.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 45,
+    overscan: 2,
+  });
+
+  const virtualRows = rowVirtualizer.getVirtualItems();
+  const totalSize = rowVirtualizer.getTotalSize();
+
+  const paddingTop = virtualRows.length > 0 ? virtualRows[0].start : 0;
+  const paddingBottom =
+    virtualRows.length > 0
+      ? totalSize - virtualRows[virtualRows.length - 1].end
+      : 0;
+
   return (
-    <div className="grid h-full grid-rows-[40px_46px_1fr] gap-8">
+    <div className="disable-vertical-scroll grid h-full grid-rows-[40px_46px_1fr] gap-8">
       <PageHeader title="Extrinsics" />
       <SearchBar
         label="Search by Block"
         type="extrinsics"
       />
-      <PDScrollArea
-        className="h-full"
-        verticalScrollClassNames="pt-8"
-      >
-        <table>
-          <colgroup>
-            <col style={{ width: '10%', minWidth: '8rem' }} />
-            <col style={{ width: '10%', minWidth: '8rem' }} />
-            <col style={{ width: '10%', minWidth: '10rem' }} />
-            <col style={{ width: '10%', minWidth: '10rem' }} />
-            <col style={{ width: '5%', minWidth: '6rem' }} />
-            <col style={{ width: '10%', minWidth: '10rem' }} />
-            <col style={{ width: '1%', minWidth: '6rem' }} />
-          </colgroup>
-          <tr className="pd-table-head">
-            <th>Extrinsic ID</th>
-            <th>Block</th>
-            <th>Signer</th>
-            <th>Time</th>
-            <th>Result</th>
-            <th>Action</th>
-            <th />
-          </tr>
-          {
-            isLoading
-              ? 'Loading...'
-              : (
-                signedExtrinsics.map((extrinsic, extrinsicIndex) => {
-                  const timeAgo = extrinsic.timestamp && formatDistanceToNowStrict(
-                    new Date(extrinsic.timestamp),
-                    { addSuffix: true },
-                  );
-
-                  return (
-                    <tr
-                      key={extrinsic.id}
-                      data-extrinsic-id={extrinsic.id}
-                      onClick={handleOpenModal}
-                      className={cn(
-                        'pd-table-row',
-                        {
-                          ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: extrinsicIndex === 0,
-                        },
-                      )}
-                    >
-                      <td>{extrinsic.id}</td>
-                      <td>{extrinsic.blockNumber}</td>
-                      <td>{truncateAddress(extrinsic.signer?.Id, 6)}</td>
-                      <td>{timeAgo}</td>
-                      <td>
-                        {
-                          extrinsic.isSuccess
-                            ? (
-                              <Icon
-                                className="text-dev-green-600"
-                                name="icon-checked"
-                                size={[16]}
-                              />
-                            )
-                            : (
-                              <Icon
-                                className="text-dev-red-800"
-                                name="icon-failed"
-                                size={[16]}
-                              />
-                            )}
-                      </td>
-                      <td>{extrinsic.method.method}</td>
-                      <td>
-                        <Icon
-                          className="text-dev-black-1000 dark:text-dev-purple-50"
-                          name="icon-dropdownArrow"
-                          size={[18]}
-                        />
-                      </td>
+      {
+        !isLoading
+          ? (
+            <PDScrollArea
+              ref={parentRef}
+              className="h-full"
+              verticalScrollClassNames="pt-8"
+            >
+              <table>
+                <colgroup>
+                  <col style={{ width: '10%', minWidth: '8rem' }} />
+                  <col style={{ width: '10%', minWidth: '8rem' }} />
+                  <col style={{ width: '10%', minWidth: '10rem' }} />
+                  <col style={{ width: '10%', minWidth: '10rem' }} />
+                  <col style={{ width: '5%', minWidth: '6rem' }} />
+                  <col style={{ width: '10%', minWidth: '10rem' }} />
+                  <col style={{ width: '1%', minWidth: '6rem' }} />
+                </colgroup>
+                <thead>
+                  <tr className="pd-table-head">
+                    <th>Extrinsic ID</th>
+                    <th>Block</th>
+                    <th>Signer</th>
+                    <th>Time</th>
+                    <th>Result</th>
+                    <th>Action</th>
+                    <th />
+                  </tr>
+                </thead>
+                <tbody>
+                  {paddingTop > 0 && (
+                    <tr>
+                      <td style={{ height: `${paddingTop}px` }} />
                     </tr>
-                  );
-                })
-              )
-          }
-        </table>
-      </PDScrollArea>
+                  )}
+                  {
+                    virtualRows.map((virtualRow) => {
+                      const extrinsic = signedExtrinsics[virtualRow.index];
+                      const timeAgo = extrinsic.timestamp && formatDistanceToNowStrict(
+                        new Date(extrinsic.timestamp),
+                        { addSuffix: true },
+                      );
 
+                      return (
+
+                        <tr
+                          key={extrinsic.id}
+                          data-extrinsic-id={extrinsic.id}
+                          onClick={handleOpenModal}
+                          className={cn(
+                            'pd-table-row',
+                            {
+                              // ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: extrinsicIndex === 0,
+                            },
+                          )}
+                        >
+                          <td>{extrinsic.id}</td>
+                          <td>{extrinsic.blockNumber}</td>
+                          <td>{truncateAddress(extrinsic.signer?.Id, 6)}</td>
+                          <td>{timeAgo}</td>
+                          <td>
+                            {
+                              extrinsic.isSuccess
+                                ? (
+                                  <Icon
+                                    className="text-dev-green-600"
+                                    name="icon-checked"
+                                    size={[16]}
+                                  />
+                                )
+                                : (
+                                  <Icon
+                                    className="text-dev-red-800"
+                                    name="icon-failed"
+                                    size={[16]}
+                                  />
+                                )}
+                          </td>
+                          <td>{extrinsic.method.method}</td>
+                          <td>
+                            <Icon
+                              className="text-dev-black-1000 dark:text-dev-purple-50"
+                              name="icon-dropdownArrow"
+                              size={[18]}
+                            />
+                          </td>
+                        </tr>
+                      );
+                    })
+                  }
+                  {paddingBottom > 0 && (
+                    <tr>
+                      <td style={{ height: `${paddingBottom}px` }} />
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </PDScrollArea>
+          )
+          : <Loader />
+      }
       {
         refSelectedExtrinsic.current && (
           <JSONViewerModal
