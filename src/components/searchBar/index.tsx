@@ -171,11 +171,15 @@ export const SearchBar = (props: ISearchBarProps) => {
         )}
       />
 
-      <JSONViewerModal
-        jsonData={refSelectedExtrinsic.current}
-        onClose={toggleVisibility}
-        title="Extrinsic Details"
-      />
+      {
+        refSelectedExtrinsic.current && (
+          <JSONViewerModal
+            jsonData={refSelectedExtrinsic.current}
+            onClose={toggleVisibility}
+            title="Extrinsic Details"
+          />
+        )
+      }
     </div>
   );
 };

@@ -12,7 +12,7 @@ import type {
 } from '@custom-types/block';
 
 interface IModalJSONViewer extends Pick<IModal, 'onClose'> {
-  jsonData: IMappedBlockExtrinsic | IMappedBlockEvent | null;
+  jsonData: IMappedBlockExtrinsic | IMappedBlockEvent;
   title?: string;
   onClose: () => void;
 }

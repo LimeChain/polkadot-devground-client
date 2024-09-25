@@ -255,10 +255,14 @@ export const BlockBody = (props: BlockBodyProps) => {
           )}
         </div>
       </Tabs>
-      <JSONViewerModal
-        jsonData={modalData}
-        onClose={toggleVisibility}
-      />
+      {
+        modalData && (
+          <JSONViewerModal
+            jsonData={modalData}
+            onClose={toggleVisibility}
+          />
+        )
+      }
     </div>
   );
 };
