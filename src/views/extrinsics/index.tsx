@@ -215,7 +215,6 @@ const Extrinsics = () => {
   const handleAccountSelect = useCallback((accountSelected: unknown) => {
     setSigner((accountSelected as InjectedPolkadotAccount).polkadotSigner);
   }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   , []);
 
   if (!palletSelected) {
