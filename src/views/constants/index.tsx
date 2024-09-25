@@ -102,7 +102,7 @@ const Constants = () => {
             label="Select Pallet"
             emptyPlaceHolder="No pallets available"
             placeholder="Please select a pallet"
-            items={palletSelectItems}
+            items={[palletSelectItems || []]}
             onChange={handlePalletSelect}
             value={palletSelected?.name}
           />
@@ -113,7 +113,7 @@ const Constants = () => {
                 label="Select Constant"
                 emptyPlaceHolder="No constants available"
                 placeholder="Please select constant"
-                items={constantItems}
+                items={[constantItems]}
                 value={constantSelected?.name}
                 onChange={handleConstantSelect}
               />

@@ -91,7 +91,7 @@ const RpcSelect = ({ onChange, param }: IRpcParam) => {
   return (
     <PDSelect
       onChange={handleOnChange}
-      items={selectItems}
+      items={[selectItems || []]}
       value={value}
     />
   );

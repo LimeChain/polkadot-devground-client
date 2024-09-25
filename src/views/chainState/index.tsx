@@ -165,7 +165,7 @@ const ChainState = () => {
             label="Select Pallet"
             emptyPlaceHolder="No pallets available"
             placeholder="Please select a pallet"
-            items={palletSelectItems}
+            items={[palletSelectItems || []]}
             onChange={handlePalletSelect}
             value={palletSelected?.name}
           />
@@ -177,7 +177,7 @@ const ChainState = () => {
                 label="Select Storage"
                 emptyPlaceHolder="No storages available"
                 placeholder="Please select a storage"
-                items={storageCallItems}
+                items={[storageCallItems]}
                 onChange={handleStorageSelect}
                 value={storageSelected?.name}
               />

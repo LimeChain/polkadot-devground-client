@@ -103,7 +103,7 @@ const RuntimeCalls = () => {
           <PDSelect
             label="Select Api"
             emptyPlaceHolder="No apis available"
-            items={apiItems}
+            items={[apiItems || []]}
             value={apiSelected?.name}
             onChange={handlePalletSelect}
           />
@@ -114,7 +114,7 @@ const RuntimeCalls = () => {
                 key={`method-select-${methodSelected?.name}`}
                 label="Select Method"
                 emptyPlaceHolder="No methods available"
-                items={methodItems}
+                items={[methodItems]}
                 value={methodSelected?.name}
                 onChange={handleCallSelect}
               />

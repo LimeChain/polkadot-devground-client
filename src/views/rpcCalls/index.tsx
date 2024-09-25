@@ -15,7 +15,7 @@ import { QueryViewContainer } from '@components/callParam/queryViewContainer';
 import { RpcParams } from '@components/callParam/rpcParams';
 import { Loader } from '@components/loader';
 import {
-  type IPDSelect,
+  type IPDSelectItem,
   PDSelect,
 } from '@components/pdSelect';
 import { newRpcCalls } from '@constants/rpcCalls';
@@ -63,7 +63,7 @@ export const RpcCalls = () => {
     setQueries([]);
   }, [chain.id]);
 
-  const [methodSelectItems, setMethodSelectItems] = useState<NonNullable<IPDSelect['items']>>([]);
+  const [methodSelectItems, setMethodSelectItems] = useState<IPDSelectItem[]>([]);
   const [methodSelected, setMethodSelected] = useState(methodSelectItems.at(0)?.value);
 
   const palletSelectItems = useMemo(() => {
@@ -79,7 +79,7 @@ export const RpcCalls = () => {
       }
 
       return acc;
-    }, [] as NonNullable<IPDSelect['items']>);
+    }, [] as IPDSelectItem[]);
 
     const methodItems = Object.keys(newRpcCalls).reduce((acc, curr) => {
       const call = curr.split('_');
@@ -95,7 +95,7 @@ export const RpcCalls = () => {
       }
 
       return acc;
-    }, [] as NonNullable<IPDSelect['items']>);
+    }, [] as IPDSelectItem[]);
 
     setMethodSelectItems(methodItems);
     setMethodSelected(methodItems.at(0)?.value);
@@ -138,7 +138,7 @@ export const RpcCalls = () => {
         }
 
         return acc;
-      }, [] as NonNullable<IPDSelect['items']>);
+      }, [] as IPDSelectItem[]);
 
       setMethodSelected(methods.at(0)?.value);
       return methods;
@@ -196,12 +196,19 @@ export const RpcCalls = () => {
       <QueryFormContainer>
         <div className="grid w-full grid-cols-2 gap-4">
           <PDSelect
-            items={palletSelectItems}
+            key={`rpc-pallet-${palletSelected}`}
+            label="Pallet"
+            emptyPlaceHolder="No pallets available"
+            items={[palletSelectItems]}
+            groups={['new', 'old']}
             value={palletSelected}
             onChange={handlePalletSelect}
           />
           <PDSelect
-            items={methodSelectItems}
+            key={`rpc-method-${methodSelected}`}
+            label="Method"
+            emptyPlaceHolder="No methods available"
+            items={[methodSelectItems]}
             value={methodSelected}
             onChange={handleMathodSelect}
           />

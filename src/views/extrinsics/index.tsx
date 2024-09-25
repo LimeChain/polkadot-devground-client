@@ -174,7 +174,7 @@ const Extrinsics = () => {
           <PDSelect
             label="Select Pallet"
             emptyPlaceHolder="No pallets available"
-            items={palletSelectItems}
+            items={[palletSelectItems]}
             value={palletSelected?.name}
             onChange={handlePalletSelect}
           />
@@ -184,7 +184,7 @@ const Extrinsics = () => {
                 key={`call-select-${palletSelected?.name}`}
                 label="Select Call"
                 emptyPlaceHolder="No calls available"
-                items={callSelectItems}
+                items={[callSelectItems]}
                 value={callSelected?.name}
                 onChange={handleCallSelect}
               />

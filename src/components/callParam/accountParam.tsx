@@ -125,7 +125,7 @@ const AccountSelectParam = ({ accounts, onChange }: IAccountSelectParam) => {
       emptyPlaceHolder="No connected accounts"
       placeholder="Please select an account"
       onChange={handleOnAccountSelect}
-      items={selectItems}
+      items={[selectItems]}
       value={selectedAccount?.address || ''}
     />
   );

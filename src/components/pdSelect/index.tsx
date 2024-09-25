@@ -8,12 +8,15 @@ import {
 import { Icon } from '@components/icon';
 import { cn } from '@utils/helpers';
 
+export interface IPDSelectItem {
+  label: string;
+  value: string;
+  key: string;
+}
+
 export interface IPDSelect {
-  items?: {
-    label: string;
-    value: string;
-    key: string;
-  }[];
+  items?: IPDSelectItem[][];
+  groups?: string[];
   value?: string;
   label?: string;
   onChange: (value: string) => void;
@@ -24,6 +27,7 @@ export interface IPDSelect {
 
 export const PDSelect = ({
   items,
+  groups,
   value,
   onChange,
   label,
@@ -97,7 +101,7 @@ export const PDSelect = ({
           <SelectPrimitive.Content
             position="popper"
             className={cn(
-              'z-50 flex w-full max-w-96 flex-col gap-1',
+              'z-50 flex w-full max-w-96 flex-col gap-1 p-2',
               'bg-dev-black-1000 dark:bg-white',
               'text-white dark:text-black',
             )}
@@ -105,20 +109,10 @@ export const PDSelect = ({
               minWidth: container?.clientWidth,
             }}
           >
-            <SelectPrimitive.Viewport className="max-h-96 p-2">
-              {
-                items?.map(item => {
-                  return (
-                    <SelectItem
-                      key={item.key}
-                      value={item.value}
-                    >
-                      {item.label}
-                    </SelectItem>
-                  );
-                })
-              }
-            </SelectPrimitive.Viewport>
+            <SelectViewport
+              items={items}
+              groups={groups}
+            />
           </SelectPrimitive.Content>
         </SelectPrimitive.Portal>
       </SelectPrimitive.Root>
@@ -176,6 +170,55 @@ const SelectPlaceholder = ({
           </span>
         )
       }
+    </div>
+  );
+};
+
+const SelectViewport = ({
+  items,
+  groups,
+}: Pick<IPDSelect, 'items' | 'groups'>) => {
+
+  const [selectedItems, setSelectedItems] = useState(items?.at(0) || []);
+  const handleGroupSelect = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    const groupIndex = Number(e.currentTarget.getAttribute('data-groupid')) || 0;
+    setSelectedItems(items?.at(groupIndex) || []);
+  }, [items]);
+
+  return (
+    <div className="flex flex-col gap-4">
+      {
+        groups && groups?.length > 1
+        && (
+          <div>
+            {
+              groups.map((group, index) => (
+                <button
+                  key={`pdselect-group-${group}`}
+                  onClick={handleGroupSelect}
+                  data-groupid={index}
+                >
+                  {group}
+                </button>
+              ),
+              )
+            }
+          </div>
+        )}
+      <SelectPrimitive.Viewport className="max-h-96">
+        {
+          selectedItems?.map(item => {
+            return (
+              <SelectItem
+                key={item.key}
+                value={item.value}
+              >
+                {item.label}
+              </SelectItem>
+            );
+          })
+        }
+      </SelectPrimitive.Viewport>
     </div>
   );
 };
