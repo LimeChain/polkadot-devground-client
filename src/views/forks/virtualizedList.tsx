@@ -115,7 +115,7 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
         onScroll={handleScroll}
         type="always"
         viewportClassNames={cn(
-          'mask-horizontal-and-vertical w-full',
+          'mask-horizontal-and-vertical',
           'px-8 py-20',
           'font-geist text-dev-purple-50 font-body2-regular',
         )}

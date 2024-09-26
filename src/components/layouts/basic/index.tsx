@@ -26,10 +26,13 @@ export const LayoutBasic = (props: ILayoutBasic) => {
 
   const [refContainerDimensions, , computedStyle] = useResizeObserver(refScrollArea, { withComputedStyle: true });
   const scrollAreaHeight = refContainerDimensions?.height;
+  const scrollAreaWidth = refContainerDimensions?.width;
+
 
   const viewportStyles = scrollAreaHeight && computedStyle?.paddingTop && computedStyle?.paddingBottom
     ? {
       '--initial-scroll-arrea-height': `${(scrollAreaHeight - parseInt(computedStyle?.paddingTop) - parseInt(computedStyle?.paddingBottom))}px`,
+      '--initial-scroll-arrea-width': `${((scrollAreaWidth ?? 0) - parseInt(computedStyle?.paddingLeft) - parseInt(computedStyle?.paddingRight))}px`,
     } as CSSProperties
     : undefined;
 
