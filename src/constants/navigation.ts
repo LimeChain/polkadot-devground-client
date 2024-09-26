@@ -10,17 +10,26 @@ export const NAVIGATION_ITEMS: TNavItem[] = [
   },
   {
     linkProps: {
+      title: 'Console',
+      to: '/code',
+    },
+    type: 'link',
+  },
+  {
+    linkProps: {
+      title: 'Forks',
+      to: '/forks',
+    },
+    type: 'link',
+  },
+  {
+    linkProps: {
       title: 'Developer',
       items: [
         {
-          title: 'Explorer',
-          to: '/explorer',
-          icon: 'logo-github',
-        },
-        {
           title: 'Chain State',
           to: '/chain-state',
-          icon: 'logo-github',
+          icon: 'icon-chain',
         },
         {
           title: 'Constants',
@@ -28,18 +37,18 @@ export const NAVIGATION_ITEMS: TNavItem[] = [
           icon: 'logo-github',
         },
         {
+          title: 'RPC Calls',
+          to: '/rpc-calls',
+          icon: 'icon-rpcCalls',
+        },
+        {
           title: 'Runtime Calls',
           to: '/runtime-calls',
-          icon: 'logo-github',
+          icon: 'icon-runtimeCalls',
         },
         {
           title: 'Extrinsics',
           to: '/extrinsics',
-          icon: 'logo-github',
-        },
-        {
-          title: 'Console',
-          to: '/code',
           icon: 'logo-github',
         },
       ],

@@ -1,3 +1,4 @@
+import BurgerMenu from '@components/burgerMenu';
 import ChainSelectButton from '@components/chainSelectButton';
 import { Logo } from '@components/logo';
 import { Navigation } from '@components/navigation';
@@ -12,11 +13,11 @@ export const Header = () => {
 
   return (
     <nav className="z-100 flex items-center justify-between px-6">
-      <div className="flex items-center gap-12">
+      <div className="flex items-center gap-8">
         <Logo />
         <Navigation />
       </div>
-      <div className="flex gap-5">
+      <div className="hidden gap-5 md:flex">
         {
           accounts.length > 0
             ? (
@@ -36,9 +37,12 @@ export const Header = () => {
               </button>
             )
         }
-
         <ChainSelectButton />
         <ToggleTheme />
+      </div>
+      <div className="flex md:hidden">
+        <ChainSelectButton />
+        <BurgerMenu />
       </div>
     </nav>
   );

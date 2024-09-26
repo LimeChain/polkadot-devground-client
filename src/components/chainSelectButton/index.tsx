@@ -31,7 +31,7 @@ const ChainSelectButton = () => {
           name={currentChain.icon}
           size={[28]}
         />
-        <h5 className="ml-[6px] mr-3 font-h5-bold">
+        <h5 className="ml-[6px] mr-3 hidden font-h5-bold lg:block">
           {currentChain.name}
         </h5>
         <Icon
