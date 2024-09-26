@@ -36,7 +36,7 @@ export const smoothScroll = async (
   const startTime = performance.now();
 
   // Easing function for smoother animation (ease-in-out in this case)
-  const easeInOutQuad = (t: number): number => t < 0.5 ? 2 * t * t : (-1 + ((4 - 2) * t)) * t;
+  const easeInOutQuad = (t: number): number => t < 0.5 ? 2 * t * t : -1 + ((4 - (2 * t)) * t);
 
   return new Promise((resolve) => {
     const animateScroll = (currentTime: number) => {
@@ -46,7 +46,7 @@ export const smoothScroll = async (
       const progress = Math.min(timeElapsed / adjustedDuration, 1);
       const easedProgress = easeInOutQuad(progress);
 
-      element[scrollPosition] = (start + change) * easedProgress;
+      element[scrollPosition] = start + (change * easedProgress);
 
       if (timeElapsed < adjustedDuration) {
         requestAnimationFrame(animateScroll);
