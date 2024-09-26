@@ -41,9 +41,12 @@ const Extrinsics = () => {
 
   const accounts = useStoreWallet?.use?.accounts?.();
 
-  const [signer, setSigner] = useState(accounts.at(0)?.polkadotSigner);
-  const palletsWithCalls = useMemo(() => metadata?.pallets?.filter(p => p.calls)?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
-  const palletSelectItems = useMemo(() => palletsWithCalls?.map(pallet => ({
+  const [
+    signer,
+    setSigner,
+  ] = useState(accounts.at(0)?.polkadotSigner);
+  const palletsWithCalls = useMemo(() => metadata?.pallets?.filter((p) => p.calls)?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
+  const palletSelectItems = useMemo(() => palletsWithCalls?.map((pallet) => ({
     label: pallet.name,
     value: pallet.name,
     key: `extrinsic-pallet-${pallet.name}`,
@@ -215,7 +218,7 @@ const Extrinsics = () => {
   const handleAccountSelect = useCallback((accountSelected: unknown) => {
     setSigner((accountSelected as InjectedPolkadotAccount).polkadotSigner);
   }
-  , []);
+    , []);
 
   if (!palletSelected) {
     return <Loader />;
@@ -247,7 +250,10 @@ const Extrinsics = () => {
         </div>
         <div className="flex flex-col gap-2">
           <span className=" font-geist font-body1-regular">Signer</span>
-          <AccountSelectParam accounts={accounts} onChange={handleAccountSelect} />
+          <AccountSelectParam
+            accounts={accounts}
+            onChange={handleAccountSelect}
+          />
         </div>
         {
           (palletSelected && callSelected) && (
@@ -266,7 +272,7 @@ const Extrinsics = () => {
           disabled={!signer}
           onClick={submitTx}
         >
-          Sign and Submit 
+          Sign and Submit
           {' '}
           {palletSelected?.name}
           /
@@ -275,9 +281,9 @@ const Extrinsics = () => {
         {
           (encodedCall && decodedCall) && (
             <p className="break-all">
-              Encoded Call: 
+              Encoded Call:
               {' '}
-              <br /> 
+              <br />
               {' '}
               {encodedCall.asHex()}
             </p>
@@ -290,6 +296,7 @@ const Extrinsics = () => {
             <Query
               key={`query-result-${query.pallet}-${query.storage}-${query.id}`}
               onUnsubscribe={handleStorageUnsubscribe}
+              querie={query}
               signer={signer}
             />
           ))
