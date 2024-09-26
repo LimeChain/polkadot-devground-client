@@ -18,13 +18,20 @@ import {
   type IPDSelectItem,
   PDSelect,
 } from '@components/pdSelect';
-import { newRpcCalls } from '@constants/rpcCalls';
+import {
+  newRpcCalls,
+  oldRpcCalls,
+} from '@constants/rpcCalls';
 import { useStoreChain } from '@stores';
 import {
   blockHeaderCodec,
   decodeExtrinsic,
 } from '@utils/codec';
 import { unwrapApiResult } from '@utils/papi/helpers';
+import {
+  mapRpcCallsToSelectMethodItems,
+  mapRpcCallsToSelectPalletItems,
+} from '@utils/rpc/rpc-calls';
 import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
 interface ICallParam {
@@ -38,11 +45,18 @@ interface IQuery {
   args: ICallParam[];
 }
 
+const newRpcKeys = Object.keys(newRpcCalls);
+
 export const RpcCalls = () => {
 
   const chain = useStoreChain?.use?.chain?.();
   const rawClient = useStoreChain?.use?.rawClient?.();
   const rawClientSubscription = useStoreChain?.use?.rawClientSubscription?.();
+
+  const allRpcCalls = useMemo(() => ({
+    ...newRpcCalls,
+    ...oldRpcCalls,
+  }), []);
 
   const refUncleanedSubscriptions = useRef<string[]>([]);
 
@@ -67,35 +81,15 @@ export const RpcCalls = () => {
   const [methodSelected, setMethodSelected] = useState(methodSelectItems.at(0)?.value);
 
   const palletSelectItems = useMemo(() => {
-    const palletItems = Object.keys(newRpcCalls).reduce((acc, curr) => {
-      const pallet = curr.split('_').at(0);
+    const newRpcItems = mapRpcCallsToSelectPalletItems(newRpcCalls);
+    const oldRpcItems = mapRpcCallsToSelectPalletItems(oldRpcCalls);
 
-      if (pallet && !acc.some(p => p.value === pallet)) {
-        acc.push({
-          label: pallet,
-          value: pallet,
-          key: `rpc-pallet-${pallet}`,
-        });
-      }
+    const palletItems = [newRpcItems, oldRpcItems];
 
-      return acc;
-    }, [] as IPDSelectItem[]);
-
-    const methodItems = Object.keys(newRpcCalls).reduce((acc, curr) => {
-      const call = curr.split('_');
-      const pallet = call.at(0);
-
-      if (pallet && pallet === palletItems.at(0)?.value) {
-        const val = call.slice(1).join('_');
-        acc.push({
-          label: val,
-          value: val,
-          key: `rpc-method-${val}`,
-        });
-      }
-
-      return acc;
-    }, [] as IPDSelectItem[]);
+    const methodItems = mapRpcCallsToSelectMethodItems({
+      rpcCalls: newRpcCalls,
+      ifPalletEquals: palletItems.at(0)?.at(0)?.value,
+    });
 
     setMethodSelectItems(methodItems);
     setMethodSelected(methodItems.at(0)?.value);
@@ -103,7 +97,7 @@ export const RpcCalls = () => {
     return palletItems;
   }, []);
 
-  const [palletSelected, setPalletSelected] = useState(palletSelectItems.at(0)?.value);
+  const [palletSelected, setPalletSelected] = useState(palletSelectItems.at(0)?.at(0)?.value);
 
   const [callParams, setCallParams] = useState<ICallParam[]>([]);
   const [queries, setQueries] = useState<IQuery[]>([]);
@@ -111,34 +105,37 @@ export const RpcCalls = () => {
   const rpcCall = useMemo(() => {
     const call = `${palletSelected}_${methodSelected}`;
 
-    if (newRpcCalls[call]) {
-      setCallParams(newRpcCalls[call].params?.map(param => ({ name: param.name, value: undefined })));
-      return newRpcCalls[call];
+    if (allRpcCalls[call]) {
+      setCallParams(allRpcCalls[call].params?.map(param => ({ name: param.name, value: undefined })));
+      return allRpcCalls[call];
     }
 
     return undefined;
 
-  }, [palletSelected, methodSelected]);
+  }, [
+    palletSelected,
+    methodSelected,
+    allRpcCalls,
+  ]);
 
   const handlePalletSelect = useCallback((selectedPalletName: string) => {
     setPalletSelected(selectedPalletName);
 
     setMethodSelectItems(() => {
-      const methods = Object.keys(newRpcCalls).reduce((acc, curr) => {
-        const call = curr.split('_');
-        const pallet = call.at(0);
+      let methods: IPDSelectItem[] = [];
+      if (newRpcKeys.some(val => val.startsWith(selectedPalletName))) {
+        methods = mapRpcCallsToSelectMethodItems({
+          rpcCalls: newRpcCalls,
+          ifPalletEquals: selectedPalletName,
+        });
 
-        if (pallet && pallet === selectedPalletName) {
-          const val = call.slice(1).join('_');
-          acc.push({
-            label: val,
-            value: val,
-            key: `rpc-call-${val}`,
-          });
-        }
+      } else {
+        methods = mapRpcCallsToSelectMethodItems({
+          rpcCalls: oldRpcCalls,
+          ifPalletEquals: selectedPalletName,
+        });
 
-        return acc;
-      }, [] as IPDSelectItem[]);
+      }
 
       setMethodSelected(methods.at(0)?.value);
       return methods;
@@ -199,8 +196,8 @@ export const RpcCalls = () => {
             key={`rpc-pallet-${palletSelected}`}
             label="Pallet"
             emptyPlaceHolder="No pallets available"
-            items={[palletSelectItems]}
-            groups={['new', 'old']}
+            items={palletSelectItems}
+            groups={['New', 'Old']}
             value={palletSelected}
             onChange={handlePalletSelect}
           />
@@ -229,7 +226,7 @@ export const RpcCalls = () => {
           Submit Rpc Call
         </QueryButton>
 
-        <CallDocs docs={newRpcCalls?.[`${palletSelected}_${methodSelected}`]?.docs || []} />
+        <CallDocs docs={allRpcCalls?.[`${palletSelected}_${methodSelected}`]?.docs || []} />
 
       </QueryFormContainer>
       <QueryResultContainer>
@@ -260,6 +257,7 @@ const Query = ({
 }) => {
 
   const rawClient = useStoreChain?.use?.rawClient?.();
+
   const rawClientSubscription = useStoreChain?.use?.rawClientSubscription?.();
   const dynamicBuilder = useDynamicBuilder();
 
@@ -267,9 +265,7 @@ const Query = ({
   const [isLoading, setIsLoading] = useState(true);
 
   const refFollowSubscription = useRef('');
-
   const call = `${querie.pallet}_${querie.method}`;
-
   useEffect(() => {
 
     const catchError = (err: Error) => {
@@ -375,37 +371,22 @@ const Query = ({
               })
               .catch(catchError);
             break;
-          case 'chainHead_v1_continue':
-          case 'chainHead_v1_stopOperation':
-            runRawQuery();
-            break;
 
-          // CHAIN SPECS
-          case 'chainSpec_v1_chainName':
-          case 'chainSpec_v1_genesisHash':
-          case 'chainSpec_v1_properties':
-            runRawQuery();
-            break;
+          // OLD RPCS
+          case 'system_dryRun':
+          case 'grandpa_proveFinality':
+            console.log(querie.args.map(arg => arg.value).filter(arg => arg));
 
-          // RPC METHODS
-          case 'rpc_methods':
-            runRawQuery();
-            break;
-
-          // TRANSACTIONS
-          case 'transaction_v1_broadcast':
-          case 'transaction_v1_stop':
-            runRawQuery();
-            break;
-
-          // TRANSACATION WATCH
-          case 'transactionWatch_v1_submitAndWatch':
-          case 'transactionWatch_v1_unwatch':
-            runRawQuery();
+            rawClient?.request(call, querie.args.map(arg => arg.value).filter(arg => arg))
+              .then(res => {
+                setResult(res);
+                setIsLoading(false);
+              })
+              .catch(catchError);
             break;
 
           default:
-            catchError({} as Error);
+            runRawQuery();
             break;
         }
       } catch (error) {
