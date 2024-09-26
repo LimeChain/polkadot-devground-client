@@ -5,7 +5,11 @@ import { cn } from '@utils/helpers';
 
 import { NavigationItem } from './navigationItem';
 
-export const Navigation = (props) => {
+interface INavigation {
+  classNames?: string;
+}
+
+export const Navigation = (props: INavigation) => {
   const { classNames } = props;
   const { pathname } = useLocation();
   const isHomePage = pathname === '/';
