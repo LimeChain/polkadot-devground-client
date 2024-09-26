@@ -127,7 +127,10 @@ export const routes = () => ([
       },
       {
         path: 'rpc-calls',
-        element: <LayoutBasic hasFooter classNames="lg:pb-8" />,
+        element: <LayoutBasic
+          classNames="lg:pb-8"
+          hasFooter
+        />,
         children: [
           {
             path: '',

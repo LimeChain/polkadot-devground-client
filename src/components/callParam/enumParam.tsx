@@ -50,7 +50,11 @@ export const EnumParam = ({ onChange, ...props }: IEnumParam) => {
     if (variable?.type === 'void') {
       handleSetValue(undefined);
     }
-  }, [key, variable, handleSetValue]);
+  }, [
+    key,
+    variable,
+    handleSetValue,
+  ]);
 
   return (
     <div className={styles.codecGroup}>

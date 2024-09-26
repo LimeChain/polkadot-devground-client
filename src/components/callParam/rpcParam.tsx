@@ -68,7 +68,10 @@ export const RpcParam = (props: IRpcParam) => {
 
 const RpcSelect = ({ onChange, param }: IRpcParam) => {
 
-  const [value, setValue] = useState(param.options?.at(0));
+  const [
+    value,
+    setValue,
+  ] = useState(param.options?.at(0));
 
   useEffect(() => {
     onChange(value);
@@ -82,7 +85,7 @@ const RpcSelect = ({ onChange, param }: IRpcParam) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const selectItems = param?.options?.map(opt => ({
+  const selectItems = param?.options?.map((opt) => ({
     label: opt,
     value: opt,
     key: `rpc-select-${opt}`,
@@ -90,8 +93,8 @@ const RpcSelect = ({ onChange, param }: IRpcParam) => {
 
   return (
     <PDSelect
-      onChange={handleOnChange}
       items={selectItems}
+      onChange={handleOnChange}
       value={value}
     />
   );

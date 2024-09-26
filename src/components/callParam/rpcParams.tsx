@@ -21,11 +21,11 @@ export const RpcParams = ({ params, onChange }: IRpcParams) => {
             <div className={styles['codecContainer']}>
               <div className={styles['codecGroup']}>
                 <RpcParam
+                  // eslint-disable-next-line react/jsx-no-bind
+                  onChange={(args) => onChange(index, args)}
                   param={param}
                   placeholder={param.description}
                   readOnly={param.readOnly}
-                  // eslint-disable-next-line react/jsx-no-bind
-                  onChange={(args) => onChange(index, args)}
                 />
               </div>
             </div>

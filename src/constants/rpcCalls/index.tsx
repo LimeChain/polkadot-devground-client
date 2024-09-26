@@ -16,9 +16,7 @@ export const newRpcCalls: IRpcCalls = {
         description: 'Block Hash',
       },
     ],
-    docs: [
-      'Retrieves the body of a pinned block.',
-    ],
+    docs: ['Retrieves the body of a pinned block.'],
     link: 'https://paritytech.github.io/json-rpc-interface-spec/api/chainHead_v1_body.html',
   },
   'chainHead_v1_call': {
@@ -45,9 +43,7 @@ export const newRpcCalls: IRpcCalls = {
         description: 'Hex-encoded SCALE-encoded value to pass as input',
       },
     ],
-    docs: [
-      'Invoke the entry point of the runtime of the given block using the storage of the given block.',
-    ],
+    docs: ['Invoke the entry point of the runtime of the given block using the storage of the given block.'],
     link: 'https://paritytech.github.io/json-rpc-interface-spec/api/chainHead_v1_call.html',
   },
   'chainHead_v1_continue': {
@@ -63,9 +59,7 @@ export const newRpcCalls: IRpcCalls = {
         description: 'string',
       },
     ],
-    docs: [
-      'Resumes a storage fetch started with chainHead_v1_storage after it has generated an operationWaitingForContinue event.',
-    ],
+    docs: ['Resumes a storage fetch started with chainHead_v1_storage after it has generated an operationWaitingForContinue event.'],
     link: 'https://paritytech.github.io/json-rpc-interface-spec/api/chainHead_v1_continue.html',
   },
   'chainHead_v1_follow': {
@@ -75,9 +69,7 @@ export const newRpcCalls: IRpcCalls = {
         type: 'boolean',
       },
     ],
-    docs: [
-      'This functions lets the JSON-RPC client track the state of the head of the chain: the finalized, non-finalized, and best blocks.',
-    ],
+    docs: ['This functions lets the JSON-RPC client track the state of the head of the chain: the finalized, non-finalized, and best blocks.'],
     link: 'https://paritytech.github.io/json-rpc-interface-spec/api/chainHead_v1_follow.html',
   },
   'chainHead_v1_header': {
@@ -94,9 +86,7 @@ export const newRpcCalls: IRpcCalls = {
         description: 'Block Hash',
       },
     ],
-    docs: [
-      'Retrieves the header of a pinned block.',
-    ],
+    docs: ['Retrieves the header of a pinned block.'],
     link: 'https://paritytech.github.io/json-rpc-interface-spec/api/chainHead_v1_header.html',
   },
   'chainHead_v1_stopOperation': {
@@ -135,7 +125,13 @@ export const newRpcCalls: IRpcCalls = {
       {
         name: 'type',
         type: 'select',
-        options: ['value', 'hash', 'closestDescendantMerkleValue', 'descendantsValues', 'descendantsHashes'],
+        options: [
+          'value',
+          'hash',
+          'closestDescendantMerkleValue',
+          'descendantsValues',
+          'descendantsHashes',
+        ],
       },
       {
         name: 'key',
@@ -143,9 +139,7 @@ export const newRpcCalls: IRpcCalls = {
         description: 'Storage key',
       },
     ],
-    docs: [
-      'Retrieves a storage key from a pinned block.',
-    ],
+    docs: ['Retrieves a storage key from a pinned block.'],
   },
   'chainHead_v1_unfollow': {
     params: [
@@ -176,40 +170,30 @@ export const newRpcCalls: IRpcCalls = {
         description: 'Block Hash',
       },
     ],
-    docs: [
-      'Unpins an array of blocks.',
-    ],
+    docs: ['Unpins an array of blocks.'],
   },
 
   // CHAIN SPEC
   'chainSpec_v1_chainName': {
     params: [],
-    docs: [
-      'Returns a string containing the human-readable name of the chain.',
-    ],
+    docs: ['Returns a string containing the human-readable name of the chain.'],
     link: 'https://paritytech.github.io/json-rpc-interface-spec/api/chainSpec_v1_chainName.html',
   },
   'chainSpec_v1_genesisHash': {
     params: [],
-    docs: [
-      'Returns a string containing the hexadecimal-encoded hash of the header of the genesis block of the chain.',
-    ],
+    docs: ['Returns a string containing the hexadecimal-encoded hash of the header of the genesis block of the chain.'],
     link: 'https://paritytech.github.io/json-rpc-interface-spec/api/chainSpec_v1_genesisHash.html',
   },
   'chainSpec_v1_properties': {
     params: [],
-    docs: [
-      'Returns the JSON payload found in the chain specification under the key "properties". No guarantee is offered about the content of this object.',
-    ],
+    docs: ['Returns the JSON payload found in the chain specification under the key "properties". No guarantee is offered about the content of this object.'],
     link: 'https://paritytech.github.io/json-rpc-interface-spec/api/chainSpec_v1_properties.html',
   },
 
   // RPC METHODS
   'rpc_methods': {
     params: [],
-    docs: [
-      'Returns the rpc methods supported.',
-    ],
+    docs: ['Returns the rpc methods supported.'],
     link: 'https://paritytech.github.io/json-rpc-interface-spec/api/rpc_methods.html',
   },
 
@@ -222,9 +206,7 @@ export const newRpcCalls: IRpcCalls = {
         description: 'SCALE-encoded transaction to try to include in a block',
       },
     ],
-    docs: [
-      'Propagate a transaction over the peer-to-peer network until transaction_v1_stop is called.',
-    ],
+    docs: ['Propagate a transaction over the peer-to-peer network until transaction_v1_stop is called.'],
     link: 'https://paritytech.github.io/json-rpc-interface-spec/api/transaction_v1_broadcast.html',
   },
   'transaction_v1_stop': {
@@ -235,9 +217,7 @@ export const newRpcCalls: IRpcCalls = {
         description: 'string',
       },
     ],
-    docs: [
-      'The node will no longer try to broadcast the transaction over the peer-to-peer network.',
-    ],
+    docs: ['The node will no longer try to broadcast the transaction over the peer-to-peer network.'],
     link: 'https://paritytech.github.io/json-rpc-interface-spec/api/transaction_v1_stop.html',
   },
 
