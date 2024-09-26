@@ -11,8 +11,8 @@ export const JsonViewer = (props: JsonViewProps) => {
     <PDScrollArea className="h-[30rem]">
       <JsonView
         {...props}
-        theme="atom"
         src={unwrapApiResult(src)}
+        theme="atom"
       />
     </PDScrollArea>
   );

@@ -69,7 +69,10 @@ const compilerOptions: monaco.languages.typescript.CompilerOptions = {
   allowSyntheticDefaultImports: true,
   allowUmdGlobalAccess: true,
   jsxFactory: 'React.createElement',
-  lib: ['esnext', 'dom'],
+  lib: [
+    'esnext',
+    'dom',
+  ],
   skipLibCheck: true,
   isolatedModules: true,
   resolveJsonModule: true,
@@ -93,8 +96,15 @@ monaco.languages.typescript.typescriptDefaults.setCompilerOptions(compilerOption
 const checkTheme = async (theme: string) => {
   const currentTheme = theme === 'dark' ? 'github-dark' : 'github-light';
   const highlighter = await getSingletonHighlighter({
-    themes: ['github-dark', 'github-light'],
-    langs: ['tsx', 'typescript', 'json'],
+    themes: [
+      'github-dark',
+      'github-light',
+    ],
+    langs: [
+      'tsx',
+      'typescript',
+      'json',
+    ],
   });
 
   shikiToMonaco(highlighter, monaco);
@@ -115,7 +125,10 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
   const refMonacoEditor = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const refModel = useRef<monaco.editor.ITextModel | null>(null);
 
-  const [isReadOnly, setIsReadOnly] = useState(false);
+  const [
+    isReadOnly,
+    setIsReadOnly,
+  ] = useState(false);
 
   const theme = useStoreUI.use.theme?.();
 
@@ -129,12 +142,18 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
       const worker = await monaco.languages.typescript.getTypeScriptWorker();
       const client = await worker(refModel.current.uri);
 
-      const [syntacticDiagnostics, semanticDiagnostics] = await Promise.all([
+      const [
+        syntacticDiagnostics,
+        semanticDiagnostics,
+      ] = await Promise.all([
         client.getSyntacticDiagnostics(refModel.current.uri.toString()),
         client.getSemanticDiagnostics(refModel.current.uri.toString()),
       ]);
 
-      const allDiagnostics = [...syntacticDiagnostics, ...semanticDiagnostics];
+      const allDiagnostics = [
+        ...syntacticDiagnostics,
+        ...semanticDiagnostics,
+      ];
 
       const markers = allDiagnostics.map((diag) => {
         const startPos = refModel.current!.getPositionAt(diag.start || 0);
@@ -371,8 +390,14 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
         classNames,
       )}
     >
-      <div ref={refMonacoEditorContainer} className="size-full" />
-      <Progress classNames="absolute top-2 right-6 z-100" size={18} />
+      <div
+        ref={refMonacoEditorContainer}
+        className="size-full"
+      />
+      <Progress
+        classNames="absolute top-2 right-6 z-100"
+        size={18}
+      />
     </div>
   );
 };

@@ -15,10 +15,16 @@ interface IStructParam extends ICallArgs {
   struct: StructVar;
 }
 
-export function StructParam({ struct, onChange }: IStructParam) {
-  const [args, setArgs] = useState(() =>
+export const StructParam = ({ struct, onChange }: IStructParam) => {
+  const [
+    args,
+    setArgs,
+  ] = useState(() =>
     Object.fromEntries(
-      Object.keys(struct.value).map((key) => [key, undefined] as const),
+      Object.keys(struct.value).map((key) => [
+        key,
+        undefined,
+      ] as const),
     ),
   );
 
@@ -28,10 +34,13 @@ export function StructParam({ struct, onChange }: IStructParam) {
   }, [args]);
 
   const handleOnChange = useCallback((key: string, value: unknown) => {
-    setArgs(args => ({ ...args, [key]: value } as typeof args));
+    setArgs((args) => ({ ...args, [key]: value } as typeof args));
   }, []);
 
-  return Object.entries(struct.value).map(([key, value], index) => {
+  return Object.entries(struct.value).map(([
+    key,
+    value,
+  ], index) => {
     return (
       <div key={`${key}-${index}-${value.id}`}>
         <span className="block pb-1 font-geist font-body1-regular">
@@ -39,12 +48,12 @@ export function StructParam({ struct, onChange }: IStructParam) {
         </span>
         <div className={styles.codecContainer}>
           <CodecParam
-            variable={value}
             // eslint-disable-next-line react/jsx-no-bind
             onChange={(args) => handleOnChange(key, args)}
+            variable={value}
           />
         </div>
       </div>
     );
   });
-}
+};

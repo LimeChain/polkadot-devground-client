@@ -22,7 +22,10 @@ export const SequenceParam = ({ sequence, onChange }: ISequence) => {
   if (sequence.value.type === 'primitive' && sequence.value.value === 'u8') {
     return (
       <div className={styles.codecParam}>
-        <BinaryParam onChange={onChange} minLength={0} />
+        <BinaryParam
+          minLength={0}
+          onChange={onChange}
+        />
       </div>
     );
   }
@@ -30,26 +33,32 @@ export const SequenceParam = ({ sequence, onChange }: ISequence) => {
   return (
     <_SequenceParam
       key={sequence.value.id}
-      sequence={sequence}
       onChange={onChange}
+      sequence={sequence}
     />
   );
 };
 
 const _SequenceParam = ({ sequence, onChange }: ISequence) => {
-  const [length, setLength] = useState<number>(1);
-  const [params, setParams] = useState(Array.from({ length }).map(() => ({ id: crypto.randomUUID(), value: undefined })));
+  const [
+    length,
+    setLength,
+  ] = useState<number>(1);
+  const [
+    params,
+    setParams,
+  ] = useState(Array.from({ length }).map(() => ({ id: crypto.randomUUID(), value: undefined })));
 
   useEffect(() => {
-    const res = params.map(p => p.value);
+    const res = params.map((p) => p.value);
     onChange(res.includes(undefined) ? undefined : res);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
 
   const handleOnChange = useCallback((args: unknown, id: string) => {
-    setParams(params => {
-      const item = params.find(p => p.id === id);
+    setParams((params) => {
+      const item = params.find((p) => p.id === id);
       if (item) {
         const index = params.indexOf(item);
         return params.with(index, {
@@ -64,47 +73,50 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
 
   const handleAddItem = useCallback(() => {
     setLength((length) => length + 1);
-    setParams(params => ([...params, { id: crypto.randomUUID(), value: undefined }]));
+    setParams((params) => ([
+      ...params,
+      { id: crypto.randomUUID(), value: undefined },
+    ]));
   }, []);
 
   const handleRemoveItem = useCallback(() => {
     setLength((length) => length - 1);
-    setParams(params => params.slice(0, -1));
+    setParams((params) => params.slice(0, -1));
   }, []);
 
   return (
     <div className="flex flex-col gap-6">
       <div className="-mb-4 flex justify-end gap-4">
         <button
+          onClick={handleAddItem}
           type="button"
           className={cn(
             'mb-2 flex gap-1 font-geist font-body1-bold'
             , 'text-dev-pink-500 transition-colors hover:text-dev-pink-300',
           )}
-          onClick={handleAddItem}
         >
           <Icon
             name="icon-add"
             size={[24]}
           />
-            Add Item
+          Add Item
         </button>
 
         <button
-          type="button"
           disabled={params.length === 0}
+          onClick={handleRemoveItem}
+          type="button"
           className={cn(
             'mb-2 flex gap-1 font-geist font-body1-bold'
             , 'text-dev-pink-500 transition-colors hover:text-dev-pink-300',
             'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-dev-pink-500',
           )}
-          onClick={handleRemoveItem}
         >
           <Icon
             name="icon-remove"
             size={[24]}
           />
-            Remove Item
+          Remove Item
         </button>
 
       </div>
@@ -125,13 +137,14 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
                 },
               )}
               >
-                {index}:
+                {index}
+                :
               </span>
               <div className="flex w-full flex-col gap-6">
                 <CodecParam
-                  variable={sequence.value}
                   // eslint-disable-next-line react/jsx-no-bind
-                  onChange={args => handleOnChange(args, param.id)}
+                  onChange={(args) => handleOnChange(args, param.id)}
+                  variable={sequence.value}
                 />
               </div>
             </div>

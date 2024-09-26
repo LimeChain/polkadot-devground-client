@@ -15,8 +15,11 @@ interface ICompactParam extends ICallArgs {
   compact: CompactVar;
 }
 
-export function CompactParam({ compact, onChange }: ICompactParam) {
-  const [value, setValue] = useState('0');
+export const CompactParam = ({ compact, onChange }: ICompactParam) => {
+  const [
+    value,
+    setValue,
+  ] = useState('0');
 
   useEffect(() => {
     onChange(compact.isBig ? BigInt(value) : Number(value));
@@ -29,22 +32,22 @@ export function CompactParam({ compact, onChange }: ICompactParam) {
 
   return (
     <input
-      type="number"
-      inputMode="numeric"
-      placeholder="Compact"
-      onChange={handleChange}
       className={styles.codecInput}
+      inputMode="numeric"
+      onChange={handleChange}
       onWheelCapture={onWheelPreventDefault}
-      min={
-        compact.isBig
-          ? '-57896044618658097711785492504343953926634992332820282019728792003956564819968'
-          : -2147483648
-      }
+      placeholder="Compact"
+      type="number"
       max={
         compact.isBig
           ? '170141183460469231731687303715884105727'
           : 4294967295
       }
+      min={
+        compact.isBig
+          ? '-57896044618658097711785492504343953926634992332820282019728792003956564819968'
+          : -2147483648
+      }
     />
   );
-}
+};

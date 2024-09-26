@@ -18,11 +18,17 @@ import type {
 import type { IConsoleMessage } from '@custom-types/global';
 
 export const ConsoleActions = () => {
-  const [messages, setMessages] = useState<IConsoleMessage[]>([]);
+  const [
+    messages,
+    setMessages,
+  ] = useState<IConsoleMessage[]>([]);
 
   useEventBus<IEventBusConsoleMessage>('@@-console-message', ({ data }) => {
     setMessages((state) => {
-      const log = [...state, ...data];
+      const log = [
+        ...state,
+        ...data,
+      ];
       return log;
     });
   });
@@ -50,16 +56,16 @@ export const ConsoleActions = () => {
       )}
     >
       <button
+        onClick={handleClear}
         type="button"
         className={cn(
           'size-4',
         )}
-        onClick={handleClear}
       >
         <Icon
+          className="text-dev-black-1000 dark:text-white"
           name="icon-circle-slash"
           size={[16]}
-          className="text-dev-black-1000 dark:text-white"
         />
       </button>
       <CopyToClipboard

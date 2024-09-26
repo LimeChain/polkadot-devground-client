@@ -62,7 +62,10 @@ export const routes = () => ([
       },
       {
         path: 'explorer',
-        element: <LayoutBasic hasFooter classNames="lg:pb-8" />,
+        element: <LayoutBasic
+          classNames="lg:pb-8"
+          hasFooter
+        />,
         children: [
           {
             path: '',
@@ -84,7 +87,10 @@ export const routes = () => ([
       },
       {
         path: 'chain-state',
-        element: <LayoutBasic hasFooter classNames="lg:pb-8" />,
+        element: <LayoutBasic
+          classNames="lg:pb-8"
+          hasFooter
+        />,
         children: [
           {
             path: '',
@@ -94,7 +100,10 @@ export const routes = () => ([
       },
       {
         path: 'constants',
-        element: <LayoutBasic hasFooter classNames="lg:pb-8" />,
+        element: <LayoutBasic
+          classNames="lg:pb-8"
+          hasFooter
+        />,
         children: [
           {
             path: '',
@@ -104,7 +113,10 @@ export const routes = () => ([
       },
       {
         path: 'runtime-calls',
-        element: <LayoutBasic hasFooter classNames="lg:pb-8" />,
+        element: <LayoutBasic
+          classNames="lg:pb-8"
+          hasFooter
+        />,
         children: [
           {
             path: '',
@@ -114,7 +126,10 @@ export const routes = () => ([
       },
       {
         path: 'extrinsics',
-        element: <LayoutBasic hasFooter classNames="lg:pb-8" />,
+        element: <LayoutBasic
+          classNames="lg:pb-8"
+          hasFooter
+        />,
         children: [
           {
             path: '',

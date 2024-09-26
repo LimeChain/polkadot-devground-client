@@ -13,8 +13,8 @@ const Explorer = () => {
       )}
     >
       <SearchBar
-        type="all"
         label="Search block/extrinsic"
+        type="all"
       />
 
       <div className={cn(

@@ -23,11 +23,11 @@ export const ToggleButton = (props: ToggleButtonProps) => {
   return (
     <>
       <input
-        id={_id}
-        type="checkbox"
-        className="sr-only"
         checked={isChecked}
+        className="sr-only"
+        id={_id}
         onChange={handleSetCheck}
+        type="checkbox"
       />
       <label
         htmlFor={_id}

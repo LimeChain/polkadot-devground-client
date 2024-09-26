@@ -24,10 +24,10 @@ export const SearchChain = () => {
 
   return (
     <input
-      type="text"
-      placeholder="Search Parachain"
       ref={inputRef}
       onChange={debouncedHandleOnChange}
+      placeholder="Search Parachain"
+      type="text"
       className={cn(
         'w-full max-w-[calc(100%-2.5rem)] bg-transparent p-3',
         'border-y border-t-transparent transition-colors',

@@ -17,7 +17,10 @@ interface IScrollButtons {
 }
 
 export const ScrollButtons = ({ refScrollArea }: IScrollButtons) => {
-  const [buttonState, setButtonState] = useState({
+  const [
+    buttonState,
+    setButtonState,
+  ] = useState({
     canGoToStart: false,
     canGoToEnd: false,
   });
@@ -47,8 +50,8 @@ export const ScrollButtons = ({ refScrollArea }: IScrollButtons) => {
   return (
     <div className="flex items-center gap-2">
       <button
-        onClick={scrollToLeft}
         disabled={!buttonState.canGoToStart}
+        onClick={scrollToLeft}
         className={cn(
           'cursor-pointer text-dev-pink-500',
           'transition-colors duration-300',
@@ -57,11 +60,14 @@ export const ScrollButtons = ({ refScrollArea }: IScrollButtons) => {
           },
         )}
       >
-        <Icon name="icon-arrowCircle" className="-rotate-90" />
+        <Icon
+          className="-rotate-90"
+          name="icon-arrowCircle"
+        />
       </button>
       <button
-        onClick={scrollToRight}
         disabled={!buttonState.canGoToEnd}
+        onClick={scrollToRight}
         className={cn(
           'cursor-pointer text-dev-pink-500',
           'transition-colors delay-300 duration-300',
@@ -70,7 +76,10 @@ export const ScrollButtons = ({ refScrollArea }: IScrollButtons) => {
           },
         )}
       >
-        <Icon name="icon-arrowCircle" className="rotate-90" />
+        <Icon
+          className="rotate-90"
+          name="icon-arrowCircle"
+        />
       </button>
     </div>
   );

@@ -32,7 +32,10 @@ const TypeScriptEditor = () => {
   const refCode = useRef<string>('');
   const refTimeout = useRef<NodeJS.Timeout>();
   const refCanPreview = useRef(false);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [
+    isLoaded,
+    setIsLoaded,
+  ] = useState(false);
 
   useEventBus<IEventBusMonacoEditorShowPreview>('@@-monaco-editor-show-preview', ({ data }) => {
     refCanPreview.current = data;
@@ -63,7 +66,15 @@ const TypeScriptEditor = () => {
 
     try {
       await navigator.clipboard.writeText(sharedUrl);
-      toast.success(<span>Copied <strong>URL</strong> to clipboard</span>, { id: toastId });
+      toast.success((
+        <span>
+          Copied
+          {' '}
+          <strong>URL</strong>
+          {' '}
+          to clipboard
+        </span>
+      ), { id: toastId });
     } catch (err) {
       toast.error('Oops. Something went wrong', { id: toastId });
     }
@@ -85,34 +96,34 @@ const TypeScriptEditor = () => {
           )}
         >
           <Panel
-            id="left"
-            order={1}
-            defaultSize={50}
-            minSize={30}
             className="relative flex flex-col border border-dev-purple-300 dark:border-dev-black-800"
+            defaultSize={50}
+            id="left"
+            minSize={30}
+            order={1}
           >
             <EditorActions />
 
             <Tabs
               unmountOnHide={false}
+              tabClassName={cn(
+                'px-10 py-2.5',
+              )}
               tabsClassName={cn(
                 'z-10 w-full py-4 pl-16',
                 'dark:bg-dev-black-800',
               )}
-              tabClassName={cn(
-                'px-10 py-2.5',
-              )}
             >
               <div
-                data-title="Editor"
                 className="flex h-full"
+                data-title="Editor"
 
               >
                 <MonacoEditor />
               </div>
               <div
-                data-title="Read me"
                 className="flex h-full p-4 dark:bg-dev-black-800"
+                data-title="Read me"
               >
                 Readme.md
               </div>
@@ -130,12 +141,15 @@ const TypeScriptEditor = () => {
             />
           </PanelResizeHandle>
           <Panel
-            id="right"
-            order={2}
             defaultSize={50}
+            id="right"
             minSize={30}
+            order={2}
           >
-            <PanelGroup direction="vertical" autoSaveId="persistence">
+            <PanelGroup
+              autoSaveId="persistence"
+              direction="vertical"
+            >
               {
                 refCanPreview.current && (
                   <>
@@ -145,15 +159,21 @@ const TypeScriptEditor = () => {
                     )}
                     >
 
-                      <ActionButton iconName="icon-externalLink" onClick={shareCode} />
-                      <ActionButton iconName="icon-export" onClick={shareCode} />
+                      <ActionButton
+                        iconName="icon-externalLink"
+                        onClick={shareCode}
+                      />
+                      <ActionButton
+                        iconName="icon-export"
+                        onClick={shareCode}
+                      />
                     </div>
                     <Panel
-                      id="right-top"
-                      order={1}
-                      defaultSize={50}
-                      minSize={30}
                       className="flex border border-t-0 border-dev-purple-300 dark:border-dev-black-800"
+                      defaultSize={50}
+                      id="right-top"
+                      minSize={30}
+                      order={1}
                     >
                       <div className="flex-1">
                         <div className="relative size-full bg-dev-purple-200 dark:bg-dev-black-800">
@@ -176,10 +196,10 @@ const TypeScriptEditor = () => {
                 )
               }
               <Panel
-                id="right-bottom"
-                order={2}
                 defaultSize={50}
+                id="right-bottom"
                 minSize={30}
+                order={2}
                 className={cn(
                   'relative bg-dev-purple-200 dark:bg-dev-black-800',
                   'border border-dev-purple-300 dark:border-dev-black-800',

@@ -33,7 +33,10 @@ export const Console = () => {
   const refIsUserScrolling = useRef(false);
   const refContainer = useRef<HTMLDivElement | null>(null);
 
-  const [messages, setMessages] = useState<IConsoleMessage[]>([]);
+  const [
+    messages,
+    setMessages,
+  ] = useState<IConsoleMessage[]>([]);
   const refSizes = useRef<Map<number, number>>(new Map());
 
   const rowVirtualizer = useVirtualizer({
@@ -52,7 +55,10 @@ export const Console = () => {
   useEventBus<IEventBusConsoleMessage>('@@-console-message', ({ data }) => {
     clearTimeout(refTimeout.current!);
     setMessages((state) => {
-      const log = [...state, ...data];
+      const log = [
+        ...state,
+        ...data,
+      ];
       void storageSetItem(STORAGE_CACHE_NAME, STORAGE_PREFIX_CONSOLE_OUTPUT, log);
       return log;
     });
@@ -106,8 +112,8 @@ export const Console = () => {
     <PDScrollArea
       ref={refScrollArea}
       className="flex-1"
-      viewportClassNames="mask-vertical"
       onScroll={handleOnScroll}
+      viewportClassNames="mask-vertical"
     >
       <div
         ref={refContainer}
@@ -133,9 +139,9 @@ export const Console = () => {
             return (
               <div
                 key={virtualItem.key}
-                data-index={virtualItem.index}
                 ref={measureRow}
                 className="absolute pb-2 pt-5"
+                data-index={virtualItem.index}
                 style={{
                   top: 0,
                   left: 0,

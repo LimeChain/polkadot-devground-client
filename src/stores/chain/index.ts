@@ -199,8 +199,8 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
           { type: 'metadata', data: await getMetadata(api) },
           { type: 'runtime', data: await getRuntime(api) },
         ])
-          .then(results => {
-            results.forEach(result => {
+          .then((results) => {
+            results.forEach((result) => {
               if (result.status === 'fulfilled') {
                 switch (result.value.type) {
                   case 'chainSpecs':
@@ -275,8 +275,8 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
 
           }
 
-          await Promise.allSettled(promises).then(results => {
-            results.forEach(blockData => {
+          await Promise.allSettled(promises).then((results) => {
+            results.forEach((blockData) => {
               if (blockData.status === 'fulfilled') {
                 blocksData.set(blockData.value.header.number, blockData.value);
               }
@@ -284,7 +284,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
             set({ bestBlock: bestBlock?.number, finalizedBlock: finalizedBlock?.number });
           })
             // prevent state crash on random smoldot error
-            .catch(err => {
+            .catch((err) => {
               console.error(err);
             });
         });
@@ -300,7 +300,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
       }
     },
   },
-  async init() {
+  init: async () => {
     try {
       const smoldot = startFromWorker(new SmWorker(), {});
 

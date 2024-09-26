@@ -3,11 +3,12 @@ import {
   FixedSizeBinary,
 } from 'polkadot-api';
 
-export function assert(prop: unknown, message: string): asserts prop {
-  if (prop === null || typeof prop === 'undefined') {
+type AssertFunction = (condition: unknown, message: string) => asserts condition;
+export const assert: AssertFunction = (condition, message) => {
+  if (!condition) {
     throw new Error(message);
   }
-}
+};
 
 export const checkIfCompatable = (isCompatable: boolean, message: string) => {
   if (!isCompatable) {
@@ -15,7 +16,7 @@ export const checkIfCompatable = (isCompatable: boolean, message: string) => {
   }
 };
 
-export function unwrapApiResult(data: unknown): unknown {
+export const unwrapApiResult = (data: unknown): unknown => {
   if (data instanceof FixedSizeBinary) {
     return data.asHex();
   }
@@ -37,6 +38,12 @@ export function unwrapApiResult(data: unknown): unknown {
   }
 
   return Object.fromEntries(
-    Object.entries(data).map(([key, value]) => [key, unwrapApiResult(value)] as const),
+    Object.entries(data).map(([
+      key,
+      value,
+    ]) => [
+      key,
+      unwrapApiResult(value),
+    ] as const),
   );
-}
+};

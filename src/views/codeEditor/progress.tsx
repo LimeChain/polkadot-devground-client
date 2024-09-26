@@ -26,7 +26,10 @@ export const Progress = (props: IProgressProps) => {
 
   const refTimeout = useRef<NodeJS.Timeout>();
   const refStrokeDashoffset = useRef((100) * (size * Math.PI) / 100);
-  const [progress, setProgress] = useState(0);
+  const [
+    progress,
+    setProgress,
+  ] = useState(0);
 
   useEventBus<IEventBusMonacoEditorTypesProgress>('@@-monaco-editor-types-progress', async ({ data }) => {
     const timeout = data * getRandomNumber(data / 10, (data / 10) + 4);
@@ -63,30 +66,30 @@ export const Progress = (props: IProgressProps) => {
       )}
     >
       <svg
-        xmlns="http://www.w3.org/2000/svg"
+        className="size-full"
+        height={size}
         viewBox={`0 0 ${size} ${size}`}
         width={size}
-        height={size}
-        className="size-full"
+        xmlns="http://www.w3.org/2000/svg"
       >
         <circle
+          className="dark:dev-purple-700 stroke-current text-dev-purple-300 dark:text-dev-purple-700"
           cx={size / 2}
           cy={size / 2}
-          r={size / 2 - 2}
           fill="none"
-          className="dark:dev-purple-700 stroke-current text-dev-purple-300 dark:text-dev-purple-700"
+          r={(size / 2) - 2}
           strokeWidth="1"
         />
         <g className="origin-center -rotate-90">
           <circle
+            className="stroke-current text-blue-600 transition-[stroke-dashoffset] duration-300 dark:text-dev-purple-400"
             cx={size / 2}
             cy={size / 2}
-            r={size / 2 - 2}
             fill="none"
-            className="stroke-current text-blue-600 transition-[stroke-dashoffset] duration-300 dark:text-dev-purple-400"
-            strokeWidth="3"
-            strokeDasharray={`${size * Math.PI - 4}`}
+            r={(size / 2) - 2}
+            strokeDasharray={`${(size * Math.PI) - 4}`}
             strokeDashoffset={refStrokeDashoffset.current}
+            strokeWidth="3"
           />
         </g>
       </svg>
@@ -102,7 +105,8 @@ export const Progress = (props: IProgressProps) => {
               fontSize,
             }}
           >
-            {progress}%
+            {progress}
+            %
           </span>
         )
       }

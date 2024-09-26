@@ -24,7 +24,10 @@ export const MethodArgs = ({
   const lookup = useStoreChain?.use?.lookup?.();
 
   const inputs = method.inputs;
-  const [args, setArgs] = useState(inputs.reduce((
+  const [
+    args,
+    setArgs,
+  ] = useState(inputs.reduce((
     acc: {
       [key: string]: unknown;
     }, curr,
@@ -40,7 +43,7 @@ export const MethodArgs = ({
   }, [args]);
 
   const handleOnChange = useCallback((key: string, value: unknown) => {
-    setArgs(args => ({ ...args, [key]: value } as typeof args));
+    setArgs((args) => ({ ...args, [key]: value } as typeof args));
   }, []);
 
   if (inputs.length <= 0 || !lookup) {
@@ -50,7 +53,7 @@ export const MethodArgs = ({
   return (
     <div className="flex flex-col gap-6">
       {
-        inputs.map(type => {
+        inputs.map((type) => {
           const apiType = lookup(type.type);
 
           return (
@@ -64,9 +67,9 @@ export const MethodArgs = ({
               )}
               >
                 <CodecParam
-                  variable={apiType}
                   // eslint-disable-next-line react/jsx-no-bind
                   onChange={(args) => handleOnChange(type.name, args)}
+                  variable={apiType}
                 />
               </div>
             </div>

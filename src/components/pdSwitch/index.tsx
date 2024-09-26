@@ -12,12 +12,12 @@ export const PDSwitch = ({ title, checked, onChange }: IPDSwitch) => {
   return (
     <label className="flex w-fit cursor-pointer items-center gap-2" >
       <_Switch.Root
+        checked={checked}
+        onCheckedChange={onChange}
         className={cn(
           'group h-7 w-11 rounded-[50px]',
           'bg-dev-black-200 transition-colors data-[state=checked]:bg-dev-pink-500',
         )}
-        checked={checked}
-        onCheckedChange={onChange}
       >
         <_Switch.Thumb className={cn(
           'block size-5 rounded-full bg-dev-white-200 transition-transform',

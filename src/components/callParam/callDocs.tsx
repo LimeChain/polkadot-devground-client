@@ -25,7 +25,10 @@ export const CallDocs = ({
       className,
     )}
     >
-      <Icon name="icon-info" size={[24]} />
+      <Icon
+        name="icon-info"
+        size={[24]}
+      />
       <div className="flex flex-col gap-2">
         {
           docs?.map((doc, i) => (

@@ -15,7 +15,10 @@ interface PortalProps {
 }
 
 export const ReactPortal: FC<PortalProps> = ({ id, children }) => {
-  const [el, setEl] = useState<HTMLElement | null>(null);
+  const [
+    el,
+    setEl,
+  ] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
     const existingContainer = document.getElementById(id);

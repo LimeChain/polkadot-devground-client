@@ -10,15 +10,15 @@ type EventType =
   | 'focusin'
   | 'focusout';
 
-export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
+export const useOnClickOutside = <T extends HTMLElement = HTMLElement>(
   ref: RefObject<T> | RefObject<T>[],
   handler: (event: MouseEvent | TouchEvent | FocusEvent | MediaQueryListEvent) => void,
   eventType: EventType = 'mousedown',
   eventListenerOptions: AddEventListenerOptions = {},
-): void {
+): void => {
   useEventListener(
     eventType,
-    event => {
+    (event) => {
       const target = event.target as Node;
 
       if (!target || !target.isConnected) {
@@ -26,14 +26,14 @@ export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
       }
 
       const isOutside = Array.isArray(ref)
-        ? ref.filter(r => Boolean(r.current)).every(r => r.current && !r.current.contains(target))
+        ? ref.filter((r) => Boolean(r.current)).every((r) => r.current && !r.current.contains(target))
         : ref.current && !ref.current.contains(target);
 
       if (isOutside) {
-        handler(event);
+        handler(event as MouseEvent | TouchEvent | FocusEvent | MediaQueryListEvent);
       }
     },
     undefined,
     eventListenerOptions,
   );
-}
+};

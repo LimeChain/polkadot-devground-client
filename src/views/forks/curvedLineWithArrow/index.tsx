@@ -29,7 +29,10 @@ interface ITranslateProps {
 }
 
 const Line = styled.svg.withConfig({
-  shouldForwardProp: (prop) => !['xTranslate', 'yTranslate'].includes(prop),
+  shouldForwardProp: (prop) => ![
+    'xTranslate',
+    'yTranslate',
+  ].includes(prop),
 }) <ITranslateProps>`
   pointer-events: none;
   z-index: 1;
@@ -52,7 +55,10 @@ const Endings = styled(Line)`
 `;
 
 const ArrowHeadEnding = styled.path.withConfig({
-  shouldForwardProp: (prop) => !['xTranslate', 'yTranslate'].includes(prop),
+  shouldForwardProp: (prop) => ![
+    'xTranslate',
+    'yTranslate',
+  ].includes(prop),
 }) <ITranslateProps & { strokeWidth: number }>`
   transition: stroke 300ms;
   stroke-width: ${({ strokeWidth }) => strokeWidth}px;
@@ -126,22 +132,22 @@ export const CurvedLineWithArrow = ({
   return (
     <div className={className}>
       <Line
-        width={canvasWidth}
         height={canvasHeight + adjustedHeight}
+        width={canvasWidth}
         xTranslate={canvasXOffset}
         yTranslate={canvasYOffset}
       >
         <RenderedLine
           d={curvedLinePath}
-          stroke={arrowStrokeColor}
-          strokeWidth={lineStrokeWidth}
-          strokeDasharray={lineStrokeDasharray}
           fill="none"
+          stroke={arrowStrokeColor}
+          strokeDasharray={lineStrokeDasharray}
+          strokeWidth={lineStrokeWidth}
         />
       </Line>
       <Endings
-        width={canvasWidth}
         height={canvasHeight + adjustedHeight}
+        width={canvasWidth}
         xTranslate={canvasXOffset}
         yTranslate={canvasYOffset}
       >
@@ -149,16 +155,16 @@ export const CurvedLineWithArrow = ({
           transform={arrowFlipHorizontally ? `translate(${p4.x + 1}, 0) scale(-1, 1)` : undefined}
         >
           <ArrowHeadEnding
+            fill="none"
+            stroke={strokeColor}
+            strokeLinecap="round"
+            strokeWidth={lineStrokeWidth}
+            xTranslate={((p4.x - arrowHeadOffset) * 2) - (lineStrokeWidth)}
+            yTranslate={p4.y - arrowHeadOffset + topOffset}
             d={`
             M ${(arrowHeadEndingSize / 5) * 2} 0
             L ${arrowHeadEndingSize} ${arrowHeadEndingSize / 2}
             L ${(arrowHeadEndingSize / 5) * 2} ${arrowHeadEndingSize}`}
-            stroke={strokeColor}
-            strokeWidth={lineStrokeWidth}
-            strokeLinecap="round"
-            fill="none"
-            xTranslate={p4.x - arrowHeadOffset * 2 - (lineStrokeWidth)}
-            yTranslate={p4.y - arrowHeadOffset + topOffset}
           />
         </g>
       </Endings>

@@ -84,7 +84,10 @@ export const formatCode = async (code: string) => {
   try {
     const r = await format(code, {
       parser: 'typescript',
-      plugins: [parserTypeScript, prettierPluginEstree],
+      plugins: [
+        parserTypeScript,
+        prettierPluginEstree,
+      ],
       semi: true,
       singleQuote: false,
       trailingComma: 'all',

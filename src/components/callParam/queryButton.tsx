@@ -18,9 +18,9 @@ export const QueryButton = ({
 
   return (
     <button
-      type="button"
       disabled={disabled}
       onClick={onClick}
+      type="button"
       className={cn(
         'block w-full cursor-pointer',
         'p-4 text-dev-white-200',

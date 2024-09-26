@@ -19,8 +19,22 @@ export const Header = () => {
       <div className="flex gap-5">
         {
           accounts.length > 0
-            ? <button type="button" onClick={disconnectWallet}>Disconnect Wallet</button>
-            : <button type="button" onClick={connectWallet}>Connect Wallet</button>
+            ? (
+              <button
+                onClick={disconnectWallet}
+                type="button"
+              >
+                Disconnect Wallet
+              </button>
+            )
+            : (
+              <button
+                onClick={connectWallet}
+                type="button"
+              >
+                Connect Wallet
+              </button>
+            )
         }
 
         <ChainSelectButton />

@@ -14,16 +14,19 @@ import { cn } from '@utils/helpers';
 import type { IEventBusSetChain } from '@custom-types/eventBus';
 
 export interface IModal {
-  onClose : () => void;
-  children:ReactNode;
-  className?:string;
+  onClose: () => void;
+  children: ReactNode;
+  className?: string;
 }
 
 export const Modal = ({ onClose, children, className }:IModal) => {
   const refTimeout = useRef<NodeJS.Timeout>();
   const refBackdrop = useRef<HTMLDivElement>(null);
   const refModal = useRef<HTMLDivElement>(null);
-  const [open, setOpen] = useState(false);
+  const [
+    open,
+    setOpen,
+  ] = useState(false);
 
   const handleClose = useCallback(() => {
     setOpen(false);
@@ -33,7 +36,10 @@ export const Modal = ({ onClose, children, className }:IModal) => {
     if (!open) {
       onClose();
     }
-  }, [onClose, open]);
+  }, [
+    onClose,
+    open,
+  ]);
 
   useEffect(() => {
     setOpen(true);
@@ -85,9 +91,9 @@ export const Modal = ({ onClose, children, className }:IModal) => {
         )}
       >
         <button
-          type="button"
-          onClick={handleClose}
           className="absolute right-6 top-6"
+          onClick={handleClose}
+          type="button"
         >
           <Icon
             name="icon-close"

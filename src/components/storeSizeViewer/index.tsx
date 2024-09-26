@@ -13,12 +13,27 @@ import type { IEventBusStoreSize } from '@custom-types/eventBus';
 
 export const StoreSizeViewer = () => {
   const refTimeout = useRef<NodeJS.Timeout>();
-  const [data, setData] = useState<Record<string, number>>({});
+  const [
+    data,
+    setData,
+  ] = useState<Record<string, number>>({});
 
-  const [visible, setVisible] = useState(false);
-  const [dragging, setDragging] = useState(false);
-  const [position, setPosition] = useState({ x: window.innerWidth / 2, y: 0 });
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [
+    visible,
+    setVisible,
+  ] = useState(false);
+  const [
+    dragging,
+    setDragging,
+  ] = useState(false);
+  const [
+    position,
+    setPosition,
+  ] = useState({ x: window.innerWidth / 2, y: 0 });
+  const [
+    offset,
+    setOffset,
+  ] = useState({ x: 0, y: 0 });
 
   const handleData = useCallback(() => {
     clearTimeout(refTimeout.current);
@@ -58,7 +73,10 @@ export const StoreSizeViewer = () => {
       return;
     }
     setPosition({ x: e.clientX - offset.x, y: e.clientY - offset.y });
-  }, [dragging, offset]);
+  }, [
+    dragging,
+    offset,
+  ]);
 
   const handleMouseUp = useCallback(() => {
     setDragging(false);
@@ -74,7 +92,11 @@ export const StoreSizeViewer = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [dragging, handleMouseMove, handleMouseUp]);
+  }, [
+    dragging,
+    handleMouseMove,
+    handleMouseUp,
+  ]);
 
   if (!visible) {
     return null;
@@ -82,6 +104,7 @@ export const StoreSizeViewer = () => {
 
   return (
     <div
+      onMouseDown={handleMouseDown}
       className={cn(
         'fixed left-1/2 z-[9999] translate-x-[-50%]',
         'flex flex-col',
@@ -95,14 +118,20 @@ export const StoreSizeViewer = () => {
         left: `${position.x}px`,
         top: `${position.y}px`,
       }}
-      onMouseDown={handleMouseDown}
     >
       {
-        Object.entries(data).map(([store, size]) => {
+        Object.entries(data).map(([
+          store,
+          size,
+        ]) => {
           const sizeFormatted = formatBytes(size);
           return (
             <div key={store}>
-              {store}: {sizeFormatted.value} {sizeFormatted.unit}
+              {store}
+              :
+              {sizeFormatted.value} 
+              {' '}
+              {sizeFormatted.unit}
             </div>
           );
         })

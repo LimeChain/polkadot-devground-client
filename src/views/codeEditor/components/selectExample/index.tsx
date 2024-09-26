@@ -12,14 +12,20 @@ import { snippets } from '@constants/snippets';
 import { cn } from '@utils/helpers';
 
 export const SelectExample = () => {
-  const [isOpened, setIsOpened] = useState(false);
-  const [type, setType] = useState('default');
+  const [
+    isOpened,
+    setIsOpened,
+  ] = useState(false);
+  const [
+    type,
+    setType,
+  ] = useState('default');
   const [searchParams] = useSearchParams();
   const selectSnipped = searchParams.get('s');
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleSetOpen = useCallback(() => {
-    setIsOpened(prev => !prev);
+    setIsOpened((prev) => !prev);
   }, []);
 
   const handleSetType = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
@@ -50,6 +56,7 @@ export const SelectExample = () => {
       className="relative w-6/12"
     >
       <button
+        onClick={handleSetOpen}
         className={cn(
           'relative flex w-full items-center justify-between',
           'px-4 py-[18px]',
@@ -62,7 +69,6 @@ export const SelectExample = () => {
             ['border-dev-pink-500']: isOpened,
           },
         )}
-        onClick={handleSetOpen}
       >
         Select Example
         <Icon
@@ -89,6 +95,7 @@ export const SelectExample = () => {
       >
         <div className="flex gap-2 border-b border-dev-purple-700 px-2 font-geist dark:border-dev-purple-300 dark:text-dev-black-800">
           <button
+            onClick={handleSetType}
             className={cn(
               'px-2 py-2.5 hover:border-dev-pink-500',
               'text-dev-white-400 hover:text-dev-white-200 dark:text-dev-black-800 dark:hover:text-dev-black-1000',
@@ -98,11 +105,11 @@ export const SelectExample = () => {
                 ['border-dev-pink-500']: type === 'custom',
               },
             )}
-            onClick={handleSetType}
           >
             Custom
           </button>
           <button
+            onClick={handleSetType}
             className={cn(
               'px-2 py-2.5 hover:border-dev-pink-500',
               'text-dev-white-400 hover:text-dev-white-200 dark:text-dev-black-800 dark:hover:text-dev-black-1000',
@@ -112,7 +119,6 @@ export const SelectExample = () => {
                 ['border-dev-pink-500']: type === 'default',
               },
             )}
-            onClick={handleSetType}
           >
             Default
           </button>
@@ -120,9 +126,9 @@ export const SelectExample = () => {
 
         <PDScrollArea
           className="h-72"
-          viewportClassNames="py-4"
           verticalScrollClassNames="py-4"
           verticalScrollThumbClassNames="before:bg-dev-purple-700 dark:before:bg-dev-purple-300"
+          viewportClassNames="py-4"
         >
           <ul>
             {
@@ -131,6 +137,8 @@ export const SelectExample = () => {
                   snippets.map((snippet) => (
                     <li key={snippet.id}>
                       <button
+                        data-snippet-index={snippet.id}
+                        onClick={handleChangeExample}
                         className={cn(
                           'flex w-full items-center justify-between',
                           'px-4 py-3.5',
@@ -140,11 +148,11 @@ export const SelectExample = () => {
                             ['bg-dev-black-800 dark:bg-dev-purple-300']: selectSnipped === snippet.id.toString(),
                           },
                         )}
-                        onClick={handleChangeExample}
-                        data-snippet-index={snippet.id}
                       >
                         <p className="font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000">
-                          Example: {snippet.id}
+                          Example: 
+                          {' '}
+                          {snippet.id}
                         </p>
                         <p className="font-geist text-dev-white-1000 font-body3-regular dark:text-dev-black-300">
                           CUSTOM

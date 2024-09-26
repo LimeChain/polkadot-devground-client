@@ -42,9 +42,9 @@ export const NavigationDropdownItem = ({
       )}
     >
       <Icon
-        size={[20]}
-        name={icon}
         className="text-dev-pink-500"
+        name={icon}
+        size={[20]}
       />
       {title}
     </PDLink>

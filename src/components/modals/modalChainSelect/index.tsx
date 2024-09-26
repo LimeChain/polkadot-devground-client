@@ -12,8 +12,8 @@ interface IModalChainSelect extends Pick<IModal, 'onClose'> {}
 export const ModalChainSelect = ({ onClose }: IModalChainSelect) => {
   return (
     <Modal
-      onClose={onClose}
       className="w-[calc(100%-32px)] max-w-[1000px]"
+      onClose={onClose}
     >
       <div className={cn(
         'grid grid-cols-chainSelect border-b px-8 py-6',

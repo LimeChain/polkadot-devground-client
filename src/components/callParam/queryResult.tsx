@@ -30,14 +30,17 @@ export const QueryResult = ({
   onRemove,
 }: IQueryResult) => {
 
-  const [resultIsLoading, setResultIsLoading] = useState(true);
+  const [
+    resultIsLoading,
+    setResultIsLoading,
+  ] = useState(true);
   const theme = useStoreUI?.use?.theme?.();
 
   useEffect(() => {
     void (async () => {
       // used to prevent a flickering feel when the result loads too quickly
       await sleep(500);
-      setResultIsLoading(isLoading ? true : false);
+      setResultIsLoading(!!isLoading);
     })();
   }, [isLoading]);
 
@@ -54,16 +57,21 @@ export const QueryResult = ({
         </p>
 
         <button
-          type="button"
           onClick={onRemove}
+          type="button"
         >
-          <Icon name="icon-close" size={[24]} />
+          <Icon
+            name="icon-close"
+            size={[24]}
+          />
         </button>
       </div>
 
       <div className="flex flex-col gap-6">
         <p>
-          Path: {' '}
+          Path: 
+          {' '}
+          {' '}
           <span
             className={cn(
               'rounded-md px-1 py-[2px] dark:bg-dev-black-600',
@@ -90,12 +98,12 @@ export const QueryResult = ({
                   Result
                   <JsonViewer
                     src={result as object}
-                    enableClipboard
                     style={{
                       borderRadius: 8,
                       backgroundColor: theme === 'dark' ? '#252525' : '#FBFCFE',
                       padding: 16,
                     }}
+                    enableClipboard
                   />
                 </>
               )

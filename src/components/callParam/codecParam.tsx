@@ -20,28 +20,78 @@ interface ICodecParam extends ICallArgs {
 export const CodecParam = ({ variable, onChange }: ICodecParam) => {
   switch (variable.type) {
     case 'struct':
-      return <StructParam struct={variable} onChange={onChange} />;
+      return (
+        <StructParam
+          onChange={onChange}
+          struct={variable}
+        />
+      );
     case 'compact':
-      return <CompactParam compact={variable} onChange={onChange} />;
+      return (
+        <CompactParam
+          compact={variable}
+          onChange={onChange}
+        />
+      );
     case 'sequence':
-      return <SequenceParam sequence={variable} onChange={onChange} />;
+      return (
+        <SequenceParam
+          onChange={onChange}
+          sequence={variable}
+        />
+      );
     case 'primitive':
-      return <PrimitiveParam primitive={variable} onChange={onChange} />;
+      return (
+        <PrimitiveParam
+          onChange={onChange}
+          primitive={variable}
+        />
+      );
     case 'array':
-      return <ArrayParam array={variable} onChange={onChange} />;
+      return (
+        <ArrayParam
+          array={variable}
+          onChange={onChange}
+        />
+      );
     case 'enum':
-      return <EnumParam enum={variable} onChange={onChange} />;
+      return (
+        <EnumParam
+          enum={variable}
+          onChange={onChange}
+        />
+      );
     case 'AccountId20':
     case 'AccountId32':
-      return <AccountParam accountId={variable} onChange={onChange} />;
+      return (
+        <AccountParam
+          accountId={variable}
+          onChange={onChange}
+        />
+      );
     case 'tuple':
-      return <TupleParam tuple={variable} onChange={onChange} />;
+      return (
+        <TupleParam
+          onChange={onChange}
+          tuple={variable}
+        />
+      );
     case 'void':
       return <VoidParam onChange={onChange} />;
     case 'option':
-      return <OptionParam option={variable} onChange={onChange} />;
+      return (
+        <OptionParam
+          onChange={onChange}
+          option={variable}
+        />
+      );
     case 'bitSequence':
-      return <BinaryParam onChange={onChange} minLength={0} />;
+      return (
+        <BinaryParam
+          minLength={0}
+          onChange={onChange}
+        />
+      );
     default:
       return (
         <div>

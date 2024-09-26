@@ -5,41 +5,6 @@ import {
 
 import type { RefObject } from 'react';
 
-// MediaQueryList Event based useEventListener interface
-function useEventListener<K extends keyof MediaQueryListEventMap>(
-  eventName: K,
-  handler: (event: MediaQueryListEventMap[K]) => void,
-  element: RefObject<MediaQueryList>,
-  options?: boolean | AddEventListenerOptions,
-): void;
-
-// Window Event based useEventListener interface
-function useEventListener<K extends keyof WindowEventMap>(
-  eventName: K,
-  handler: (event: WindowEventMap[K]) => void,
-  element?: undefined,
-  options?: boolean | AddEventListenerOptions,
-): void;
-
-// Element Event based useEventListener interface
-function useEventListener<
-  K extends keyof HTMLElementEventMap & keyof SVGElementEventMap,
-  T extends Element = K extends keyof HTMLElementEventMap ? HTMLDivElement : SVGElement,
->(
-  eventName: K,
-  handler: ((event: HTMLElementEventMap[K]) => void) | ((event: SVGElementEventMap[K]) => void),
-  element: RefObject<T>,
-  options?: boolean | AddEventListenerOptions,
-): void;
-
-// Document Event based useEventListener interface
-function useEventListener<K extends keyof DocumentEventMap>(
-  eventName: K,
-  handler: (event: DocumentEventMap[K]) => void,
-  element: RefObject<Document>,
-  options?: boolean | AddEventListenerOptions,
-): void;
-
 /**
  * Custom hook that attaches event listeners to DOM elements, the window, or media query lists.
  * @template KW - The type of event for window events.
@@ -70,7 +35,7 @@ function useEventListener<K extends keyof DocumentEventMap>(
  * useEventListener('click', handleButtonClick, buttonRef);
  * ```
  */
-function useEventListener<
+const useEventListener = <
   KW extends keyof WindowEventMap,
   KH extends keyof HTMLElementEventMap & keyof SVGElementEventMap,
   KM extends keyof MediaQueryListEventMap,
@@ -82,7 +47,7 @@ function useEventListener<
   ) => void,
   element?: RefObject<T>,
   options?: boolean | AddEventListenerOptions,
-) {
+) => {
   // Create a ref that stores handler
   const savedHandler = useRef(handler);
 
@@ -99,7 +64,7 @@ function useEventListener<
     }
 
     // Create event listener that calls handler function stored in ref
-    const listener: typeof handler = event => {
+    const listener: typeof handler = (event) => {
       savedHandler.current(event);
     };
 
@@ -109,7 +74,11 @@ function useEventListener<
     return () => {
       targetElement.removeEventListener(eventName, listener, options);
     };
-  }, [eventName, element, options]);
-}
+  }, [
+    eventName,
+    element,
+    options,
+  ]);
+};
 
 export { useEventListener };

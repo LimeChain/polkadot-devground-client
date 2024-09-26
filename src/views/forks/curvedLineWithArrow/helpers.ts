@@ -27,8 +27,8 @@ export const calculateCanvasDimensions = ({
   canvasWidth: number;
   canvasHeight: number;
 } => ({
-  canvasWidth: absDx + 2 * boundingBoxBuffer.horizontal,
-  canvasHeight: absDy + 2 * boundingBoxBuffer.vertical,
+  canvasWidth: absDx + (2 * boundingBoxBuffer.horizontal),
+  canvasHeight: absDy + (2 * boundingBoxBuffer.vertical),
 });
 
 interface ICalculateControlPoints {

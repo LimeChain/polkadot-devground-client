@@ -23,7 +23,10 @@ export const Problems = (props: IProblemsProps) => {
     maxWidth,
   } = props;
 
-  const [messages, setMessages] = useState<IErrorItem[]>([]);
+  const [
+    messages,
+    setMessages,
+  ] = useState<IErrorItem[]>([]);
 
   useEventBus<IEventBusErrorItem>('@@-problems-message', ({ data }) => {
     setMessages(data);
@@ -57,8 +60,8 @@ export const Problems = (props: IProblemsProps) => {
             ? messages.map((message, index) => (
               <div
                 key={index}
-                data-index={index}
                 className="flex items-center gap-x-3 whitespace-nowrap text-xs"
+                data-index={index}
                 onClick={handleClick}
               >
                 <span className="truncate">{message.message}</span>

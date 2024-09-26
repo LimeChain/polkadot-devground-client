@@ -111,9 +111,9 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
         <ScrollButtons refScrollArea={refScrollArea} />
       </div>
       <PDScrollArea
-        type="always"
         ref={refScrollArea}
         onScroll={handleScroll}
+        type="always"
         viewportClassNames={cn(
           'mask-horizontal-and-vertical',
           'px-8 py-20',
@@ -137,9 +137,9 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
                 return (
                   <div
                     key={virtualIndex}
-                    id={`group-${virtualCol.index}`}
                     ref={virtualCol.measureElement}
                     data-index={virtualCol.index}
+                    id={`group-${virtualCol.index}`}
                     className={cn(
                       'absolute left-0 top-0',
                       'h-16',
@@ -167,14 +167,14 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
                                     ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: refLatestBlockHash.current === item.blockHash,
                                   },
                                 )}
+                                endPoint={{
+                                  x: 0,
+                                  y: blockItemIndex * arrowOffset,
+                                }}
                                 startPoint={{
                                   // related to the padding above
                                   x: (blockItems.length > 1 ? -96 : -40),
                                   y: 0,
-                                }}
-                                endPoint={{
-                                  x: 0,
-                                  y: blockItemIndex * arrowOffset,
                                 }}
                               />
                             )
@@ -212,9 +212,9 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
                             {
                               item.isFinalized && (
                                 <Icon
-                                  size={[16]}
-                                  name="icon-checked"
                                   className="w-full max-w-4 text-dev-green-600"
+                                  name="icon-checked"
+                                  size={[16]}
                                 />
                               )
                             }
@@ -223,9 +223,9 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
                             </div>
 
                             <CopyToClipboard
+                              className="hover:text-dev-dev-purple-50"
                               text={item.blockHash}
                               toastMessage="Block Hash"
-                              className="hover:text-dev-dev-purple-50"
                             >
                               {
                                 ({ ClipboardIcon }) => (
