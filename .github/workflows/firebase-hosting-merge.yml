@@ -12,6 +12,8 @@ jobs:
         run: npm ci
       - name: Add Polkadot Descriptors
         run: npm run add-descriptors
+      - name: Check lint rules
+        run: npm run lint
       - name: Build
         run: npm run build
         env:
