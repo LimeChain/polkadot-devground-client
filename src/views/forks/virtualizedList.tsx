@@ -105,7 +105,7 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
   }, [items]);
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col disable-vertical-scroll">
       <div className="flex justify-between">
         <PageHeader title="Forks" />
         <ScrollButtons refScrollArea={refScrollArea} />
@@ -119,7 +119,7 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
           'px-8 py-20',
           'font-geist text-dev-purple-50 font-body2-regular',
         )}
-        className="disable-horizontal-scroll disable-vertical-scroll"
+        className="disable-horizontal-scroll"
       >
         <div
           ref={refContent}
