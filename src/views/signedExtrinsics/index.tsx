@@ -26,31 +26,43 @@ const SignedExtrinsics = () => {
 
   const blocksData = useStoreChain?.use?.blocksData?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
-  const [JSONViewerModal, toggleVisibility] = useToggleVisibility(ModalJSONViewer);
+  const [
+    JSONViewerModal,
+    toggleVisibility,
+  ] = useToggleVisibility(ModalJSONViewer);
 
-  const [signedExtrinsics, setSignedExtrinsics] = useState<IMappedBlockExtrinsic[]>([]);
+  const [
+    signedExtrinsics,
+    setSignedExtrinsics,
+  ] = useState<IMappedBlockExtrinsic[]>([]);
   const isLoading = blocksData.size === 0;
 
   const handleOpenModal = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
     const extrinsicId = e.currentTarget.getAttribute('data-extrinsic-id');
-    refSelectedExtrinsic.current = signedExtrinsics.find(extrinsic => extrinsic.id === extrinsicId);
+    refSelectedExtrinsic.current = signedExtrinsics.find((extrinsic) => extrinsic.id === extrinsicId);
     toggleVisibility();
-  }, [signedExtrinsics, toggleVisibility]);
+  }, [
+    signedExtrinsics,
+    toggleVisibility,
+  ]);
 
   useEffect(() => {
     const extrinsics = Array.from(blocksData.values())
-      .flatMap(block => block?.body?.extrinsics?.slice(2) ?? [])
+      .flatMap((block) => block?.body?.extrinsics?.slice(2) ?? [])
       .reverse();
 
     setSignedExtrinsics(extrinsics);
-  }, [blocksData, latestBlock]);
+  }, [
+    blocksData,
+    latestBlock,
+  ]);
 
   return (
     <div className="grid h-full grid-rows-[40px_46px_1fr] gap-8">
       <PageHeader title="Extrinsics" />
       <SearchBar
-        type="extrinsics"
         label="Search by Block"
+        type="extrinsics"
       />
       <PDScrollArea
         className="h-full"
@@ -89,41 +101,42 @@ const SignedExtrinsics = () => {
                     <tr
                       key={extrinsic.id}
                       data-extrinsic-id={extrinsic.id}
+                      onClick={handleOpenModal}
                       className={cn(
                         'pd-table-row',
                         {
                           ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: extrinsicIndex === 0,
                         },
                       )}
-                      onClick={handleOpenModal}
                     >
                       <td>{extrinsic.id}</td>
                       <td>{extrinsic.blockNumber}</td>
                       <td>{truncateAddress(extrinsic.signer?.Id, 6)}</td>
                       <td>{timeAgo}</td>
-                      <td>{
-                        extrinsic.isSuccess
-                          ? (
-                            <Icon
-                              size={[16]}
-                              name="icon-checked"
-                              className="text-dev-green-600"
-                            />
-                          )
-                          : (
-                            <Icon
-                              size={[16]}
-                              name="icon-failed"
-                              className="text-dev-red-800"
-                            />
-                          )}
+                      <td>
+                        {
+                          extrinsic.isSuccess
+                            ? (
+                              <Icon
+                                className="text-dev-green-600"
+                                name="icon-checked"
+                                size={[16]}
+                              />
+                            )
+                            : (
+                              <Icon
+                                className="text-dev-red-800"
+                                name="icon-failed"
+                                size={[16]}
+                              />
+                            )}
                       </td>
                       <td>{extrinsic.method.method}</td>
                       <td>
                         <Icon
-                          size={[18]}
-                          name="icon-dropdownArrow"
                           className="text-dev-black-1000 dark:text-dev-purple-50"
+                          name="icon-dropdownArrow"
+                          size={[18]}
                         />
                       </td>
                     </tr>
@@ -137,8 +150,8 @@ const SignedExtrinsics = () => {
       {
         refSelectedExtrinsic.current && (
           <JSONViewerModal
-            onClose={toggleVisibility}
             jsonData={refSelectedExtrinsic.current}
+            onClose={toggleVisibility}
             title="Extrinsic Details"
           />
         )

@@ -17,7 +17,10 @@ interface IPDFileUpload extends ICallArgs {}
 export const PDFileUpload = ({ onChange }: IPDFileUpload) => {
   const inputRef = useRef<HTMLLabelElement>(null);
   const inputId = crypto.randomUUID();
-  const [fileUploaded, setFileUploaded] = useState<File | undefined>(undefined);
+  const [
+    fileUploaded,
+    setFileUploaded,
+  ] = useState<File | undefined>(undefined);
 
   const handleFileUpload = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.item(0);
@@ -83,16 +86,16 @@ export const PDFileUpload = ({ onChange }: IPDFileUpload) => {
         }
       </span>
       <button
-        type="button"
         className="pointer-events-none bg-dev-pink-500 px-10 py-2 text-dev-white-200 font-body2-bold"
+        type="button"
       >
         Upload file
       </button>
       <input
-        type="file"
-        id={inputId}
         className="hidden"
+        id={inputId}
         onChange={handleFileUpload}
+        type="file"
       />
     </label>
   );

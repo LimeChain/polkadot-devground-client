@@ -27,7 +27,10 @@ export const EnumParam = ({ onChange, ...props }: IEnumParam) => {
     }));
   }, [enumKeys]);
 
-  const [key, setKey] = useState(enumKeys.at(0)!);
+  const [
+    key,
+    setKey,
+  ] = useState(enumKeys.at(0)!);
 
   const handleSetValue = useCallback((args: unknown) => {
     onChange({ type: key, value: args });
@@ -55,8 +58,8 @@ export const EnumParam = ({ onChange, ...props }: IEnumParam) => {
             <CodecParam
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               key={`${variable.type}-${(variable as any)?.id}`} /* used to fix state on enum change */
-              variable={variable}
               onChange={handleSetValue}
+              variable={variable}
             />
           </div>
         )

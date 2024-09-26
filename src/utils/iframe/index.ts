@@ -11,7 +11,7 @@ interface ImportMap {
   scopes?: Record<string, string>;
 }
 
-export function getImportMap(code: string) {
+export const getImportMap = (code: string) => {
   const importRegex = /import\s+(?:type\s+)?(?:\{[^}]*\}|[^'"]*)\s+from\s+['"]([^'"]+)['"]|import\s+['"]([^'"]+)['"]/g;
 
   const importSet = new Set<string>();
@@ -20,7 +20,10 @@ export function getImportMap(code: string) {
 
   while (match !== null) {
     const importPath = match[1] || match[2];
-    const isRelative = ['.', '/'].some((e) => importPath.startsWith(e));
+    const isRelative = [
+      '.',
+      '/',
+    ].some((e) => importPath.startsWith(e));
     if (!isRelative) {
       importSet.add(importPath);
     }
@@ -36,9 +39,9 @@ export function getImportMap(code: string) {
   }
 
   return importMap;
-}
+};
 
-export function mergeImportMap(...maps: ImportMap[]): ImportMap {
+export const mergeImportMap = (...maps: ImportMap[]): ImportMap => {
   const importMap: ImportMap = {
     imports: {},
     scopes: {},
@@ -57,7 +60,7 @@ export function mergeImportMap(...maps: ImportMap[]): ImportMap {
   }
 
   return importMap;
-}
+};
 
 const compressCode = (code: string): string => {
   const compressed = deflate(new TextEncoder().encode(code));
@@ -76,7 +79,7 @@ const getIframeContent = (script: string, importMap: string) => {
 };
 
 const decompressCode = (compressed: string): string => {
-  const decoded = Uint8Array.from(atob(compressed), c => c.charCodeAt(0));
+  const decoded = Uint8Array.from(atob(compressed), (c) => c.charCodeAt(0));
   const decompressed = inflate(decoded, { to: 'string' });
   return decompressed;
 };
@@ -97,10 +100,10 @@ const removeNamedImports = (code: string, namedImportsToRemove: string[]): strin
   // Replace function for imports
   const replaceImport = (match: string, imports: string, moduleName: string): string => {
     // Split the imports by comma and trim whitespace
-    let importNames = imports.split(',').map(name => name.trim());
+    let importNames = imports.split(',').map((name) => name.trim());
 
     // Filter out the named imports that should be removed
-    importNames = importNames.filter(name => !namedImportsToRemove.includes(name));
+    importNames = importNames.filter((name) => !namedImportsToRemove.includes(name));
 
     // If no named imports remain, remove the entire import statement
     if (importNames.length === 0) {
@@ -126,7 +129,10 @@ export const generateHTML = (code: string, importMap: string) => {
 
   try {
     const output = transform(code, {
-      transforms: ['typescript', 'jsx'],
+      transforms: [
+        'typescript',
+        'jsx',
+      ],
       jsxRuntime: 'automatic',
       production: true,
       filePath: 'index.js',

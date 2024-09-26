@@ -21,29 +21,41 @@ const Constants = () => {
   const metadata = useStoreChain?.use?.metadata?.();
   const chain = useStoreChain?.use?.chain?.();
 
-  const palletsWithConstants = useMemo(() => metadata?.pallets?.filter(p => p.constants.length > 0)?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
-  const palletSelectItems = useMemo(() => palletsWithConstants?.map(pallet => ({
+  const palletsWithConstants = useMemo(() => metadata?.pallets?.filter((p) => p.constants.length > 0)?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
+  const palletSelectItems = useMemo(() => palletsWithConstants?.map((pallet) => ({
     label: pallet.name,
     value: pallet.name,
     key: `pallet-select-${pallet.name}`,
   })), [palletsWithConstants]);
 
-  const [palletSelected, setPalletSelected] = useState(palletsWithConstants?.at(0));
+  const [
+    palletSelected,
+    setPalletSelected,
+  ] = useState(palletsWithConstants?.at(0));
 
   const constants = useMemo(() => palletSelected?.constants?.sort((a, b) => a.name.localeCompare(b.name)), [palletSelected]);
   const constantItems = useMemo(() => {
     if (palletSelected) {
-      return constants?.map(item => ({
+      return constants?.map((item) => ({
         label: item.name,
         value: item.name,
         key: `constant-select-${item.name}`,
       }));
     }
     return undefined;
-  }, [constants, palletSelected]);
+  }, [
+    constants,
+    palletSelected,
+  ]);
 
-  const [constantSelected, setConstantSelected] = useState(palletSelected?.constants?.at?.(0));
-  const [queries, setQueries] = useState<{ pallet: string; storage: string; id: string }[]>([]);
+  const [
+    constantSelected,
+    setConstantSelected,
+  ] = useState(palletSelected?.constants?.at?.(0));
+  const [
+    queries,
+    setQueries,
+  ] = useState<{ pallet: string; storage: string; id: string }[]>([]);
 
   useEffect(() => {
     setQueries([]);
@@ -60,7 +72,7 @@ const Constants = () => {
 
   const handlePalletSelect = useCallback((selectedPalletName: string) => {
     if (palletsWithConstants) {
-      const selectedPallet = palletsWithConstants.find(pallet => pallet.name === selectedPalletName);
+      const selectedPallet = palletsWithConstants.find((pallet) => pallet.name === selectedPalletName);
 
       if (selectedPallet) {
         setPalletSelected(selectedPallet);
@@ -71,23 +83,29 @@ const Constants = () => {
 
   const handleConstantSelect = useCallback((constantSelectedName: string) => {
     if (palletSelected) {
-      const selectedStorage = palletSelected.constants.find(constant => constant.name === constantSelectedName);
+      const selectedStorage = palletSelected.constants.find((constant) => constant.name === constantSelectedName);
       setConstantSelected(selectedStorage);
     }
   }, [palletSelected]);
 
   const handleStorageQuerySubmit = useCallback(() => {
     if (palletSelected?.name && constantSelected?.name) {
-      setQueries(queries => ([{
-        pallet: palletSelected.name,
-        storage: constantSelected.name,
-        id: crypto.randomUUID(),
-      }, ...queries]));
+      setQueries((queries) => ([
+        {
+          pallet: palletSelected.name,
+          storage: constantSelected.name,
+          id: crypto.randomUUID(),
+        },
+        ...queries,
+      ]));
     }
-  }, [palletSelected, constantSelected]);
+  }, [
+    palletSelected,
+    constantSelected,
+  ]);
 
   const handleStorageUnsubscribe = useCallback((id: string) => {
-    setQueries(queries => queries.filter(query => query.id !== id));
+    setQueries((queries) => queries.filter((query) => query.id !== id));
   }, []);
 
   if (!palletSelected) {
@@ -99,32 +117,36 @@ const Constants = () => {
       <QueryFormContainer>
         <div className="grid w-full grid-cols-2 gap-4">
           <PDSelect
-            label="Select Pallet"
             emptyPlaceHolder="No pallets available"
-            placeholder="Please select a pallet"
             items={palletSelectItems}
+            label="Select Pallet"
             onChange={handlePalletSelect}
+            placeholder="Please select a pallet"
             value={palletSelected?.name}
           />
           {
             constantItems
           && (
             <PDSelect
-              label="Select Constant"
               emptyPlaceHolder="No constants available"
-              placeholder="Please select constant"
               items={constantItems}
-              value={constantSelected?.name}
+              label="Select Constant"
               onChange={handleConstantSelect}
+              placeholder="Please select constant"
+              value={constantSelected?.name}
             />
           )
           }
         </div>
 
-        <CallDocs docs={constantSelected?.docs?.filter(d => d) || []} />
+        <CallDocs docs={constantSelected?.docs?.filter((d) => d) || []} />
 
         <QueryButton onClick={handleStorageQuerySubmit}>
-          Query {palletSelected?.name}/{constantSelected?.name}
+          Query 
+          {' '}
+          {palletSelected?.name}
+          /
+          {constantSelected?.name}
         </QueryButton>
 
       </QueryFormContainer>
@@ -133,8 +155,8 @@ const Constants = () => {
           queries.map((query) => (
             <Query
               key={`query-result-${query.pallet}-${query.storage}-${query.id}`}
-              querie={query}
               onUnsubscribe={handleStorageUnsubscribe}
+              querie={query}
             />
           ))
         }
@@ -155,8 +177,14 @@ const Query = (
   }) => {
   const api = useStoreChain?.use?.api?.() as TRelayApi;
 
-  const [result, setResult] = useState<unknown>();
-  const [isLoading, setIsLoading] = useState(true);
+  const [
+    result,
+    setResult,
+  ] = useState<unknown>();
+  const [
+    isLoading,
+    setIsLoading,
+  ] = useState(true);
 
   useEffect(() => {
     const catchError = (err: Error) => {
@@ -179,19 +207,25 @@ const Query = (
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [querie, api]);
+  }, [
+    querie,
+    api,
+  ]);
 
   const handleUnsubscribe = useCallback(() => {
     onUnsubscribe(querie.id);
-  }, [querie, onUnsubscribe]);
+  }, [
+    querie,
+    onUnsubscribe,
+  ]);
 
   return (
     <QueryResult
-      title="Constant"
-      path={`${querie.pallet}/${querie.storage}`}
       isLoading={isLoading}
-      result={result}
       onRemove={handleUnsubscribe}
+      path={`${querie.pallet}/${querie.storage}`}
+      result={result}
+      title="Constant"
     />
   );
 };

@@ -26,7 +26,10 @@ const FooterLink = ({ linkProps, iconProps, className, text }: IFooterLinkProps)
       )}
       {...linkProps}
     >
-      <Icon size={[24]} {...iconProps} />
+      <Icon
+        size={[24]}
+        {...iconProps}
+      />
       {
         text && (
           <span>{text}</span>

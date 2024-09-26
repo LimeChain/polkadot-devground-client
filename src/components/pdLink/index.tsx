@@ -25,10 +25,11 @@ export const PDLink = (props: IPDLink) => {
   } = props;
   return (
     <Link
-      to={to.toString()}
       className={cn('text-current hover:text-current', className)}
+      to={to.toString()}
       {...rest}
-    >{children}
+    >
+      {children}
     </Link>
   );
 };

@@ -35,8 +35,14 @@ export const Iframe = (props: IframeProps) => {
   const refTimeout = useRef<NodeJS.Timeout>();
 
   const refIframe = useRef<HTMLIFrameElement>(null);
-  const [blobUrl, setBlobUrl] = useState('');
-  const [showLoading, setShowLoading] = useState(false);
+  const [
+    blobUrl,
+    setBlobUrl,
+  ] = useState('');
+  const [
+    showLoading,
+    setShowLoading,
+  ] = useState(false);
 
   useEventBus<IEventBusMonacoEditorExecuteSnippet>('@@-monaco-editor-execute-snippet', ({ data }) => {
     clearTimeout(refTimeout.current);
@@ -64,8 +70,8 @@ export const Iframe = (props: IframeProps) => {
     <>
       <iframe
         ref={refIframe}
-        src={blobUrl}
         onLoad={onLoad}
+        src={blobUrl}
         className={cn(
           'size-full flex-1 border-0',
           {

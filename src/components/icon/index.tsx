@@ -40,8 +40,8 @@ export const Icon = forwardRef(
       <svg
         ref={ref}
         {...attributes}
-        fill={color}
         data-testid={testId}
+        fill={color}
       >
         <use href={`${path}`} />
       </svg>

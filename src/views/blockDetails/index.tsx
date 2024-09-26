@@ -21,7 +21,10 @@ const BlockDetails = () => {
   const data = useStoreChain?.use?.blocksData?.();
   const latestFinalizedBlock = useStoreChain.use.finalizedBlock?.();
 
-  const [blockData, setBlockData] = useState<IMappedBlock>();
+  const [
+    blockData,
+    setBlockData,
+  ] = useState<IMappedBlock>();
 
   useEffect(() => {
     if (blockNumber && data.size > 0) {
@@ -49,7 +52,11 @@ const BlockDetails = () => {
         },
       });
     }
-  }, [blockNumber, data, latestFinalizedBlock]);
+  }, [
+    blockNumber,
+    data,
+    latestFinalizedBlock,
+  ]);
 
   if (!blockData) {
     return 'Loading...';
@@ -59,32 +66,41 @@ const BlockDetails = () => {
     <div className="grid gap-8">
       <div className="flex items-center justify-between">
         <PageHeader
-          title="Block"
           blockNumber={formatNumber(blockData.header.number)}
+          title="Block"
         />
         <div className="hidden gap-6 md:flex">
           <PDLink
-            to={`https://polkadot.subscan.io/block/${blockData.header.number}`}
             className={styles['pd-link-btn']}
-            target="_blank"
             rel="noopener noreferrer"
+            target="_blank"
+            to={`https://polkadot.subscan.io/block/${blockData.header.number}`}
           >
             Polkadot Subscan
-            <Icon name="icon-openLink" size={[16]} />
+            <Icon
+              name="icon-openLink"
+              size={[16]}
+            />
           </PDLink>
           <PDLink
-            to={`https://polkadot.statescan.io/#/blocks/${blockData.header.number}`}
             className={styles['pd-link-btn']}
-            target="_blank"
             rel="noopener noreferrer"
+            target="_blank"
+            to={`https://polkadot.statescan.io/#/blocks/${blockData.header.number}`}
           >
             Polkadot Statescan
-            <Icon name="icon-openLink" size={[16]} />
+            <Icon
+              name="icon-openLink"
+              size={[16]}
+            />
           </PDLink>
         </div>
       </div>
       <BlockHeader headerData={blockData.header} />
-      <BlockBody bodyData={blockData.body} blockNumber={blockData.header.number} />
+      <BlockBody
+        blockNumber={blockData.header.number}
+        bodyData={blockData.body}
+      />
     </div>
   );
 };

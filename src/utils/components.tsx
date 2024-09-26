@@ -37,10 +37,10 @@ RightJoinProps<AsProps, AdditionalProps> & {
 type PolymorphicComponent<C extends As, Props extends object = object> = {
   <AsComponent extends As = C>(
     props: MergeWithAs<
-    ComponentProps<C>,
-    ComponentProps<AsComponent>,
-    Props,
-    AsComponent
+      ComponentProps<C>,
+      ComponentProps<AsComponent>,
+      Props,
+      AsComponent
     >,
   ): JSX.Element;
 
@@ -54,7 +54,7 @@ export const polymorphicComponent = <
   Props extends object = object,
 >(
   render: ForwardRefRenderFunction<
-  unknown,
+    unknown,
   RightJoinProps<PropsOf<C>, Props> & {
     as?: As;
   }

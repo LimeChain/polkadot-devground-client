@@ -39,7 +39,10 @@ export const Tabs = (props: TabsProps) => {
     unmountOnHide = true,
   } = props;
 
-  const [selectedTab, setSelectedTab] = useState(initialTab);
+  const [
+    selectedTab,
+    setSelectedTab,
+  ] = useState(initialTab);
 
   const handleTabChange = useCallback<MouseEventHandler<HTMLDivElement>>((e) => {
     const index = Number(e.currentTarget.dataset.index);
@@ -49,7 +52,10 @@ export const Tabs = (props: TabsProps) => {
 
   useEffect(() => {
     setSelectedTab(initialTab);
-  }, [initialTab, children]);
+  }, [
+    initialTab,
+    children,
+  ]);
 
   const items = Array.isArray(children) ? children : [children];
 

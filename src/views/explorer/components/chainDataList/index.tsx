@@ -26,8 +26,14 @@ export const ChainDataList = (props: IChainDataList) => {
 
   const refScrollArea = useRef<HTMLDivElement>(null);
 
-  const [isAtStart, setIsAtStart] = useState(true);
-  const [isAtEnd, setIsAtEnd] = useState(false);
+  const [
+    isAtStart,
+    setIsAtStart,
+  ] = useState(true);
+  const [
+    isAtEnd,
+    setIsAtEnd,
+  ] = useState(false);
 
   const scrollToBottom = useCallback(() => {
     if (refScrollArea.current) {
@@ -78,8 +84,8 @@ export const ChainDataList = (props: IChainDataList) => {
 
         <div className="flex items-center gap-2">
           <button
-            onClick={scrollToTop}
             disabled={isAtStart}
+            onClick={scrollToTop}
             className={cn(
               'text-dev-black-200',
               'transition-colors duration-300',
@@ -91,8 +97,8 @@ export const ChainDataList = (props: IChainDataList) => {
             <Icon name="icon-arrowCircle" />
           </button>
           <button
-            onClick={scrollToBottom}
             disabled={isAtEnd}
+            onClick={scrollToBottom}
             className={cn(
               'text-dev-black-200',
               'transition-colors duration-300',
@@ -101,7 +107,10 @@ export const ChainDataList = (props: IChainDataList) => {
               },
             )}
           >
-            <Icon name="icon-arrowCircle" className="rotate-180" />
+            <Icon
+              className="rotate-180"
+              name="icon-arrowCircle"
+            />
           </button>
         </div>
       </div>

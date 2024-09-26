@@ -59,9 +59,9 @@ export const PDScrollArea = polymorphicComponent<'div', IPDScrollAreaProps>((pro
   return (
     <ScrollAreaPrimitive.Root
       id={id}
-      asChild
-      type={type}
       scrollHideDelay={scrollHideDelay}
+      type={type}
+      asChild
     >
       <div
         className={cn(
@@ -156,6 +156,7 @@ export const PDScrollArea = polymorphicComponent<'div', IPDScrollAreaProps>((pro
           ref={refs}
           data-index={dataIndex}
           onScroll={handleOnScroll}
+          style={viewportStyles}
           className={cn(
             'limechain-scrollarea-viewport',
             'peer-defined[data-orientation=vertical][data-state=visible]:pr-[1rem]',
@@ -164,7 +165,6 @@ export const PDScrollArea = polymorphicComponent<'div', IPDScrollAreaProps>((pro
             'transition-all duration-300',
             viewportClassNames,
           )}
-          style={viewportStyles}
         >
           {children}
         </ScrollAreaPrimitive.Viewport>

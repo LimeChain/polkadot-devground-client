@@ -16,7 +16,7 @@ export interface ICallParam extends ICallArgs {
   param: TMetaDataCallParam;
 }
 
-export function CallParam({ param, onChange }: ICallParam) {
+export const CallParam = ({ param, onChange }: ICallParam) => {
   const lookup = useStoreChain?.use?.lookup?.();
 
   if (!lookup) {
@@ -33,5 +33,10 @@ export function CallParam({ param, onChange }: ICallParam) {
 
   const variable = param.type === 'lookupEntry' ? lookup(param.value.id) : param;
 
-  return <CodecParam variable={variable} onChange={onChange} />;
-}
+  return (
+    <CodecParam
+      onChange={onChange}
+      variable={variable}
+    />
+  );
+};

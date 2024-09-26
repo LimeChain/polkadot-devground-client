@@ -15,14 +15,27 @@ interface IArrayParam extends ICallArgs {
 
 export const ArrayParam = ({ array, onChange }: IArrayParam) => {
   if (array.value.type === 'primitive' && array.value.value === 'u8') {
-    return <BinaryParam onChange={onChange} minLength={array.len} />;
+    return (
+      <BinaryParam
+        minLength={array.len}
+        onChange={onChange}
+      />
+    );
   }
 
-  return <_ArrayParam array={array} onChange={onChange} />;
+  return (
+    <_ArrayParam
+      array={array}
+      onChange={onChange}
+    />
+  );
 };
 
 const _ArrayParam = ({ array, onChange }: IArrayParam) => {
-  const [arrayProps, setArrayProps] = useState(Array.from({ length: array.len }).fill(undefined));
+  const [
+    arrayProps,
+    setArrayProps,
+  ] = useState(Array.from({ length: array.len }).fill(undefined));
 
   useEffect(() => {
     if (arrayProps.includes(undefined)) {
@@ -41,9 +54,9 @@ const _ArrayParam = ({ array, onChange }: IArrayParam) => {
           return (
             <CodecParam
               key={`array-param-${index}`}
-              variable={array.value}
               // eslint-disable-next-line react/jsx-no-bind
               onChange={(args) => setArrayProps((props) => props.with(index, args))}
+              variable={array.value}
             />
           );
         })

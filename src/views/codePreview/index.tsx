@@ -15,7 +15,10 @@ import { defaultImportMap } from '@views/codeEditor/constants';
 
 const CodePreview = () => {
   const { previewId } = useParams();
-  const [blobUrl, setBlobUrl] = useState<string | undefined>();
+  const [
+    blobUrl,
+    setBlobUrl,
+  ] = useState<string | undefined>();
 
   useEffect(() => {
     if (previewId) {

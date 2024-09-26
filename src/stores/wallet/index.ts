@@ -27,7 +27,7 @@ const initialState: Omit<StoreInterface, 'actions'> = {
 const baseStore = create<StoreInterface>()((set, get) => ({
   ...initialState,
   actions: {
-    async connect() {
+    connect: async () => {
       const extensions: string[] = getInjectedExtensions();
       const selectedExtension: InjectedExtension = await connectInjectedExtension(
         extensions[0],
@@ -42,7 +42,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
     },
 
-    disconnect() {
+    disconnect: () => {
       get().selectedExtensions.at(0)?.disconnect();
       set({ accounts: [] });
     },

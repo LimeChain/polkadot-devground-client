@@ -35,9 +35,9 @@ export const NavigationDropdown = ({
       >
         {title}
         <Icon
+          className="transition-transform group-focus-within:rotate-180"
           name="icon-dropdownArrow"
           size={[16]}
-          className="transition-transform group-focus-within:rotate-180"
         />
       </button>
       <ul
