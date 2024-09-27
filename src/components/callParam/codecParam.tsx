@@ -44,9 +44,9 @@ export const CodecParam = ({ variable, onChange, placeholder }: ICodecParam) => 
     case 'primitive':
       return (
         <PrimitiveParam
-          primitive={variable}
           onChange={onChange}
           placeholder={placeholder}
+          primitive={variable}
         />
       );
     case 'array':

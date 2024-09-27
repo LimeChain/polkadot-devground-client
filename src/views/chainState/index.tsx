@@ -62,11 +62,23 @@ const ChainState = () => {
     setStorageSelected,
   ] = useState(palletSelected?.storage?.items?.at?.(0));
 
-  const [callArgs, setCallArgs] = useState<unknown>(undefined);
-  const [encodedStorageKey, setEncodedStorageKey] = useState<string | undefined>('0x');
+  const [
+    callArgs,
+    setCallArgs,
+  ] = useState<unknown>(undefined);
+  const [
+    encodedStorageKey,
+    setEncodedStorageKey,
+  ] = useState<string | undefined>('0x');
 
-  const [queries, setQueries] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
-  const [subscriptions, setSubscriptions] = useState<ISubscription[]>([]);
+  const [
+    queries,
+    setQueries,
+  ] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
+  const [
+    subscriptions,
+    setSubscriptions,
+  ] = useState<ISubscription[]>([]);
 
   useEffect(() => {
     setQueries([]);
@@ -98,7 +110,7 @@ const ChainState = () => {
       try {
         const storageCodec = dynamicBulder.buildStorage(palletSelected.name, storageSelected.name);
 
-        const encodedKey = storageCodec.enc(...([callArgs].filter(arg => Boolean(arg))));
+        const encodedKey = storageCodec.enc(...([callArgs].filter((arg) => Boolean(arg))));
         setEncodedStorageKey(encodedKey);
 
         // const decodedArgs = storageCodec.keyDecoder(encodedKey);
@@ -114,7 +126,11 @@ const ChainState = () => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [palletSelected, storageSelected, callArgs]);
+  }, [
+    palletSelected,
+    storageSelected,
+    callArgs,
+  ]);
 
   const handlePalletSelect = useCallback((selectedPalletName: string) => {
     if (palletsWithStorage) {
@@ -138,12 +154,15 @@ const ChainState = () => {
 
   const handleStorageQuerySubmit = useCallback(() => {
     if (palletSelected?.name && storageSelected?.name && dynamicBulder) {
-      setQueries(queries => ([{
-        pallet: palletSelected.name,
-        storage: storageSelected.name,
-        id: crypto.randomUUID(),
-        args: callArgs,
-      }, ...queries]));
+      setQueries((queries) => ([
+        {
+          pallet: palletSelected.name,
+          storage: storageSelected.name,
+          id: crypto.randomUUID(),
+          args: callArgs,
+        },
+        ...queries,
+      ]));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -190,7 +209,6 @@ const ChainState = () => {
             storageCallItems && (
               <PDSelect
                 key={`storage-select-${palletSelected?.name}`}
-                label="Select Storage"
                 emptyPlaceHolder="No storages available"
                 items={storageCallItems}
                 label="Select Storage"
@@ -206,7 +224,6 @@ const ChainState = () => {
           storageSelected && (
             <StorageArgs
               key={`storage-param-${storageSelected.name}`}
-              storage={storageSelected}
               onChange={setCallArgs}
               storage={storageSelected}
             />
@@ -214,7 +231,7 @@ const ChainState = () => {
         }
 
         <QueryButton onClick={handleStorageQuerySubmit}>
-          Subscribe to 
+          Subscribe to
           {' '}
           {palletSelected?.name}
           /
@@ -224,12 +241,16 @@ const ChainState = () => {
         {
           (encodedStorageKey) && (
             <p className="break-all">
-              Encoded Storage Key: <br /> {encodedStorageKey}
+              Encoded Storage Key:
+              {' '}
+              <br />
+              {' '}
+              {encodedStorageKey}
             </p>
           )
         }
 
-        <CallDocs docs={storageSelected?.docs?.filter(d => d) || []} />
+        <CallDocs docs={storageSelected?.docs?.filter((d) => d) || []} />
 
       </QueryFormContainer>
       <QueryResultContainer>

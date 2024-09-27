@@ -51,8 +51,8 @@ export const BinaryParam = ({
           ? <PDFileUpload onChange={onChange} />
           : (
             <TextBinaryParam
-              onChange={onChange}
               minLength={minLength}
+              onChange={onChange}
               placeholder={placeholder}
               readOnly={readOnly}
             />
@@ -108,12 +108,9 @@ export const TextBinaryParam = ({
 
   return (
     <input
-      type="text"
-      placeholder={placeholder || 'Binary hex or string'}
-      value={value}
-      readOnly={readOnly}
       onChange={handleOnChange}
-      placeholder="Binary hex or string"
+      placeholder={placeholder || 'Binary hex or string'}
+      readOnly={readOnly}
       type="text"
       value={value}
       className={cn(

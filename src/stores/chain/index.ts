@@ -282,8 +282,8 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
           }
 
           Promise.allSettled(promises)
-            .then(results => {
-              results.forEach(blockData => {
+            .then((results) => {
+              results.forEach((blockData) => {
                 if (blockData.status === 'fulfilled') {
                   blocksData.set(blockData.value.header.number, blockData.value);
                 }
@@ -304,7 +304,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
           const createSubscription = () => {
             const rawClientSubscription = rawClient.chainHead(
               true,
-              () => {},
+              () => { },
               (error) => {
                 console.log(error);
                 createSubscription();

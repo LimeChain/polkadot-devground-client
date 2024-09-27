@@ -128,12 +128,12 @@ const Constants = () => {
             constantItems && (
               <PDSelect
                 key={`storage-select-${palletSelected?.name}`}
-                label="Select Constant"
                 emptyPlaceHolder="No constants available"
-                placeholder="Please select constant"
                 items={constantItems}
-                value={constantSelected?.name}
+                label="Select Constant"
                 onChange={handleConstantSelect}
+                placeholder="Please select constant"
+                value={constantSelected?.name}
               />
             )
           }
@@ -142,7 +142,7 @@ const Constants = () => {
         <CallDocs docs={constantSelected?.docs?.filter((d) => d) || []} />
 
         <QueryButton onClick={handleStorageQuerySubmit}>
-          Query 
+          Query
           {' '}
           {palletSelected?.name}
           /

@@ -69,7 +69,7 @@ export const QueryResult = ({
 
       <div className="flex flex-col gap-6">
         <p>
-          Path: 
+          Path:
           {' '}
           {' '}
           <span
@@ -97,9 +97,9 @@ export const QueryResult = ({
                 <>
                   Result
                   <JsonViewer
+                    collapseObjectsAfterLength={8}
                     src={result as object}
-collapseObjectsAfterLength={8}                    
-style={{
+                    style={{
                       borderRadius: 8,
                       backgroundColor: theme === 'dark' ? '#252525' : '#FBFCFE',
                       padding: 16,

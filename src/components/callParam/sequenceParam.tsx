@@ -25,8 +25,8 @@ export const SequenceParam = ({ sequence, onChange, placeholder }: ISequence) =>
     return (
       <div className={styles.codecParam}>
         <BinaryParam
-          onChange={onChange}
           minLength={0}
+          onChange={onChange}
           placeholder={placeholder}
         />
       </div>
@@ -36,16 +36,22 @@ export const SequenceParam = ({ sequence, onChange, placeholder }: ISequence) =>
   return (
     <_SequenceParam
       key={`sequence-param-${sequence.value.id}`}
-      sequence={sequence}
       onChange={onChange}
       placeholder={placeholder}
+      sequence={sequence}
     />
   );
 };
 
 const _SequenceParam = ({ sequence, onChange, placeholder }: ISequence) => {
-  const [length, setLength] = useState<number>(1);
-  const [params, setParams] = useState(Array.from({ length }).map(() => ({ id: crypto.randomUUID(), value: undefined })));
+  const [
+    length,
+    setLength,
+  ] = useState<number>(1);
+  const [
+    params,
+    setParams,
+  ] = useState(Array.from({ length }).map(() => ({ id: crypto.randomUUID(), value: undefined })));
 
   useEffect(() => {
     const res = params.map((p) => p.value);
@@ -141,8 +147,9 @@ const _SequenceParam = ({ sequence, onChange, placeholder }: ISequence) => {
               <div className="flex w-full flex-col gap-6">
                 <CodecParam
                   // eslint-disable-next-line react/jsx-no-bind
-                  onChange={args => handleOnChange(args, param.id)}
+                  onChange={(args) => handleOnChange(args, param.id)}
                   placeholder={placeholder}
+                  variable={sequence.value}
                 />
               </div>
             </div>

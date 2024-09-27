@@ -23,7 +23,10 @@ export const PrimitiveParam = ({
   placeholder,
   readOnly,
 }: IPrimitiveParam) => {
-  const [value, setValue] = useState('');
+  const [
+    value,
+    setValue,
+  ] = useState('');
 
   const commonProps = {
     placeholder: placeholder || primitive.value,
@@ -31,7 +34,7 @@ export const PrimitiveParam = ({
     className: styles.codecInput,
     onChange: (event: ChangeEvent<HTMLInputElement>) =>
       setValue(event.target.value),
-    readOnly: readOnly ? true : false,
+    readOnly: !!readOnly,
   };
 
   const commonNumberInputProps = {

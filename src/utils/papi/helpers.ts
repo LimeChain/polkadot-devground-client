@@ -16,7 +16,7 @@ export const checkIfCompatable = (isCompatable: boolean, message: string) => {
   }
 };
 
-export function unwrapApiResult(data: unknown): unknown {
+export const unwrapApiResult = (data: unknown): unknown => {
   // instanceof Binary doesn't catch Binaries returned from rpc calls
   if (data && typeof data === 'object' && 'asHex' in data) {
     return (data as Binary).asHex();

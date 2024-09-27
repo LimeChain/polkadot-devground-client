@@ -49,7 +49,7 @@ export const RpcCalls = () => {
   useEffect(() => {
     return () => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      refUncleanedSubscriptions?.current?.forEach(sub => {
+      refUncleanedSubscriptions?.current?.forEach((sub) => {
         rawClient?.request('chainHead_v1_unfollow', [sub])
           .then(() => {
             console.log('follow subscription cleaned', sub);
@@ -63,14 +63,20 @@ export const RpcCalls = () => {
     setQueries([]);
   }, [chain.id]);
 
-  const [methodSelectItems, setMethodSelectItems] = useState<NonNullable<IPDSelect['items']>>([]);
-  const [methodSelected, setMethodSelected] = useState(methodSelectItems.at(0)?.value);
+  const [
+    methodSelectItems,
+    setMethodSelectItems,
+  ] = useState<NonNullable<IPDSelect['items']>>([]);
+  const [
+    methodSelected,
+    setMethodSelected,
+  ] = useState(methodSelectItems.at(0)?.value);
 
   const palletSelectItems = useMemo(() => {
     const palletItems = Object.keys(newRpcCalls).reduce((acc, curr) => {
       const pallet = curr.split('_').at(0);
 
-      if (pallet && !acc.some(p => p.value === pallet)) {
+      if (pallet && !acc.some((p) => p.value === pallet)) {
         acc.push({
           label: pallet,
           value: pallet,
@@ -103,22 +109,34 @@ export const RpcCalls = () => {
     return palletItems;
   }, []);
 
-  const [palletSelected, setPalletSelected] = useState(palletSelectItems.at(0)?.value);
+  const [
+    palletSelected,
+    setPalletSelected,
+  ] = useState(palletSelectItems.at(0)?.value);
 
-  const [callParams, setCallParams] = useState<ICallParam[]>([]);
-  const [queries, setQueries] = useState<IQuery[]>([]);
+  const [
+    callParams,
+    setCallParams,
+  ] = useState<ICallParam[]>([]);
+  const [
+    queries,
+    setQueries,
+  ] = useState<IQuery[]>([]);
 
   const rpcCall = useMemo(() => {
     const call = `${palletSelected}_${methodSelected}`;
 
     if (newRpcCalls[call]) {
-      setCallParams(newRpcCalls[call].params?.map(param => ({ name: param.name, value: undefined })));
+      setCallParams(newRpcCalls[call].params?.map((param) => ({ name: param.name, value: undefined })));
       return newRpcCalls[call];
     }
 
     return undefined;
 
-  }, [palletSelected, methodSelected]);
+  }, [
+    palletSelected,
+    methodSelected,
+  ]);
 
   const handlePalletSelect = useCallback((selectedPalletName: string) => {
     setPalletSelected(selectedPalletName);
@@ -150,7 +168,7 @@ export const RpcCalls = () => {
   }, []);
 
   const handleRpcParamChange = useCallback((index: number, args: unknown) => {
-    setCallParams(params => {
+    setCallParams((params) => {
       if (!params || params.length === 0) {
         return [];
       }
@@ -165,12 +183,12 @@ export const RpcCalls = () => {
   }, []);
 
   const handleStorageUnsubscribe = useCallback((id: string) => {
-    setQueries(queries => queries.filter(query => query.id !== id));
+    setQueries((queries) => queries.filter((query) => query.id !== id));
   }, []);
 
   const handleRpcSubmit = useCallback(() => {
     if (palletSelected && methodSelected) {
-      setQueries(queries => ([
+      setQueries((queries) => ([
         {
           pallet: palletSelected,
           method: methodSelected,
@@ -197,13 +215,13 @@ export const RpcCalls = () => {
         <div className="grid w-full grid-cols-2 gap-4">
           <PDSelect
             items={palletSelectItems}
-            value={palletSelected}
             onChange={handlePalletSelect}
+            value={palletSelected}
           />
           <PDSelect
             items={methodSelectItems}
-            value={methodSelected}
             onChange={handleMathodSelect}
+            value={methodSelected}
           />
         </div>
 
@@ -212,8 +230,8 @@ export const RpcCalls = () => {
           && rpcCall?.params?.length > 0 && (
             <RpcParams
               key={`rpc-param-${palletSelected}-${methodSelected}`}
-              params={rpcCall.params}
               onChange={handleRpcParamChange}
+              params={rpcCall.params}
             />
           )
         }
@@ -230,8 +248,8 @@ export const RpcCalls = () => {
           queries.map((query) => (
             <Query
               key={`query-result-${query.pallet}-${query.method}-${query.id}`}
-              querie={query}
               onUnsubscribe={handleStorageUnsubscribe}
+              querie={query}
               unCleanedSubscriptions={refUncleanedSubscriptions}
             />
           ))
@@ -256,8 +274,14 @@ const Query = ({
   const rawClientSubscription = useStoreChain?.use?.rawClientSubscription?.();
   const dynamicBuilder = useDynamicBuilder();
 
-  const [result, setResult] = useState<unknown>();
-  const [isLoading, setIsLoading] = useState(true);
+  const [
+    result,
+    setResult,
+  ] = useState<unknown>();
+  const [
+    isLoading,
+    setIsLoading,
+  ] = useState(true);
 
   const refFollowSubscription = useRef('');
 
@@ -271,9 +295,9 @@ const Query = ({
     };
 
     const runRawQuery = (onSucess?: (res: unknown) => void) => {
-      const args = querie?.args ? querie.args.map(arg => arg.value).filter(arg => arg !== undefined) : [];
+      const args = querie?.args ? querie.args.map((arg) => arg.value).filter((arg) => arg !== undefined) : [];
 
-      rawClient?.request(call, [...args]).then(res => {
+      rawClient?.request(call, [...args]).then((res) => {
         setResult(res);
         setIsLoading(false);
 
@@ -294,7 +318,7 @@ const Query = ({
             break;
           case 'chainHead_v1_unfollow':
             runRawQuery(() => {
-              unCleanedSubscriptions.current = unCleanedSubscriptions.current.filter(sub => sub !== querie.args.at(0)?.value as string);
+              unCleanedSubscriptions.current = unCleanedSubscriptions.current.filter((sub) => sub !== querie.args.at(0)?.value as string);
             });
             break;
           case 'chainHead_v1_header':
@@ -313,7 +337,7 @@ const Query = ({
               .then((res) => {
                 setResult({
                   raw: res,
-                  decoded: res.map(extrinsic => decodeExtrinsic(extrinsic)),
+                  decoded: res.map((extrinsic) => decodeExtrinsic(extrinsic)),
                 });
                 setIsLoading(false);
               })
@@ -327,7 +351,7 @@ const Query = ({
               querie.args.at(3)?.value as string,
               null,
             )
-              .then(res => {
+              .then((res) => {
                 setResult(res);
                 setIsLoading(false);
               })
@@ -339,7 +363,7 @@ const Query = ({
               querie.args.at(2)?.value as string,
               querie.args.at(3)?.value as string,
             )
-              .then(res => {
+              .then((res) => {
                 if (dynamicBuilder) {
                   const args = (querie.args.at(2)?.value as string)?.split('_');
 
@@ -362,7 +386,7 @@ const Query = ({
             break;
           case 'chainHead_v1_unpin':
             rawClientSubscription?.unpin((querie?.args?.at(1)?.value as string[]))
-              .then(res => {
+              .then((res) => {
                 setResult(res);
                 setIsLoading(false);
               })
@@ -407,7 +431,10 @@ const Query = ({
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [querie, rawClient]);
+  }, [
+    querie,
+    rawClient,
+  ]);
 
   const handleUnsubscribe = useCallback(() => {
     onUnsubscribe(querie.id);
@@ -428,11 +455,11 @@ const Query = ({
 
   return (
     <QueryResult
-      title="Rpc Call"
-      path={`${querie.pallet}_${querie.method}`}
       isLoading={isLoading}
-      result={result}
       onRemove={handleUnsubscribe}
+      path={`${querie.pallet}_${querie.method}`}
+      result={result}
+      title="Rpc Call"
     />
   );
 };
