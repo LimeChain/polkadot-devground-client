@@ -12,7 +12,10 @@ import {
 import { cn } from '@utils/helpers';
 
 const BurgerMenu = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [
+    isOpen,
+    setIsOpen,
+  ] = useState(false);
   const currentChain = useStoreChain.use.chain();
 
   const { toggleTheme } = useStoreUI.use.actions();
@@ -25,8 +28,8 @@ const BurgerMenu = () => {
   return (
     <>
       <button
-        onClick={handleMenuClick}
         className="ml-2"
+        onClick={handleMenuClick}
       >
         <Icon name="icon-menu" />
       </button>
@@ -43,14 +46,17 @@ const BurgerMenu = () => {
       >
         <div className="flex items-center justify-between text-dev-white-200">
           <div className="flex items-center">
-            <Icon name={currentChain.icon} size={[28]} />
+            <Icon
+              name={currentChain.icon}
+              size={[28]}
+            />
             <h5 className="ml-1 mr-3 text-dev-white-200 font-h5-bold">
               {currentChain.name}
             </h5>
           </div>
           <button
-            onClick={handleMenuClick}
             className="p-4"
+            onClick={handleMenuClick}
           >
             <Icon name="icon-close" />
           </button>
@@ -59,16 +65,16 @@ const BurgerMenu = () => {
         <div className="absolute bottom-5">
           <div className="flex items-center">
             <button
-              type="button"
               onClick={toggleTheme}
+              type="button"
               className={cn(
                 'navSpacer',
               )}
             >
               <Icon
+                className="text-dev-purple-100"
                 name={'icon-lightMode'}
                 size={[24]}
-                className="text-dev-purple-100"
               />
             </button>
             <span className="ml-2 text-dev-white-200">

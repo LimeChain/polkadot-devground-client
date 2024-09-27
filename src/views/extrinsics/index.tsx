@@ -12,6 +12,7 @@ import {
   CallParam,
   type ICallParam,
 } from '@components/callParam';
+import { AccountSelectParam } from '@components/callParam/accountSelectParam';
 import { QueryButton } from '@components/callParam/queryButton';
 import { QueryFormContainer } from '@components/callParam/queryFormContainer';
 import { QueryResult } from '@components/callParam/queryResult';
@@ -25,6 +26,10 @@ import { useViewBuilder } from 'src/hooks/useViewBuilder';
 import { useStoreWallet } from 'src/stores/wallet';
 
 import type { TRelayApi } from '@custom-types/chain';
+import type {
+  InjectedPolkadotAccount,
+  PolkadotSigner,
+} from 'polkadot-api/dist/reexports/pjs-signer';
 
 const Extrinsics = () => {
   const dynamicBulder = useDynamicBuilder();
@@ -36,9 +41,10 @@ const Extrinsics = () => {
 
   const accounts = useStoreWallet?.use?.accounts?.();
 
-  // TODO: FIX AFTER REFACTORING THE WALLET CONNECTOR
-  const signer = accounts.at(0)?.polkadotSigner;
-
+  const [
+    signer,
+    setSigner,
+  ] = useState(accounts.at(0)?.polkadotSigner);
   const palletsWithCalls = useMemo(() => metadata?.pallets?.filter((p) => p.calls)?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
   const palletSelectItems = useMemo(() => palletsWithCalls?.map((pallet) => ({
     label: pallet.name,
@@ -209,6 +215,11 @@ const Extrinsics = () => {
     setQueries((queries) => queries.filter((query) => query.id !== id));
   }, []);
 
+  const handleAccountSelect = useCallback((accountSelected: unknown) => {
+    setSigner((accountSelected as InjectedPolkadotAccount).polkadotSigner);
+  }
+  , []);
+
   if (!palletSelected) {
     return <Loader />;
   }
@@ -237,6 +248,13 @@ const Extrinsics = () => {
             )
           }
         </div>
+        <div className="flex flex-col gap-2">
+          <span className=" font-geist font-body1-regular">Signer</span>
+          <AccountSelectParam
+            accounts={accounts}
+            onChange={handleAccountSelect}
+          />
+        </div>
         {
           (palletSelected && callSelected) && (
             <div className="flex flex-col gap-6 empty:hidden">
@@ -254,7 +272,7 @@ const Extrinsics = () => {
           disabled={!signer}
           onClick={submitTx}
         >
-          Sign and Submit 
+          Sign and Submit
           {' '}
           {palletSelected?.name}
           /
@@ -263,9 +281,9 @@ const Extrinsics = () => {
         {
           (encodedCall && decodedCall) && (
             <p className="break-all">
-              Encoded Call: 
+              Encoded Call:
               {' '}
-              <br /> 
+              <br />
               {' '}
               {encodedCall.asHex()}
             </p>
@@ -274,11 +292,12 @@ const Extrinsics = () => {
       </QueryFormContainer>
       <QueryResultContainer>
         {
-          queries.map((query) => (
+          signer && queries.map((query) => (
             <Query
               key={`query-result-${query.pallet}-${query.storage}-${query.id}`}
               onUnsubscribe={handleStorageUnsubscribe}
               querie={query}
+              signer={signer}
             />
           ))
         }
@@ -292,9 +311,11 @@ export default Extrinsics;
 const Query = ({
   querie,
   onUnsubscribe,
+  signer,
 }: {
   querie: { pallet: string; storage: string; id: string; args: unknown };
   onUnsubscribe: (id: string) => void;
+  signer: PolkadotSigner;
 }) => {
   const api = useStoreChain?.use?.api?.() as TRelayApi;
   const [
@@ -305,11 +326,6 @@ const Query = ({
     isLoading,
     setIsLoading,
   ] = useState(true);
-
-  const accounts = useStoreWallet?.use?.accounts?.();
-
-  // TODO: FIX AFTER REFACTORING THE WALLET CONNECTOR
-  const signer = accounts.at(0)?.polkadotSigner;
 
   useEffect(() => {
     const catchError = (err: Error) => {

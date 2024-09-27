@@ -6,6 +6,8 @@ import {
 } from 'polkadot-api/pjs-signer';
 import { create } from 'zustand';
 
+import walletService from '@services/walletService';
+
 import { createSelectors } from '../createSelectors';
 
 interface StoreInterface {
@@ -13,12 +15,14 @@ interface StoreInterface {
   selectedExtensions: InjectedExtension[];
   accounts: InjectedPolkadotAccount[];
   actions: {
-    connect: () => void;
+    connect: (extension: string) => void;
     disconnect: () => void;
+    resetStore: () => void;
   };
+  init: () => void;
 }
 
-const initialState: Omit<StoreInterface, 'actions'> = {
+const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   extensions: [],
   selectedExtensions: [],
   accounts: [],
@@ -27,25 +31,63 @@ const initialState: Omit<StoreInterface, 'actions'> = {
 const baseStore = create<StoreInterface>()((set, get) => ({
   ...initialState,
   actions: {
-    connect: async () => {
+    resetStore: () => {
+      set(initialState);
+    },
+    connect: async (extension: string) => {
+      try {
+        const extensions: string[] = getInjectedExtensions();
+        if (extension && extensions.indexOf(extension) === -1) {
+          return;
+        }
+        const selectedExtension: InjectedExtension = await connectInjectedExtension(
+          extension,
+        );
+        await walletService.setLatestWallet(extension);
+        // selectedExtension.subscribe((accounts) => {
+        //   set({ accounts });
+        // });
+
+        const accounts: InjectedPolkadotAccount[] = selectedExtension.getAccounts();
+        set({ accounts, extensions, selectedExtensions: [selectedExtension] });
+
+      } catch (error) {
+        console.error('Error connecting to wallet', error);
+      }
+    },
+
+    disconnect: async () => {
+      try {
+        get().selectedExtensions.at(0)?.disconnect();
+        set({ accounts: [] });
+        await walletService.setLatestWallet('');
+      } catch (error) {
+        console.error('Error disconnecting wallet', error);
+      }
+    },
+  },
+  init: async () => {
+    try {
       const extensions: string[] = getInjectedExtensions();
-      const selectedExtension: InjectedExtension = await connectInjectedExtension(
-        extensions[0],
-      );
+      const latestWalletUsed = await walletService.getLatestWallet();
 
-      selectedExtension.subscribe((accounts) => {
-        set({ accounts });
-      });
+      set({ extensions });
 
-      const accounts: InjectedPolkadotAccount[] = selectedExtension.getAccounts();
-      set({ accounts, extensions, selectedExtensions: [selectedExtension] });
+      if (extensions.length > 0 && latestWalletUsed && extensions.indexOf(latestWalletUsed) !== -1) {
+        const selectedExtension: InjectedExtension = await connectInjectedExtension(
+          latestWalletUsed,
+        );
 
-    },
+        selectedExtension.subscribe((accounts) => {
+          set({ accounts });
+        });
 
-    disconnect: () => {
-      get().selectedExtensions.at(0)?.disconnect();
-      set({ accounts: [] });
-    },
+        const accounts: InjectedPolkadotAccount[] = selectedExtension.getAccounts();
+        set({ accounts, selectedExtensions: [selectedExtension] });
+      }
+    } catch (error) {
+      console.error('Error initializing wallet store', error);
+    }
   },
 }));
 
