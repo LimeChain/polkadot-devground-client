@@ -34,7 +34,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
     resetStore: () => {
       set(initialState);
     },
-    async connect(extension: string) {
+    connect: async (extension: string) => {
       try {
         const extensions: string[] = getInjectedExtensions();
         if (extension && extensions.indexOf(extension) === -1) {
@@ -56,7 +56,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
       }
     },
 
-    async disconnect() {
+    disconnect: async () => {
       try {
         get().selectedExtensions.at(0)?.disconnect();
         set({ accounts: [] });
@@ -70,18 +70,18 @@ const baseStore = create<StoreInterface>()((set, get) => ({
     try {
       const extensions: string[] = getInjectedExtensions();
       const latestWalletUsed = await walletService.getLatestWallet();
-  
+
       set({ extensions });
-  
+
       if (extensions.length > 0 && latestWalletUsed && extensions.indexOf(latestWalletUsed) !== -1) {
         const selectedExtension: InjectedExtension = await connectInjectedExtension(
           latestWalletUsed,
         );
-  
+
         selectedExtension.subscribe((accounts) => {
           set({ accounts });
         });
-  
+
         const accounts: InjectedPolkadotAccount[] = selectedExtension.getAccounts();
         set({ accounts, selectedExtensions: [selectedExtension] });
       }

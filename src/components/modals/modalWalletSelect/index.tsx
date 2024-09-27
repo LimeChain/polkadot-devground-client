@@ -17,7 +17,7 @@ export interface IWalletExtensions {
   };
 }
 
-interface IModalWalletSelect extends Pick<IModal, 'onClose'> {}
+interface IModalWalletSelect extends Pick<IModal, 'onClose'> { }
 
 export const ModalWalletSelect = ({ onClose }: IModalWalletSelect) => {
 
@@ -28,7 +28,10 @@ export const ModalWalletSelect = ({ onClose }: IModalWalletSelect) => {
     const extensionName = e.currentTarget.getAttribute('data-wallet-name') || '';
     connectWallet(extensionName);
     onClose();
-  }, [connectWallet, onClose]);
+  }, [
+    connectWallet,
+    onClose,
+  ]);
 
   return (
     <Modal
@@ -58,8 +61,8 @@ export const ModalWalletSelect = ({ onClose }: IModalWalletSelect) => {
                 )}
               >
                 <Icon
-                  size={[38]}
                   name={walletExtensions[extension].icon || 'icon-wallet'}
+                  size={[38]}
                 />
                 <div className="pl-3">
                   <div className="font-body1-bold">

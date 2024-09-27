@@ -218,7 +218,7 @@ const Extrinsics = () => {
   const handleAccountSelect = useCallback((accountSelected: unknown) => {
     setSigner((accountSelected as InjectedPolkadotAccount).polkadotSigner);
   }
-    , []);
+  , []);
 
   if (!palletSelected) {
     return <Loader />;
