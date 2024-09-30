@@ -140,8 +140,9 @@ const SignedExtrinsics = () => {
     <div className="disable-vertical-scroll grid h-full grid-rows-[40px_46px_1fr] gap-8">
       <PageHeader title="Extrinsics" />
       {
-        !isLoading
-          ? (
+        isLoading
+          ? <Loader />
+          : (
             <>
               <SearchBar
                 label="Search by Block"
@@ -154,7 +155,6 @@ const SignedExtrinsics = () => {
               />
             </>
           )
-          : <Loader />
       }
 
       {

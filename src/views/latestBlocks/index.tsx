@@ -95,7 +95,7 @@ const LatestBlocks = () => {
     setBlocks,
   ] = useState<IMappedBlock[]>([]);
 
-  const isLoading = blocks.length !== 0;
+  const isLoading = blocks.length === 0;
 
   const goRouteId = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
     const dataIndex = Number(e.currentTarget.dataset.index);
@@ -120,7 +120,7 @@ const LatestBlocks = () => {
     <div className="disable-vertical-scroll grid h-full grid-rows-[40px_46px_1fr] gap-8">
       <PageHeader title="Latest Blocks" />
       {
-        !isLoading
+        isLoading
           ? <Loader />
           : (
             <>
