@@ -3,17 +3,22 @@ import { formatDistanceToNowStrict } from 'date-fns';
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
 
 import { Icon } from '@components/icon';
+import { Loader } from '@components/loader';
 import { ModalJSONViewer } from '@components/modals/modalJSONViewer';
 import { PageHeader } from '@components/pageHeader';
 import { SearchBar } from '@components/searchBar';
 import TableComponent from '@components/table';
 import { useStoreChain } from '@stores';
-import { truncateAddress } from '@utils/helpers';
+import {
+  cn,
+  truncateAddress,
+} from '@utils/helpers';
 
 import type {
   IMappedBlock,
@@ -38,8 +43,10 @@ const SignedExtrinsics = () => {
   ] = useState<IMappedBlockExtrinsic[]>([]);
   const isLoading = blocksData.size === 0;
 
-  const handleOpenModal = useCallback((row: Record<string, unknown>) => {
-    const typedRow = row as unknown as IMappedBlockExtrinsic | IMappedBlock;
+  const handleOpenModal = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
+    const dataIndex = Number(e.currentTarget.dataset.index);
+    const typedRow = signedExtrinsics[dataIndex] as unknown as IMappedBlockExtrinsic | IMappedBlock;
+
     if ('header' in typedRow) {
       const blockNumber = typedRow.header.number;
       refSelectedExtrinsic.current = signedExtrinsics.find((extrinsic) => extrinsic.blockNumber === blockNumber);
@@ -63,60 +70,72 @@ const SignedExtrinsics = () => {
     latestBlock,
   ]);
 
-  const columns: ColumnDef<IMappedBlockExtrinsic>[] = [
-    {
-      header: 'Extrinsic ID',
-      accessorKey: 'id',
-    },
-    {
-      header: 'Block',
-      accessorKey: 'blockNumber',
-    },
-    {
-      header: 'Signer',
-      accessorKey: 'signer',
-      cell: ({ row }: { row: { original: IMappedBlockExtrinsic } }) => truncateAddress(row.original.signer?.Id, 6),
-    },
-    {
-      header: 'Time',
-      accessorKey: 'timestamp',
-      cell: ({ row }: { row: { original: IMappedBlockExtrinsic } }) => row.original.timestamp && formatDistanceToNowStrict(new Date(row.original.timestamp), { addSuffix: true }),
-    },
-    {
-      header: 'Result',
-      accessorKey: 'isSuccess',
-      cell: ({ row }: { row: { original: IMappedBlockExtrinsic } }) => row.original.isSuccess
-        ? (
-          <Icon
-            className="text-dev-green-600"
-            name="icon-checked"
-            size={[16]}
-          />
-        )
-        : (
-          <Icon
-            className="text-dev-red-800"
-            name="icon-failed"
-            size={[16]}
-          />
-        ),
-    },
-    {
-      header: 'Action',
-      accessorKey: 'method.method',
-    },
-    {
-      header: '',
-      accessorKey: 'dropdown',
-      cell: () => (
-        <Icon
-          className="text-dev-black-1000 dark:text-dev-purple-50"
-          name="icon-dropdownArrow"
-          size={[18]}
-        />
-      ),
-    },
-  ];
+  const columns = useMemo(() => {
+    const result: ColumnDef<IMappedBlockExtrinsic>[] = [
+      {
+        header: 'Extrinsic ID',
+        accessorKey: 'id',
+      },
+      {
+        header: 'Block',
+        accessorKey: 'blockNumber',
+      },
+      {
+        header: 'Signer',
+        accessorKey: 'signer',
+        cell: ({ row }) => {
+          return truncateAddress(row.original.signer?.Id, 6);
+        },
+      },
+      {
+        header: 'Time',
+        accessorKey: 'timestamp',
+        cell: ({ row }) => {
+          return row.original.timestamp
+            && formatDistanceToNowStrict(new Date(row.original.timestamp), { addSuffix: true });
+        },
+      },
+      {
+        header: 'Result',
+        accessorKey: 'isSuccess',
+        cell: ({ row }) => {
+          const isSuccess = row.original.isSuccess;
+
+          return (
+            <Icon
+              name={isSuccess ? 'icon-checked' : 'icon-failed'}
+              size={[16]}
+              className={cn(
+                {
+                  ['text-dev-green-600']: isSuccess,
+                  ['text-dev-red-800']: !isSuccess,
+                },
+              )}
+            />
+          );
+        },
+      },
+      {
+        header: 'Action',
+        accessorKey: 'method.method',
+      },
+      {
+        header: '',
+        accessorKey: 'dropdown',
+        cell: () => {
+          return (
+            <Icon
+              className="text-dev-black-1000 dark:text-dev-purple-50"
+              name="icon-dropdownArrow"
+              size={[18]}
+            />
+          );
+        },
+      },
+    ];
+
+    return result;
+  }, []);
 
   return (
     <div className="disable-vertical-scroll grid h-full grid-rows-[40px_46px_1fr] gap-8">
@@ -126,15 +145,17 @@ const SignedExtrinsics = () => {
         type="extrinsics"
       />
 
-      {isLoading
-        ? 'Loading...'
-        : (
-          <TableComponent
-            columns={columns}
-            data={signedExtrinsics}
-            onRowClick={handleOpenModal}
-          />
-        )}
+      {
+        isLoading
+          ? <Loader />
+          : (
+            <TableComponent
+              columns={columns}
+              data={signedExtrinsics}
+              onRowClick={handleOpenModal}
+            />
+          )
+      }
 
       {
         refSelectedExtrinsic.current && (
