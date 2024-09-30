@@ -104,6 +104,7 @@ export const PDSelect = ({
               'z-50 flex w-full max-w-96 flex-col gap-1 p-2',
               'bg-dev-black-1000 dark:bg-white',
               'text-white dark:text-black',
+              'font-geist font-body2-regular',
             )}
             style={{
               minWidth: container?.clientWidth,
@@ -112,6 +113,7 @@ export const PDSelect = ({
             <SelectViewport
               items={items}
               groups={groups}
+              value={value}
             />
           </SelectPrimitive.Content>
         </SelectPrimitive.Portal>
@@ -177,26 +179,49 @@ const SelectPlaceholder = ({
 const SelectViewport = ({
   items,
   groups,
-}: Pick<IPDSelect, 'items' | 'groups'>) => {
+  value,
+}: Pick<IPDSelect, 'items' | 'groups' | 'value'>) => {
+  const [selectedGroupIndex, setSelectedGroupIndex] = useState(() => {
+    // Find the group index of the selected item
+    if (items) {
+      for (let i = 0; i < items.length; i++) {
+        for (let j = 0; j < items[i].length; j++) {
+          if (items[i][j].value === value) {
+            return i;
+          }
+        }
+      }
+    }
 
-  const [selectedItems, setSelectedItems] = useState(items?.at(0) || []);
+    return 0;
+  });
+
   const handleGroupSelect = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     const groupIndex = Number(e.currentTarget.getAttribute('data-groupid')) || 0;
-    setSelectedItems(items?.at(groupIndex) || []);
-  }, [items]);
+    setSelectedGroupIndex(groupIndex);
+  }, []);
 
   return (
     <div className="flex flex-col gap-4">
       {
         groups && groups?.length > 1
         && (
-          <div>
+          <div className="flex gap-2 px-2">
             {
               groups.map((group, index) => (
                 <button
                   key={`pdselect-group-${group}`}
                   onClick={handleGroupSelect}
                   data-groupid={index}
+                  className={cn(
+                    'px-2 py-3',
+                    'border-b-[3px] border-transparent',
+                    'transition-colors',
+                    'hover:border-dev-pink-300',
+                    {
+                      ['border-dev-pink-500 hover:border-dev-pink-500']: selectedGroupIndex === index,
+                    },
+                  )}
                 >
                   {group}
                 </button>
@@ -207,7 +232,7 @@ const SelectViewport = ({
         )}
       <SelectPrimitive.Viewport className="max-h-96">
         {
-          selectedItems?.map(item => {
+          items?.[selectedGroupIndex]?.map(item => {
             return (
               <SelectItem
                 key={item.key}

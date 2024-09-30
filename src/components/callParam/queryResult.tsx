@@ -1,18 +1,19 @@
-import React, {
+import {
   useEffect,
   useState,
 } from 'react';
 import 'react18-json-view/src/dark.css';
 import 'react18-json-view/src/style.css';
+import JsonView from 'react18-json-view';
 
 import { Icon } from '@components/icon';
-import { JsonViewer } from '@components/jsonViewer';
 import { Loader } from '@components/loader';
 import { useStoreUI } from '@stores';
 import {
   cn,
   sleep,
 } from '@utils/helpers';
+import { unwrapApiResult } from '@utils/papi/helpers';
 
 interface IQueryResult {
   title: string;
@@ -88,8 +89,9 @@ export const QueryResult = ({
               : (
                 <>
                   Result
-                  <JsonViewer
-                    src={result as object}
+                  <JsonView
+                    theme="atom"
+                    src={unwrapApiResult(result)}
                     enableClipboard
                     collapseObjectsAfterLength={8}
                     style={{

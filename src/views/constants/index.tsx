@@ -78,6 +78,7 @@ const Constants = () => {
 
   const handleStorageQuerySubmit = useCallback(() => {
     if (palletSelected?.name && constantSelected?.name) {
+
       setQueries(queries => ([{
         pallet: palletSelected.name,
         storage: constantSelected.name,
@@ -168,10 +169,11 @@ const Query = (
       try {
         // @TODO: fix types
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (api.constants as any)[querie.pallet][querie.storage]?.().then((res: unknown) => {
-          setResult(res);
-          setIsLoading(false);
-        })
+        (api.constants as any)[querie.pallet][querie.storage]?.()
+          .then((res: unknown) => {
+            setResult(res);
+            setIsLoading(false);
+          })
           .catch(catchError);
 
       } catch (error) {

@@ -1,3 +1,4 @@
+import { Binary } from 'polkadot-api';
 import {
   useCallback,
   useEffect,
@@ -15,10 +16,13 @@ import { QueryViewContainer } from '@components/callParam/queryViewContainer';
 import { Loader } from '@components/loader';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
+import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
 import type { TRelayApi } from '@custom-types/chain';
 
 const RuntimeCalls = () => {
+  const dynamicBulder = useDynamicBuilder();
+
   const metadata = useStoreChain?.use?.metadata?.();
   const chain = useStoreChain?.use?.chain?.();
 
@@ -40,6 +44,7 @@ const RuntimeCalls = () => {
 
   const [methodSelected, setMethodSelected] = useState(apiSelected?.methods.at(0));
   const [callArgs, setCallArgs] = useState<unknown>(undefined);
+  const [encodedCall, setEncodedCall] = useState<Binary>(Binary.fromHex('0x'));
   const [queries, setQueries] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
 
   useEffect(() => {
@@ -87,6 +92,25 @@ const RuntimeCalls = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiSelected, methodSelected, callArgs]);
+
+  useEffect(() => {
+    if (dynamicBulder && apiSelected?.name && methodSelected?.name) {
+      try {
+        const callCodec = dynamicBulder?.buildRuntimeCall(
+          apiSelected.name,
+          methodSelected.name,
+        ).args.enc(Object.values(callArgs || {} as object));
+
+        const _encodedCall = Binary.fromBytes(callCodec);
+        setEncodedCall(_encodedCall);
+
+      } catch (err) {
+        setEncodedCall(Binary.fromHex('0x'));
+        console.log(err);
+      }
+    }
+
+  }, [apiSelected, methodSelected, callArgs, dynamicBulder]);
 
   const handleStorageUnsubscribe = useCallback((id: string) => {
     setQueries(queries => queries.filter(query => query.id !== id));
@@ -138,6 +162,14 @@ const RuntimeCalls = () => {
           Call {apiSelected?.name}/{methodSelected?.name}
         </QueryButton>
 
+        {
+          encodedCall && (
+            <p className="break-all">
+              Encoded Call: <br /> {encodedCall.asHex()}
+            </p>
+          )
+        }
+
       </QueryFormContainer>
       <QueryResultContainer>
         {
@@ -177,10 +209,11 @@ const Query = ({
       try {
         // @TODO: fix types
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (api.apis as any)[querie.pallet][querie.storage](...Object.values(querie.args as object)).then((res: unknown) => {
-          setResult(res);
-          setIsLoading(false);
-        })
+        (api.apis as any)[querie.pallet][querie.storage](...Object.values(querie.args as object))
+          .then((res: unknown) => {
+            setResult(res);
+            setIsLoading(false);
+          })
           .catch(catchError);
 
       } catch (error) {

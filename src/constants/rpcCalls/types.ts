@@ -1,3 +1,5 @@
+import type { MetadataPrimitives } from '@polkadot-api/metadata-builders';
+
 export interface IRpcCalls {
   [key: string]: {
     params: IRpcCallParam[];
@@ -6,7 +8,7 @@ export interface IRpcCalls {
   };
 }
 
-export type TRpcCall = 'boolean' | 'string' | 'hex' | 'select' | 'array';
+export type TRpcCall = 'boolean' | 'string' | 'hex' | 'select' | 'array' | 'number';
 export type TArrayItem = 'string';
 
 export interface IRpcCallParam {
@@ -17,4 +19,6 @@ export interface IRpcCallParam {
   description?: string;
   options?: string[];
   arrayItemType?: TArrayItem;
+  primitiveType?: MetadataPrimitives;
+  optional?: boolean;
 }

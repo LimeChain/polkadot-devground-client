@@ -82,7 +82,7 @@ const Extrinsics = () => {
     key: `extrinsic-call-${call.name}`,
   })) || [], [calls]);
 
-  const [encodedCall, setEncodedCall] = useState<Binary | undefined>(Binary.fromHex('0x'));
+  const [encodedCall, setEncodedCall] = useState<Binary>(Binary.fromHex('0x'));
   const decodedCall = useMemo(() => {
     if (viewBuilder && encodedCall) {
       try {
@@ -96,7 +96,7 @@ const Extrinsics = () => {
   }, [encodedCall, viewBuilder]);
 
   useEffect(() => {
-    if (dynamicBulder && palletSelected?.name && callSelected?.name && viewBuilder) {
+    if (dynamicBulder && palletSelected?.name && callSelected?.name) {
       try {
         const callCodec = dynamicBulder.buildCall(palletSelected.name, callSelected.name);
 
@@ -110,12 +110,12 @@ const Extrinsics = () => {
         setEncodedCall(_encodedCall);
 
       } catch (err) {
-        setEncodedCall(undefined);
+        setEncodedCall(Binary.fromHex('0x'));
         console.log(err);
       }
     }
 
-  }, [palletSelected, callSelected, callArgs, dynamicBulder, viewBuilder]);
+  }, [palletSelected, callSelected, callArgs, dynamicBulder]);
 
   const submitTx = useCallback(async () => {
     if (palletSelected?.name && callSelected?.name) {
@@ -155,7 +155,6 @@ const Extrinsics = () => {
     const selectedCall = calls.find(call => call.name === callSelectedName);
 
     setCallSelected(selectedCall);
-    setEncodedCall(undefined);
     setCallArgs({});
   }, [calls]);
 

@@ -88,15 +88,8 @@ const ChainState = () => {
     if (palletSelected?.name && storageSelected?.name && dynamicBulder) {
       try {
         const storageCodec = dynamicBulder.buildStorage(palletSelected.name, storageSelected.name);
-
         const encodedKey = storageCodec.enc(...([callArgs].filter(arg => Boolean(arg))));
         setEncodedStorageKey(encodedKey);
-
-        // const decodedArgs = storageCodec.keyDecoder(encodedKey);
-        // console.log(decodedArgs);
-
-        // const decodedReturnValue = storageCodec.dec('');
-        // console.log(decodedReturnValue);
       } catch (error) {
         setEncodedStorageKey(undefined);
         console.log(error);
@@ -253,10 +246,12 @@ const Query = (
       try {
         // @TODO: fix types
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const subscription = (api.query as any)[querie.pallet][querie.storage].watchValue(querie.args || 'finalized').subscribe((res: unknown) => {
-          setResult(res);
-          setIsLoading(false);
-        });
+        const subscription = (api.query as any)[querie.pallet][querie.storage]
+          .watchValue(querie.args || 'finalized')
+          .subscribe((res: unknown) => {
+            setResult(res);
+            setIsLoading(false);
+          });
 
         subscription.id = querie.id;
         onSubscribe(subscription);

@@ -111,7 +111,6 @@ export const RpcCalls = () => {
     }
 
     return undefined;
-
   }, [
     palletSelected,
     methodSelected,
@@ -123,7 +122,7 @@ export const RpcCalls = () => {
 
     setMethodSelectItems(() => {
       let methods: IPDSelectItem[] = [];
-      if (newRpcKeys.some(val => val.startsWith(selectedPalletName))) {
+      if (newRpcKeys.some(val => val.split('_').at(0) === selectedPalletName)) {
         methods = mapRpcCallsToSelectMethodItems({
           rpcCalls: newRpcCalls,
           ifPalletEquals: selectedPalletName,
@@ -177,7 +176,6 @@ export const RpcCalls = () => {
         ...queries,
       ]));
     }
-
   }, [
     callParams,
     palletSelected,
@@ -276,15 +274,14 @@ const Query = ({
     const runRawQuery = (onSucess?: (res: unknown) => void) => {
       const args = querie?.args ? querie.args.map(arg => arg.value).filter(arg => arg !== undefined) : [];
 
-      rawClient?.request(call, [...args]).then(res => {
-        setResult(res);
-        setIsLoading(false);
-
-        onSucess?.(res);
-      })
+      rawClient?.request(call, args)
+        .then((...res) => {
+          setResult(res.at(0));
+          setIsLoading(false);
+          onSucess?.(res);
+        })
         .catch(catchError);
     };
-
     if (rawClient) {
       try {
         switch (call) {
@@ -364,7 +361,34 @@ const Query = ({
               .catch(catchError);
             break;
           case 'chainHead_v1_unpin':
-            rawClientSubscription?.unpin((querie?.args?.at(1)?.value as string[]))
+            rawClientSubscription
+              ?.unpin((querie?.args?.at(1)?.value as string[]))
+              .then(res => {
+                setResult(res);
+                setIsLoading(false);
+              })
+              .catch(catchError);
+            break;
+          // OLD RPCS
+          case 'system_dryRun':
+          case 'grandpa_proveFinality':
+          case 'chain_getHeader':
+          case 'chain_getBlock':
+          case 'chain_getBlockHash':
+          case 'state_getPairs':
+          case 'state_getKeysPaged':
+          case 'state_getStorage':
+          case 'state_getStorageHash':
+          case 'state_getStorageSize':
+          case 'state_getMetadata':
+          case 'state_getRuntimeVersion':
+          case 'state_queryStorage':
+          case 'state_getReadProof':
+          case 'childstate_getStorage':
+          case 'childstate_getStorageHash':
+          case 'childstate_getStorageSize':
+          case 'payment_queryInfo':
+            rawClient?.request(call, querie.args.map(arg => (arg.value || arg.value === 0) ? arg.value : null))
               .then(res => {
                 setResult(res);
                 setIsLoading(false);
@@ -372,12 +396,24 @@ const Query = ({
               .catch(catchError);
             break;
 
-          // OLD RPCS
-          case 'system_dryRun':
-          case 'grandpa_proveFinality':
-            console.log(querie.args.map(arg => arg.value).filter(arg => arg));
+          case 'childstate_getKeys':
+            rawClient?.request(
+              call,
+              [
+                querie.args.at(0)?.value,
+                querie.args.at(1)?.value || '',
+                querie.args.at(2)?.value || null,
+              ],
+            )
+              .then(res => {
+                setResult(res);
+                setIsLoading(false);
+              })
+              .catch(catchError);
+            break;
 
-            rawClient?.request(call, querie.args.map(arg => arg.value).filter(arg => arg))
+          case 'author_removeExtrinsic':
+            rawClient?.request(call, querie.args.at(0)?.value as string[])
               .then(res => {
                 setResult(res);
                 setIsLoading(false);
