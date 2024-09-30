@@ -60,7 +60,6 @@ const LatestBlocks = () => {
           return row.original.header.timestamp
             && formatDistanceToNowStrict(new Date(row.original.header.timestamp), { addSuffix: true });
         },
-
       },
       {
         header: 'Extrinsics',
@@ -95,7 +94,8 @@ const LatestBlocks = () => {
     blocks,
     setBlocks,
   ] = useState<IMappedBlock[]>([]);
-  const isLoading = blocksData.size === 0;
+
+  const isLoading = blocks.length !== 0;
 
   const goRouteId = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
     const dataIndex = Number(e.currentTarget.dataset.index);

@@ -27,7 +27,6 @@ import type {
 import type { ColumnDef } from '@tanstack/react-table';
 
 const SignedExtrinsics = () => {
-
   const refSelectedExtrinsic = useRef<IMappedBlockExtrinsic | undefined>();
 
   const blocksData = useStoreChain?.use?.blocksData?.();
@@ -140,21 +139,22 @@ const SignedExtrinsics = () => {
   return (
     <div className="disable-vertical-scroll grid h-full grid-rows-[40px_46px_1fr] gap-8">
       <PageHeader title="Extrinsics" />
-      <SearchBar
-        label="Search by Block"
-        type="extrinsics"
-      />
-
       {
-        isLoading
-          ? <Loader />
-          : (
-            <TableComponent
-              columns={columns}
-              data={signedExtrinsics}
-              onRowClick={handleOpenModal}
-            />
+        !isLoading
+          ? (
+            <>
+              <SearchBar
+                label="Search by Block"
+                type="extrinsics"
+              />
+              <TableComponent
+                columns={columns}
+                data={signedExtrinsics}
+                onRowClick={handleOpenModal}
+              />
+            </>
           )
+          : <Loader />
       }
 
       {

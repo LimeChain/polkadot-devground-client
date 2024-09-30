@@ -42,6 +42,7 @@ const Table = <T,>(props: TableProps<T>): React.ReactElement => {
     <PDScrollArea
       ref={tableContainerRef}
       className="h-full"
+      verticalScrollClassNames="pt-8"
     >
       <div className="relative grid">
         <thead className="sticky top-0 z-10">
