@@ -69,7 +69,7 @@ const ChainState = () => {
   const [
     encodedStorageKey,
     setEncodedStorageKey,
-  ] = useState<string | undefined>('0x');
+  ] = useState<string>('');
 
   const [
     queries,
@@ -113,13 +113,8 @@ const ChainState = () => {
         const encodedKey = storageCodec.enc(...([callArgs].filter((arg) => Boolean(arg))));
         setEncodedStorageKey(encodedKey);
 
-        // const decodedArgs = storageCodec.keyDecoder(encodedKey);
-        // console.log(decodedArgs);
-
-        // const decodedReturnValue = storageCodec.dec('');
-        // console.log(decodedReturnValue);
       } catch (error) {
-        setEncodedStorageKey(undefined);
+        setEncodedStorageKey('');
         console.log(error);
 
       }

@@ -320,6 +320,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
         }
 
       } catch (err) {
+        // TODO: HANDLE INFINITE LOOP CASE
         console.log('Unpredicted Error, reseting chain store...', err);
         get()?.actions?.setChain?.(get()?.chain);
       }
@@ -333,6 +334,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
       get().actions.setChain(get().chain);
 
     } catch (err) {
+      // TODO: HANDLE INFINITE LOOP CASE
       console.log('Smoldot Error, retrying to init...', err);
 
       get().smoldot?.terminate?.()

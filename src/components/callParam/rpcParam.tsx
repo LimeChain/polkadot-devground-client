@@ -81,7 +81,6 @@ const RpcSelect = ({ onChange, param }: IRpcParam) => {
   const handleOnChange = useCallback((value: string) => {
     onChange(value);
     setValue(value);
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
