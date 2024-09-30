@@ -4,6 +4,7 @@ import { LayoutBasic } from '@components/layouts/basic';
 import { LayoutCodeEditor } from '@components/layouts/codeEditor';
 import LatestBlocks from '@views/latestBlocks';
 import { NotFound } from '@views/notFound';
+import { RpcCalls } from '@views/rpcCalls';
 
 const Home = lazy(() => import('../views/home'));
 const CodeEditor = lazy(() => import('../views/codeEditor'));
@@ -121,6 +122,19 @@ export const routes = () => ([
           {
             path: '',
             element: <RuntimeCalls />,
+          },
+        ],
+      },
+      {
+        path: 'rpc-calls',
+        element: <LayoutBasic
+          classNames="lg:pb-8"
+          hasFooter
+        />,
+        children: [
+          {
+            path: '',
+            element: <RpcCalls />,
           },
         ],
       },

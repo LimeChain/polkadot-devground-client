@@ -8,7 +8,7 @@ import {
 import { Icon } from '@components/icon';
 import { cn } from '@utils/helpers';
 
-interface IPDSelect {
+export interface IPDSelect {
   items?: {
     label: string;
     value: string;

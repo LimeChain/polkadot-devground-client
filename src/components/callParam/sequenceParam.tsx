@@ -16,15 +16,18 @@ import { type ICallArgs } from '.';
 import type { SequenceVar } from '@polkadot-api/metadata-builders';
 interface ISequence extends ICallArgs {
   sequence: SequenceVar;
+  placeholder?: string;
+
 }
 
-export const SequenceParam = ({ sequence, onChange }: ISequence) => {
+export const SequenceParam = ({ sequence, onChange, placeholder }: ISequence) => {
   if (sequence.value.type === 'primitive' && sequence.value.value === 'u8') {
     return (
       <div className={styles.codecParam}>
         <BinaryParam
           minLength={0}
           onChange={onChange}
+          placeholder={placeholder}
         />
       </div>
     );
@@ -32,14 +35,15 @@ export const SequenceParam = ({ sequence, onChange }: ISequence) => {
 
   return (
     <_SequenceParam
-      key={sequence.value.id}
+      key={`sequence-param-${sequence.value.id}`}
       onChange={onChange}
+      placeholder={placeholder}
       sequence={sequence}
     />
   );
 };
 
-const _SequenceParam = ({ sequence, onChange }: ISequence) => {
+const _SequenceParam = ({ sequence, onChange, placeholder }: ISequence) => {
   const [
     length,
     setLength,
@@ -144,6 +148,7 @@ const _SequenceParam = ({ sequence, onChange }: ISequence) => {
                 <CodecParam
                   // eslint-disable-next-line react/jsx-no-bind
                   onChange={(args) => handleOnChange(args, param.id)}
+                  placeholder={placeholder}
                   variable={sequence.value}
                 />
               </div>
