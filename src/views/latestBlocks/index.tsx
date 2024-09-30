@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { Icon } from '@components/icon';
 import { Loader } from '@components/loader';
 import { PageHeader } from '@components/pageHeader';
 import { SearchBar } from '@components/searchBar';
@@ -15,6 +16,7 @@ import { useStoreChain } from '@stores';
 import { truncateAddress } from '@utils/helpers';
 
 import type { IMappedBlock } from '@custom-types/block';
+import type { ColumnDef } from '@tanstack/react-table';
 
 const LatestBlocks = () => {
   const navigate = useNavigate();
@@ -23,58 +25,50 @@ const LatestBlocks = () => {
   const latestFinalizedBlock = useStoreChain?.use?.finalizedBlock?.();
   const chain = useStoreChain?.use?.chain?.();
 
-  const columns = useMemo(() => [
+  const columns: ColumnDef<IMappedBlock>[] = useMemo(() => [
     {
       accessorKey: 'header.number',
       header: 'Block',
     },
     {
       header: 'Status',
-      cell: ({ row }) => {
-        const block = row.original;
-        const isFinalized = latestFinalizedBlock && latestFinalizedBlock >= block.header.number;
-        return isFinalized ? 'Finalized' : 'Unfinalized';
-      },
+      cell: ({ row }: { row: { original: IMappedBlock } }) => latestFinalizedBlock !== null && latestFinalizedBlock >= row.original.header.number
+        ? (
+          <Icon
+            className="text-dev-green-600"
+            name="icon-checked"
+            size={[16]}
+          />
+        )
+        : (
+          <Icon
+            className="animate-rotate text-dev-yellow-700"
+            name="icon-clock"
+            size={[16]}
+          />
+        ),
     },
     {
       accessorKey: 'header.timestamp',
       header: 'Time',
-      cell: ({ row }) => {
-        const block = row.original;
-        const timeAgo = block.header.timestamp && formatDistanceToNowStrict(
-          new Date(block.header.timestamp),
-          { addSuffix: true },
-        );
-        return timeAgo;
-      },
+      cell: ({ row }: { row: { original: IMappedBlock } }) => row.original.header.timestamp && formatDistanceToNowStrict(new Date(row.original.header.timestamp), { addSuffix: true }),
+
     },
     {
       header: 'Extrinsics',
-      cell: ({ row }) => {
-        const block = row.original;
-        return block.body.extrinsics.length;
-      },
+      cell: ({ row }) => row.original.body.extrinsics.length,
     },
     {
       header: 'Events',
-      cell: ({ row }) => {
-        const block = row.original;
-        return <td>{block.body.events.length}</td>;
-      },
+      cell: ({ row }) => row.original.body.events.length,
     },
     {
       header: 'Validator',
-      cell: ({ row }) => {
-        const block = row.original;
-        return truncateAddress(block.header.identity.address.toString() || '', 6);
-      },
+      cell: ({ row }) => truncateAddress(row.original.header.identity.address.toString() || '', 6),
     },
     {
       header: 'Block Hash',
-      cell: ({ row }) => {
-        const block = row.original;
-        return truncateAddress(block.header.hash.toString() || '', 6);
-      },
+      cell: ({ row }) => truncateAddress(row.original.header.hash.toString() || '', 6),
     },
   ], [latestFinalizedBlock]);
 

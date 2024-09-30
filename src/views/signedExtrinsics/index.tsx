@@ -38,12 +38,13 @@ const SignedExtrinsics = () => {
   ] = useState<IMappedBlockExtrinsic[]>([]);
   const isLoading = blocksData.size === 0;
 
-  const handleOpenModal = useCallback((row: IMappedBlockExtrinsic | IMappedBlock) => {
-    if ('header' in row) {
-      const blockNumber = row.header.number;
+  const handleOpenModal = useCallback((row: Record<string, unknown>) => {
+    const typedRow = row as unknown as IMappedBlockExtrinsic | IMappedBlock;
+    if ('header' in typedRow) {
+      const blockNumber = typedRow.header.number;
       refSelectedExtrinsic.current = signedExtrinsics.find((extrinsic) => extrinsic.blockNumber === blockNumber);
     } else {
-      refSelectedExtrinsic.current = row;
+      refSelectedExtrinsic.current = typedRow;
     }
     toggleVisibility();
   }, [
@@ -74,17 +75,17 @@ const SignedExtrinsics = () => {
     {
       header: 'Signer',
       accessorKey: 'signer',
-      cell: ({ row }) => truncateAddress(row.original.signer?.Id, 6),
+      cell: ({ row }: { row: { original: IMappedBlockExtrinsic } }) => truncateAddress(row.original.signer?.Id, 6),
     },
     {
       header: 'Time',
       accessorKey: 'timestamp',
-      cell: ({ row }) => row.original.timestamp && formatDistanceToNowStrict(new Date(row.original.timestamp), { addSuffix: true }),
+      cell: ({ row }: { row: { original: IMappedBlockExtrinsic } }) => row.original.timestamp && formatDistanceToNowStrict(new Date(row.original.timestamp), { addSuffix: true }),
     },
     {
       header: 'Result',
       accessorKey: 'isSuccess',
-      cell: ({ row }) => row.original.isSuccess
+      cell: ({ row }: { row: { original: IMappedBlockExtrinsic } }) => row.original.isSuccess
         ? (
           <Icon
             className="text-dev-green-600"

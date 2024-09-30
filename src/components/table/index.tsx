@@ -77,7 +77,7 @@ const Table: React.FC<ReusableTableProps> = ({ data, columns, onRowClick }) => {
                 key={row.id}
                 data-index={virtualRow.index}
                 // eslint-disable-next-line react/jsx-no-bind
-                onClick={() => onRowClick(row.original)}
+                onClick={() => onRowClick(row.original as Record<string, unknown>)}
                 className={cn(
                   'pd-table-row',
                   {
