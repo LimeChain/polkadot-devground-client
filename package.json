@@ -33,6 +33,7 @@
     "@shikijs/monaco": "1.10.0",
     "@stylistic/eslint-plugin": "2.8.0",
     "@stylistic/eslint-plugin-jsx": "2.8.0",
+    "@tanstack/react-table": "8.20.5",
     "@tanstack/react-virtual": "3.8.2",
     "@typescript/ata": "0.9.6",
     "@vitejs/plugin-react-swc": "3.7.0",

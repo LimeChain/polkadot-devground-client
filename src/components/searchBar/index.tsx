@@ -118,7 +118,7 @@ export const SearchBar = (props: ISearchBarProps) => {
   return (
     <div
       ref={refContainer}
-      className="relative z-50 flex w-1/2 items-end gap-4"
+      className="relative z-50 flex w-full items-end gap-4 md:w-1/2"
       onClick={handleShowResults}
     >
       <div
@@ -148,12 +148,13 @@ export const SearchBar = (props: ISearchBarProps) => {
         onClick={handleShowResults}
         className={cn(
           'px-6',
-          'h-10',
+          'hidden h-10',
           'bg-dev-purple-700 text-dev-purple-300',
           'font-geist font-body2-bold',
           'transition-all duration-300 hover:bg-dev-purple-900',
           'dark:bg-dev-purple-50 dark:text-dev-black-1000 dark:hover:bg-dev-purple-200',
           'disabled:cursor-not-allowed disabled:opacity-50',
+          'md:block',
         )}
       >
         Search
