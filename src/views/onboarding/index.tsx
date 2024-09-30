@@ -14,7 +14,8 @@ import { snippets } from '@constants/snippets';
 import { cn } from '@utils/helpers';
 import { NotFound } from '@views/notFound';
 
-import Search from './components/Search';
+import NotFound from './components/notFound';
+import Search from './components/search';
 
 const Onboarding = () => {
   const [
