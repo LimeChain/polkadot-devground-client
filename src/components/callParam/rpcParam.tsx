@@ -35,7 +35,7 @@ export const RpcParam = (props: IRpcParam) => {
           primitive={{ value: props.param.primitiveType || 'u64', type: 'primitive' }}
         />
       );
-
+      
     case 'string':
     case 'hex':
       return (
@@ -76,7 +76,10 @@ export const RpcParam = (props: IRpcParam) => {
 
 const RpcSelect = ({ onChange, param }: IRpcParam) => {
 
-  const [value, setValue] = useState(param.options?.at(0));
+  const [
+    value,
+    setValue,
+  ] = useState(param.options?.at(0));
 
   useEffect(() => {
     onChange(value);
@@ -86,11 +89,10 @@ const RpcSelect = ({ onChange, param }: IRpcParam) => {
   const handleOnChange = useCallback((value: string) => {
     onChange(value);
     setValue(value);
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const selectItems = param?.options?.map(opt => ({
+  const selectItems = param?.options?.map((opt) => ({
     label: opt,
     value: opt,
     key: `rpc-select-${opt}`,

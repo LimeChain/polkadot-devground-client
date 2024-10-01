@@ -27,10 +27,13 @@ export const BinaryParam = ({
   readOnly,
 }: IBinaryParam) => {
 
-  const [useFileUpload, setUseFileUpload] = useState(false);
+  const [
+    useFileUpload,
+    setUseFileUpload,
+  ] = useState(false);
 
   const handleFileUploadToggle = useCallback(() => {
-    setUseFileUpload(upload => !upload);
+    setUseFileUpload((upload) => !upload);
     onChange(Binary.fromText(''));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -39,17 +42,17 @@ export const BinaryParam = ({
   return (
     <div className={styles.codecGroup}>
       <PDSwitch
-        title="File Upload"
         checked={useFileUpload}
         onChange={handleFileUploadToggle}
+        title="File Upload"
       />
       {
         useFileUpload && !readOnly
           ? <PDFileUpload onChange={onChange} />
           : (
             <TextBinaryParam
-              onChange={onChange}
               minLength={minLength}
+              onChange={onChange}
               placeholder={placeholder}
               readOnly={readOnly}
             />
@@ -70,8 +73,14 @@ export const TextBinaryParam = ({
   const requiredBinaryLength = minLength;
   const encodedValue = String().padEnd(requiredHexLength, '0');
 
-  const [value, setValue] = useState(requiredHexLength ? `0x${encodedValue}` : '');
-  const [isError, setIsError] = useState(false);
+  const [
+    value,
+    setValue,
+  ] = useState(requiredHexLength ? `0x${encodedValue}` : '');
+  const [
+    isError,
+    setIsError,
+  ] = useState(false);
 
   const handleOnChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
@@ -99,11 +108,11 @@ export const TextBinaryParam = ({
 
   return (
     <input
-      type="text"
-      placeholder={placeholder || 'Binary hex or string'}
-      value={value}
-      readOnly={readOnly}
       onChange={handleOnChange}
+      placeholder={placeholder || 'Binary hex or string'}
+      readOnly={readOnly}
+      type="text"
+      value={value}
       className={cn(
         styles.codecInput,
         {

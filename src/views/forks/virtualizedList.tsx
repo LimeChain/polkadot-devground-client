@@ -35,7 +35,6 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
 
   const refTimeout = useRef<NodeJS.Timeout>();
   const refScrollArea = useRef<HTMLDivElement>(null);
-  const refContent = useRef<HTMLDivElement>(null);
   const refExtraElementWidth = useRef(0);
 
   const refLatestBlockHash = useRef<string>();
@@ -61,8 +60,6 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
     const htmlTag = document.documentElement;
     htmlTag.classList.add('block-scroll-back');
 
-    refContent.current?.style.setProperty('--min-height', `${(refScrollArea.current?.clientHeight || 0) - 80}px`);
-
     return () => {
       htmlTag.classList.remove('block-scroll-back');
     };
@@ -80,7 +77,7 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
         } = refScrollArea.current;
 
         const canGoToStart = scrollLeft > 0 && scrollWidth > clientWidth;
-        const canGoToEnd = scrollWidth - clientWidth >= scrollLeft + refExtraElementWidth.current;
+        const canGoToEnd = (scrollWidth > clientWidth) && (scrollWidth - clientWidth >= scrollLeft + refExtraElementWidth.current);
         const keepScrollToEnd = scrollWidth - clientWidth === scrollLeft + refExtraElementWidth.current;
 
         busDispatch<IEventBusForksReceiveUpdate>({
@@ -105,29 +102,28 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
   }, [items]);
 
   return (
-    <div className="flex h-full flex-col">
+    <div
+      className={cn(
+        'disable-vertical-scroll disable-horizontal-scroll',
+        'flex flex-col',
+        'h-[var(--initial-scroll-arrea-height)]',
+      )}
+    >
       <div className="flex justify-between">
         <PageHeader title="Forks" />
         <ScrollButtons refScrollArea={refScrollArea} />
       </div>
       <PDScrollArea
-        type="always"
         ref={refScrollArea}
         onScroll={handleScroll}
+        type="always"
         viewportClassNames={cn(
           'mask-horizontal-and-vertical',
           'px-8 py-20',
           'font-geist text-dev-purple-50 font-body2-regular',
         )}
       >
-        <div
-          ref={refContent}
-          className="relative py-20"
-          style={{
-            height: 'var(--min-height, auto)',
-            width: `${rowVirtualizer.getTotalSize()}px`,
-          }}
-        >
+        <div style={{ width: rowVirtualizer.getTotalSize() }}>
           <div className="relative">
             {
               rowVirtualizer.getVirtualItems().map((virtualCol, virtualIndex) => {
@@ -137,9 +133,9 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
                 return (
                   <div
                     key={virtualIndex}
-                    id={`group-${virtualCol.index}`}
                     ref={virtualCol.measureElement}
                     data-index={virtualCol.index}
+                    id={`group-${virtualCol.index}`}
                     className={cn(
                       'absolute left-0 top-0',
                       'h-16',
@@ -167,14 +163,14 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
                                     ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: refLatestBlockHash.current === item.blockHash,
                                   },
                                 )}
+                                endPoint={{
+                                  x: 0,
+                                  y: blockItemIndex * arrowOffset,
+                                }}
                                 startPoint={{
                                   // related to the padding above
                                   x: (blockItems.length > 1 ? -96 : -40),
                                   y: 0,
-                                }}
-                                endPoint={{
-                                  x: 0,
-                                  y: blockItemIndex * arrowOffset,
                                 }}
                               />
                             )
@@ -212,9 +208,9 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
                             {
                               item.isFinalized && (
                                 <Icon
-                                  size={[16]}
-                                  name="icon-checked"
                                   className="w-full max-w-4 text-dev-green-600"
+                                  name="icon-checked"
+                                  size={[16]}
                                 />
                               )
                             }
@@ -223,9 +219,9 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
                             </div>
 
                             <CopyToClipboard
+                              className="hover:text-dev-dev-purple-50"
                               text={item.blockHash}
                               toastMessage="Block Hash"
-                              className="hover:text-dev-dev-purple-50"
                             >
                               {
                                 ({ ClipboardIcon }) => (

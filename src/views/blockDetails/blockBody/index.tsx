@@ -24,14 +24,29 @@ interface BlockBodyProps {
 
 export const BlockBody = (props: BlockBodyProps) => {
   const { bodyData, blockNumber } = props;
-  const [JSONViewerModal, toggleVisibility] = useToggleVisibility(ModalJSONViewer);
+  const [
+    JSONViewerModal,
+    toggleVisibility,
+  ] = useToggleVisibility(ModalJSONViewer);
 
   const refContainer = useRef<HTMLDivElement | null>(null);
 
-  const [modalData, setModalData] = useState<IMappedBlockEvent | IMappedBlockExtrinsic | null>(null);
-  const [initialTab, setInitialTab] = useState(0);
-  const [showMoreExtrinsics, setShowMoreExtrinsics] = useState(false);
-  const [showMoreEvents, setShowMoreEvents] = useState(false);
+  const [
+    modalData,
+    setModalData,
+  ] = useState<IMappedBlockEvent | IMappedBlockExtrinsic | null>(null);
+  const [
+    initialTab,
+    setInitialTab,
+  ] = useState(0);
+  const [
+    showMoreExtrinsics,
+    setShowMoreExtrinsics,
+  ] = useState(false);
+  const [
+    showMoreEvents,
+    setShowMoreEvents,
+  ] = useState(false);
 
   const visibleExtrinsics = showMoreExtrinsics ? bodyData.extrinsics : bodyData.extrinsics.slice(0, 3);
   const visibleEvents = showMoreEvents ? bodyData.events : bodyData.events.slice(0, 3);
@@ -47,7 +62,11 @@ export const BlockBody = (props: BlockBodyProps) => {
     }
 
     toggleVisibility();
-  }, [toggleVisibility, bodyData.extrinsics, bodyData.events]);
+  }, [
+    toggleVisibility,
+    bodyData.extrinsics,
+    bodyData.events,
+  ]);
 
   const handleShowMore = useCallback((e: React.MouseEvent) => {
     const type = e.currentTarget.getAttribute('data-type');
@@ -57,20 +76,23 @@ export const BlockBody = (props: BlockBodyProps) => {
       setShowMoreEvents(!showMoreEvents);
     }
 
-  }, [showMoreEvents, showMoreExtrinsics]);
+  }, [
+    showMoreEvents,
+    showMoreExtrinsics,
+  ]);
 
   return (
     <div className="grid gap-4">
       <Tabs
-        refContainer={refContainer}
         initialTab={initialTab}
         onChange={setInitialTab}
-        unmountOnHide={false}
+        refContainer={refContainer}
         tabClassName="px-2 py-2 mb-5"
+        unmountOnHide={false}
       >
         <div
-          data-title="Extrinsics"
           className="overflow-x-auto"
+          data-title="Extrinsics"
         >
           <table className="w-full">
             <colgroup>
@@ -118,19 +140,25 @@ export const BlockBody = (props: BlockBodyProps) => {
                       <td>{timeAgo}</td>
                       <td>
                         <Icon
-                          size={[16]}
                           name={extrinsic.isSuccess ? 'icon-checked' : 'icon-clock'}
+                          size={[16]}
                           className={cn(
                             extrinsic.isSuccess ? 'text-dev-green-600' : 'animate-rotate text-dev-yellow-700',
                           )}
                         />
                       </td>
-                      <td>{extrinsic.method.section} ({extrinsic.method.method})</td>
+                      <td>
+                        {extrinsic.method.section}
+                        {' '}
+                        (
+                        {extrinsic.method.method}
+                        )
+                      </td>
                       <td>
                         <Icon
-                          size={[18]}
-                          name="icon-dropdownArrow"
                           className="text-dev-black-1000 dark:text-dev-purple-50"
+                          name="icon-dropdownArrow"
+                          size={[18]}
                         />
                       </td>
                     </tr>
@@ -143,9 +171,9 @@ export const BlockBody = (props: BlockBodyProps) => {
             bodyData.extrinsics.length > 3 && (
               <div className="flex justify-center">
                 <button
-                  onClick={handleShowMore}
-                  data-type="extrinsic"
                   className="mt-4 font-geist font-body2-bold"
+                  data-type="extrinsic"
+                  onClick={handleShowMore}
                 >
                   {showMoreExtrinsics ? 'Show Less' : 'Show More'}
                 </button>
@@ -154,8 +182,8 @@ export const BlockBody = (props: BlockBodyProps) => {
           }
         </div>
         <div
-          data-title="Events"
           className="overflow-x-auto"
+          data-title="Events"
         >
           <table className="w-full">
             <colgroup>
@@ -181,22 +209,32 @@ export const BlockBody = (props: BlockBodyProps) => {
                 visibleEvents.map((event: IMappedBlockEvent, eventIndex: number) => (
                   <tr
                     key={eventIndex}
-                    data-type="event"
                     data-index={eventIndex}
+                    data-type="event"
                     onClick={handleOpenModal}
                     className={cn(
                       'pd-table-row',
                       ' text-dev-purple-600 dark:text-dev-purple-550',
                     )}
                   >
-                    <td>{blockNumber}-{eventIndex}</td>
-                    <td>{event.event.type} ({event.event.value.type})</td>
+                    <td>
+                      {blockNumber}
+                      -
+                      {eventIndex}
+                    </td>
+                    <td>
+                      {event.event.type}
+                      {' '}
+                      (
+                      {event.event.value.type}
+                      )
+                    </td>
                     <td>{event.phase.type}</td>
                     <td>
                       <Icon
-                        size={[18]}
-                        name="icon-dropdownArrow"
                         className="text-dev-black-1000 dark:text-dev-purple-50"
+                        name="icon-dropdownArrow"
+                        size={[18]}
                       />
                     </td>
                   </tr>
@@ -207,9 +245,9 @@ export const BlockBody = (props: BlockBodyProps) => {
           {bodyData.events.length > 3 && (
             <div className="flex justify-center">
               <button
-                onClick={handleShowMore}
-                data-type="event"
                 className="mt-4 font-geist font-body2-bold"
+                data-type="event"
+                onClick={handleShowMore}
               >
                 {showMoreEvents ? 'Show Less' : 'Show More'}
               </button>
@@ -218,8 +256,8 @@ export const BlockBody = (props: BlockBodyProps) => {
         </div>
       </Tabs>
       <JSONViewerModal
-        onClose={toggleVisibility}
         jsonData={modalData}
+        onClose={toggleVisibility}
       />
     </div>
   );

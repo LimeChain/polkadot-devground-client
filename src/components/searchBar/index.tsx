@@ -34,18 +34,28 @@ export const SearchBar = (props: ISearchBarProps) => {
 
   const refContainer = useRef<HTMLDivElement>(null);
   const refInput = useRef<HTMLInputElement>(null);
-  const refSelectedExtrinsic = useRef<IMappedBlockExtrinsic | undefined>();
+  const refSelectedExtrinsic = useRef<IMappedBlockExtrinsic | null>(null);
 
   const blocksData = useStoreChain?.use?.blocksData?.();
 
-  const [showResults, setShowResults] = useState(false);
+  const [
+    showResults,
+    setShowResults,
+  ] = useState(false);
 
-  const [results, setResults] = useState({
+  const [
+    results,
+    setResults,
+  ] = useState({
     blockNumber: null,
     extrinsics: [] as IMappedBlockExtrinsic[],
   });
 
-  const [JSONViewerModal, toggleVisibility, isOpen] = useToggleVisibility(ModalJSONViewer);
+  const [
+    JSONViewerModal,
+    toggleVisibility,
+    isOpen,
+  ] = useToggleVisibility(ModalJSONViewer);
 
   const handleSearch = useCallback(() => {
     let searchValue = refInput.current?.value || '';
@@ -97,16 +107,19 @@ export const SearchBar = (props: ISearchBarProps) => {
 
   const handleOpenModal = useCallback((e?: React.MouseEvent<HTMLDivElement>) => {
     const extrinsicId = e?.currentTarget.getAttribute('data-extrinsic-id');
-    refSelectedExtrinsic.current = results.extrinsics?.find(extrinsic => extrinsic.id === extrinsicId);
+    refSelectedExtrinsic.current = results.extrinsics?.find((extrinsic) => extrinsic.id === extrinsicId) || null;
 
     toggleVisibility();
-  }, [results, toggleVisibility]);
+  }, [
+    results,
+    toggleVisibility,
+  ]);
 
   return (
     <div
       ref={refContainer}
-      onClick={handleShowResults}
       className="relative z-50 flex w-1/2 items-end gap-4"
+      onClick={handleShowResults}
     >
       <div
         className={cn(
@@ -119,10 +132,10 @@ export const SearchBar = (props: ISearchBarProps) => {
       >
         <Icon name="icon-search" />
         <input
-          type="text"
           ref={refInput}
-          placeholder={label}
           onChange={debouncedHandleSearch}
+          placeholder={label}
+          type="text"
           className={cn(
             'w-full bg-transparent',
             'caret-dev-pink-500 focus-visible:outline-none',
@@ -131,8 +144,8 @@ export const SearchBar = (props: ISearchBarProps) => {
         />
       </div>
       <button
-        onClick={handleShowResults}
         disabled={!refInput.current?.value}
+        onClick={handleShowResults}
         className={cn(
           'px-6',
           'h-10',
@@ -147,9 +160,9 @@ export const SearchBar = (props: ISearchBarProps) => {
       </button>
 
       <Results
-        type={type}
-        results={results}
         handleOpenModal={handleOpenModal}
+        results={results}
+        type={type}
         classNames={cn(
           'opacity-0 transition-all duration-300',
           {
@@ -159,8 +172,8 @@ export const SearchBar = (props: ISearchBarProps) => {
       />
 
       <JSONViewerModal
-        onClose={toggleVisibility}
         jsonData={refSelectedExtrinsic.current}
+        onClose={toggleVisibility}
         title="Extrinsic Details"
       />
     </div>

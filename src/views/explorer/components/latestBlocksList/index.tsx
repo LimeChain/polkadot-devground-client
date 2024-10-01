@@ -32,7 +32,10 @@ export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
   const refScrollArea = useRef<HTMLDivElement>(null);
   const refs = useMergedRefs(ref, refScrollArea);
 
-  const [blocks, setBlocks] = useState<Block[]>([]);
+  const [
+    blocks,
+    setBlocks,
+  ] = useState<Block[]>([]);
 
   const blocksData = useStoreChain?.use?.blocksData?.();
   const bestBlock = useStoreChain?.use?.bestBlock?.();
@@ -48,7 +51,10 @@ export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
     const blocksArray = Array.from(blocksData.values()).reverse();
 
     setBlocks(blocksArray);
-  }, [blocksData, bestBlock]);
+  }, [
+    blocksData,
+    bestBlock,
+  ]);
 
   return (
     <PDScrollArea
@@ -71,8 +77,8 @@ export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
                   <Row
                     key={virtualIndex}
                     blockNumber={block.header.number}
-                    extrinsicsLength={block.body.extrinsics.length}
                     eventsLength={block.body.events.length}
+                    extrinsicsLength={block.body.extrinsics.length}
                     timestamp={block.header.timestamp}
                     className={cn(
                       styles['pd-explorer-list'],

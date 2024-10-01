@@ -29,23 +29,35 @@ export const ExtrinsicsList = polymorphicComponent<'div'>((_props, ref) => {
   const blocksData = useStoreChain?.use?.blocksData?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
 
-  const [JSONViewerModal, toggleVisibility] = useToggleVisibility(ModalJSONViewer);
+  const [
+    JSONViewerModal,
+    toggleVisibility,
+  ] = useToggleVisibility(ModalJSONViewer);
 
-  const [signedExtrinsics, setSignedExtrinsics] = useState<IMappedBlockExtrinsic[]>([]);
+  const [
+    signedExtrinsics,
+    setSignedExtrinsics,
+  ] = useState<IMappedBlockExtrinsic[]>([]);
 
   const handleOpenModal = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
     const extrinsicId = e.currentTarget.getAttribute('data-extrinsic-id');
-    refSelectedExtrinsic.current = signedExtrinsics.find(extrinsic => extrinsic.id === extrinsicId);
+    refSelectedExtrinsic.current = signedExtrinsics.find((extrinsic) => extrinsic.id === extrinsicId);
     toggleVisibility();
-  }, [signedExtrinsics, toggleVisibility]);
+  }, [
+    signedExtrinsics,
+    toggleVisibility,
+  ]);
 
   useEffect(() => {
     const extrinsics = Array.from(blocksData.values())
-      .flatMap(block => block?.body?.extrinsics?.slice(2) ?? [])
+      .flatMap((block) => block?.body?.extrinsics?.slice(2) ?? [])
       .reverse();
 
     setSignedExtrinsics(extrinsics);
-  }, [blocksData, latestBlock]);
+  }, [
+    blocksData,
+    latestBlock,
+  ]);
 
   const rowVirtualizer = useVirtualizer({
     count: signedExtrinsics.length,
@@ -75,9 +87,9 @@ export const ExtrinsicsList = polymorphicComponent<'div'>((_props, ref) => {
                   return (
                     <Row
                       key={virtualIndex}
-                      handleOpenModal={handleOpenModal}
-                      extrinsicId={extrinsic.id}
                       action={`${extrinsic.method.section}.${extrinsic.method.method}`}
+                      extrinsicId={extrinsic.id}
+                      handleOpenModal={handleOpenModal}
                       isSuccess={extrinsic.isSuccess}
                       timestamp={extrinsic.timestamp}
                       className={cn(
@@ -100,8 +112,8 @@ export const ExtrinsicsList = polymorphicComponent<'div'>((_props, ref) => {
       {
         refSelectedExtrinsic.current && (
           <JSONViewerModal
-            onClose={toggleVisibility}
             jsonData={refSelectedExtrinsic.current}
+            onClose={toggleVisibility}
             title="Extrinsic Details"
           />
         )

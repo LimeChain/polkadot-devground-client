@@ -90,6 +90,11 @@ pre {
   max-height: var(--initial-scroll-arrea-height, 100vh);
 }
 
+.disable-horizontal-scroll {
+  @apply overflow-hidden;
+  max-width: var(--initial-scroll-arrea-width, 100vh);
+}
+
 @keyframes bounce {
   0% {
     transform: translateY(0);

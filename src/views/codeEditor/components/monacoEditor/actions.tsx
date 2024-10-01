@@ -22,10 +22,13 @@ import type { IEventBusMonacoEditorUpdateCode } from '@custom-types/eventBus';
 
 export const EditorActions = () => {
   const refCode = useRef<string>('');
-  const [isRunning, setIsRunning] = useState(false);
+  const [
+    isRunning,
+    setIsRunning,
+  ] = useState(false);
 
   const handleRun = useCallback(() => {
-    setIsRunning(state => !state);
+    setIsRunning((state) => !state);
     busDispatch({
       type: '@@-monaco-editor-execute-snippet',
       data: refCode.current,
@@ -33,7 +36,7 @@ export const EditorActions = () => {
   }, []);
 
   const handleStop = useCallback(() => {
-    setIsRunning(state => !state);
+    setIsRunning((state) => !state);
     busDispatch({
       type: '@@-iframe-destroy',
     });
@@ -114,16 +117,22 @@ export const EditorActions = () => {
       <div className="flex gap-2 pr-2">
         <ActionButton iconName="icon-share" />
         <ActionButton iconName="icon-save" />
-        <ActionButton iconName="icon-download" onClick={handleDownload} />
+        <ActionButton
+          iconName="icon-download"
+          onClick={handleDownload}
+        />
         {isRunning
           ? (
-            <ActionButton iconName="icon-pause" onClick={handleStop} />
+            <ActionButton
+              iconName="icon-pause"
+              onClick={handleStop}
+            />
           )
           : (
             <ActionButton
+              fill="red"
               iconName="icon-play"
               onClick={handleRun}
-              fill="red"
             />
           )}
       </div>

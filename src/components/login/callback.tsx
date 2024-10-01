@@ -12,7 +12,10 @@ import { getSearchParam } from '@utils/helpers';
 const Callback = () => {
   const navigate = useNavigate();
   const codeUsed = useRef<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [
+    error,
+    setError,
+  ] = useState<string | null>(null);
 
   const { login } = useStoreAuth.use.actions();
 
@@ -42,7 +45,10 @@ const Callback = () => {
 
     void getAccessToken();
 
-  }, [navigate, login]);
+  }, [
+    navigate,
+    login,
+  ]);
 
   if (error) {
     return (

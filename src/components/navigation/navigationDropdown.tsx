@@ -23,21 +23,22 @@ export const NavigationDropdown = ({
       <button
         {...props}
         className={cn(
-          'relative px-2 py-5',
+          'relative px-2 py-2',
           'after:absolute after:bottom-0 after:left-0 after:content-[""]',
           'after:h-[3px] after:w-full after:bg-dev-pink-500',
           'after:opacity-0 after:transition-opacity',
           'group-hover:after:opacity-100',
           'group-focus-within:after:opacity-100',
           'flex items-center gap-1',
+          'text-dev-purple-50 sm:text-dev-black-1000 sm:dark:text-dev-purple-50',
           className,
         )}
       >
         {title}
         <Icon
+          className="transition-transform group-focus-within:rotate-180"
           name="icon-dropdownArrow"
           size={[16]}
-          className="transition-transform group-focus-within:rotate-180"
         />
       </button>
       <ul

@@ -16,11 +16,17 @@ interface IOptionParam extends ICallArgs {
 }
 
 export const OptionParam = ({ option, onChange }: IOptionParam) => {
-  const [includeOption, setIncludeOption] = useState(false);
-  const [value, setValue] = useState(undefined);
+  const [
+    includeOption,
+    setIncludeOption,
+  ] = useState(false);
+  const [
+    value,
+    setValue,
+  ] = useState(undefined);
 
   const handleIncludeOptionToggle = useCallback(() => {
-    setIncludeOption(include => !include);
+    setIncludeOption((include) => !include);
   }, []);
 
   const handleOnChange = useCallback((args: unknown) => {
@@ -30,17 +36,25 @@ export const OptionParam = ({ option, onChange }: IOptionParam) => {
   useEffect(() => {
     onChange(includeOption ? value : undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, includeOption]);
+  }, [
+    value,
+    includeOption,
+  ]);
 
   return (
     <div className={styles.codecGroup}>
       <PDSwitch
-        title="Include Option"
         checked={includeOption}
         onChange={handleIncludeOptionToggle}
+        title="Include Option"
       />
       {
-        includeOption && <CodecParam variable={option.value} onChange={handleOnChange} />
+        includeOption && (
+          <CodecParam
+            onChange={handleOnChange}
+            variable={option.value}
+          />
+        )
       }
     </div>
   );

@@ -32,7 +32,10 @@ const DetailRow = (props: DetailRowProps) => {
       <div className="flex items-center gap-x-1">
         <p>{value}</p>
         {value && (
-          <CopyToClipboard text={value} toastMessage={label}>
+          <CopyToClipboard
+            text={value}
+            toastMessage={label}
+          >
             {({ ClipboardIcon }) => <>{ClipboardIcon}</>}
           </CopyToClipboard>
         )}
@@ -43,7 +46,10 @@ const DetailRow = (props: DetailRowProps) => {
 
 export const BlockHeader = (props: BlockHeaderProps) => {
   const { headerData } = props;
-  const [isUTC, setIsUTC] = useState(false);
+  const [
+    isUTC,
+    setIsUTC,
+  ] = useState(false);
 
   const handleSetCheck = useCallback(() => {
     setIsUTC((prevState) => !prevState);
@@ -59,7 +65,10 @@ export const BlockHeader = (props: BlockHeaderProps) => {
         <p>Time stamp</p>
         <div className="flex items-center gap-x-2">
           <span>{formattedTimestamp}</span>
-          <ToggleButton isChecked={isUTC} handleSetCheck={handleSetCheck} />
+          <ToggleButton
+            handleSetCheck={handleSetCheck}
+            isChecked={isUTC}
+          />
           <span>UTC</span>
         </div>
       </div>
@@ -67,9 +76,9 @@ export const BlockHeader = (props: BlockHeaderProps) => {
         <p>Status</p>
         <div className="flex items-center gap-x-2">
           <Icon
-            size={[16]}
-            name={headerData.isFinalized ? 'icon-checked' : 'icon-clock'}
             className={headerData.isFinalized ? 'text-dev-green-600' : 'animate-rotate text-dev-yellow-700'}
+            name={headerData.isFinalized ? 'icon-checked' : 'icon-clock'}
+            size={[16]}
           />
           <p>{headerData.isFinalized ? 'Finalized' : 'Unfinalized'}</p>
         </div>
@@ -95,15 +104,18 @@ export const BlockHeader = (props: BlockHeaderProps) => {
           <p>Validator</p>
           <div className={styles['validator']}>
             <Identicon
-              value={headerData.identity.address}
               size={32}
               theme="polkadot"
+              value={headerData.identity.address}
             />
             <span>
               {headerData.identity.name}
               <div className="flex items-center gap-x-2">
                 <span>{headerData.identity.address}</span>
-                <CopyToClipboard text={headerData.identity.address || ''} toastMessage="Validator Address">
+                <CopyToClipboard
+                  text={headerData.identity.address || ''}
+                  toastMessage="Validator Address"
+                >
                   {({ ClipboardIcon }) => <>{ClipboardIcon}</>}
                 </CopyToClipboard>
               </div>

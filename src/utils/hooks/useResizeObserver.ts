@@ -27,10 +27,16 @@ export const useResizeObserver = <T extends HTMLElement = HTMLElement>(
   ref: HTMLElement | RefObject<T> | null | undefined,
   options?: UseResizeObserverOptions<T>,
 ): [DOMRectReadOnly | null, visibilityDetails: IVisibilityDetails, computedStyle: CSSStyleDeclaration | null] => {
-  const [dimensions, setDimensions] = useState<DOMRectReadOnly | null>(null);
+  const [
+    dimensions,
+    setDimensions,
+  ] = useState<DOMRectReadOnly | null>(null);
   const frameId = useRef<number | null>(null);
 
-  const [visibilityDetails, setVisibilityDetails] = useState<IVisibilityDetails>({
+  const [
+    visibilityDetails,
+    setVisibilityDetails,
+  ] = useState<IVisibilityDetails>({
     isVisible: false,
     top: false,
     middleVertical: false,
@@ -40,7 +46,10 @@ export const useResizeObserver = <T extends HTMLElement = HTMLElement>(
     right: false,
   });
 
-  const [computedStyle, setComputedStyle] = useState<CSSStyleDeclaration | null>(null);
+  const [
+    computedStyle,
+    setComputedStyle,
+  ] = useState<CSSStyleDeclaration | null>(null);
 
   const { enableScrollListener, containerRef, withComputedStyle } = options || {};
 
@@ -73,13 +82,13 @@ export const useResizeObserver = <T extends HTMLElement = HTMLElement>(
         const containerRect = container.getBoundingClientRect();
 
         // Check for horizontal visibility
-        const elementCenterHorizontal = rect.left + rect.width / 2;
+        const elementCenterHorizontal = rect.left + (rect.width / 2);
         detail.left = rect.left >= containerRect.left && rect.left <= containerRect.right;
         detail.middleHorizontal = elementCenterHorizontal >= containerRect.left && elementCenterHorizontal <= containerRect.right;
         detail.right = rect.right <= containerRect.right && rect.right >= containerRect.left;
 
         // Check for vertical visibility
-        const elementCenterVertical = rect.top + rect.height / 2;
+        const elementCenterVertical = rect.top + (rect.height / 2);
         detail.top = rect.top >= containerRect.top && rect.top <= containerRect.bottom;
         detail.middleVertical = elementCenterVertical >= containerRect.top && elementCenterVertical <= containerRect.bottom;
         detail.bottom = rect.bottom <= containerRect.bottom && rect.bottom >= containerRect.top;
@@ -99,7 +108,11 @@ export const useResizeObserver = <T extends HTMLElement = HTMLElement>(
         setComputedStyle(getComputedStyle(observeTarget));
       }
     });
-  }, [ref, containerRef, withComputedStyle]);
+  }, [
+    ref,
+    containerRef,
+    withComputedStyle,
+  ]);
 
   useEffect(() => {
     const observeTarget = ref instanceof HTMLElement ? ref : ref?.current;
@@ -126,7 +139,15 @@ export const useResizeObserver = <T extends HTMLElement = HTMLElement>(
         cancelAnimationFrame(frameId.current);
       }
     };
-  }, [ref, updateDimensionsAndVisibility, enableScrollListener]);
+  }, [
+    ref,
+    updateDimensionsAndVisibility,
+    enableScrollListener,
+  ]);
 
-  return [dimensions, visibilityDetails, computedStyle];
+  return [
+    dimensions,
+    visibilityDetails,
+    computedStyle,
+  ];
 };

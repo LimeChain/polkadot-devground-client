@@ -25,14 +25,22 @@ const LatestBlocks = () => {
   const latestFinalizedBlock = useStoreChain?.use?.finalizedBlock?.();
   const chain = useStoreChain?.use?.chain?.();
 
-  const [blocks, setBlocks] = useState<IMappedBlock[]>([]);
+  const [
+    blocks,
+    setBlocks,
+  ] = useState<IMappedBlock[]>([]);
   const isLoading = blocksData.size === 0;
 
   useEffect(() => {
     const blocksArray = Array.from(blocksData.values()).reverse();
 
     setBlocks(blocksArray);
-  }, [blocksData, bestBlock, chain, latestFinalizedBlock]);
+  }, [
+    blocksData,
+    bestBlock,
+    chain,
+    latestFinalizedBlock,
+  ]);
 
   const goRouteId = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
     navigate(`/explorer/${e.currentTarget.dataset.blockNumber}`);
@@ -42,8 +50,8 @@ const LatestBlocks = () => {
     <div className="grid h-full grid-rows-[40px_46px_1fr] gap-8">
       <PageHeader title="Latest Blocks" />
       <SearchBar
-        type="block"
         label="Search by Block"
+        type="block"
       />
       <PDScrollArea
         className="h-full"
@@ -82,8 +90,8 @@ const LatestBlocks = () => {
                   return (
                     <tr
                       key={block.header.number}
-                      onClick={goRouteId}
                       data-block-number={block.header.number}
+                      onClick={goRouteId}
                       className={cn(
                         'pd-table-row',
                         {
@@ -97,16 +105,16 @@ const LatestBlocks = () => {
                           isFinalized
                             ? (
                               <Icon
-                                size={[16]}
-                                name="icon-checked"
                                 className="text-dev-green-600"
+                                name="icon-checked"
+                                size={[16]}
                               />
                             )
                             : (
                               <Icon
-                                size={[16]}
-                                name="icon-clock"
                                 className="animate-rotate text-dev-yellow-700"
+                                name="icon-clock"
+                                size={[16]}
                               />
                             )
                         }

@@ -133,7 +133,7 @@ export const subscribeToRuntime = async (api: TApi, callback: (runtime: IRuntime
   );
 
   // at finalized because the first block we show is finalized
-  return api.query.System.LastRuntimeUpgrade.watchValue('finalized').subscribe(runtime => {
+  return api.query.System.LastRuntimeUpgrade.watchValue('finalized').subscribe((runtime) => {
     if (runtime) {
       callback(runtime);
     }
@@ -217,7 +217,7 @@ export const subscribeToTotalIssuance = async (api: TApi, callback: (issuance: b
     'api.query.Balances.TotalIssuance is not compatable',
   );
 
-  api.query.Balances.TotalIssuance.watchValue('best').subscribe(issuance => {
+  api.query.Balances.TotalIssuance.watchValue('best').subscribe((issuance) => {
     callback(issuance);
   });
 };
@@ -237,10 +237,10 @@ export const subscribeToStakedTokens = async (api: TStakingApi, callback: (total
     'api.query.Staking.ErasTotalStake is not compatable',
   );
 
-  api.query.Staking.ActiveEra.watchValue('best').subscribe(async era => {
+  api.query.Staking.ActiveEra.watchValue('best').subscribe(async (era) => {
     const totalValueLocked = await api.query.NominationPools.TotalValueLocked.getValue();
     if (typeof era?.index === 'number') {
-      api.query.Staking.ErasTotalStake.watchValue(era?.index).subscribe(totalStake => {
+      api.query.Staking.ErasTotalStake.watchValue(era?.index).subscribe((totalStake) => {
         callback(totalValueLocked + totalStake);
       });
     }

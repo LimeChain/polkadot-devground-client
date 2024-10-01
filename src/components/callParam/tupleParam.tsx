@@ -20,15 +20,19 @@ export const TupleParam = ({ tuple, onChange }: ISequence) => {
   ) {
     return (
       <div className="border-l pl-4 pt-2">
-        <BinaryParam onChange={onChange} minLength={0} />;
+        <BinaryParam
+          minLength={0}
+          onChange={onChange}
+        />
+        ;
       </div>
     );
   }
 
   return (
     <_TupleParam
-      tuple={tuple}
       onChange={onChange}
+      tuple={tuple}
     />
   );
 };
@@ -37,7 +41,10 @@ const _TupleParam = ({
   tuple,
   onChange,
 }: ISequence) => {
-  const [params, setParams] = useState(Array.from({ length: tuple.value.length }).fill(undefined));
+  const [
+    params,
+    setParams,
+  ] = useState(Array.from({ length: tuple.value.length }).fill(undefined));
 
   useEffect(() => {
     onChange(params);

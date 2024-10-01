@@ -10,7 +10,10 @@ export const ReloadPrompt = () => {
     updateServiceWorker,
   } = useRegisterSW();
 
-  const [ReloadPromptModal, toggleVisibility] = useToggleVisibility(ModalReloadPrompt);
+  const [
+    ReloadPromptModal,
+    toggleVisibility,
+  ] = useToggleVisibility(ModalReloadPrompt);
 
   useEffect(() => {
     if (needRefresh) {

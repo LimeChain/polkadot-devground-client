@@ -50,8 +50,14 @@ export const DebugPanel = (props: IframeProps) => {
   const [refContainerDimensions] = useResizeObserver(refContainer);
   const containerWidth = refContainerDimensions?.width;
 
-  const [initialTab, setInitialTab] = useState(0);
-  const [chipContent, setChipContent] = useState<number | undefined>(undefined);
+  const [
+    initialTab,
+    setInitialTab,
+  ] = useState(0);
+  const [
+    chipContent,
+    setChipContent,
+  ] = useState<number | undefined>(undefined);
 
   const theme = useStoreUI.use.theme?.();
 
@@ -89,26 +95,26 @@ export const DebugPanel = (props: IframeProps) => {
 
   return (
     <Tabs
-      refContainer={refContainer}
+      contentClassName="relative"
       initialTab={initialTab}
       onChange={setInitialTab}
-      unmountOnHide={false}
-      tabsClassName="px-2 py-0.5"
+      refContainer={refContainer}
       tabClassName="text-[11px] uppercase tracking-widest"
-      contentClassName="relative"
+      tabsClassName="px-2 py-0.5"
+      unmountOnHide={false}
     >
       <div
-        data-title="Console"
         className="h-full overflow-hidden p-3 pt-2"
+        data-title="Console"
       >
         <Console />
         <ConsoleActions />
         {!canPreview && <Iframe classNames="hidden" />}
       </div>
       <div
-        data-title="Problems"
-        data-chip={{ content: chipContent }}
         className="h-full overflow-hidden p-3 pt-2"
+        data-chip={{ content: chipContent }}
+        data-title="Problems"
       >
         <Problems maxWidth={containerWidth} />
       </div>

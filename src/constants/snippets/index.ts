@@ -98,4 +98,9 @@ const snippet4: ICodeSnippet = {
   `,
 };
 
-export const snippets = [snippet1, snippet2, snippet3, snippet4];
+export const snippets = [
+  snippet1,
+  snippet2,
+  snippet3,
+  snippet4,
+];

@@ -1,11 +1,14 @@
 import type { IBlockItem } from '@custom-types/block';
 
 export const groupData = (data: Record<string, IBlockItem[]>): Record<string, IBlockItem[]> => {
-  return Object.entries(data).reduce<Record<string, IBlockItem[]>>((acc, [blockNumber, blocks]) => {
+  return Object.entries(data).reduce<Record<string, IBlockItem[]>>((acc, [
+    blockNumber,
+    blocks,
+  ]) => {
     // Sort blocks so that finalized blocks come first
     const sortedBlocks = blocks.sort((a, b) => (a.isFinalized === b.isFinalized ? 0 : a.isFinalized ? -1 : 1));
 
-    acc[blockNumber] = sortedBlocks.map(block => ({
+    acc[blockNumber] = sortedBlocks.map((block) => ({
       ...block,
       blockNumber: Number(blockNumber),
     }));
@@ -33,7 +36,7 @@ export const smoothScroll = async (
   const startTime = performance.now();
 
   // Easing function for smoother animation (ease-in-out in this case)
-  const easeInOutQuad = (t: number): number => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+  const easeInOutQuad = (t: number): number => t < 0.5 ? 2 * t * t : -1 + ((4 - (2 * t)) * t);
 
   return new Promise((resolve) => {
     const animateScroll = (currentTime: number) => {
@@ -43,7 +46,7 @@ export const smoothScroll = async (
       const progress = Math.min(timeElapsed / adjustedDuration, 1);
       const easedProgress = easeInOutQuad(progress);
 
-      element[scrollPosition] = start + change * easedProgress;
+      element[scrollPosition] = start + (change * easedProgress);
 
       if (timeElapsed < adjustedDuration) {
         requestAnimationFrame(animateScroll);

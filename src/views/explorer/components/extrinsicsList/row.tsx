@@ -27,9 +27,9 @@ export const Row = (props: IRowProps) => {
 
   return (
     <div
+      className={className}
       data-extrinsic-id={extrinsicId}
       onClick={handleOpenModal}
-      className={className}
       style={style}
     >
       <div>
@@ -41,16 +41,16 @@ export const Row = (props: IRowProps) => {
           isSuccess
             ? (
               <Icon
-                size={[16]}
-                name="icon-checked"
                 className="text-dev-green-600"
+                name="icon-checked"
+                size={[16]}
               />
             )
             : (
               <Icon
-                size={[16]}
-                name="icon-failed"
                 className="text-dev-red-800"
+                name="icon-failed"
+                size={[16]}
               />
             )
         }

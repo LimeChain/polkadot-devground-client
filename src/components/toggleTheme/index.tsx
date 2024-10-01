@@ -14,8 +14,8 @@ export const ToggleTheme = () => {
 
   return (
     <button
-      type="button"
       onClick={toggleTheme}
+      type="button"
       className={cn(
         'navSpacer',
         {
@@ -25,9 +25,9 @@ export const ToggleTheme = () => {
       )}
     >
       <Icon
+        className="text-dev-black-600 dark:text-dev-purple-100"
         name={theme ? 'icon-lightMode' : 'icon-darkMode'}
         size={[24]}
-        className="text-dev-black-600 dark:text-dev-purple-100"
       />
     </button>
   );

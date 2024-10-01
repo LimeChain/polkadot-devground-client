@@ -27,25 +27,40 @@ const RuntimeCalls = () => {
   const chain = useStoreChain?.use?.chain?.();
 
   const apis = useMemo(() => metadata?.apis?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
-  const apiItems = useMemo(() => apis?.map(api => ({
+  const apiItems = useMemo(() => apis?.map((api) => ({
     label: api.name,
     value: api.name,
     key: `api-select-${api.name}`,
   })), [apis]);
 
-  const [apiSelected, setApiSelected] = useState(apis?.at(0));
+  const [
+    apiSelected,
+    setApiSelected,
+  ] = useState(apis?.at(0));
 
   const apiMethods = useMemo(() => apiSelected?.methods?.sort((a, b) => a.name.localeCompare(b.name)) || [], [apiSelected]);
-  const methodItems = useMemo(() => apiMethods?.map(item => ({
+  const methodItems = useMemo(() => apiMethods?.map((item) => ({
     label: item.name,
     value: item.name,
     key: `method-select-${item.name}`,
   })), [apiMethods]);
 
-  const [methodSelected, setMethodSelected] = useState(apiSelected?.methods.at(0));
-  const [callArgs, setCallArgs] = useState<unknown>(undefined);
-  const [encodedCall, setEncodedCall] = useState<Binary>(Binary.fromHex('0x'));
-  const [queries, setQueries] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
+  const [
+    methodSelected,
+    setMethodSelected,
+  ] = useState(apiSelected?.methods.at(0));
+  const [
+    encodedCall, 
+    setEncodedCall,
+  ] = useState<Binary>(Binary.fromHex('0x'));
+  const [
+    callArgs,
+    setCallArgs,
+  ] = useState<unknown>(undefined);
+  const [
+    queries,
+    setQueries,
+  ] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
 
   useEffect(() => {
     setQueries([]);
@@ -63,7 +78,7 @@ const RuntimeCalls = () => {
 
   const handlePalletSelect = useCallback((palletSelectedName: string) => {
     if (apis) {
-      const selectedMethod = apis.find(api => api.name === palletSelectedName);
+      const selectedMethod = apis.find((api) => api.name === palletSelectedName);
 
       if (selectedMethod) {
         setApiSelected(selectedMethod);
@@ -75,7 +90,7 @@ const RuntimeCalls = () => {
 
   const handleCallSelect = useCallback((callSelectedName: string) => {
     if (apiSelected) {
-      const selectedStorage = apiSelected.methods.find(item => item.name === callSelectedName);
+      const selectedStorage = apiSelected.methods.find((item) => item.name === callSelectedName);
       setMethodSelected(selectedStorage);
       setCallArgs(undefined);
     }
@@ -83,15 +98,22 @@ const RuntimeCalls = () => {
 
   const handleStorageQuerySubmit = useCallback(() => {
     if (apiSelected?.name && methodSelected?.name) {
-      setQueries(queries => ([{
-        pallet: apiSelected.name,
-        storage: methodSelected.name,
-        id: crypto.randomUUID(),
-        args: callArgs,
-      }, ...queries]));
+      setQueries((queries) => ([
+        {
+          pallet: apiSelected.name,
+          storage: methodSelected.name,
+          id: crypto.randomUUID(),
+          args: callArgs,
+        },
+        ...queries,
+      ]));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiSelected, methodSelected, callArgs]);
+  }, [
+    apiSelected,
+    methodSelected,
+    callArgs,
+  ]);
 
   useEffect(() => {
     if (dynamicBulder && apiSelected?.name && methodSelected?.name) {
@@ -113,7 +135,7 @@ const RuntimeCalls = () => {
   }, [apiSelected, methodSelected, callArgs, dynamicBulder]);
 
   const handleStorageUnsubscribe = useCallback((id: string) => {
-    setQueries(queries => queries.filter(query => query.id !== id));
+    setQueries((queries) => queries.filter((query) => query.id !== id));
   }, []);
 
   if (!apiSelected) {
@@ -125,8 +147,8 @@ const RuntimeCalls = () => {
       <QueryFormContainer>
         <div className="grid w-full grid-cols-2 gap-4">
           <PDSelect
-            label="Select Api"
             emptyPlaceHolder="No apis available"
+            label="Select Api"
             items={[apiItems || []]}
             value={apiSelected?.name}
             onChange={handlePalletSelect}
@@ -136,8 +158,8 @@ const RuntimeCalls = () => {
             methodItems && (
               <PDSelect
                 key={`method-select-${methodSelected?.name}`}
-                label="Select Method"
                 emptyPlaceHolder="No methods available"
+                label="Select Method"
                 items={[methodItems]}
                 value={methodSelected?.name}
                 onChange={handleCallSelect}
@@ -156,10 +178,14 @@ const RuntimeCalls = () => {
           )
         }
 
-        <CallDocs docs={methodSelected?.docs?.filter(d => d) || []} />
+        <CallDocs docs={methodSelected?.docs?.filter((d) => d) || []} />
 
         <QueryButton onClick={handleStorageQuerySubmit}>
-          Call {apiSelected?.name}/{methodSelected?.name}
+          Call 
+          {' '}
+          {apiSelected?.name}
+          /
+          {methodSelected?.name}
         </QueryButton>
 
         {
@@ -176,8 +202,8 @@ const RuntimeCalls = () => {
           queries.map((query) => (
             <Query
               key={`query-result-${query.pallet}-${query.storage}-${query.id}`}
-              querie={query}
               onUnsubscribe={handleStorageUnsubscribe}
+              querie={query}
             />
           ))
         }
@@ -196,8 +222,14 @@ const Query = ({
   onUnsubscribe: (id: string) => void;
 }) => {
   const api = useStoreChain?.use?.api?.() as TRelayApi;
-  const [result, setResult] = useState<unknown>();
-  const [isLoading, setIsLoading] = useState(true);
+  const [
+    result,
+    setResult,
+  ] = useState<unknown>();
+  const [
+    isLoading,
+    setIsLoading,
+  ] = useState(true);
 
   useEffect(() => {
     const catchError = (err: Error) => {
@@ -221,19 +253,25 @@ const Query = ({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [querie, api]);
+  }, [
+    querie,
+    api,
+  ]);
 
   const handleUnsubscribe = useCallback(() => {
     onUnsubscribe(querie.id);
-  }, [querie, onUnsubscribe]);
+  }, [
+    querie,
+    onUnsubscribe,
+  ]);
 
   return (
     <QueryResult
-      title="Runtime Call"
-      path={`${querie.pallet}/${querie.storage}`}
       isLoading={isLoading}
-      result={result}
       onRemove={handleUnsubscribe}
+      path={`${querie.pallet}/${querie.storage}`}
+      result={result}
+      title="Runtime Call"
     />
   );
 };

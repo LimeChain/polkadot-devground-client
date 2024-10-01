@@ -46,7 +46,6 @@ interface IQuery {
 }
 
 const newRpcKeys = Object.keys(newRpcCalls);
-
 export const RpcCalls = () => {
 
   const chain = useStoreChain?.use?.chain?.();
@@ -63,7 +62,7 @@ export const RpcCalls = () => {
   useEffect(() => {
     return () => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      refUncleanedSubscriptions?.current?.forEach(sub => {
+      refUncleanedSubscriptions?.current?.forEach((sub) => {
         rawClient?.request('chainHead_v1_unfollow', [sub])
           .then(() => {
             console.log('follow subscription cleaned', sub);
@@ -146,7 +145,7 @@ export const RpcCalls = () => {
   }, []);
 
   const handleRpcParamChange = useCallback((index: number, args: unknown) => {
-    setCallParams(params => {
+    setCallParams((params) => {
       if (!params || params.length === 0) {
         return [];
       }
@@ -161,12 +160,12 @@ export const RpcCalls = () => {
   }, []);
 
   const handleStorageUnsubscribe = useCallback((id: string) => {
-    setQueries(queries => queries.filter(query => query.id !== id));
+    setQueries((queries) => queries.filter((query) => query.id !== id));
   }, []);
 
   const handleRpcSubmit = useCallback(() => {
     if (palletSelected && methodSelected) {
-      setQueries(queries => ([
+      setQueries((queries) => ([
         {
           pallet: palletSelected,
           method: methodSelected,
@@ -176,6 +175,7 @@ export const RpcCalls = () => {
         ...queries,
       ]));
     }
+    
   }, [
     callParams,
     palletSelected,
@@ -214,8 +214,8 @@ export const RpcCalls = () => {
           && rpcCall?.params?.length > 0 && (
             <RpcParams
               key={`rpc-param-${palletSelected}-${methodSelected}`}
-              params={rpcCall.params}
               onChange={handleRpcParamChange}
+              params={rpcCall.params}
             />
           )
         }
@@ -232,8 +232,8 @@ export const RpcCalls = () => {
           queries.map((query) => (
             <Query
               key={`query-result-${query.pallet}-${query.method}-${query.id}`}
-              querie={query}
               onUnsubscribe={handleStorageUnsubscribe}
+              querie={query}
               unCleanedSubscriptions={refUncleanedSubscriptions}
             />
           ))
@@ -255,15 +255,21 @@ const Query = ({
 }) => {
 
   const rawClient = useStoreChain?.use?.rawClient?.();
-
   const rawClientSubscription = useStoreChain?.use?.rawClientSubscription?.();
   const dynamicBuilder = useDynamicBuilder();
 
-  const [result, setResult] = useState<unknown>();
-  const [isLoading, setIsLoading] = useState(true);
+  const [
+    result,
+    setResult,
+  ] = useState<unknown>();
+  const [
+    isLoading,
+    setIsLoading,
+  ] = useState(true);
 
   const refFollowSubscription = useRef('');
   const call = `${querie.pallet}_${querie.method}`;
+
   useEffect(() => {
 
     const catchError = (err: Error) => {
@@ -294,7 +300,7 @@ const Query = ({
             break;
           case 'chainHead_v1_unfollow':
             runRawQuery(() => {
-              unCleanedSubscriptions.current = unCleanedSubscriptions.current.filter(sub => sub !== querie.args.at(0)?.value as string);
+              unCleanedSubscriptions.current = unCleanedSubscriptions.current.filter((sub) => sub !== querie.args.at(0)?.value as string);
             });
             break;
           case 'chainHead_v1_header':
@@ -313,7 +319,7 @@ const Query = ({
               .then((res) => {
                 setResult({
                   raw: res,
-                  decoded: res.map(extrinsic => decodeExtrinsic(extrinsic)),
+                  decoded: res.map((extrinsic) => decodeExtrinsic(extrinsic)),
                 });
                 setIsLoading(false);
               })
@@ -327,7 +333,7 @@ const Query = ({
               querie.args.at(3)?.value as string,
               null,
             )
-              .then(res => {
+              .then((res) => {
                 setResult(res);
                 setIsLoading(false);
               })
@@ -339,7 +345,7 @@ const Query = ({
               querie.args.at(2)?.value as string,
               querie.args.at(3)?.value as string,
             )
-              .then(res => {
+              .then((res) => {
                 if (dynamicBuilder) {
                   const args = (querie.args.at(2)?.value as string)?.split('_');
 
@@ -431,7 +437,10 @@ const Query = ({
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [querie, rawClient]);
+  }, [
+    querie,
+    rawClient,
+  ]);
 
   const handleUnsubscribe = useCallback(() => {
     onUnsubscribe(querie.id);
@@ -452,11 +461,11 @@ const Query = ({
 
   return (
     <QueryResult
-      title="Rpc Call"
-      path={`${querie.pallet}_${querie.method}`}
       isLoading={isLoading}
-      result={result}
       onRemove={handleUnsubscribe}
+      path={`${querie.pallet}_${querie.method}`}
+      result={result}
+      title="Rpc Call"
     />
   );
 };

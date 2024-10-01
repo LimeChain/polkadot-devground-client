@@ -36,9 +36,9 @@ export const Row = (props: IRowProps) => {
 
   return (
     <PDLink
-      to={blockNumber}
       className={className}
       style={style}
+      to={blockNumber}
     >
       <div>
         <span>
@@ -49,16 +49,16 @@ export const Row = (props: IRowProps) => {
           isFinalized
             ? (
               <Icon
-                size={[16]}
-                name="icon-checked"
                 className="text-dev-green-600"
+                name="icon-checked"
+                size={[16]}
               />
             )
             : (
               <Icon
-                size={[16]}
-                name="icon-clock"
                 className="animate-rotate text-dev-yellow-700"
+                name="icon-clock"
+                size={[16]}
               />
             )
         }
@@ -66,8 +66,15 @@ export const Row = (props: IRowProps) => {
       <div>
         <span>
           <span className="text-dev-black-300 dark:text-dev-purple-300">Includes </span>
-          <span>{extrinsicsLength} Extrinsics </span>
-          {eventsLength} Events
+          <span>
+            {extrinsicsLength}
+            {' '}
+            Extrinsics
+            {' '}
+          </span>
+          {eventsLength}
+          {' '}
+          Events
         </span>
         <span>{timeAgo}</span>
       </div>

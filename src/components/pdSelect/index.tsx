@@ -35,7 +35,10 @@ export const PDSelect = ({
   emptyPlaceHolder = 'No Items',
   disabled = false,
 }: IPDSelect) => {
-  const [container, setContainer] = useState<HTMLDivElement>();
+  const [
+    container,
+    setContainer,
+  ] = useState<HTMLDivElement>();
 
   const refContainer = useCallback((node: HTMLDivElement) => {
     if (node) {
@@ -68,13 +71,13 @@ export const PDSelect = ({
           )}
         >
           <SelectPrimitive.Value
-            asChild
             placeholder={(
               <SelectPlaceholder
                 label={label}
                 value={placeholder || emptyPlaceHolder}
               />
             )}
+            asChild
           >
             <div className="flex flex-col items-start gap-1">
               {
@@ -94,7 +97,10 @@ export const PDSelect = ({
             </div>
           </SelectPrimitive.Value>
           <SelectPrimitive.Icon className="shrink-0">
-            <Icon name="icon-dropdownArrow" size={[24]} />
+            <Icon
+              name="icon-dropdownArrow"
+              size={[24]}
+            />
           </SelectPrimitive.Icon>
         </SelectPrimitive.Trigger>
         <SelectPrimitive.Portal>
@@ -142,7 +148,10 @@ const SelectItem = ({ children, value }: ISelectItem) => {
       )}
     >
       <SelectPrimitive.ItemIndicator className="absolute left-2 top-1/2 -translate-y-1/2">
-        <Icon name="icon-check" size={[16]} />
+        <Icon
+          name="icon-check"
+          size={[16]}
+        />
       </SelectPrimitive.ItemIndicator>
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
     </SelectPrimitive.Item>

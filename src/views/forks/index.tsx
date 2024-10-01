@@ -19,7 +19,10 @@ const Forks = () => {
 
   const refSubscription = useRef<Subscription | null>(null);
 
-  const [items, setItems] = useState<Record<string, IBlockItem[]>>({});
+  const [
+    items,
+    setItems,
+  ] = useState<Record<string, IBlockItem[]>>({});
 
   const resetState = useCallback(() => {
     refSubscription.current?.unsubscribe?.();
@@ -33,7 +36,7 @@ const Forks = () => {
 
     resetState();
 
-    refSubscription.current = client.bestBlocks$.subscribe(bestBlocks => {
+    refSubscription.current = client.bestBlocks$.subscribe((bestBlocks) => {
       const bestBlock = bestBlocks.at(0);
       const finalizedBlock = bestBlocks.at(-1);
 
@@ -42,7 +45,7 @@ const Forks = () => {
         const blockHash = bestBlock.hash;
         const parentBlockHash = bestBlock.parent;
 
-        setItems(forks => {
+        setItems((forks) => {
           const isFirstFork = typeof forks?.[blockNumber] === 'undefined';
           const forkIndex = isFirstFork ? 0 : forks[blockNumber].length;
 
@@ -62,7 +65,10 @@ const Forks = () => {
           if (isFirstFork) {
             return groupData({ ...forks, [blockNumber]: [newFork] });
           } else {
-            return groupData({ ...forks, [blockNumber]: [...forks[blockNumber], newFork] });
+            return groupData({ ...forks, [blockNumber]: [
+              ...forks[blockNumber],
+              newFork,
+            ] });
           }
         });
       }
@@ -71,20 +77,20 @@ const Forks = () => {
         const blockNumber = finalizedBlock.number;
         const blockHash = finalizedBlock.hash;
 
-        setItems(forks => {
+        setItems((forks) => {
           const blockForks = forks[blockNumber];
           if (!blockForks) {
             return forks;
           }
 
-          const forkIndex = blockForks.find(fork => fork.blockHash === blockHash)?.index || 0;
+          const forkIndex = blockForks.find((fork) => fork.blockHash === blockHash)?.index || 0;
           if (blockForks[forkIndex].isFinalized) {
             return forks;
           }
 
           return {
             ...forks,
-            [blockNumber]: forks[blockNumber].map(block => {
+            [blockNumber]: forks[blockNumber].map((block) => {
               if (block.blockHash === blockHash) {
                 block.isFinalized = true;
                 return block;
@@ -101,7 +107,11 @@ const Forks = () => {
       resetState();
     };
 
-  }, [client, chain, resetState]);
+  }, [
+    client,
+    chain,
+    resetState,
+  ]);
 
   return <VirtualizedList items={items} />;
 };

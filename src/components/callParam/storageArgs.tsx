@@ -21,6 +21,9 @@ export const StorageArgs = ({ storage, onChange }: IStorageArgs) => {
   const keyVariable = lookup!(storageType.value.key);
 
   return (
-    <CodecParam variable={keyVariable} onChange={onChange} />
+    <CodecParam
+      onChange={onChange}
+      variable={keyVariable}
+    />
   );
 };

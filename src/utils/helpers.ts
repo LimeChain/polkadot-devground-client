@@ -54,6 +54,17 @@ export const setSearchParam = (
   }
 };
 
+/**
+ * stringifyBigIntValues - A replacer function for JSON.stringify that converts BigInt values to strings.
+ *
+ * @param {string} _key - The key of the property being stringified.
+ * @param {unknown} value - The value of the property being stringified.
+ * @returns {unknown} - The value of the property being stringified.
+ */
+export const stringifyBigIntValues = (_key: string, value: unknown) => {
+  return typeof value === 'bigint' ? value.toString() : value;
+};
+
 export const debounce = (func:(...args:unknown[]) => unknown, wait: number) => {
   let timeout:NodeJS.Timeout;
 
@@ -120,7 +131,7 @@ export const formatTokenValue = (
     tokenDecimals?: number;
     precision?: number;
   }) => {
-  return (value / 10 ** tokenDecimals).toFixed(precision);
+  return (value / (10 ** tokenDecimals)).toFixed(precision);
 };
 
 // @TODO: fix types

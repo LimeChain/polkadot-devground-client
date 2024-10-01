@@ -113,9 +113,9 @@ export const getBlockDetailsWithPAPI = async ({
     events,
     identity,
   ] = await Promise.all([
-    client.getBlockHeader(blockHash),
-    client.getBlockBody(blockHash),
-    getSystemEvents(api, blockHash),
+    client?.getBlockHeader(blockHash),
+    client?.getBlockBody(blockHash),
+    api && getSystemEvents(api, blockHash),
     getBlockValidator({ blockHash }),
   ]);
 
@@ -155,7 +155,7 @@ export const getBlockDetailsWithPAPI = async ({
     });
   });
 
-  events?.forEach(ev => {
+  events?.forEach((ev) => {
     if (ev.event.type === 'System') {
       const extrinsicIsSuccess = ev.event.value.type === 'ExtrinsicSuccess';
       const extrinsicIndex = ev.phase.value || 0;

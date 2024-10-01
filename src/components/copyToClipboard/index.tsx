@@ -39,7 +39,10 @@ export const CopyToClipboard = memo((props: ICopyToClipboardProps) => {
 
   const refTimeout = useRef<NodeJS.Timeout>();
 
-  const [isCopied, setIsCopied] = useState(false);
+  const [
+    isCopied,
+    setIsCopied,
+  ] = useState(false);
 
   useEffect(() => {
     if (isCopied) {
@@ -64,7 +67,15 @@ export const CopyToClipboard = memo((props: ICopyToClipboardProps) => {
 
       if (showToast && !!toastMessage?.length) {
         toast.loading('Copying...', { id: toastId });
-        toast.success(<span>Copied <strong>{toastMessage}</strong> to clipboard</span>, { id: toastId });
+        toast.success((
+          <span>
+            Copied
+            {' '}
+            <strong>{toastMessage}</strong>
+            {' '}
+            to clipboard
+          </span>
+        ), { id: toastId });
       }
     } catch (err) {
       onCopy?.(false, text);
@@ -72,7 +83,12 @@ export const CopyToClipboard = memo((props: ICopyToClipboardProps) => {
         toast.error('Oops. Something went wrong', { id: toastId });
       }
     }
-  }, [text, onCopy, showToast, toastMessage]);
+  }, [
+    text,
+    onCopy,
+    showToast,
+    toastMessage,
+  ]);
 
   const ClipboardIcon = useMemo(() => {
     return (
@@ -90,16 +106,21 @@ export const CopyToClipboard = memo((props: ICopyToClipboardProps) => {
       >
         <Icon
           name={`icon-${isCopied ? 'check' : 'clipboard'}`}
+          size={[iconSize]}
           className={cn(
             {
               ['text-green-500']: isCopied,
             },
           )}
-          size={[iconSize]}
         />
       </span>
     );
-  }, [className, copyToClipboard, iconSize, isCopied]);
+  }, [
+    className,
+    copyToClipboard,
+    iconSize,
+    isCopied,
+  ]);
 
   return children({
     ClipboardIcon,

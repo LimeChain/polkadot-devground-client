@@ -30,46 +30,69 @@ const ChainState = () => {
   const metadata = useStoreChain?.use?.metadata?.();
   const chain = useStoreChain?.use?.chain?.();
 
-  const palletsWithStorage = useMemo(() => metadata?.pallets?.filter(p => p.storage)?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
-  const palletSelectItems = useMemo(() => palletsWithStorage?.map(pallet => ({
+  const palletsWithStorage = useMemo(() => metadata?.pallets?.filter((p) => p.storage)?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
+  const palletSelectItems = useMemo(() => palletsWithStorage?.map((pallet) => ({
     label: pallet.name,
     value: pallet.name,
     key: `chainState-pallet-${pallet.name}`,
   })), [palletsWithStorage]);
 
-  const [palletSelected, setPalletSelected] = useState(palletsWithStorage?.at(0));
+  const [
+    palletSelected,
+    setPalletSelected,
+  ] = useState(palletsWithStorage?.at(0));
 
   const storageCalls = useMemo(() => palletSelected?.storage?.items?.sort((a, b) => a.name.localeCompare(b.name)), [palletSelected]);
   const storageCallItems = useMemo(() => {
     if (palletSelected) {
-      return storageCalls?.map(item => ({
+      return storageCalls?.map((item) => ({
         label: item.name,
         value: item.name,
         key: `chainState-call-${item.name}`,
       }));
     }
     return undefined;
-  }, [palletSelected, storageCalls]);
+  }, [
+    palletSelected,
+    storageCalls,
+  ]);
 
-  const [storageSelected, setStorageSelected] = useState(palletSelected?.storage?.items?.at?.(0));
+  const [
+    storageSelected,
+    setStorageSelected,
+  ] = useState(palletSelected?.storage?.items?.at?.(0));
 
-  const [callArgs, setCallArgs] = useState<unknown>(undefined);
-  const [encodedStorageKey, setEncodedStorageKey] = useState<string | undefined>('0x');
+  const [
+    callArgs,
+    setCallArgs,
+  ] = useState<unknown>(undefined);
+      
+  const [
+    encodedStorageKey,
+    setEncodedStorageKey,
+  ] = useState<string>('');
 
-  const [queries, setQueries] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
-  const [subscriptions, setSubscriptions] = useState<ISubscription[]>([]);
+  const [
+    queries,
+    setQueries,
+  ] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
+      
+  const [
+    subscriptions,
+    setSubscriptions,
+  ] = useState<ISubscription[]>([]);
 
   useEffect(() => {
     setQueries([]);
     setCallArgs(undefined);
     setPalletSelected(undefined);
-    subscriptions.forEach(sub => {
+    subscriptions.forEach((sub) => {
       sub?.unsubscribe?.();
     });
 
     return () => {
       setQueries([]);
-      subscriptions.forEach(sub => {
+      subscriptions.forEach((sub) => {
         sub?.unsubscribe?.();
       });
     };
@@ -88,21 +111,27 @@ const ChainState = () => {
     if (palletSelected?.name && storageSelected?.name && dynamicBulder) {
       try {
         const storageCodec = dynamicBulder.buildStorage(palletSelected.name, storageSelected.name);
-        const encodedKey = storageCodec.enc(...([callArgs].filter(arg => Boolean(arg))));
+
+        const encodedKey = storageCodec.enc(...([callArgs].filter((arg) => Boolean(arg))));
         setEncodedStorageKey(encodedKey);
+
       } catch (error) {
-        setEncodedStorageKey(undefined);
+        setEncodedStorageKey('');
         console.log(error);
 
       }
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [palletSelected, storageSelected, callArgs]);
+  }, [
+    palletSelected,
+    storageSelected,
+    callArgs,
+  ]);
 
   const handlePalletSelect = useCallback((selectedPalletName: string) => {
     if (palletsWithStorage) {
-      const selectedPallet = palletsWithStorage.find(pallet => pallet.name === selectedPalletName);
+      const selectedPallet = palletsWithStorage.find((pallet) => pallet.name === selectedPalletName);
 
       if (selectedPallet) {
         setPalletSelected(selectedPallet);
@@ -114,7 +143,7 @@ const ChainState = () => {
 
   const handleStorageSelect = useCallback((selectedCallName: string) => {
     if (palletSelected) {
-      const selectedStorage = palletSelected.storage?.items.find(item => item.name === selectedCallName);
+      const selectedStorage = palletSelected.storage?.items.find((item) => item.name === selectedCallName);
       setStorageSelected(selectedStorage);
       setCallArgs(undefined);
     }
@@ -122,27 +151,37 @@ const ChainState = () => {
 
   const handleStorageQuerySubmit = useCallback(() => {
     if (palletSelected?.name && storageSelected?.name && dynamicBulder) {
-      setQueries(queries => ([{
-        pallet: palletSelected.name,
-        storage: storageSelected.name,
-        id: crypto.randomUUID(),
-        args: callArgs,
-      }, ...queries]));
+      setQueries((queries) => ([
+        {
+          pallet: palletSelected.name,
+          storage: storageSelected.name,
+          id: crypto.randomUUID(),
+          args: callArgs,
+        },
+        ...queries,
+      ]));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [palletSelected, storageSelected, callArgs]);
+  }, [
+    palletSelected,
+    storageSelected,
+    callArgs,
+  ]);
 
   const handleStorageSubscribe = useCallback((subscription: ISubscription) => {
-    setSubscriptions(subs => ([...subs, subscription]));
+    setSubscriptions((subs) => ([
+      ...subs,
+      subscription,
+    ]));
   }, []);
 
   const handleStorageUnsubscribe = useCallback((id: string) => {
-    setQueries(queries => queries.filter(query => query.id !== id));
+    setQueries((queries) => queries.filter((query) => query.id !== id));
 
-    const subscriptionToCancel = subscriptions.find(sub => sub.id === id);
+    const subscriptionToCancel = subscriptions.find((sub) => sub.id === id);
     if (subscriptionToCancel) {
       subscriptionToCancel.unsubscribe();
-      setSubscriptions(subs => subs.filter(sub => sub.id !== id));
+      setSubscriptions((subs) => subs.filter((sub) => sub.id !== id));
     }
   }, [subscriptions]);
 
@@ -155,10 +194,10 @@ const ChainState = () => {
       <QueryFormContainer>
         <div className="grid w-full grid-cols-2 gap-4">
           <PDSelect
-            label="Select Pallet"
             emptyPlaceHolder="No pallets available"
             placeholder="Please select a pallet"
             items={[palletSelectItems || []]}
+            label="Select Pallet"
             onChange={handlePalletSelect}
             value={palletSelected?.name}
           />
@@ -184,23 +223,30 @@ const ChainState = () => {
               key={`storage-param-${storageSelected.name}`}
               storage={storageSelected}
               onChange={setCallArgs}
+              storage={storageSelected}
             />
           )
         }
 
         <QueryButton onClick={handleStorageQuerySubmit}>
-          Subscribe to {palletSelected?.name}/{storageSelected?.name}
+          Subscribe to
+          {' '}
+          {palletSelected?.name}
+          /
+          {storageSelected?.name}
         </QueryButton>
 
         {
           (encodedStorageKey) && (
             <p className="break-all">
-              Encoded Storage Key: <br /> {encodedStorageKey}
+              <br />
+              {' '}
+              {encodedStorageKey}
             </p>
           )
         }
 
-        <CallDocs docs={storageSelected?.docs?.filter(d => d) || []} />
+        <CallDocs docs={storageSelected?.docs?.filter((d) => d) || []} />
 
       </QueryFormContainer>
       <QueryResultContainer>
@@ -208,9 +254,9 @@ const ChainState = () => {
           queries.map((query) => (
             <Query
               key={`query-result-${query.pallet}-${query.storage}-${query.id}`}
-              querie={query}
               onSubscribe={handleStorageSubscribe}
               onUnsubscribe={handleStorageUnsubscribe}
+              querie={query}
             />
           ))
         }
@@ -233,8 +279,14 @@ const Query = (
   }) => {
   const api = useStoreChain?.use?.api?.() as TRelayApi;
 
-  const [result, setResult] = useState<unknown>();
-  const [isLoading, setIsLoading] = useState(true);
+  const [
+    result,
+    setResult,
+  ] = useState<unknown>();
+  const [
+    isLoading,
+    setIsLoading,
+  ] = useState(true);
 
   useEffect(() => {
     const catchError = (err: Error) => {
@@ -262,19 +314,25 @@ const Query = (
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [querie, api]);
+  }, [
+    querie,
+    api,
+  ]);
 
   const handleUnsubscribe = useCallback(() => {
     onUnsubscribe(querie.id);
-  }, [querie, onUnsubscribe]);
+  }, [
+    querie,
+    onUnsubscribe,
+  ]);
 
   return (
     <QueryResult
-      title="Storage Subscription"
-      path={`${querie.pallet}/${querie.storage}`}
       isLoading={isLoading}
-      result={result}
       onRemove={handleUnsubscribe}
+      path={`${querie.pallet}/${querie.storage}`}
+      result={result}
+      title="Storage Subscription"
     />
   );
 };

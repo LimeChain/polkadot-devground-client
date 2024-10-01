@@ -59,7 +59,10 @@ export const Results = (props: IResultProps) => {
   } = props;
   const { blockNumber, extrinsics } = results;
 
-  const [filter, setFilter] = useState<string>(type);
+  const [
+    filter,
+    setFilter,
+  ] = useState<string>(type);
 
   const showExtrinsics = filter === 'all' || filter === 'extrinsics';
   const showBlock = filter === 'all' || filter === 'block';
@@ -90,31 +93,35 @@ export const Results = (props: IResultProps) => {
         )}
       >
         <Button
-          type="all"
-          onClick={handleFilter}
           isActive={filter === 'all'}
+          onClick={handleFilter}
+          type="all"
         >
           All
         </Button>
         <Button
-          type="block"
-          onClick={handleFilter}
           isActive={filter === 'block'}
+          onClick={handleFilter}
+          type="block"
         >
-          Blocks ({blockNumber ? 1 : 0})
+          Blocks (
+          {blockNumber ? 1 : 0}
+          )
         </Button>
         <Button
-          type="extrinsics"
-          onClick={handleFilter}
           isActive={filter === 'extrinsics'}
+          onClick={handleFilter}
+          type="extrinsics"
         >
-          Extrinsics ({extrinsics?.length || 0})
+          Extrinsics (
+          {extrinsics?.length || 0}
+          )
         </Button>
       </div>
       <PDScrollArea
+        className="flex max-h-80 flex-col gap-4"
         verticalScrollClassNames="py-4"
         verticalScrollThumbClassNames="before:bg-dev-purple-700 dark:before:bg-dev-purple-300"
-        className="flex max-h-80 flex-col gap-4"
       >
         {
           showBlock && blockNumber && (
@@ -124,7 +131,9 @@ export const Results = (props: IResultProps) => {
                 'font-geist text-dev-white-1000 font-body2-regular dark:text-dev-black-1000',
               )}
               >
-                Blocks ({blockNumber ? 1 : 0})
+                Blocks (
+                {blockNumber ? 1 : 0}
+                )
               </p>
               <PDLink
                 to={`/explorer/${blockNumber}`}
@@ -137,7 +146,11 @@ export const Results = (props: IResultProps) => {
               >
                 <p className="font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000">
                   Block#
-                  <span className="font-body2-bold"> {blockNumber}</span>
+                  {' '}
+                  <span className="font-body2-bold">
+                    {' '}
+                    {blockNumber}
+                  </span>
                 </p>
                 <p className="font-geist text-dev-white-1000 font-body3-regular dark:text-dev-black-1000">
                   Block
@@ -156,7 +169,9 @@ export const Results = (props: IResultProps) => {
                   'font-geist text-dev-white-1000 font-body2-regular dark:text-dev-black-1000',
                 )}
               >
-                Extrinsics ({extrinsics?.length})
+                Extrinsics (
+                {extrinsics?.length}
+                )
               </p>
 
               {
@@ -174,7 +189,11 @@ export const Results = (props: IResultProps) => {
                   >
                     <p className="font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000">
                       Extrinsic#
-                      <span className="font-body2-bold"> {extrinsic?.id}</span>
+                      {' '}
+                      <span className="font-body2-bold">
+                        {' '}
+                        {extrinsic?.id}
+                      </span>
                     </p>
                     <p className="font-geist text-dev-white-1000 font-body3-regular dark:text-dev-black-1000">
                       Extrinsic

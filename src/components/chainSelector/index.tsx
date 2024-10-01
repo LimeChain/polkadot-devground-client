@@ -25,7 +25,7 @@ import type {
 
 const CHAIN_GROUPS = Object.keys(SUPPORTED_CHAIN_GROUPS);
 const ALL_CHAINS = CHAIN_GROUPS.reduce((acc: ISupportedChainGroups['<chain_name>']['chains'], curr) => {
-  SUPPORTED_CHAIN_GROUPS[curr].chains.forEach(chain => {
+  SUPPORTED_CHAIN_GROUPS[curr].chains.forEach((chain) => {
     acc.push(chain);
   });
   return acc;
@@ -34,9 +34,18 @@ const ALL_CHAINS = CHAIN_GROUPS.reduce((acc: ISupportedChainGroups['<chain_name>
 export const ChainSelector = () => {
   const { setChain } = useStoreChain.use.actions();
 
-  const [selectedChainGroup, setSelectedChainGroup] = useState('');
-  const [filteredChains, setFilteredChains] = useState<ISupportedChainGroups['<chain_name>']['chains']>(ALL_CHAINS);
-  const [query, setQuery] = useState('');
+  const [
+    selectedChainGroup,
+    setSelectedChainGroup,
+  ] = useState('');
+  const [
+    filteredChains,
+    setFilteredChains,
+  ] = useState<ISupportedChainGroups['<chain_name>']['chains']>(ALL_CHAINS);
+  const [
+    query,
+    setQuery,
+  ] = useState('');
 
   useEventBus<IEventBusSearchChain>('@@-search-chain', ({ data }) => {
     setQuery(data);
@@ -55,7 +64,7 @@ export const ChainSelector = () => {
     const chainId = e.currentTarget.getAttribute('data-chain-id') || '';
 
     // const chain = SUPPORTED_CHAIN_GROUPS[chainId].chains.find(c => c.id === chainId);
-    const chain = ALL_CHAINS.find(c => c.id === chainId);
+    const chain = ALL_CHAINS.find((c) => c.id === chainId);
 
     if (chain) {
       setChain(chain);
@@ -76,22 +85,25 @@ export const ChainSelector = () => {
     } else {
       setFilteredChains(ALL_CHAINS.filter(filterChainsByQuery));
     }
-  }, [selectedChainGroup, filterChainsByQuery]);
+  }, [
+    selectedChainGroup,
+    filterChainsByQuery,
+  ]);
 
   return (
     <div className="grid grid-cols-chainSelect">
       <PDScrollArea>
         <ul className="bg-dev-purple-100 p-2 dark:bg-dev-black-900">
           {
-            CHAIN_GROUPS.map(chainGroup => {
+            CHAIN_GROUPS.map((chainGroup) => {
               return (
                 <li
                   key={`chain-group-${chainGroup}`}
                 >
                   <button
-                    type="button"
                     data-chain-group={chainGroup}
                     onClick={handleSelectGroup}
+                    type="button"
                     className={cn(
                       'w-full p-4 text-left',
                       'font-geist font-body2-regular',
@@ -115,7 +127,9 @@ export const ChainSelector = () => {
           {
             query && (
               <span className="font-geist font-body2-regular">
-                Search Results for "{query}"
+                Search Results for "
+                {query}
+                "
               </span>
             )
           }
@@ -131,13 +145,13 @@ export const ChainSelector = () => {
                   )}
                 >
                   {
-                    filteredChains.map(chain => {
+                    filteredChains.map((chain) => {
                       return (
                         <li key={`chain-list-${chain.name}`}>
                           <button
-                            type="button"
                             data-chain-id={chain.id}
                             onClick={handleSetChain}
+                            type="button"
                             className={cn(
                               'flex w-full items-center gap-3 p-4',
                               'transition-colors',
@@ -145,9 +159,9 @@ export const ChainSelector = () => {
                             )}
                           >
                             <Icon
+                              className="shrink-0"
                               name={chain.icon}
                               size={[28]}
-                              className="shrink-0"
                             />
                             <span>
                               {chain.name}

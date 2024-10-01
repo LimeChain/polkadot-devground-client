@@ -23,15 +23,21 @@ const ChainSelectButton = () => {
   return (
     <>
       <button
-        type="button"
-        onClick={toggleVisibility}
         className="flex items-center"
+        onClick={toggleVisibility}
+        type="button"
       >
-        <Icon name={currentChain.icon} size={[28]}/>
-        <h5 className="ml-[6px] mr-3 font-h5-bold">
+        <Icon
+          name={currentChain.icon}
+          size={[28]}
+        />
+        <h5 className="ml-[6px] mr-3 hidden font-h5-bold lg:block">
           {currentChain.name}
         </h5>
-        <Icon name="icon-dropdownArrow" size={[24]} />
+        <Icon
+          name="icon-dropdownArrow"
+          size={[24]}
+        />
       </button>
       <ChainSelectModal onClose={toggleVisibility}/>
     </>

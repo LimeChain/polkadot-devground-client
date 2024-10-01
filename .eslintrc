@@ -1,4 +1,8 @@
 {
+  "env": {
+    "browser": true,
+    "node": true
+  },
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
@@ -28,46 +32,70 @@
     }
   },
   "plugins": [
+    "@typescript-eslint",
+    "@stylistic",
+    "@stylistic/jsx",
+    "eslint-plugin-react",
+    "eslint-plugin-prefer-arrow",
+    "filenames",
     "import",
     "import-newlines",
     "unused-imports",
     "react",
-    "react-hooks",
-    "eslint-plugin-react",
-    "eslint-plugin-prefer-arrow",
-    "@typescript-eslint"
+    "react-hooks"
   ],
   "rules": {
-    "jsx-quotes": [
+    "@stylistic/array-bracket-newline": [
       "error",
-      "prefer-double"
+      {
+        "multiline": true
+      }
     ],
-    "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "error",
-    "react/jsx-boolean-value": "error",
-    "react/jsx-closing-bracket-location": [
+    "@stylistic/array-element-newline": "error",
+    "@stylistic/arrow-parens": [
       "error",
-      "tag-aligned"
+      "always"
     ],
-    "react/jsx-closing-tag-location": "error",
-    "react/jsx-first-prop-new-line": [
+    "@stylistic/no-mixed-operators": "error",
+    "@stylistic/jsx/jsx-one-expression-per-line": [
+      "error",
+      {
+        "allow": "single-child"
+      }
+    ],
+    "@stylistic/jsx/jsx-child-element-spacing": "error",
+    "@stylistic/jsx/jsx-sort-props": [
+      "error",
+      {
+        "callbacksLast": false,
+        "shorthandLast": true,
+        "multiline": "last",
+        "ignoreCase": true,
+        "noSortAlphabetically": false,
+        "reservedFirst": true
+      }
+    ],
+    "@stylistic/multiline-ternary": [
+      "error",
+      "always-multiline"
+    ],
+    "@stylistic/jsx/jsx-closing-bracket-location": [
+      1,
+      "line-aligned"
+    ],
+    "@stylistic/jsx/jsx-closing-tag-location": "error",
+    "@stylistic/jsx/jsx-first-prop-new-line": [
       "error",
       "multiline-multiprop"
     ],
-    "react/jsx-key": "error",
-    "react/jsx-no-bind": "error",
-    "react/jsx-no-duplicate-props": "error",
-    "react/jsx-max-props-per-line": [
+    "@stylistic/jsx/jsx-max-props-per-line": [
       "error",
       {
-        "maximum": {
-          "single": 2,
-          "multi": 1
-        }
+        "maximum": 1,
+        "when": "always"
       }
     ],
-    "react/self-closing-comp": "error",
-    "react/jsx-wrap-multilines": [
+    "@stylistic/jsx/jsx-wrap-multilines": [
       "error",
       {
         "declaration": "parens-new-line",
@@ -79,52 +107,106 @@
         "prop": "parens-new-line"
       }
     ],
-    "react/no-danger-with-children": "error",
-    "@typescript-eslint/consistent-type-imports": "error",
-    "@typescript-eslint/indent": [
+    "@stylistic/indent": [
       "error",
       2,
       {
         "SwitchCase": 1
       }
     ],
-    "@typescript-eslint/member-delimiter-style": "error",
-    "@typescript-eslint/no-floating-promises": "error",
-    "@typescript-eslint/semi": "error",
-    "@typescript-eslint/no-empty-interface": "off",
-    "@typescript-eslint/ban-ts-comment": "off",
-    "@typescript-eslint/no-empty-function": "off",
-    "@typescript-eslint/no-explicit-any": "warn",
-    "@typescript-eslint/no-unused-vars": "error",
-    "array-bracket-spacing": [
+    "@stylistic/array-bracket-spacing": [
       "error",
       "never"
     ],
-    "arrow-spacing": "error",
-    "brace-style": [
+    "@stylistic/arrow-spacing": "error",
+    "@stylistic/brace-style": [
       "error",
       "1tbs",
       {
         "allowSingleLine": false
       }
     ],
-    "comma-dangle": [
+    "@stylistic/comma-dangle": [
       "error",
       "always-multiline"
     ],
-    "comma-spacing": "error",
-    "comma-style": "error",
-    "curly": [
-      "error",
-      "all"
-    ],
-    "dot-location": [
+    "@stylistic/comma-spacing": "error",
+    "@stylistic/comma-style": "error",
+    "@stylistic/dot-location": [
       "error",
       "property"
     ],
-    "eqeqeq": "error",
+    "@stylistic/member-delimiter-style": "error",
+    "@stylistic/semi": "error",
+    "@stylistic/key-spacing": [
+      "error",
+      {
+        "afterColon": true,
+        "beforeColon": false,
+        "mode": "strict"
+      }
+    ],
+    "@stylistic/keyword-spacing": "error",
+    "@stylistic/semi-spacing": "error",
+    "@stylistic/space-in-parens": [
+      "error",
+      "never"
+    ],
+    "@stylistic/space-infix-ops": "error",
+    "@stylistic/no-multiple-empty-lines": [
+      "error",
+      {
+        "max": 1,
+        "maxBOF": 0,
+        "maxEOF": 1
+      }
+    ],
+    "@stylistic/no-whitespace-before-property": "error",
+    "@stylistic/object-curly-spacing": [
+      "error",
+      "always"
+    ],
+    "@stylistic/operator-linebreak": [
+      "error",
+      "before",
+      {
+        "overrides": {
+          "+=": "ignore",
+          "+": "ignore",
+          "=": "ignore"
+        }
+      }
+    ],
+    "filenames/match-regex": [
+      "error",
+      "^[a-z][a-zA-Z0-9_.-]*$",
+      {
+        "ignoreExtensions": true,
+        "caseSensitive": true
+      }
+    ],
+    "jsx-quotes": [
+      "error",
+      "prefer-double"
+    ],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "error",
+    "react/jsx-boolean-value": "error",
+    "react/jsx-key": "error",
+    "react/jsx-no-bind": "error",
+    "react/jsx-no-duplicate-props": "error",
+    "react/self-closing-comp": "error",
+    "react/no-danger-with-children": "error",
+    "@typescript-eslint/consistent-type-imports": "error",
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/no-empty-object-type": "off",
+    "@typescript-eslint/no-empty-interface": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-unused-vars": "error",
     "import-newlines/enforce": [
-      "warn",
+      "error",
       {
         "items": 1,
         "semi": false
@@ -170,15 +252,7 @@
         ]
       }
     ],
-    "key-spacing": [
-      "error",
-      {
-        "afterColon": true,
-        "beforeColon": false,
-        "mode": "strict"
-      }
-    ],
-    "keyword-spacing": "error",
+    "no-unneeded-ternary": "error",
     "no-extra-boolean-cast": "off",
     "no-prototype-builtins": "off",
     "no-unused-vars": [
@@ -205,32 +279,23 @@
       }
     ],
     "no-duplicate-case": "error",
-    "no-multi-spaces": "error",
-    "no-multiple-empty-lines": [
-      "error",
-      {
-        "max": 1,
-        "maxBOF": 0,
-        "maxEOF": 1
-      }
-    ],
     "no-param-reassign": "error",
     "no-unreachable-loop": "error",
-    "no-whitespace-before-property": "error",
-    "object-curly-spacing": [
-      "error",
-      "always"
-    ],
     "object-shorthand": "error",
-    "operator-linebreak": [
-      "error",
-      "before",
+    "prefer-arrow/prefer-arrow-functions": [
+      "warn",
       {
-        "overrides": {
-          "+=": "ignore",
-          "+": "ignore",
-          "=": "ignore"
-        }
+        "disallowPrototype": true,
+        "singleReturnOnly": false,
+        "classPropertiesAllowed": false
+      }
+    ],
+    "semi": "off",
+    "sort-imports": [
+      "error",
+      {
+        "ignoreCase": true,
+        "ignoreDeclarationSort": true
       }
     ],
     "tailwindcss/no-custom-classname": "off",
@@ -251,51 +316,24 @@
       {
         "allowTemplateLiterals": true
       }
-    ],
-    "semi-spacing": "error",
-    "semi": "off",
-    "sort-imports": [
-      "error",
-      {
-        "ignoreCase": true,
-        "ignoreDeclarationSort": true
-      }
-    ],
-    "space-in-parens": [
-      "error",
-      "never"
-    ],
-    "space-infix-ops": "error"
+    ]
   },
-  "overrides": [
-    {
-      "files": [
-        "src/assets/workers/*.ts"
-      ],
-      "rules": {
-        "import/default": "off"
-      }
-    }
-  ],
   "settings": {
     "import/parsers": {
       "@typescript-eslint/parser": [
         ".js",
         ".jsx",
         ".ts",
-        ".tsx"
+        ".tsx",
+        ".txt"
       ]
     },
     "import/resolver": {
       "typescript": {
         "project": [
-          "app/tsconfig.json",
-          "packages/*/tsconfig.json"
+          "./tsconfig.json"
         ]
       }
-    },
-    "react": {
-      "version": "detect"
     }
   }
 }

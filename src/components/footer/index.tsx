@@ -19,19 +19,22 @@ export const Footer = () => {
       )}
     >
       <PDLink
+        className="flex items-center gap-2"
         target="_blank"
         to={LINK_LIMECHAIN}
-        className="flex items-center gap-2"
       >
         <span className="font-body2-regular">Made by</span>
         <Icon
           name="logo-limeChain"
-          size={[94, 28]}
+          size={[
+            94,
+            28,
+          ]}
         />
       </PDLink>
       <div className="flex items-center gap-5">
         {
-          footerLinks.map(link => {
+          footerLinks.map((link) => {
             return (
               <FooterLink
                 key={`footer-link-${link.linkProps.to}`}
