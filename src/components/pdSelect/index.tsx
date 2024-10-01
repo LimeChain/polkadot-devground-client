@@ -220,9 +220,10 @@ const SelectViewport = ({
         groups && groups?.length > 1
         && (
           <div className={cn(
-            "flex gap-2 px-2 -mb-1",
-            'border-b dark:border-dev-purple-300 border-dev-purple-700'
-          )}>
+            '-mb-1 flex gap-2 px-2',
+            'border-b border-dev-purple-700 dark:border-dev-purple-300',
+          )}
+          >
             {
               groups.map((group, index) => (
                 <button
