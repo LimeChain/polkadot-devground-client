@@ -73,7 +73,7 @@ export const CurvedLineWithArrow = ({
 }: IArrowProps) => {
   const defaultConfig = {
     arrowStrokeColor: '#B3B3B3',
-    arrowHeadEndingSize: 24,
+    arrowHeadEndingSize: 20,
     lineStrokeWidth: 2,
     curveRadius: 30,
   };
@@ -159,12 +159,12 @@ export const CurvedLineWithArrow = ({
             stroke={strokeColor}
             strokeLinecap="round"
             strokeWidth={lineStrokeWidth}
-            xTranslate={((p4.x - arrowHeadOffset) * 2) - (lineStrokeWidth)}
+            xTranslate={p4.x - (arrowHeadOffset * 2) - lineStrokeWidth}
             yTranslate={p4.y - arrowHeadOffset + topOffset}
             d={`
-            M ${(arrowHeadEndingSize / 5) * 2} 0
+            M ${arrowHeadEndingSize / (5 * 2)} 0
             L ${arrowHeadEndingSize} ${arrowHeadEndingSize / 2}
-            L ${(arrowHeadEndingSize / 5) * 2} ${arrowHeadEndingSize}`}
+            L ${arrowHeadEndingSize / (5 * 2)} ${arrowHeadEndingSize}`}
           />
         </g>
       </Endings>
