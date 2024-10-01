@@ -12,8 +12,8 @@ import { PDScrollArea } from '@components/pdScrollArea';
 import { Tabs } from '@components/tabs';
 import { snippets } from '@constants/snippets';
 import { cn } from '@utils/helpers';
+import { NotFound } from '@views/notFound';
 
-import NotFound from './components/notFound';
 import Search from './components/Search';
 
 const Onboarding = () => {
@@ -49,8 +49,18 @@ const Onboarding = () => {
             'after:text-dev-pink-500 after:content-["]"]',
           )}
         >
-        Select Example
+          Select Example
         </h1>
+        <PDLink
+          to={`/code`}
+          className={cn(
+            'absolute right-20 top-0',
+            'mt-1 px-3 py-4',
+            'font-geist font-body1-bold',
+          )}
+        >
+          Skip
+        </PDLink>
         <Tabs
           refContainer={refContainer}
           initialTab={initialTab}
@@ -61,10 +71,10 @@ const Onboarding = () => {
         >
           <div
             data-title="Default"
-            className="grid h-full grid-rows-[auto_1fr]"
+            className="flex flex-col"
           >
             <Search onChange={handleSearch} />
-            <PDScrollArea className="h-[20vh]">
+            <PDScrollArea className="h-[calc(100vh-550px)] grow overflow-y-auto">
               <ul>
                 {
                   filteredSnippets.map((snippet, index) => (
@@ -88,7 +98,7 @@ const Onboarding = () => {
               </ul>
             </PDScrollArea>
             <button onClick={toggleVisibility} className="mt-10 text-center font-body1-regular">
-            Have any ideas about Example? Request example here.
+              Have any ideas about Example? Request example here.
             </button>
           </div>
           <div data-title="Custom" className="px-16">
@@ -96,16 +106,6 @@ const Onboarding = () => {
           </div>
         </Tabs >
         <RequestExampleModal onClose={toggleVisibility} />
-        <PDLink
-          to={`/code`}
-          className={cn(
-            'absolute right-20',
-            'mt-1 px-3 py-4',
-            'font-geist font-body1-bold',
-          )}
-        >
-          Skip
-        </PDLink>
       </div>
     </>
   );
