@@ -114,17 +114,19 @@ export const Tabs = (props: TabsProps) => {
                 )}
               >
                 {title}
-                {chip?.content && (
-                  <div
-                    className={cn(
-                      'ml-3',
-                      'z-10 text-gray-400 group-hover:text-white',
-                      chip.classNames,
-                    )}
-                  >
-                    {chip.content}
-                  </div>
-                )}
+                {
+                  chip?.content && (
+                    <div
+                      className={cn(
+                        'ml-3',
+                        'z-10 text-gray-400 group-hover:text-white',
+                        chip.classNames,
+                      )}
+                    >
+                      {chip.content}
+                    </div>
+                  )
+                }
               </div>
             );
           })

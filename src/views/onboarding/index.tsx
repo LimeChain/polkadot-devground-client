@@ -1,23 +1,23 @@
 import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import {
+  useCallback,
+  useEffect,
   useRef,
   useState,
 } from 'react';
 
 import { Icon } from '@components/icon';
 import { ModalRequestExample } from '@components/modals/modalRequestExample';
+import { PDLink } from '@components/pdLink';
 import { PDScrollArea } from '@components/pdScrollArea';
 import { Tabs } from '@components/tabs';
 import { snippets } from '@constants/snippets';
-import { useStoreAuth } from '@stores';
 import { cn } from '@utils/helpers';
 
 import NotFound from './components/notFound';
-import Search from './components/search';
+import Search from './components/Search';
 
 const Onboarding = () => {
-  const isAuthenticated = useStoreAuth.use.jwtToken?.();
-  const { authorize } = useStoreAuth.use.actions();
   const [
     RequestExampleModal,
     toggleVisibility,
@@ -31,8 +31,16 @@ const Onboarding = () => {
     snippet.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
+  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('hasVisitedOnboarding', 'true');
+  }, []);
+
   return (
-    <div className="disable-vertical-scroll grid justify-center">
+    <div className="disable-vertical-scroll grid h-screen grid-rows-[auto_1fr] justify-center">
       <h1
         className={cn(
           'pb-4',
@@ -48,20 +56,21 @@ const Onboarding = () => {
         initialTab={initialTab}
         onChange={setInitialTab}
         unmountOnHide={false}
-        tabClassName="px-2 py-2 mb-10"
+        tabClassName="w-full justify-center"
+        tabsClassName="mb-10 p-1"
       >
         <div
           data-title="Default"
+          className="grid h-full grid-rows-[auto_1fr]"
         >
-          <Search onChange={e => setSearchQuery(e.target.value)} />
-          <PDScrollArea
-            className="h-48 w-full"
-          >
+          <Search onChange={handleSearch} />
+          <PDScrollArea className="h-72">
             <ul>
               {
                 filteredSnippets.map((snippet, index) => (
                   <li key={index}>
-                    <button
+                    <PDLink
+                      to={`/code?s=${snippet.id}`}
                       className={cn(
                         'flex w-full items-center justify-between',
                         'mt-1 px-3 py-4',
@@ -76,7 +85,7 @@ const Onboarding = () => {
                         name="icon-dropdownArrow"
                         className="-rotate-90"
                       />
-                    </button>
+                    </PDLink>
                   </li>
                 ))
               }
@@ -90,7 +99,6 @@ const Onboarding = () => {
           <NotFound />
         </div>
       </Tabs >
-
       <RequestExampleModal onClose={toggleVisibility} />
     </div>
   );
