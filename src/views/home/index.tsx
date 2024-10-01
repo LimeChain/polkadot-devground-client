@@ -31,6 +31,7 @@ const Home = () => {
 
         <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-3">
           <CardLink
+            description={'With devGround’s custom IDE, safely execute selected JavaScript snippets within the ecosystem.'}
             iconName="icon-brackets"
             title="Developer Console"
             to={hasVisited ? '/code' : '/onboarding'}

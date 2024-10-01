@@ -23,10 +23,16 @@ const Onboarding = () => {
   ] = useToggleVisibility(ModalRequestExample);
 
   const refContainer = useRef<HTMLDivElement | null>(null);
-  const [initialTab, setInitialTab] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [
+    initialTab,
+    setInitialTab,
+  ] = useState(0);
+  const [
+    searchQuery,
+    setSearchQuery,
+  ] = useState('');
 
-  const filteredSnippets = snippets.filter(snippet =>
+  const filteredSnippets = snippets.filter((snippet) =>
     snippet.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
@@ -62,16 +68,16 @@ const Onboarding = () => {
           Skip
         </PDLink>
         <Tabs
-          refContainer={refContainer}
           initialTab={initialTab}
           onChange={setInitialTab}
-          unmountOnHide={false}
+          refContainer={refContainer}
           tabClassName="w-full justify-center"
           tabsClassName="mb-10 p-1"
+          unmountOnHide={false}
         >
           <div
-            data-title="Default"
             className="flex flex-col"
+            data-title="Default"
           >
             <Search onChange={handleSearch} />
             <PDScrollArea className="h-[calc(100vh-550px)] grow overflow-y-auto">
@@ -97,11 +103,17 @@ const Onboarding = () => {
                 }
               </ul>
             </PDScrollArea>
-            <button onClick={toggleVisibility} className="mt-10 text-center font-body1-regular">
+            <button
+              className="mt-10 text-center font-body1-regular"
+              onClick={toggleVisibility}
+            >
               Have any ideas about Example? Request example here.
             </button>
           </div>
-          <div data-title="Custom" className="px-16">
+          <div
+            className="px-16"
+            data-title="Custom"
+          >
             <NotFound />
           </div>
         </Tabs >
