@@ -31,10 +31,9 @@ const Home = () => {
 
         <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-3">
           <CardLink
-            description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut purus eget sapien. Sed ut purus eget sapien."
             iconName="icon-brackets"
             title="Developer Console"
-            to={!hasVisited ? '/code' : '/onboarding'}
+            to={hasVisited ? '/code' : '/onboarding'}
           />
           {HOME_LINKS.map((card) => (
             <CardLink
