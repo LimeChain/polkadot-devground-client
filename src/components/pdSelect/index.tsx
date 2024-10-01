@@ -195,6 +195,7 @@ const SelectViewport = ({
     setSelectedGroupIndex,
   ] = useState(() => {
     // Find the group index of the selected item
+    // TODO: Optimize group find alg
     if (items) {
       for (let i = 0; i < items.length; i++) {
         for (let j = 0; j < items[i].length; j++) {
