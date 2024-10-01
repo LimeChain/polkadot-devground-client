@@ -219,7 +219,11 @@ const SelectViewport = ({
       {
         groups && groups?.length > 1
         && (
-          <div className="flex gap-2 px-2">
+          <div className={cn(
+            '-mb-1 flex gap-2 px-2',
+            'border-b border-dev-purple-700 dark:border-dev-purple-300',
+          )}
+          >
             {
               groups.map((group, index) => (
                 <button
@@ -228,6 +232,7 @@ const SelectViewport = ({
                   onClick={handleGroupSelect}
                   className={cn(
                     'px-2 py-3',
+                    '-mb-[1px]',
                     'border-b-[3px] border-transparent',
                     'transition-colors',
                     'hover:border-dev-pink-300',
