@@ -195,10 +195,10 @@ const ChainState = () => {
         <div className="grid w-full grid-cols-2 gap-4">
           <PDSelect
             emptyPlaceHolder="No pallets available"
-            placeholder="Please select a pallet"
             items={[palletSelectItems || []]}
             label="Select Pallet"
             onChange={handlePalletSelect}
+            placeholder="Please select a pallet"
             value={palletSelected?.name}
           />
 
@@ -206,11 +206,11 @@ const ChainState = () => {
             storageCallItems && (
               <PDSelect
                 key={`storage-select-${palletSelected?.name}`}
-                label="Select Storage"
                 emptyPlaceHolder="No storages available"
-                placeholder="Please select a storage"
                 items={[storageCallItems]}
+                label="Select Storage"
                 onChange={handleStorageSelect}
+                placeholder="Please select a storage"
                 value={storageSelected?.name}
               />
             )
@@ -221,8 +221,8 @@ const ChainState = () => {
           storageSelected && (
             <StorageArgs
               key={`storage-param-${storageSelected.name}`}
-              storage={storageSelected}
               onChange={setCallArgs}
+              storage={storageSelected}
             />
           )
         }

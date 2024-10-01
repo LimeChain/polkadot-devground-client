@@ -229,20 +229,20 @@ const Extrinsics = () => {
         <div className="grid w-full grid-cols-2 gap-4">
           <PDSelect
             emptyPlaceHolder="No pallets available"
-            label="Select Pallet"
             items={[palletSelectItems]}
-            value={palletSelected?.name}
+            label="Select Pallet"
             onChange={handlePalletSelect}
+            value={palletSelected?.name}
           />
           {
             (callSelectItems.length > 0) && (
               <PDSelect
                 key={`call-select-${palletSelected?.name}`}
                 emptyPlaceHolder="No calls available"
-                label="Select Call"
                 items={[callSelectItems]}
-                value={callSelected?.name}
+                label="Select Call"
                 onChange={handleCallSelect}
+                value={callSelected?.name}
               />
             )
           }

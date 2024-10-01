@@ -98,15 +98,15 @@ export const QueryResult = ({
                 <>
                   Result
                   <JsonView
-                    theme="atom"
-                    src={unwrapApiResult(result)}
-                    enableClipboard
                     collapseObjectsAfterLength={8}
+                    src={unwrapApiResult(result)}
+                    theme="atom"
                     style={{
                       borderRadius: 8,
                       backgroundColor: theme === 'dark' ? '#252525' : '#FBFCFE',
                       padding: 16,
                     }}
+                    enableClipboard
                   />
                 </>
               )

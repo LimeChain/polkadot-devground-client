@@ -117,8 +117,8 @@ export const PDSelect = ({
             }}
           >
             <SelectViewport
-              items={items}
               groups={groups}
+              items={items}
               value={value}
             />
           </SelectPrimitive.Content>
@@ -190,7 +190,10 @@ const SelectViewport = ({
   groups,
   value,
 }: Pick<IPDSelect, 'items' | 'groups' | 'value'>) => {
-  const [selectedGroupIndex, setSelectedGroupIndex] = useState(() => {
+  const [
+    selectedGroupIndex,
+    setSelectedGroupIndex,
+  ] = useState(() => {
     // Find the group index of the selected item
     if (items) {
       for (let i = 0; i < items.length; i++) {
@@ -220,8 +223,8 @@ const SelectViewport = ({
               groups.map((group, index) => (
                 <button
                   key={`pdselect-group-${group}`}
-                  onClick={handleGroupSelect}
                   data-groupid={index}
+                  onClick={handleGroupSelect}
                   className={cn(
                     'px-2 py-3',
                     'border-b-[3px] border-transparent',
@@ -241,7 +244,7 @@ const SelectViewport = ({
         )}
       <SelectPrimitive.Viewport className="max-h-96">
         {
-          items?.[selectedGroupIndex]?.map(item => {
+          items?.[selectedGroupIndex]?.map((item) => {
             return (
               <SelectItem
                 key={item.key}

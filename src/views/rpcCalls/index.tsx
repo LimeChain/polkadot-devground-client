@@ -76,14 +76,23 @@ export const RpcCalls = () => {
     setQueries([]);
   }, [chain.id]);
 
-  const [methodSelectItems, setMethodSelectItems] = useState<IPDSelectItem[]>([]);
-  const [methodSelected, setMethodSelected] = useState(methodSelectItems.at(0)?.value);
+  const [
+    methodSelectItems,
+    setMethodSelectItems,
+  ] = useState<IPDSelectItem[]>([]);
+  const [
+    methodSelected,
+    setMethodSelected,
+  ] = useState(methodSelectItems.at(0)?.value);
 
   const palletSelectItems = useMemo(() => {
     const newRpcItems = mapRpcCallsToSelectPalletItems(newRpcCalls);
     const oldRpcItems = mapRpcCallsToSelectPalletItems(oldRpcCalls);
 
-    const palletItems = [newRpcItems, oldRpcItems];
+    const palletItems = [
+      newRpcItems,
+      oldRpcItems,
+    ];
 
     const methodItems = mapRpcCallsToSelectMethodItems({
       rpcCalls: newRpcCalls,
@@ -96,16 +105,25 @@ export const RpcCalls = () => {
     return palletItems;
   }, []);
 
-  const [palletSelected, setPalletSelected] = useState(palletSelectItems.at(0)?.at(0)?.value);
+  const [
+    palletSelected,
+    setPalletSelected,
+  ] = useState(palletSelectItems.at(0)?.at(0)?.value);
 
-  const [callParams, setCallParams] = useState<ICallParam[]>([]);
-  const [queries, setQueries] = useState<IQuery[]>([]);
+  const [
+    callParams,
+    setCallParams,
+  ] = useState<ICallParam[]>([]);
+  const [
+    queries,
+    setQueries,
+  ] = useState<IQuery[]>([]);
 
   const rpcCall = useMemo(() => {
     const call = `${palletSelected}_${methodSelected}`;
 
     if (allRpcCalls[call]) {
-      setCallParams(allRpcCalls[call].params?.map(param => ({ name: param.name, value: undefined })));
+      setCallParams(allRpcCalls[call].params?.map((param) => ({ name: param.name, value: undefined })));
       return allRpcCalls[call];
     }
 
@@ -121,7 +139,7 @@ export const RpcCalls = () => {
 
     setMethodSelectItems(() => {
       let methods: IPDSelectItem[] = [];
-      if (newRpcKeys.some(val => val.split('_').at(0) === selectedPalletName)) {
+      if (newRpcKeys.some((val) => val.split('_').at(0) === selectedPalletName)) {
         methods = mapRpcCallsToSelectMethodItems({
           rpcCalls: newRpcCalls,
           ifPalletEquals: selectedPalletName,
@@ -175,7 +193,7 @@ export const RpcCalls = () => {
         ...queries,
       ]));
     }
-    
+
   }, [
     callParams,
     palletSelected,
@@ -192,20 +210,23 @@ export const RpcCalls = () => {
         <div className="grid w-full grid-cols-2 gap-4">
           <PDSelect
             key={`rpc-pallet-${palletSelected}`}
-            label="Pallet"
             emptyPlaceHolder="No pallets available"
             items={palletSelectItems}
-            groups={['New', 'Old']}
-            value={palletSelected}
+            label="Pallet"
             onChange={handlePalletSelect}
+            value={palletSelected}
+            groups={[
+              'New',
+              'Old',
+            ]}
           />
           <PDSelect
             key={`rpc-method-${methodSelected}`}
-            label="Method"
             emptyPlaceHolder="No methods available"
             items={[methodSelectItems]}
-            value={methodSelected}
+            label="Method"
             onChange={handleMathodSelect}
+            value={methodSelected}
           />
         </div>
 
@@ -278,7 +299,7 @@ const Query = ({
     };
 
     const runRawQuery = (onSucess?: (res: unknown) => void) => {
-      const args = querie?.args ? querie.args.map(arg => arg.value).filter(arg => arg !== undefined) : [];
+      const args = querie?.args ? querie.args.map((arg) => arg.value).filter((arg) => arg !== undefined) : [];
 
       rawClient?.request(call, args)
         .then((...res) => {
@@ -369,7 +390,7 @@ const Query = ({
           case 'chainHead_v1_unpin':
             rawClientSubscription
               ?.unpin((querie?.args?.at(1)?.value as string[]))
-              .then(res => {
+              .then((res) => {
                 setResult(res);
                 setIsLoading(false);
               })
@@ -394,8 +415,8 @@ const Query = ({
           case 'childstate_getStorageHash':
           case 'childstate_getStorageSize':
           case 'payment_queryInfo':
-            rawClient?.request(call, querie.args.map(arg => (arg.value || arg.value === 0) ? arg.value : null))
-              .then(res => {
+            rawClient?.request(call, querie.args.map((arg) => (arg.value || arg.value === 0) ? arg.value : null))
+              .then((res) => {
                 setResult(res);
                 setIsLoading(false);
               })
@@ -411,7 +432,7 @@ const Query = ({
                 querie.args.at(2)?.value || null,
               ],
             )
-              .then(res => {
+              .then((res) => {
                 setResult(res);
                 setIsLoading(false);
               })
@@ -420,7 +441,7 @@ const Query = ({
 
           case 'author_removeExtrinsic':
             rawClient?.request(call, querie.args.at(0)?.value as string[])
-              .then(res => {
+              .then((res) => {
                 setResult(res);
                 setIsLoading(false);
               })

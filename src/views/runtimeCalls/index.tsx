@@ -132,7 +132,12 @@ const RuntimeCalls = () => {
       }
     }
 
-  }, [apiSelected, methodSelected, callArgs, dynamicBulder]);
+  }, [
+    apiSelected,
+    methodSelected,
+    callArgs,
+    dynamicBulder,
+  ]);
 
   const handleStorageUnsubscribe = useCallback((id: string) => {
     setQueries((queries) => queries.filter((query) => query.id !== id));
@@ -148,10 +153,10 @@ const RuntimeCalls = () => {
         <div className="grid w-full grid-cols-2 gap-4">
           <PDSelect
             emptyPlaceHolder="No apis available"
-            label="Select Api"
             items={[apiItems || []]}
-            value={apiSelected?.name}
+            label="Select Api"
             onChange={handlePalletSelect}
+            value={apiSelected?.name}
           />
 
           {
@@ -159,10 +164,10 @@ const RuntimeCalls = () => {
               <PDSelect
                 key={`method-select-${methodSelected?.name}`}
                 emptyPlaceHolder="No methods available"
-                label="Select Method"
                 items={[methodItems]}
-                value={methodSelected?.name}
+                label="Select Method"
                 onChange={handleCallSelect}
+                value={methodSelected?.name}
               />
             )
           }
@@ -191,7 +196,11 @@ const RuntimeCalls = () => {
         {
           encodedCall && (
             <p className="break-all">
-              Encoded Call: <br /> {encodedCall.asHex()}
+              Encoded Call: 
+              {' '}
+              <br /> 
+              {' '}
+              {encodedCall.asHex()}
             </p>
           )
         }

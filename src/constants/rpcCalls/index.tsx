@@ -354,9 +354,7 @@ export const oldRpcCalls: IRpcCalls = {
   // BABE
   'babe_epochAuthorship': {
     params: [],
-    docs: [
-      'Returns data about which slots (primary or secondary) can be claimed in the current epoch with the key in the keystore.',
-    ],
+    docs: ['Returns data about which slots (primary or secondary) can be claimed in the current epoch with the key in the keystore.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#161-babe_epochauthorship',
   },
 
@@ -393,9 +391,7 @@ export const oldRpcCalls: IRpcCalls = {
   },
   'grandpa_subscribeJustifications': {
     params: [],
-    docs: [
-      'Returns the block most recently finalized by Grandpa, alongside side its justification.',
-    ],
+    docs: ['Returns the block most recently finalized by Grandpa, alongside side its justification.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#173-grandpa_subscribejustifications-pubsub',
   },
   'grandpa_unsubscribeJustifications': {
@@ -445,7 +441,15 @@ export const oldRpcCalls: IRpcCalls = {
         name: 'Key type',
         type: 'select',
         description: 'string',
-        options: ['babe', 'gran', 'acco', 'aura', 'imon', 'audi', 'dumy'],
+        options: [
+          'babe',
+          'gran',
+          'acco',
+          'aura',
+          'imon',
+          'audi',
+          'dumy',
+        ],
       },
       {
         name: 'Seed',
@@ -474,9 +478,7 @@ export const oldRpcCalls: IRpcCalls = {
         description: 'The SCALE encoded, concatenated keys.',
       },
     ],
-    docs: [
-      'Checks if the keystore has private keys for the given session public keys.',
-    ],
+    docs: ['Checks if the keystore has private keys for the given session public keys.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#187-author_hassessionkeys',
   },
   'author_hasKey': {
@@ -492,9 +494,7 @@ export const oldRpcCalls: IRpcCalls = {
         description: 'string',
       },
     ],
-    docs: [
-      'Checks if the keystore has private keys for the given public key and key type.',
-    ],
+    docs: ['Checks if the keystore has private keys for the given public key and key type.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#188-author_haskey',
   },
   'author_submitAndWatchExtrinsic': {
@@ -505,9 +505,7 @@ export const oldRpcCalls: IRpcCalls = {
         description: 'The SCALE-encoded extrinsic.',
       },
     ],
-    docs: [
-      'Submit an extrinsic and watch.',
-    ],
+    docs: ['Submit an extrinsic and watch.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#189-author_submitandwatchextrinsic-pubsub',
   },
   'author_unwatchExtrinsic': {
@@ -518,9 +516,7 @@ export const oldRpcCalls: IRpcCalls = {
         description: 'string',
       },
     ],
-    docs: [
-      'Unsubscribe from watching an extrinsic.',
-    ],
+    docs: ['Unsubscribe from watching an extrinsic.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#1810-author_unwatchextrinsic-pubsub',
   },
 
@@ -534,9 +530,7 @@ export const oldRpcCalls: IRpcCalls = {
         optional: true,
       },
     ],
-    docs: [
-      'Get header of a relay chain block. If no block hash is provided, the latest block header will be returned.',
-    ],
+    docs: ['Get header of a relay chain block. If no block hash is provided, the latest block header will be returned.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#192-chain_getheader',
   },
   'chain_getBlock': {
@@ -548,9 +542,7 @@ export const oldRpcCalls: IRpcCalls = {
         optional: true,
       },
     ],
-    docs: [
-      'Get header and body of a relay chain block. If no block hash is provided, the latest block body will be returned.',
-    ],
+    docs: ['Get header and body of a relay chain block. If no block hash is provided, the latest block body will be returned.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#193-chain_getblock',
   },
   'chain_getBlockHash': {
@@ -571,16 +563,12 @@ export const oldRpcCalls: IRpcCalls = {
   },
   'chain_getFinalizedHead': {
     params: [],
-    docs: [
-      'Get hash of the last finalized block in the canon chain.',
-    ],
+    docs: ['Get hash of the last finalized block in the canon chain.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#195-chain_getfinalizedhead',
   },
   'chain_subscribeAllHeads': {
     params: [],
-    docs: [
-      'Subscription for all block headers (new blocks and finalized blocks).',
-    ],
+    docs: ['Subscription for all block headers (new blocks and finalized blocks).'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#196-chain_subscribeallheads-pubsub',
   },
   'chain_unsubscribeAllHeads': {
@@ -591,16 +579,12 @@ export const oldRpcCalls: IRpcCalls = {
         description: 'string',
       },
     ],
-    docs: [
-      'Unsubscribe from watching all block headers.',
-    ],
+    docs: ['Unsubscribe from watching all block headers.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#197-chain_unsubscribeallheads-pubsub',
   },
   'chain_subscribeFinalizedHeads': {
     params: [],
-    docs: [
-      'Subscription for finalized block headers.',
-    ],
+    docs: ['Subscription for finalized block headers.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#1910-chain_subscribefinalizedheads-pubsub',
   },
   'chain_unsubscribeFinalizedHeads': {
@@ -611,9 +595,7 @@ export const oldRpcCalls: IRpcCalls = {
         description: 'string',
       },
     ],
-    docs: [
-      'Unsubscribe from watching finalized block headers.',
-    ],
+    docs: ['Unsubscribe from watching finalized block headers.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#1911-chain_unsubscribefinalizedheads-pubsub',
   },
 
@@ -623,7 +605,10 @@ export const oldRpcCalls: IRpcCalls = {
       {
         name: 'Storage kind',
         type: 'select',
-        options: ['PERSISTENT', 'LOCAL'],
+        options: [
+          'PERSISTENT',
+          'LOCAL',
+        ],
       },
       {
         name: 'Key',
@@ -636,9 +621,7 @@ export const oldRpcCalls: IRpcCalls = {
         description: 'hex',
       },
     ],
-    docs: [
-      'Set offchain local storage under given key and prefix.',
-    ],
+    docs: ['Set offchain local storage under given key and prefix.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#1103-offchain_localstorageset',
   },
   'offchain_localStorageGet': {
@@ -646,7 +629,10 @@ export const oldRpcCalls: IRpcCalls = {
       {
         name: 'Storage kind',
         type: 'select',
-        options: ['PERSISTENT', 'LOCAL'],
+        options: [
+          'PERSISTENT',
+          'LOCAL',
+        ],
       },
       {
         name: 'Key',
@@ -654,9 +640,7 @@ export const oldRpcCalls: IRpcCalls = {
         description: 'hex',
       },
     ],
-    docs: [
-      'Get offchain local storage under given key and prefix.',
-    ],
+    docs: ['Get offchain local storage under given key and prefix.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#1104-offchain_localstorageget',
   },
 
@@ -675,9 +659,7 @@ export const oldRpcCalls: IRpcCalls = {
         optional: true,
       },
     ],
-    docs: [
-      'Returns the keys with prefix, leave empty to get all the keys.',
-    ],
+    docs: ['Returns the keys with prefix, leave empty to get all the keys.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#1114-state_getpairs',
   },
   'state_getKeysPaged': {
@@ -706,9 +688,7 @@ export const oldRpcCalls: IRpcCalls = {
         optional: true,
       },
     ],
-    docs: [
-      'Returns the keys with prefix with pagination support.',
-    ],
+    docs: ['Returns the keys with prefix with pagination support.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#1115-state_getkeyspaged',
   },
   'state_getStorage': {
@@ -745,9 +725,7 @@ export const oldRpcCalls: IRpcCalls = {
         optional: true,
       },
     ],
-    docs: [
-      'Returns the hash of a storage entry at a block\'s state. If no block hash is provided, the latest value is returned.',
-    ],
+    docs: ['Returns the hash of a storage entry at a block\'s state. If no block hash is provided, the latest value is returned.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#1117-state_getstoragehash',
   },
   'state_getStorageSize': {
@@ -764,9 +742,7 @@ export const oldRpcCalls: IRpcCalls = {
         optional: true,
       },
     ],
-    docs: [
-      'Returns the size of a storage entry at a block\'s state. If no block hash is provided, the latest value is used.',
-    ],
+    docs: ['Returns the size of a storage entry at a block\'s state. If no block hash is provided, the latest value is used.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#1118-state_getstoragesize',
   },
   'state_getMetadata': {
@@ -778,9 +754,7 @@ export const oldRpcCalls: IRpcCalls = {
         optional: true,
       },
     ],
-    docs: [
-      'Returns the runtime metadata.',
-    ],
+    docs: ['Returns the runtime metadata.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#1119-state_getmetadata',
   },
   'state_getRuntimeVersion': {
@@ -792,9 +766,7 @@ export const oldRpcCalls: IRpcCalls = {
         optional: true,
       },
     ],
-    docs: [
-      'Get the runtime version at a given block. If no block hash is provided, the latest version gets returned.',
-    ],
+    docs: ['Get the runtime version at a given block. If no block hash is provided, the latest version gets returned.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#11110-state_getruntimeversion',
   },
   'state_queryStorage': {
@@ -817,9 +789,7 @@ export const oldRpcCalls: IRpcCalls = {
         optional: true,
       },
     ],
-    docs: [
-      'Query historical storage entries (by key) starting from a block given as the second parameter.',
-    ],
+    docs: ['Query historical storage entries (by key) starting from a block given as the second parameter.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#11111-state_querystorage',
   },
   'state_getReadProof': {
@@ -837,16 +807,12 @@ export const oldRpcCalls: IRpcCalls = {
         optional: true,
       },
     ],
-    docs: [
-      'Returns the proof of storage entries.',
-    ],
+    docs: ['Returns the proof of storage entries.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#11112-state_getreadproof',
   },
   'state_subscribeRuntimeVersion': {
     params: [],
-    docs: [
-      'Runtime version subscription. Creates a message for current version and each upgrade.',
-    ],
+    docs: ['Runtime version subscription. Creates a message for current version and each upgrade.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#11113-state_subscriberuntimeversion-pubsub',
   },
   'state_unsubscribeRuntimeVersion': {
@@ -857,9 +823,8 @@ export const oldRpcCalls: IRpcCalls = {
         description: 'string',
       },
     ],
-    docs: [
-      'Unsubscribe from watching the runtime version.',
-    ],
+    docs:
+      ['Unsubscribe from watching the runtime version.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#11114-state_unsubscriberuntimeversion-pubsub',
   },
   'state_subscribeStorage': {
@@ -872,9 +837,7 @@ export const oldRpcCalls: IRpcCalls = {
         optional: true,
       },
     ],
-    docs: [
-      'Storage subscription. If storage keys are specified, it creates a message for each block which changes the specified storage keys. If none are specified, then it creates a message for every block.',
-    ],
+    docs: ['Storage subscription. If storage keys are specified, it creates a message for each block which changes the specified storage keys. If none are specified, then it creates a message for every block.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#11115-state_subscribestorage-pubsub',
   },
   'state_unsubscribeStorage': {
@@ -885,9 +848,7 @@ export const oldRpcCalls: IRpcCalls = {
         description: 'string',
       },
     ],
-    docs: [
-      'Unsubscribe from watching storage.',
-    ],
+    docs: ['Unsubscribe from watching storage.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#11116-state_unsubscribestorage-pubsub',
   },
 
@@ -911,9 +872,7 @@ export const oldRpcCalls: IRpcCalls = {
         optional: true,
       },
     ],
-    docs: [
-      'Returns the keys from the specified child storage. The keys can also be filtered based on a prefix.',
-    ],
+    docs: ['Returns the keys from the specified child storage. The keys can also be filtered based on a prefix.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#1121-childstate_getkeys',
   },
   'childstate_getStorage': {
@@ -935,9 +894,7 @@ export const oldRpcCalls: IRpcCalls = {
         optional: true,
       },
     ],
-    docs: [
-      'Returns a child storage entry.',
-    ],
+    docs: ['Returns a child storage entry.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#1122-childstate_getstorage',
   },
   'childstate_getStorageHash': {
@@ -959,9 +916,7 @@ export const oldRpcCalls: IRpcCalls = {
         optional: true,
       },
     ],
-    docs: [
-      'Returns the hash of a child storage entry.',
-    ],
+    docs: ['Returns the hash of a child storage entry.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#1123-childstate_getstoragehash',
   },
   'childstate_getStorageSize': {
@@ -983,9 +938,7 @@ export const oldRpcCalls: IRpcCalls = {
         optional: true,
       },
     ],
-    docs: [
-      'Returns the size of a child storage entry.',
-    ],
+    docs: ['Returns the size of a child storage entry.'],
     link: 'https://github.com/w3f/PSPs/blob/master/PSPs/drafts/psp-6.md#1124-childstate_getstoragesize',
   },
 

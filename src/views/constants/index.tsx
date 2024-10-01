@@ -118,22 +118,22 @@ const Constants = () => {
         <div className="grid w-full grid-cols-2 gap-4">
           <PDSelect
             emptyPlaceHolder="No pallets available"
-            placeholder="Please select a pallet"
             items={[palletSelectItems || []]}
             label="Select Pallet"
             onChange={handlePalletSelect}
+            placeholder="Please select a pallet"
             value={palletSelected?.name}
           />
           {
             constantItems && (
               <PDSelect
                 key={`storage-select-${palletSelected?.name}`}
-                label="Select Constant"
                 emptyPlaceHolder="No constants available"
-                placeholder="Please select constant"
                 items={[constantItems]}
-                value={constantSelected?.name}
+                label="Select Constant"
                 onChange={handleConstantSelect}
+                placeholder="Please select constant"
+                value={constantSelected?.name}
               />
             )
           }
