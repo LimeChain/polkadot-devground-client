@@ -52,7 +52,7 @@ export const AccountSelectParam = ({ accounts, onChange }: IAccountSelectParam) 
   return (
     <PDSelect
       emptyPlaceHolder="No connected accounts"
-      items={selectItems}
+      items={[selectItems]}
       onChange={handleOnAccountSelect}
       placeholder="Please select an account"
       value={selectedAccount?.address || ''}

@@ -59,7 +59,7 @@ export const EnumParam = ({ onChange, ...props }: IEnumParam) => {
   return (
     <div className={styles.codecGroup}>
       <PDSelect
-        items={enumItems}
+        items={[enumItems]}
         onChange={setKey}
         value={key}
       />

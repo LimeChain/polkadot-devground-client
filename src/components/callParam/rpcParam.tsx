@@ -28,6 +28,14 @@ export const RpcParam = (props: IRpcParam) => {
         />
       );
 
+    case 'number':
+      return (
+        <PrimitiveParam
+          {...props}
+          primitive={{ value: props.param.primitiveType || 'u64', type: 'primitive' }}
+        />
+      );
+      
     case 'string':
     case 'hex':
       return (
@@ -92,7 +100,7 @@ const RpcSelect = ({ onChange, param }: IRpcParam) => {
 
   return (
     <PDSelect
-      items={selectItems}
+      items={[selectItems || []]}
       onChange={handleOnChange}
       value={value}
     />

@@ -1,3 +1,4 @@
+import { Binary } from 'polkadot-api';
 import {
   useCallback,
   useEffect,
@@ -15,10 +16,13 @@ import { QueryViewContainer } from '@components/callParam/queryViewContainer';
 import { Loader } from '@components/loader';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
+import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
 import type { TRelayApi } from '@custom-types/chain';
 
 const RuntimeCalls = () => {
+  const dynamicBuilder = useDynamicBuilder();
+
   const metadata = useStoreChain?.use?.metadata?.();
   const chain = useStoreChain?.use?.chain?.();
 
@@ -45,6 +49,10 @@ const RuntimeCalls = () => {
     methodSelected,
     setMethodSelected,
   ] = useState(apiSelected?.methods.at(0));
+  const [
+    encodedCall,
+    setEncodedCall,
+  ] = useState<Binary>(Binary.fromHex('0x'));
   const [
     callArgs,
     setCallArgs,
@@ -107,6 +115,30 @@ const RuntimeCalls = () => {
     callArgs,
   ]);
 
+  useEffect(() => {
+    if (dynamicBuilder && apiSelected?.name && methodSelected?.name) {
+      try {
+        const callCodec = dynamicBuilder?.buildRuntimeCall(
+          apiSelected.name,
+          methodSelected.name,
+        ).args.enc(Object.values(callArgs || {} as object));
+
+        const _encodedCall = Binary.fromBytes(callCodec);
+        setEncodedCall(_encodedCall);
+
+      } catch (err) {
+        setEncodedCall(Binary.fromHex('0x'));
+        console.log(err);
+      }
+    }
+
+  }, [
+    apiSelected,
+    methodSelected,
+    callArgs,
+    dynamicBuilder,
+  ]);
+
   const handleStorageUnsubscribe = useCallback((id: string) => {
     setQueries((queries) => queries.filter((query) => query.id !== id));
   }, []);
@@ -121,7 +153,7 @@ const RuntimeCalls = () => {
         <div className="grid w-full grid-cols-2 gap-4">
           <PDSelect
             emptyPlaceHolder="No apis available"
-            items={apiItems}
+            items={[apiItems || []]}
             label="Select Api"
             onChange={handlePalletSelect}
             value={apiSelected?.name}
@@ -132,7 +164,7 @@ const RuntimeCalls = () => {
               <PDSelect
                 key={`method-select-${methodSelected?.name}`}
                 emptyPlaceHolder="No methods available"
-                items={methodItems}
+                items={[methodItems]}
                 label="Select Method"
                 onChange={handleCallSelect}
                 value={methodSelected?.name}
@@ -154,12 +186,24 @@ const RuntimeCalls = () => {
         <CallDocs docs={methodSelected?.docs?.filter((d) => d) || []} />
 
         <QueryButton onClick={handleStorageQuerySubmit}>
-          Call 
+          Call
           {' '}
           {apiSelected?.name}
           /
           {methodSelected?.name}
         </QueryButton>
+
+        {
+          encodedCall && (
+            <p className="break-all">
+              Encoded Call:
+              {' '}
+              <br />
+              {' '}
+              {encodedCall.asHex()}
+            </p>
+          )
+        }
 
       </QueryFormContainer>
       <QueryResultContainer>
@@ -206,10 +250,11 @@ const Query = ({
       try {
         // @TODO: fix types
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (api.apis as any)[querie.pallet][querie.storage](...Object.values(querie.args as object)).then((res: unknown) => {
-          setResult(res);
-          setIsLoading(false);
-        })
+        (api.apis as any)[querie.pallet][querie.storage](...Object.values(querie.args as object))
+          .then((res: unknown) => {
+            setResult(res);
+            setIsLoading(false);
+          })
           .catch(catchError);
 
       } catch (error) {

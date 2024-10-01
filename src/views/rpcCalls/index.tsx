@@ -15,16 +15,23 @@ import { QueryViewContainer } from '@components/callParam/queryViewContainer';
 import { RpcParams } from '@components/callParam/rpcParams';
 import { Loader } from '@components/loader';
 import {
-  type IPDSelect,
+  type IPDSelectItem,
   PDSelect,
 } from '@components/pdSelect';
-import { newRpcCalls } from '@constants/rpcCalls';
+import {
+  newRpcCalls,
+  oldRpcCalls,
+} from '@constants/rpcCalls';
 import { useStoreChain } from '@stores';
 import {
   blockHeaderCodec,
   decodeExtrinsic,
 } from '@utils/codec';
 import { unwrapApiResult } from '@utils/papi/helpers';
+import {
+  mapRpcCallsToSelectMethodItems,
+  mapRpcCallsToSelectPalletItems,
+} from '@utils/rpc/rpc-calls';
 import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
 interface ICallParam {
@@ -38,11 +45,17 @@ interface IQuery {
   args: ICallParam[];
 }
 
+const newRpcKeys = Object.keys(newRpcCalls);
 export const RpcCalls = () => {
 
   const chain = useStoreChain?.use?.chain?.();
   const rawClient = useStoreChain?.use?.rawClient?.();
   const rawClientSubscription = useStoreChain?.use?.rawClientSubscription?.();
+
+  const allRpcCalls = useMemo(() => ({
+    ...newRpcCalls,
+    ...oldRpcCalls,
+  }), []);
 
   const refUncleanedSubscriptions = useRef<string[]>([]);
 
@@ -66,42 +79,25 @@ export const RpcCalls = () => {
   const [
     methodSelectItems,
     setMethodSelectItems,
-  ] = useState<NonNullable<IPDSelect['items']>>([]);
+  ] = useState<IPDSelectItem[]>([]);
   const [
     methodSelected,
     setMethodSelected,
   ] = useState(methodSelectItems.at(0)?.value);
 
   const palletSelectItems = useMemo(() => {
-    const palletItems = Object.keys(newRpcCalls).reduce((acc, curr) => {
-      const pallet = curr.split('_').at(0);
+    const newRpcItems = mapRpcCallsToSelectPalletItems(newRpcCalls);
+    const oldRpcItems = mapRpcCallsToSelectPalletItems(oldRpcCalls);
 
-      if (pallet && !acc.some((p) => p.value === pallet)) {
-        acc.push({
-          label: pallet,
-          value: pallet,
-          key: `rpc-pallet-${pallet}`,
-        });
-      }
+    const palletItems = [
+      newRpcItems,
+      oldRpcItems,
+    ];
 
-      return acc;
-    }, [] as NonNullable<IPDSelect['items']>);
-
-    const methodItems = Object.keys(newRpcCalls).reduce((acc, curr) => {
-      const call = curr.split('_');
-      const pallet = call.at(0);
-
-      if (pallet && pallet === palletItems.at(0)?.value) {
-        const val = call.slice(1).join('_');
-        acc.push({
-          label: val,
-          value: val,
-          key: `rpc-method-${val}`,
-        });
-      }
-
-      return acc;
-    }, [] as NonNullable<IPDSelect['items']>);
+    const methodItems = mapRpcCallsToSelectMethodItems({
+      rpcCalls: newRpcCalls,
+      ifPalletEquals: palletItems.at(0)?.at(0)?.value,
+    });
 
     setMethodSelectItems(methodItems);
     setMethodSelected(methodItems.at(0)?.value);
@@ -112,7 +108,7 @@ export const RpcCalls = () => {
   const [
     palletSelected,
     setPalletSelected,
-  ] = useState(palletSelectItems.at(0)?.value);
+  ] = useState(palletSelectItems.at(0)?.at(0)?.value);
 
   const [
     callParams,
@@ -126,37 +122,36 @@ export const RpcCalls = () => {
   const rpcCall = useMemo(() => {
     const call = `${palletSelected}_${methodSelected}`;
 
-    if (newRpcCalls[call]) {
-      setCallParams(newRpcCalls[call].params?.map((param) => ({ name: param.name, value: undefined })));
-      return newRpcCalls[call];
+    if (allRpcCalls[call]) {
+      setCallParams(allRpcCalls[call].params?.map((param) => ({ name: param.name, value: undefined })));
+      return allRpcCalls[call];
     }
 
     return undefined;
-
   }, [
     palletSelected,
     methodSelected,
+    allRpcCalls,
   ]);
 
   const handlePalletSelect = useCallback((selectedPalletName: string) => {
     setPalletSelected(selectedPalletName);
 
     setMethodSelectItems(() => {
-      const methods = Object.keys(newRpcCalls).reduce((acc, curr) => {
-        const call = curr.split('_');
-        const pallet = call.at(0);
+      let methods: IPDSelectItem[] = [];
+      if (newRpcKeys.some((val) => val.split('_').at(0) === selectedPalletName)) {
+        methods = mapRpcCallsToSelectMethodItems({
+          rpcCalls: newRpcCalls,
+          ifPalletEquals: selectedPalletName,
+        });
 
-        if (pallet && pallet === selectedPalletName) {
-          const val = call.slice(1).join('_');
-          acc.push({
-            label: val,
-            value: val,
-            key: `rpc-call-${val}`,
-          });
-        }
+      } else {
+        methods = mapRpcCallsToSelectMethodItems({
+          rpcCalls: oldRpcCalls,
+          ifPalletEquals: selectedPalletName,
+        });
 
-        return acc;
-      }, [] as NonNullable<IPDSelect['items']>);
+      }
 
       setMethodSelected(methods.at(0)?.value);
       return methods;
@@ -214,12 +209,22 @@ export const RpcCalls = () => {
       <QueryFormContainer>
         <div className="grid w-full grid-cols-2 gap-4">
           <PDSelect
+            key={`rpc-pallet-${palletSelected}`}
+            emptyPlaceHolder="No pallets available"
             items={palletSelectItems}
+            label="Pallet"
             onChange={handlePalletSelect}
             value={palletSelected}
+            groups={[
+              'New',
+              'Old',
+            ]}
           />
           <PDSelect
-            items={methodSelectItems}
+            key={`rpc-method-${methodSelected}`}
+            emptyPlaceHolder="No methods available"
+            items={[methodSelectItems]}
+            label="Method"
             onChange={handleMathodSelect}
             value={methodSelected}
           />
@@ -240,7 +245,7 @@ export const RpcCalls = () => {
           Submit Rpc Call
         </QueryButton>
 
-        <CallDocs docs={newRpcCalls?.[`${palletSelected}_${methodSelected}`]?.docs || []} />
+        <CallDocs docs={allRpcCalls?.[`${palletSelected}_${methodSelected}`]?.docs || []} />
 
       </QueryFormContainer>
       <QueryResultContainer>
@@ -284,7 +289,6 @@ const Query = ({
   ] = useState(true);
 
   const refFollowSubscription = useRef('');
-
   const call = `${querie.pallet}_${querie.method}`;
 
   useEffect(() => {
@@ -297,15 +301,14 @@ const Query = ({
     const runRawQuery = (onSucess?: (res: unknown) => void) => {
       const args = querie?.args ? querie.args.map((arg) => arg.value).filter((arg) => arg !== undefined) : [];
 
-      rawClient?.request(call, [...args]).then((res) => {
-        setResult(res);
-        setIsLoading(false);
-
-        onSucess?.(res);
-      })
+      rawClient?.request(call, args)
+        .then((...res) => {
+          setResult(res.at(0));
+          setIsLoading(false);
+          onSucess?.(res);
+        })
         .catch(catchError);
     };
-
     if (rawClient) {
       try {
         switch (call) {
@@ -385,44 +388,68 @@ const Query = ({
               .catch(catchError);
             break;
           case 'chainHead_v1_unpin':
-            rawClientSubscription?.unpin((querie?.args?.at(1)?.value as string[]))
+            rawClientSubscription
+              ?.unpin((querie?.args?.at(1)?.value as string[]))
               .then((res) => {
                 setResult(res);
                 setIsLoading(false);
               })
               .catch(catchError);
             break;
-          case 'chainHead_v1_continue':
-          case 'chainHead_v1_stopOperation':
-            runRawQuery();
+          // OLD RPCS
+          case 'system_dryRun':
+          case 'grandpa_proveFinality':
+          case 'chain_getHeader':
+          case 'chain_getBlock':
+          case 'chain_getBlockHash':
+          case 'state_getPairs':
+          case 'state_getKeysPaged':
+          case 'state_getStorage':
+          case 'state_getStorageHash':
+          case 'state_getStorageSize':
+          case 'state_getMetadata':
+          case 'state_getRuntimeVersion':
+          case 'state_queryStorage':
+          case 'state_getReadProof':
+          case 'childstate_getStorage':
+          case 'childstate_getStorageHash':
+          case 'childstate_getStorageSize':
+          case 'payment_queryInfo':
+            rawClient?.request(call, querie.args.map((arg) => (arg.value || arg.value === 0) ? arg.value : null))
+              .then((res) => {
+                setResult(res);
+                setIsLoading(false);
+              })
+              .catch(catchError);
             break;
 
-          // CHAIN SPECS
-          case 'chainSpec_v1_chainName':
-          case 'chainSpec_v1_genesisHash':
-          case 'chainSpec_v1_properties':
-            runRawQuery();
+          case 'childstate_getKeys':
+            rawClient?.request(
+              call,
+              [
+                querie.args.at(0)?.value,
+                querie.args.at(1)?.value || '',
+                querie.args.at(2)?.value || null,
+              ],
+            )
+              .then((res) => {
+                setResult(res);
+                setIsLoading(false);
+              })
+              .catch(catchError);
             break;
 
-          // RPC METHODS
-          case 'rpc_methods':
-            runRawQuery();
-            break;
-
-          // TRANSACTIONS
-          case 'transaction_v1_broadcast':
-          case 'transaction_v1_stop':
-            runRawQuery();
-            break;
-
-          // TRANSACATION WATCH
-          case 'transactionWatch_v1_submitAndWatch':
-          case 'transactionWatch_v1_unwatch':
-            runRawQuery();
+          case 'author_removeExtrinsic':
+            rawClient?.request(call, querie.args.at(0)?.value as string[])
+              .then((res) => {
+                setResult(res);
+                setIsLoading(false);
+              })
+              .catch(catchError);
             break;
 
           default:
-            catchError({} as Error);
+            runRawQuery();
             break;
         }
       } catch (error) {

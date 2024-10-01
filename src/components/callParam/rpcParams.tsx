@@ -15,8 +15,8 @@ export const RpcParams = ({ params, onChange }: IRpcParams) => {
       {
         params.map((param, index) => (
           <div key={`rpc-param-${param.name}-${param.type}`}>
-            <span className="block pb-1 font-geist font-body1-regular">
-              {param.name}
+            <span className="block pb-1 font-geist capitalize font-body1-regular">
+              {param.optional ? `Optional<${param.name}>` : param.name}
             </span>
             <div className={styles['codecContainer']}>
               <div className={styles['codecGroup']}>

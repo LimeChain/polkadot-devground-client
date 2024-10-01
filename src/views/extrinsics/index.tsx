@@ -32,7 +32,7 @@ import type {
 } from 'polkadot-api/dist/reexports/pjs-signer';
 
 const Extrinsics = () => {
-  const dynamicBulder = useDynamicBuilder();
+  const dynamicBuilder = useDynamicBuilder();
   const viewBuilder = useViewBuilder();
 
   const metadata = useStoreChain?.use?.metadata?.();
@@ -112,7 +112,8 @@ const Extrinsics = () => {
   const [
     encodedCall,
     setEncodedCall,
-  ] = useState<Binary | undefined>(Binary.fromHex('0x'));
+  ] = useState<Binary>(Binary.fromHex('0x'));
+
   const decodedCall = useMemo(() => {
     if (viewBuilder && encodedCall) {
       try {
@@ -129,9 +130,9 @@ const Extrinsics = () => {
   ]);
 
   useEffect(() => {
-    if (dynamicBulder && palletSelected?.name && callSelected?.name && viewBuilder) {
+    if (dynamicBuilder && palletSelected?.name && callSelected?.name) {
       try {
-        const callCodec = dynamicBulder.buildCall(palletSelected.name, callSelected.name);
+        const callCodec = dynamicBuilder.buildCall(palletSelected.name, callSelected.name);
 
         const _encodedCall = Binary.fromBytes(
           mergeUint8(
@@ -143,7 +144,7 @@ const Extrinsics = () => {
         setEncodedCall(_encodedCall);
 
       } catch (err) {
-        setEncodedCall(undefined);
+        setEncodedCall(Binary.fromHex('0x'));
         console.log(err);
       }
     }
@@ -152,8 +153,7 @@ const Extrinsics = () => {
     palletSelected,
     callSelected,
     callArgs,
-    dynamicBulder,
-    viewBuilder,
+    dynamicBuilder,
   ]);
 
   const submitTx = useCallback(async () => {
@@ -207,7 +207,6 @@ const Extrinsics = () => {
     const selectedCall = calls.find((call) => call.name === callSelectedName);
 
     setCallSelected(selectedCall);
-    setEncodedCall(undefined);
     setCallArgs({});
   }, [calls]);
 
@@ -217,8 +216,7 @@ const Extrinsics = () => {
 
   const handleAccountSelect = useCallback((accountSelected: unknown) => {
     setSigner((accountSelected as InjectedPolkadotAccount).polkadotSigner);
-  }
-  , []);
+  }, []);
 
   if (!palletSelected) {
     return <Loader />;
@@ -230,7 +228,7 @@ const Extrinsics = () => {
         <div className="grid w-full grid-cols-2 gap-4">
           <PDSelect
             emptyPlaceHolder="No pallets available"
-            items={palletSelectItems}
+            items={[palletSelectItems]}
             label="Select Pallet"
             onChange={handlePalletSelect}
             value={palletSelected?.name}
@@ -240,7 +238,7 @@ const Extrinsics = () => {
               <PDSelect
                 key={`call-select-${palletSelected?.name}`}
                 emptyPlaceHolder="No calls available"
-                items={callSelectItems}
+                items={[callSelectItems]}
                 label="Select Call"
                 onChange={handleCallSelect}
                 value={callSelected?.name}

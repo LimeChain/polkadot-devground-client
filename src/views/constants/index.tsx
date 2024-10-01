@@ -118,7 +118,7 @@ const Constants = () => {
         <div className="grid w-full grid-cols-2 gap-4">
           <PDSelect
             emptyPlaceHolder="No pallets available"
-            items={palletSelectItems}
+            items={[palletSelectItems || []]}
             label="Select Pallet"
             onChange={handlePalletSelect}
             placeholder="Please select a pallet"
@@ -129,7 +129,7 @@ const Constants = () => {
               <PDSelect
                 key={`storage-select-${palletSelected?.name}`}
                 emptyPlaceHolder="No constants available"
-                items={constantItems}
+                items={[constantItems]}
                 label="Select Constant"
                 onChange={handleConstantSelect}
                 placeholder="Please select constant"
@@ -196,10 +196,11 @@ const Query = (
       try {
         // @TODO: fix types
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (api.constants as any)[querie.pallet][querie.storage]?.().then((res: unknown) => {
-          setResult(res);
-          setIsLoading(false);
-        })
+        (api.constants as any)[querie.pallet][querie.storage]?.()
+          .then((res: unknown) => {
+            setResult(res);
+            setIsLoading(false);
+          })
           .catch(catchError);
 
       } catch (error) {

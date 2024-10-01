@@ -25,7 +25,7 @@ interface ISubscription {
 }
 
 const ChainState = () => {
-  const dynamicBulder = useDynamicBuilder();
+  const dynamicBuilder = useDynamicBuilder();
 
   const metadata = useStoreChain?.use?.metadata?.();
   const chain = useStoreChain?.use?.chain?.();
@@ -66,6 +66,7 @@ const ChainState = () => {
     callArgs,
     setCallArgs,
   ] = useState<unknown>(undefined);
+
   const [
     encodedStorageKey,
     setEncodedStorageKey,
@@ -75,6 +76,7 @@ const ChainState = () => {
     queries,
     setQueries,
   ] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
+
   const [
     subscriptions,
     setSubscriptions,
@@ -106,9 +108,9 @@ const ChainState = () => {
   }, [palletsWithStorage]);
 
   useEffect(() => {
-    if (palletSelected?.name && storageSelected?.name && dynamicBulder) {
+    if (palletSelected?.name && storageSelected?.name && dynamicBuilder) {
       try {
-        const storageCodec = dynamicBulder.buildStorage(palletSelected.name, storageSelected.name);
+        const storageCodec = dynamicBuilder.buildStorage(palletSelected.name, storageSelected.name);
 
         const encodedKey = storageCodec.enc(...([callArgs].filter((arg) => Boolean(arg))));
         setEncodedStorageKey(encodedKey);
@@ -148,7 +150,7 @@ const ChainState = () => {
   }, [palletSelected]);
 
   const handleStorageQuerySubmit = useCallback(() => {
-    if (palletSelected?.name && storageSelected?.name && dynamicBulder) {
+    if (palletSelected?.name && storageSelected?.name && dynamicBuilder) {
       setQueries((queries) => ([
         {
           pallet: palletSelected.name,
@@ -193,7 +195,7 @@ const ChainState = () => {
         <div className="grid w-full grid-cols-2 gap-4">
           <PDSelect
             emptyPlaceHolder="No pallets available"
-            items={palletSelectItems}
+            items={[palletSelectItems || []]}
             label="Select Pallet"
             onChange={handlePalletSelect}
             placeholder="Please select a pallet"
@@ -205,7 +207,7 @@ const ChainState = () => {
               <PDSelect
                 key={`storage-select-${palletSelected?.name}`}
                 emptyPlaceHolder="No storages available"
-                items={storageCallItems}
+                items={[storageCallItems]}
                 label="Select Storage"
                 onChange={handleStorageSelect}
                 placeholder="Please select a storage"
@@ -237,7 +239,6 @@ const ChainState = () => {
           (encodedStorageKey) && (
             <p className="break-all">
               Encoded Storage Key:
-              {' '}
               <br />
               {' '}
               {encodedStorageKey}
@@ -297,10 +298,12 @@ const Query = (
       try {
         // @TODO: fix types
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const subscription = (api.query as any)[querie.pallet][querie.storage].watchValue(querie.args || 'finalized').subscribe((res: unknown) => {
-          setResult(res);
-          setIsLoading(false);
-        });
+        const subscription = (api.query as any)[querie.pallet][querie.storage]
+          .watchValue(querie.args || 'finalized')
+          .subscribe((res: unknown) => {
+            setResult(res);
+            setIsLoading(false);
+          });
 
         subscription.id = querie.id;
         onSubscribe(subscription);

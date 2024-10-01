@@ -304,7 +304,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
           const createSubscription = () => {
             const rawClientSubscription = rawClient.chainHead(
               true,
-              () => { },
+              () => {},
               (error) => {
                 console.log(error);
                 createSubscription();
