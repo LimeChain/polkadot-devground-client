@@ -32,7 +32,7 @@ import type {
 } from 'polkadot-api/dist/reexports/pjs-signer';
 
 const Extrinsics = () => {
-  const dynamicBulder = useDynamicBuilder();
+  const dynamicBuilder = useDynamicBuilder();
   const viewBuilder = useViewBuilder();
 
   const metadata = useStoreChain?.use?.metadata?.();
@@ -110,10 +110,10 @@ const Extrinsics = () => {
   })) || [], [calls]);
 
   const [
-    encodedCall, 
+    encodedCall,
     setEncodedCall,
   ] = useState<Binary>(Binary.fromHex('0x'));
-  
+
   const decodedCall = useMemo(() => {
     if (viewBuilder && encodedCall) {
       try {
@@ -130,9 +130,9 @@ const Extrinsics = () => {
   ]);
 
   useEffect(() => {
-    if (dynamicBulder && palletSelected?.name && callSelected?.name) {
+    if (dynamicBuilder && palletSelected?.name && callSelected?.name) {
       try {
-        const callCodec = dynamicBulder.buildCall(palletSelected.name, callSelected.name);
+        const callCodec = dynamicBuilder.buildCall(palletSelected.name, callSelected.name);
 
         const _encodedCall = Binary.fromBytes(
           mergeUint8(
@@ -153,7 +153,7 @@ const Extrinsics = () => {
     palletSelected,
     callSelected,
     callArgs,
-    dynamicBulder,
+    dynamicBuilder,
   ]);
 
   const submitTx = useCallback(async () => {
@@ -217,7 +217,7 @@ const Extrinsics = () => {
   const handleAccountSelect = useCallback((accountSelected: unknown) => {
     setSigner((accountSelected as InjectedPolkadotAccount).polkadotSigner);
   }
-  , []);
+    , []);
 
   if (!palletSelected) {
     return <Loader />;

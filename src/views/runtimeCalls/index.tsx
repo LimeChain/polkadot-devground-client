@@ -21,7 +21,7 @@ import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 import type { TRelayApi } from '@custom-types/chain';
 
 const RuntimeCalls = () => {
-  const dynamicBulder = useDynamicBuilder();
+  const dynamicBuilder = useDynamicBuilder();
 
   const metadata = useStoreChain?.use?.metadata?.();
   const chain = useStoreChain?.use?.chain?.();
@@ -50,7 +50,7 @@ const RuntimeCalls = () => {
     setMethodSelected,
   ] = useState(apiSelected?.methods.at(0));
   const [
-    encodedCall, 
+    encodedCall,
     setEncodedCall,
   ] = useState<Binary>(Binary.fromHex('0x'));
   const [
@@ -116,9 +116,9 @@ const RuntimeCalls = () => {
   ]);
 
   useEffect(() => {
-    if (dynamicBulder && apiSelected?.name && methodSelected?.name) {
+    if (dynamicBuilder && apiSelected?.name && methodSelected?.name) {
       try {
-        const callCodec = dynamicBulder?.buildRuntimeCall(
+        const callCodec = dynamicBuilder?.buildRuntimeCall(
           apiSelected.name,
           methodSelected.name,
         ).args.enc(Object.values(callArgs || {} as object));
@@ -136,7 +136,7 @@ const RuntimeCalls = () => {
     apiSelected,
     methodSelected,
     callArgs,
-    dynamicBulder,
+    dynamicBuilder,
   ]);
 
   const handleStorageUnsubscribe = useCallback((id: string) => {
@@ -186,7 +186,7 @@ const RuntimeCalls = () => {
         <CallDocs docs={methodSelected?.docs?.filter((d) => d) || []} />
 
         <QueryButton onClick={handleStorageQuerySubmit}>
-          Call 
+          Call
           {' '}
           {apiSelected?.name}
           /
@@ -196,9 +196,9 @@ const RuntimeCalls = () => {
         {
           encodedCall && (
             <p className="break-all">
-              Encoded Call: 
+              Encoded Call:
               {' '}
-              <br /> 
+              <br />
               {' '}
               {encodedCall.asHex()}
             </p>

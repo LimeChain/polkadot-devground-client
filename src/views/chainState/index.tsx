@@ -25,7 +25,7 @@ interface ISubscription {
 }
 
 const ChainState = () => {
-  const dynamicBulder = useDynamicBuilder();
+  const dynamicBuilder = useDynamicBuilder();
 
   const metadata = useStoreChain?.use?.metadata?.();
   const chain = useStoreChain?.use?.chain?.();
@@ -108,9 +108,9 @@ const ChainState = () => {
   }, [palletsWithStorage]);
 
   useEffect(() => {
-    if (palletSelected?.name && storageSelected?.name && dynamicBulder) {
+    if (palletSelected?.name && storageSelected?.name && dynamicBuilder) {
       try {
-        const storageCodec = dynamicBulder.buildStorage(palletSelected.name, storageSelected.name);
+        const storageCodec = dynamicBuilder.buildStorage(palletSelected.name, storageSelected.name);
 
         const encodedKey = storageCodec.enc(...([callArgs].filter((arg) => Boolean(arg))));
         setEncodedStorageKey(encodedKey);
@@ -150,7 +150,7 @@ const ChainState = () => {
   }, [palletSelected]);
 
   const handleStorageQuerySubmit = useCallback(() => {
-    if (palletSelected?.name && storageSelected?.name && dynamicBulder) {
+    if (palletSelected?.name && storageSelected?.name && dynamicBuilder) {
       setQueries((queries) => ([
         {
           pallet: palletSelected.name,
