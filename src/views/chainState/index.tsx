@@ -66,7 +66,7 @@ const ChainState = () => {
     callArgs,
     setCallArgs,
   ] = useState<unknown>(undefined);
-      
+
   const [
     encodedStorageKey,
     setEncodedStorageKey,
@@ -76,7 +76,7 @@ const ChainState = () => {
     queries,
     setQueries,
   ] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
-      
+
   const [
     subscriptions,
     setSubscriptions,
@@ -223,7 +223,6 @@ const ChainState = () => {
               key={`storage-param-${storageSelected.name}`}
               storage={storageSelected}
               onChange={setCallArgs}
-              storage={storageSelected}
             />
           )
         }
