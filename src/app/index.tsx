@@ -24,6 +24,7 @@ import {
 import { routes } from './routes';
 
 export const App = () => {
+  const refTimeout = useRef<NodeJS.Timeout>();
   const refRoutes = useRef(createBrowserRouter(routes()));
 
   const initStoreAuth = useStoreAuth.use.init?.();
@@ -59,6 +60,10 @@ export const App = () => {
       connectInjectedExtension,
       getInjectedExtensions,
     });
+
+    refTimeout.current = setTimeout(() => {
+      document.body.removeAttribute('style');
+    }, 400);
 
     return () => {
       resetStoreAuth();

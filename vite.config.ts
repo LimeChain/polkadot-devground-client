@@ -11,6 +11,8 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export default defineConfig(({ mode }) => {
   const isVisualizer = mode === 'dev';
 
+  const visualizerPlugin = isVisualizer ? visualizer({ filename: './dist/stats.html', open: false }) : undefined;
+
   return {
     plugins: [
       react(),
@@ -55,7 +57,7 @@ export default defineConfig(({ mode }) => {
           },
         ],
       }),
-      isVisualizer && visualizer({ filename: './dist/stats.html', open: false }),
+      ...(Array.isArray(visualizerPlugin) ? visualizerPlugin : []),
     ],
     build: {
       rollupOptions: {
