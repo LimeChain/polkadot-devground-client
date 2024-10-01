@@ -140,10 +140,10 @@ export const BlockBody = (props: BlockBodyProps) => {
                       <td>{timeAgo}</td>
                       <td>
                         <Icon
-                          name={extrinsic.isSuccess ? 'icon-checked' : 'icon-clock'}
+                          name={extrinsic.isSuccess ? 'icon-checked' : 'icon-failed'}
                           size={[16]}
                           className={cn(
-                            extrinsic.isSuccess ? 'text-dev-green-600' : 'animate-rotate text-dev-yellow-700',
+                            extrinsic.isSuccess ? 'text-dev-green-600' : 'text-dev-red-800',
                           )}
                         />
                       </td>

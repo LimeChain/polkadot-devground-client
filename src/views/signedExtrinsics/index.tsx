@@ -3,25 +3,30 @@ import { formatDistanceToNowStrict } from 'date-fns';
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
 
 import { Icon } from '@components/icon';
+import { Loader } from '@components/loader';
 import { ModalJSONViewer } from '@components/modals/modalJSONViewer';
 import { PageHeader } from '@components/pageHeader';
-import { PDScrollArea } from '@components/pdScrollArea';
 import { SearchBar } from '@components/searchBar';
+import TableComponent from '@components/table';
 import { useStoreChain } from '@stores';
 import {
   cn,
   truncateAddress,
 } from '@utils/helpers';
 
-import type { IMappedBlockExtrinsic } from '@custom-types/block';
+import type {
+  IMappedBlock,
+  IMappedBlockExtrinsic,
+} from '@custom-types/block';
+import type { ColumnDef } from '@tanstack/react-table';
 
 const SignedExtrinsics = () => {
-
   const refSelectedExtrinsic = useRef<IMappedBlockExtrinsic | undefined>();
 
   const blocksData = useStoreChain?.use?.blocksData?.();
@@ -38,8 +43,15 @@ const SignedExtrinsics = () => {
   const isLoading = blocksData.size === 0;
 
   const handleOpenModal = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
-    const extrinsicId = e.currentTarget.getAttribute('data-extrinsic-id');
-    refSelectedExtrinsic.current = signedExtrinsics.find((extrinsic) => extrinsic.id === extrinsicId);
+    const dataIndex = Number(e.currentTarget.dataset.index);
+    const typedRow = signedExtrinsics[dataIndex] as unknown as IMappedBlockExtrinsic | IMappedBlock;
+
+    if ('header' in typedRow) {
+      const blockNumber = typedRow.header.number;
+      refSelectedExtrinsic.current = signedExtrinsics.find((extrinsic) => extrinsic.blockNumber === blockNumber);
+    } else {
+      refSelectedExtrinsic.current = typedRow;
+    }
     toggleVisibility();
   }, [
     signedExtrinsics,
@@ -57,95 +69,93 @@ const SignedExtrinsics = () => {
     latestBlock,
   ]);
 
-  return (
-    <div className="grid h-full grid-rows-[40px_46px_1fr] gap-8">
-      <PageHeader title="Extrinsics" />
-      <SearchBar
-        label="Search by Block"
-        type="extrinsics"
-      />
-      <PDScrollArea
-        className="h-full"
-        verticalScrollClassNames="pt-8"
-      >
-        <table>
-          <colgroup>
-            <col style={{ width: '10%', minWidth: '8rem' }} />
-            <col style={{ width: '10%', minWidth: '8rem' }} />
-            <col style={{ width: '10%', minWidth: '10rem' }} />
-            <col style={{ width: '10%', minWidth: '10rem' }} />
-            <col style={{ width: '5%', minWidth: '6rem' }} />
-            <col style={{ width: '10%', minWidth: '10rem' }} />
-            <col style={{ width: '1%', minWidth: '6rem' }} />
-          </colgroup>
-          <tr className="pd-table-head">
-            <th>Extrinsic ID</th>
-            <th>Block</th>
-            <th>Signer</th>
-            <th>Time</th>
-            <th>Result</th>
-            <th>Action</th>
-            <th />
-          </tr>
-          {
-            isLoading
-              ? 'Loading...'
-              : (
-                signedExtrinsics.map((extrinsic, extrinsicIndex) => {
-                  const timeAgo = extrinsic.timestamp && formatDistanceToNowStrict(
-                    new Date(extrinsic.timestamp),
-                    { addSuffix: true },
-                  );
+  const columns = useMemo(() => {
+    const result: ColumnDef<IMappedBlockExtrinsic>[] = [
+      {
+        header: 'Extrinsic ID',
+        accessorKey: 'id',
+      },
+      {
+        header: 'Block',
+        accessorKey: 'blockNumber',
+      },
+      {
+        header: 'Signer',
+        accessorKey: 'signer',
+        cell: ({ row }) => {
+          return truncateAddress(row.original.signer?.Id, 6);
+        },
+      },
+      {
+        header: 'Time',
+        accessorKey: 'timestamp',
+        cell: ({ row }) => {
+          return row.original.timestamp
+            && formatDistanceToNowStrict(new Date(row.original.timestamp), { addSuffix: true });
+        },
+      },
+      {
+        header: 'Result',
+        accessorKey: 'isSuccess',
+        cell: ({ row }) => {
+          const isSuccess = row.original.isSuccess;
 
-                  return (
-                    <tr
-                      key={extrinsic.id}
-                      data-extrinsic-id={extrinsic.id}
-                      onClick={handleOpenModal}
-                      className={cn(
-                        'pd-table-row',
-                        {
-                          ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: extrinsicIndex === 0,
-                        },
-                      )}
-                    >
-                      <td>{extrinsic.id}</td>
-                      <td>{extrinsic.blockNumber}</td>
-                      <td>{truncateAddress(extrinsic.signer?.Id, 6)}</td>
-                      <td>{timeAgo}</td>
-                      <td>
-                        {
-                          extrinsic.isSuccess
-                            ? (
-                              <Icon
-                                className="text-dev-green-600"
-                                name="icon-checked"
-                                size={[16]}
-                              />
-                            )
-                            : (
-                              <Icon
-                                className="text-dev-red-800"
-                                name="icon-failed"
-                                size={[16]}
-                              />
-                            )}
-                      </td>
-                      <td>{extrinsic.method.method}</td>
-                      <td>
-                        <Icon
-                          className="text-dev-black-1000 dark:text-dev-purple-50"
-                          name="icon-dropdownArrow"
-                          size={[18]}
-                        />
-                      </td>
-                    </tr>
-                  );
-                })
-              )
-          }
-        </table>
-      </PDScrollArea>
+          return (
+            <Icon
+              name={isSuccess ? 'icon-checked' : 'icon-failed'}
+              size={[16]}
+              className={cn(
+                {
+                  ['text-dev-green-600']: isSuccess,
+                  ['text-dev-red-800']: !isSuccess,
+                },
+              )}
+            />
+          );
+        },
+      },
+      {
+        header: 'Action',
+        accessorKey: 'method.method',
+      },
+      {
+        header: '',
+        accessorKey: 'dropdown',
+        cell: () => {
+          return (
+            <Icon
+              className="text-dev-black-1000 dark:text-dev-purple-50"
+              name="icon-dropdownArrow"
+              size={[18]}
+            />
+          );
+        },
+      },
+    ];
+
+    return result;
+  }, []);
+
+  return (
+    <div className="disable-vertical-scroll grid h-full grid-rows-[40px_46px_1fr] gap-8">
+      <PageHeader title="Extrinsics" />
+      {
+        isLoading
+          ? <Loader />
+          : (
+            <>
+              <SearchBar
+                label="Search by Block"
+                type="extrinsics"
+              />
+              <TableComponent
+                columns={columns}
+                data={signedExtrinsics}
+                onRowClick={handleOpenModal}
+              />
+            </>
+          )
+      }
 
       {
         refSelectedExtrinsic.current && (
@@ -157,7 +167,6 @@ const SignedExtrinsics = () => {
         )
       }
     </div>
-
   );
 };
 

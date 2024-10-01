@@ -1,15 +1,17 @@
 import { formatDistanceToNowStrict } from 'date-fns';
-import {
+import React, {
   useCallback,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Icon } from '@components/icon';
+import { Loader } from '@components/loader';
 import { PageHeader } from '@components/pageHeader';
-import { PDScrollArea } from '@components/pdScrollArea';
 import { SearchBar } from '@components/searchBar';
+import Table from '@components/table';
 import { useStoreChain } from '@stores';
 import {
   cn,
@@ -17,6 +19,7 @@ import {
 } from '@utils/helpers';
 
 import type { IMappedBlock } from '@custom-types/block';
+import type { ColumnDef } from '@tanstack/react-table';
 
 const LatestBlocks = () => {
   const navigate = useNavigate();
@@ -25,15 +28,86 @@ const LatestBlocks = () => {
   const latestFinalizedBlock = useStoreChain?.use?.finalizedBlock?.();
   const chain = useStoreChain?.use?.chain?.();
 
+  const columns = useMemo(() => {
+    const result: ColumnDef<IMappedBlock>[] = [
+      {
+        accessorKey: 'header.number',
+        header: 'Block',
+      },
+      {
+        header: 'Status',
+        cell: ({ row }) => {
+          const isFinalized = latestFinalizedBlock && latestFinalizedBlock >= row.original.header.number;
+
+          return (
+            <Icon
+              name={isFinalized ? 'icon-checked' : 'icon-clock'}
+              size={[16]}
+              className={cn(
+                {
+                  ['text-dev-green-600']: isFinalized,
+                  ['animate-rotate text-dev-yellow-700']: !isFinalized,
+                },
+              )}
+            />
+          );
+        },
+      },
+      {
+        accessorKey: 'header.timestamp',
+        header: 'Time',
+        cell: ({ row }) => {
+          return row.original.header.timestamp
+            && formatDistanceToNowStrict(new Date(row.original.header.timestamp), { addSuffix: true });
+        },
+      },
+      {
+        header: 'Extrinsics',
+        cell: ({ row }) => {
+          return row.original.body.extrinsics.length;
+        },
+      },
+      {
+        header: 'Events',
+        cell: ({ row }) => {
+          return row.original.body.events.length;
+        },
+      },
+      {
+        header: 'Validator',
+        cell: ({ row }) => {
+          return truncateAddress(row.original.header.identity.address.toString() || '', 6);
+        },
+      },
+      {
+        header: 'Block Hash',
+        cell: ({ row }) => {
+          return truncateAddress(row.original.header.hash.toString() || '', 6);
+        },
+      },
+    ];
+
+    return result;
+  }, [latestFinalizedBlock]);
+
   const [
     blocks,
     setBlocks,
   ] = useState<IMappedBlock[]>([]);
-  const isLoading = blocksData.size === 0;
+
+  const isLoading = blocks.length === 0;
+
+  const goRouteId = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
+    const dataIndex = Number(e.currentTarget.dataset.index);
+    const blockNumber = blocks[dataIndex].header.number;
+    navigate(`/explorer/${blockNumber}`);
+  }, [
+    blocks,
+    navigate,
+  ]);
 
   useEffect(() => {
     const blocksArray = Array.from(blocksData.values()).reverse();
-
     setBlocks(blocksArray);
   }, [
     blocksData,
@@ -42,95 +116,26 @@ const LatestBlocks = () => {
     latestFinalizedBlock,
   ]);
 
-  const goRouteId = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
-    navigate(`/explorer/${e.currentTarget.dataset.blockNumber}`);
-  }, [navigate]);
-
   return (
-    <div className="grid h-full grid-rows-[40px_46px_1fr] gap-8">
+    <div className="disable-vertical-scroll grid h-full grid-rows-[40px_46px_1fr] gap-8">
       <PageHeader title="Latest Blocks" />
-      <SearchBar
-        label="Search by Block"
-        type="block"
-      />
-      <PDScrollArea
-        className="h-full"
-        verticalScrollClassNames="pt-8"
-      >
-        <table className="w-full">
-          <colgroup>
-            <col style={{ width: '10%', minWidth: '9rem' }} />
-            <col style={{ width: '10%', minWidth: '4rem' }} />
-            <col style={{ width: '20%', minWidth: '8rem' }} />
-            <col style={{ width: '10%', minWidth: '6rem' }} />
-            <col style={{ width: '10%', minWidth: '6rem' }} />
-            <col style={{ width: '20%', minWidth: '10rem' }} />
-            <col style={{ width: '20%', minWidth: '10rem' }} />
-          </colgroup>
-          <tr className="pd-table-head">
-            <th>Block</th>
-            <th>Status</th>
-            <th>Time</th>
-            <th>Extrinsics</th>
-            <th>Events</th>
-            <th>Validator</th>
-            <th>Block Hash</th>
-          </tr>
-          {
-            isLoading
-              ? 'Loading...'
-              : (
-                blocks.map((block, blockIndex) => {
-                  const timeAgo = block.header.timestamp && formatDistanceToNowStrict(
-                    new Date(block.header.timestamp),
-                    { addSuffix: true },
-                  );
-                  const isFinalized = latestFinalizedBlock && latestFinalizedBlock >= block.header.number;
-
-                  return (
-                    <tr
-                      key={block.header.number}
-                      data-block-number={block.header.number}
-                      onClick={goRouteId}
-                      className={cn(
-                        'pd-table-row',
-                        {
-                          ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: blockIndex === 0,
-                        },
-                      )}
-                    >
-                      <td>{block.header.number}</td>
-                      <td>
-                        {
-                          isFinalized
-                            ? (
-                              <Icon
-                                className="text-dev-green-600"
-                                name="icon-checked"
-                                size={[16]}
-                              />
-                            )
-                            : (
-                              <Icon
-                                className="animate-rotate text-dev-yellow-700"
-                                name="icon-clock"
-                                size={[16]}
-                              />
-                            )
-                        }
-                      </td>
-                      <td>{timeAgo}</td>
-                      <td>{block.body.extrinsics.length}</td>
-                      <td>{block.body.events.length}</td>
-                      <td>{truncateAddress(block.header.identity.address.toString() || '', 6)}</td>
-                      <td>{truncateAddress(block.header.hash, 6)}</td>
-                    </tr>
-                  );
-                })
-              )
-          }
-        </table>
-      </PDScrollArea>
+      {
+        isLoading
+          ? <Loader />
+          : (
+            <>
+              <SearchBar
+                label="Search by Block"
+                type="block"
+              />
+              <Table
+                columns={columns}
+                data={blocks}
+                onRowClick={goRouteId}
+              />
+            </>
+          )
+      }
     </div>
   );
 };
