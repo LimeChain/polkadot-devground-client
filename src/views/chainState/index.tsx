@@ -238,6 +238,7 @@ const ChainState = () => {
         {
           (encodedStorageKey) && (
             <p className="break-all">
+              Encoded Storage Key:
               <br />
               {' '}
               {encodedStorageKey}
