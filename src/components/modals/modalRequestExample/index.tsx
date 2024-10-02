@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { cn } from '@utils/helpers';
 
 import {
@@ -10,14 +8,6 @@ import {
 interface IModalGithubLogin extends Pick<IModal, 'onClose'> {}
 
 export const ModalRequestExample = ({ onClose }: IModalGithubLogin) => {
-  const [
-    exampleName,
-    setExampleName,
-  ] = useState('');
-  const [
-    description,
-    setDescription,
-  ] = useState('');
 
   return (
     <Modal
@@ -32,10 +22,7 @@ export const ModalRequestExample = ({ onClose }: IModalGithubLogin) => {
       <h5 className="self-start font-h5-bold">Request Example</h5>
       <div className="flex flex-col">
         <input
-          // eslint-disable-next-line react/jsx-no-bind
-          onChange={(e) => setExampleName(e.target.value)}
           placeholder="Enter Example Name"
-          value={exampleName}
           className={cn(
             'mb-6 p-4',
             'border border-dev-white-900',
@@ -44,10 +31,7 @@ export const ModalRequestExample = ({ onClose }: IModalGithubLogin) => {
           )}
         />
         <textarea
-          // eslint-disable-next-line react/jsx-no-bind
-          onChange={(e) => setDescription(e.target.value)}
           placeholder="Enter Description"
-          value={description}
           className={cn(
             'mb-6 p-4',
             'border border-dev-white-900',

@@ -2,7 +2,6 @@ import { lazy } from 'react';
 
 import { LayoutBasic } from '@components/layouts/basic';
 import { LayoutCodeEditor } from '@components/layouts/codeEditor';
-import LatestBlocks from '@views/latestBlocks';
 import { NotFound } from '@views/notFound';
 import { RpcCalls } from '@views/rpcCalls';
 
@@ -19,6 +18,7 @@ const ChainState = lazy(() => import('../views/chainState'));
 const Constants = lazy(() => import('../views/constants'));
 const RuntimeCalls = lazy(() => import('../views/runtimeCalls'));
 const Onboarding = lazy(() => import('../views/onboarding'));
+const LatestBlocks = lazy(() => import('../views/latestBlocks'));
 
 export const routes = () => ([
   {

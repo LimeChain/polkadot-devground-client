@@ -7,7 +7,8 @@ interface SearchProps {
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
-const Search = ({ onChange }: SearchProps) => {
+export const Search = (props: SearchProps) => {
+  const { onChange } = props;
 
   return (
     <div
@@ -37,5 +38,3 @@ const Search = ({ onChange }: SearchProps) => {
     </div>
   );
 };
-
-export default Search;

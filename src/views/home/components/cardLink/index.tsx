@@ -9,7 +9,14 @@ interface CardLinkProps {
   description: string;
 }
 
-const CardLink: React.FC<CardLinkProps> = ({ to, iconName, title, description }) => {
+export const CardLink = (props: CardLinkProps) => {
+  const {
+    to,
+    iconName,
+    title,
+    description,
+  } = props;
+
   return (
     <PDLink
       to={to}
@@ -51,5 +58,3 @@ const CardLink: React.FC<CardLinkProps> = ({ to, iconName, title, description })
     </PDLink>
   );
 };
-
-export default CardLink;

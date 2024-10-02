@@ -1,7 +1,7 @@
 import { HOME_LINKS } from '@constants/links';
 import { cn } from '@utils/helpers';
 
-import CardLink from './components/cardLink';
+import { CardLink } from './components/cardLink';
 
 const Home = () => {
   const hasVisited = localStorage.getItem('hasVisitedOnboarding');

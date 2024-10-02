@@ -1,6 +1,5 @@
 import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import {
-  useCallback,
   useEffect,
   useRef,
   useState,
@@ -8,13 +7,10 @@ import {
 
 import { ModalRequestExample } from '@components/modals/modalRequestExample';
 import { PDLink } from '@components/pdLink';
-import { PDScrollArea } from '@components/pdScrollArea';
 import { Tabs } from '@components/tabs';
-import { snippets } from '@constants/snippets';
 import { cn } from '@utils/helpers';
-
-import NotFound from './components/notFound';
-import Search from './components/search';
+import { DefaultExamples } from '@views/onboarding/components/defaultExamples';
+import { GithubExamples } from '@views/onboarding/components/githubExamples';
 
 const Onboarding = () => {
   const [
@@ -27,18 +23,6 @@ const Onboarding = () => {
     initialTab,
     setInitialTab,
   ] = useState(0);
-  const [
-    searchQuery,
-    setSearchQuery,
-  ] = useState('');
-
-  const filteredSnippets = snippets.filter((snippet) =>
-    snippet.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
-
-  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  }, []);
 
   useEffect(() => {
     localStorage.setItem('hasVisitedOnboarding', 'true');
@@ -57,7 +41,7 @@ const Onboarding = () => {
         Select Example
       </h1>
       <PDLink
-        to={`/code`}
+        to="/code"
         className={cn(
           'absolute right-20 top-0',
           'mt-1 px-3 py-4',
@@ -78,46 +62,15 @@ const Onboarding = () => {
           className="flex flex-col"
           data-title="Default"
         >
-          <Search onChange={handleSearch} />
-          <PDScrollArea className="h-[calc(100vh-550px)] grow overflow-y-auto">
-            <ul>
-              {
-                filteredSnippets.map((snippet, index) => (
-                  <li key={index}>
-                    <PDLink
-                      to={`/code?s=${snippet.id}`}
-                      className={cn(
-                        'flex w-full items-center justify-between',
-                        'mt-1 px-3 py-4',
-                        'font-geist font-body2-regular',
-                        'duration-300 ease-in-out',
-                        'hover:bg-dev-purple-100',
-                        'dark:hover:bg-dev-purple-900',
-                      )}
-                    >
-                      {snippet.name}
-                    </PDLink>
-                  </li>
-                ))
-              }
-            </ul>
-          </PDScrollArea>
-          <button
-            onClick={toggleVisibility}
-            className={cn(
-              'mt-10 p-4 text-center font-body1-regular',
-            )}
-          >
-            Have any ideas about Example? Request example here.
-          </button>
+          <DefaultExamples toggleVisibility={toggleVisibility} />
         </div>
         <div
           className="px-16"
           data-title="Custom"
         >
-          <NotFound />
+          <GithubExamples />
         </div>
-      </Tabs >
+      </Tabs>
       <RequestExampleModal onClose={toggleVisibility} />
     </div>
   );
