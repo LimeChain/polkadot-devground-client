@@ -6,9 +6,11 @@ import { cn } from '@utils/helpers';
 
 export interface INavigationLink extends IPDLink {
   title: string;
+  onClick?: () => void;
 }
 
 export const NavigationLink = ({ title, ...props }: INavigationLink) => {
+
   return (
     <PDLink
       {...props}

@@ -11,6 +11,7 @@ import { cn } from '@utils/helpers';
 export interface INavigationDropdownItem extends IPDLink {
   title: string;
   icon: SVGIconProps['name'];
+  onClick?: () => void;
 }
 
 export const NavigationDropdownItem = ({

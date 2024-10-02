@@ -74,3 +74,8 @@ export interface IEventBusForksReceiveUpdate {
     keepScrollToEnd: boolean;
   };
 }
+
+export interface IEventBusClickLink {
+  type: '@@-click-link';
+  data: string;
+}
