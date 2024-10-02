@@ -9,7 +9,7 @@ import { PageHeader } from '@components/pageHeader';
 import { PDLink } from '@components/pdLink';
 import { useStoreChain } from '@stores';
 import { formatNumber } from '@utils/helpers';
-import { getBlockDetailsWithPAPIRaw } from '@utils/rpc/getBlockDetails';
+import { getBlockDetailsWithRawClient } from '@utils/rpc/getBlockDetails';
 import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
 import { BlockBody } from './blockBody';
@@ -30,22 +30,22 @@ const BlockDetails = () => {
   ] = useState<IMappedBlock>();
 
   useEffect(() => {
-    const fetchData = async () => {
-      const blockRaw = data.get(Number(blockNumber));
-      if (!blockRaw) {
+    void (async () => {
+      const blockStore = data.get(Number(blockNumber));
+      if (!blockStore) {
         return;
       }
-      const block = await getBlockDetailsWithPAPIRaw({
-        blockNumber: blockRaw.number,
+      const block = await getBlockDetailsWithRawClient({
+        blockNumber: blockStore.number,
         dynamicBuilder,
       });
 
-      setBlockData({ ...block, header: { ...block.header, identity: blockRaw.identity } });
-    };
-    void fetchData();
+      setBlockData({ ...block, header: { ...block.header, identity: blockStore.identity } });
+    })();
+    // Removed data from dependencies as we expect this should be already in place when hitting this page
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     blockNumber,
-    data,
     dynamicBuilder,
     latestFinalizedBlock,
   ]);

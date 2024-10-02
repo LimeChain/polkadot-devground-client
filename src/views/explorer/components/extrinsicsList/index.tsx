@@ -13,7 +13,7 @@ import { useStoreChain } from '@stores';
 import { polymorphicComponent } from '@utils/components';
 import { cn } from '@utils/helpers';
 import { useMergedRefs } from '@utils/hooks/useMergedRefs';
-import { getBlockDetailsWithPAPIRaw } from '@utils/rpc/getBlockDetails';
+import { getBlockDetailsWithRawClient } from '@utils/rpc/getBlockDetails';
 import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
 import styles from '../styles.module.css';
@@ -29,7 +29,6 @@ export const ExtrinsicsList = polymorphicComponent<'div'>((_props, ref) => {
 
   const refSelectedExtrinsic = useRef<IBlockExtrinsic | undefined>();
 
-  // const blocksData = useStoreChain?.use?.blocksData?.();
   const blocksData = useStoreChain?.use?.blocksData?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
   const dynamicBuilder = useDynamicBuilder();
@@ -51,7 +50,7 @@ export const ExtrinsicsList = polymorphicComponent<'div'>((_props, ref) => {
 
     if (!extrinsicStore) return;
 
-    const block = await getBlockDetailsWithPAPIRaw({
+    const block = await getBlockDetailsWithRawClient({
       blockNumber: extrinsicStore.blockNumber,
       dynamicBuilder,
     });

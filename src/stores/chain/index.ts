@@ -226,7 +226,6 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
                         lookup: getLookupFn(decodededMetadata.metadata.value),
                       });
                     }
-
                     registry.setMetadata(metadata);
                     break;
                   }
@@ -282,7 +281,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
 
           }
 
-          await Promise.allSettled(promises).then((results) => {
+          Promise.allSettled(promises).then((results) => {
             results.forEach((blockData) => {
               if (blockData.status === 'fulfilled') {
                 const blockExtrinsics = (blockData?.value.body?.extrinsics?.slice(2) ?? []).reverse().map((extrinsic) => {

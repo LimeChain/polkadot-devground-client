@@ -119,7 +119,6 @@ export const formatPrettyNumberString = (value: string = '') => {
 };
 
 export const truncateAddress = (address: string = '', chars: number = 3) => {
-  console.log('address mitko', address);
   return `${address.slice(0, chars)}...${address.slice(-chars)}`;
 };
 

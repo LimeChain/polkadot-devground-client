@@ -19,7 +19,7 @@ import {
   cn,
   truncateAddress,
 } from '@utils/helpers';
-import { getBlockDetailsWithPAPIRaw } from '@utils/rpc/getBlockDetails';
+import { getBlockDetailsWithRawClient } from '@utils/rpc/getBlockDetails';
 import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
 import type { IBlockExtrinsic } from '@custom-types/block';
@@ -29,7 +29,6 @@ import type { ColumnDef } from '@tanstack/react-table';
 const SignedExtrinsics = () => {
   const refSelectedExtrinsic = useRef<IBlockExtrinsic | undefined>();
 
-  // const blocksData = useStoreChain?.use?.blocksData?.();
   const blocksData = useStoreChain?.use?.blocksData?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
   const dynamicBuilder = useDynamicBuilder();
@@ -52,7 +51,7 @@ const SignedExtrinsics = () => {
     const extrinsicStore = signedExtrinsics.find((extrinsic) => extrinsic.id === extrinsicId);
     if (!extrinsicStore) return;
 
-    const block = await getBlockDetailsWithPAPIRaw({
+    const block = await getBlockDetailsWithRawClient({
       blockNumber: extrinsicStore.blockNumber,
       dynamicBuilder,
     });

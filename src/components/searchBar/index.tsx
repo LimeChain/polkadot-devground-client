@@ -16,7 +16,7 @@ import {
 } from '@utils/helpers';
 import { useDebounce } from '@utils/hooks/useDebounce';
 import { useOnClickOutside } from '@utils/hooks/useOnClickOutside';
-import { getBlockDetailsWithPAPIRaw } from '@utils/rpc/getBlockDetails';
+import { getBlockDetailsWithRawClient } from '@utils/rpc/getBlockDetails';
 import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
 import { Results } from './results';
@@ -116,7 +116,7 @@ export const SearchBar = (props: ISearchBarProps) => {
 
     if (!extrinsicStore) return;
 
-    const block = await getBlockDetailsWithPAPIRaw({
+    const block = await getBlockDetailsWithRawClient({
       blockNumber: extrinsicStore.blockNumber,
       dynamicBuilder,
     });

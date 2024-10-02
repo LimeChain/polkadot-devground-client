@@ -26,11 +26,8 @@ export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
     setBlocks,
   ] = useState<IBlockStoreData[]>([]);
 
-  // const blocksData = useStoreChain?.use?.blocksData?.();
   const blocksData = useStoreChain?.use?.blocksData?.();
   const bestBlock = useStoreChain?.use?.bestBlock?.();
-  // console.log('blocksData', blocksData);
-  // console.log('blocksDataNew', blocksDataNew);
   const rowVirtualizer = useVirtualizer({
     count: blocks.length,
     getScrollElement: () => refScrollArea?.current,

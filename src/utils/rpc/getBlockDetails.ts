@@ -184,7 +184,8 @@ export const getBlockDetailsWithPAPI = async ({
   };
 };
 
-export const getBlockDetailsWithPAPIRaw = async ({
+// Not reusing the function getBlockDetailsWithPAPI above as expecting these functions to diverge in future
+export const getBlockDetailsWithRawClient = async ({
   blockNumber,
   dynamicBuilder,
 }: {
@@ -196,26 +197,31 @@ export const getBlockDetailsWithPAPIRaw = async ({
 
   const rawClient = baseStoreChain.getState().rawClient as StoreInterface['rawClient'];
   const blockHash = await rawClient?.request('chain_getBlockHash', [blockNumber]) as string;
+
   assert(blockHash, 'Block Hash prop is not defined');
 
-  const block = await rawClient?.request('chain_getBlock', [blockHash]) as BlockDetails;
-  assert(block, 'Failed to fetch block details');
+  const storageCodec = dynamicBuilder.buildStorage('System', 'Events');
+  const encodedKey = storageCodec.enc();
 
-  const runtime = await rawClient?.request('state_getRuntimeVersion', [blockHash]) as RuntimeVersion;
+  const [
+    block,
+    runtime,
+    storage,
+  ] = await Promise.all([
+    rawClient?.request('chain_getBlock', [blockHash]) as Promise<BlockDetails>,
+    rawClient?.request('state_getRuntimeVersion', [blockHash]) as Promise<RuntimeVersion>,
+    rawClient?.request('state_getStorage', [
+      encodedKey,
+      blockHash,
+    ]) as Promise<HexString>,
+  ]);
+
+  assert(block, 'Failed to fetch block details');
   assert(runtime, 'Failed to fetch runtime version');
 
   const blockHeader = block.block.header;
   const blockHeaderNumber = Number(block.block.header.number);
   const extrinsicsRaw: HexString[] = block.block.extrinsics;
-
-  const storageCodec = dynamicBuilder.buildStorage('System', 'Events');
-  const encodedKey = storageCodec.enc();
-
-  const storage = await rawClient?.request('state_getStorage', [
-    encodedKey,
-    blockHash,
-  ]) as HexString;
-
   const events = storageCodec.dec(storage) as Awaited<ReturnType<typeof getSystemEvents>>;
 
   // Initialize timestamp variable
