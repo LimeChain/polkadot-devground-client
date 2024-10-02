@@ -37,7 +37,7 @@ export const SearchBar = (props: ISearchBarProps) => {
 
   const refContainer = useRef<HTMLDivElement>(null);
   const refInput = useRef<HTMLInputElement>(null);
-  const refSelectedExtrinsic = useRef<IBlockExtrinsic | undefined>();
+  const refSelectedExtrinsic = useRef<IBlockExtrinsic | null>(null);
 
   const blocksData = useStoreChain?.use?.blocksData?.();
   const dynamicBuilder = useDynamicBuilder();
@@ -120,7 +120,7 @@ export const SearchBar = (props: ISearchBarProps) => {
       blockNumber: extrinsicStore.blockNumber,
       dynamicBuilder,
     });
-    refSelectedExtrinsic.current = block.body.extrinsics.find((extrinsic) => extrinsic.id === extrinsicId)?.extrinsicData;
+    refSelectedExtrinsic.current = block.body.extrinsics.find((extrinsic) => extrinsic.id === extrinsicId)?.extrinsicData || null;
     toggleVisibility();
   }, [
     dynamicBuilder,

@@ -35,7 +35,7 @@ export const BlockBody = (props: BlockBodyProps) => {
   const [
     modalData,
     setModalData,
-  ] = useState<IMappedBlockEvent | IBlockExtrinsic | undefined>(undefined);
+  ] = useState<IMappedBlockEvent | IBlockExtrinsic | null>(null);
   const [
     initialTab,
     setInitialTab,
