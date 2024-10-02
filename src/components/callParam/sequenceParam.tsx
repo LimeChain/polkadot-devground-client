@@ -90,7 +90,12 @@ const _SequenceParam = ({ sequence, onChange, placeholder }: ISequence) => {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="-mb-4 flex justify-end gap-4">
+      <div className={cn(
+        "flex justify-end gap-4",
+        {
+          ['-mb-4 ']: length > 0
+        }
+      )}>
         <button
           onClick={handleAddItem}
           type="button"
