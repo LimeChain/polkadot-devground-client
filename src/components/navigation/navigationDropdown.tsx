@@ -1,3 +1,5 @@
+import { useLocation } from 'react-router-dom';
+
 import { Icon } from '@components/icon';
 import { cn } from '@utils/helpers';
 
@@ -18,19 +20,23 @@ export const NavigationDropdown = ({
   ...props
 }: INavigationDropdown) => {
 
+  const location = useLocation();
+
   return (
     <div className="group relative">
       <button
         {...props}
         className={cn(
+          'group',
           'relative px-2 py-2',
           'after:absolute after:bottom-0 after:left-0 after:content-[""]',
           'after:h-[3px] after:w-full after:bg-dev-pink-500',
           'after:opacity-0 after:transition-opacity',
-          'group-hover:after:opacity-100',
-          'group-focus-within:after:opacity-100',
           'flex items-center gap-1',
           'text-dev-purple-50 sm:text-dev-black-1000 sm:dark:text-dev-purple-50',
+          {
+            ['after:opacity-100']: items.some((item) => String(item.to).startsWith(location.pathname)),
+          },
           className,
         )}
       >

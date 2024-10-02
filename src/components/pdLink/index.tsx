@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 import { cn } from '@utils/helpers';
 
@@ -7,11 +7,17 @@ import type {
   ReactNode,
 } from 'react';
 
+type NavLinkRenderProps = {
+  isActive: boolean;
+  isPending: boolean;
+  isTransitioning: boolean;
+};
+
 export interface IPDLink {
   to: number | string;
   children?: ReactNode;
   target?: string; // Add this line
-  className?: string;
+  className?: string | ((props: NavLinkRenderProps) => string);
   rel?: string;
   style?: CSSProperties;
 }
@@ -24,12 +30,21 @@ export const PDLink = (props: IPDLink) => {
     ...rest
   } = props;
   return (
-    <Link
-      className={cn('text-current hover:text-current', className)}
+    <NavLink
       to={to.toString()}
+      // eslint-disable-next-line react/jsx-no-bind
+      className={(props) => {
+        const baseClasses = 'text-current hover:text-current';
+        if (typeof className === 'function') {
+          return cn(baseClasses, className(props));
+        } else if (typeof className === 'string') {
+          return cn(baseClasses, className);
+        }
+        return baseClasses;
+      }}
       {...rest}
     >
       {children}
-    </Link>
+    </NavLink>
   );
 };
