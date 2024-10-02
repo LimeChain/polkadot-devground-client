@@ -55,7 +55,7 @@ const BlockDetails = () => {
   }
 
   return (
-    <div className="grid gap-8">
+    <div className="disable-horizontal-scroll grid gap-8">
       <div className="flex items-center justify-between">
         <PageHeader
           blockNumber={formatNumber(blockData.header.number)}
