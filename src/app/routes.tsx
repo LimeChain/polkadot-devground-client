@@ -4,6 +4,7 @@ import { LayoutBasic } from '@components/layouts/basic';
 import { LayoutCodeEditor } from '@components/layouts/codeEditor';
 import { NotFound } from '@views/notFound';
 import { RpcCalls } from '@views/rpcCalls';
+import Decoder from '@views/decode';
 
 const Home = lazy(() => import('../views/home'));
 const CodeEditor = lazy(() => import('../views/codeEditor'));
@@ -63,6 +64,10 @@ export const routes = () => ([
           {
             path: 'rpc-calls',
             element: <RpcCalls />,
+          },
+          {
+            path: 'decoder',
+            element: <Decoder/>,
           },
         ],
       },
