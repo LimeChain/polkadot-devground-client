@@ -30,7 +30,7 @@ const SignedExtrinsics = () => {
   const refSelectedExtrinsic = useRef<IBlockExtrinsic | undefined>();
 
   // const blocksData = useStoreChain?.use?.blocksData?.();
-  const blocksData = useStoreChain?.use?.blockDataNew?.();
+  const blocksData = useStoreChain?.use?.blocksData?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
   const dynamicBuilder = useDynamicBuilder();
 

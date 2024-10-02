@@ -73,10 +73,7 @@ export interface StoreInterface {
   api: TApi | null;
   peopleApi: TPeopleApi | null;
   stakingApi: TStakingApi | null;
-
-  blocksData: Map<number, Awaited<ReturnType<typeof getBlockDetailsWithPAPI>>>;
-  // TODO: fix types when we have the actual data
-  blockDataNew: Map<number, IBlockStoreData>;
+  blocksData: Map<number, IBlockStoreData>;
   bestBlock: number | null;
   finalizedBlock: number | null;
   totalIssuance: bigint | null;
@@ -110,7 +107,6 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   stakingApi: null,
   smoldot: null,
   blocksData: new Map(),
-  blockDataNew: new Map(),
   bestBlock: null,
   finalizedBlock: null,
   totalIssuance: null,
@@ -165,7 +161,6 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
         get()?.actions?.resetStore?.();
 
         const blocksData = get()?.blocksData;
-        const blockDataNew = get()?.blockDataNew;
         const registry = get().registry;
 
         set({ chain });
@@ -284,7 +279,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
             const block = bestBlocks[i];
 
             // skip allready fetched blocks
-            const blockHashHasBeenFetched = blocksData.get(block.number)?.header?.hash === block.hash;
+            const blockHashHasBeenFetched = blocksData.get(block.number)?.hash === block.hash;
             if (blockHashHasBeenFetched) {
               continue;
             }
@@ -322,7 +317,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
                 };
                 // blocksData.set(blockData.value.header.number, blockData.value);
 
-                blockDataNew.set(blockData.value.header.number, newBlockData);
+                blocksData.set(blockData.value.header.number, newBlockData);
               }
             });
             set({ bestBlock: bestBlock?.number, finalizedBlock: finalizedBlock?.number });

@@ -24,7 +24,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 const LatestBlocks = () => {
   const navigate = useNavigate();
   // const blocksData = useStoreChain?.use?.blocksData?.();
-  const blocksData = useStoreChain?.use?.blockDataNew?.();
+  const blocksData = useStoreChain?.use?.blocksData?.();
   const bestBlock = useStoreChain?.use?.bestBlock?.();
   const latestFinalizedBlock = useStoreChain?.use?.finalizedBlock?.();
   const chain = useStoreChain?.use?.chain?.();

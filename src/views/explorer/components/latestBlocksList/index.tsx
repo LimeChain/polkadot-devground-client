@@ -27,7 +27,7 @@ export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
   ] = useState<IBlockStoreData[]>([]);
 
   // const blocksData = useStoreChain?.use?.blocksData?.();
-  const blocksData = useStoreChain?.use?.blockDataNew?.();
+  const blocksData = useStoreChain?.use?.blocksData?.();
   const bestBlock = useStoreChain?.use?.bestBlock?.();
   // console.log('blocksData', blocksData);
   // console.log('blocksDataNew', blocksDataNew);

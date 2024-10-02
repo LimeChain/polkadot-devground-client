@@ -20,7 +20,7 @@ import type { IMappedBlock } from '@custom-types/block';
 
 const BlockDetails = () => {
   const { blockNumber } = useParams();
-  const data = useStoreChain?.use?.blockDataNew?.();
+  const data = useStoreChain?.use?.blocksData?.();
   const latestFinalizedBlock = useStoreChain.use.finalizedBlock?.();
   const dynamicBuilder = useDynamicBuilder();
 

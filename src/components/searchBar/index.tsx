@@ -39,7 +39,7 @@ export const SearchBar = (props: ISearchBarProps) => {
   const refInput = useRef<HTMLInputElement>(null);
   const refSelectedExtrinsic = useRef<IBlockExtrinsic | undefined>();
 
-  const blocksData = useStoreChain?.use?.blockDataNew?.();
+  const blocksData = useStoreChain?.use?.blocksData?.();
   const dynamicBuilder = useDynamicBuilder();
 
   const [
