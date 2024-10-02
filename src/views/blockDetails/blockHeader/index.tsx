@@ -61,6 +61,7 @@ export const BlockHeader = (props: BlockHeaderProps) => {
   const formattedTimestamp = isUTC
     ? new Date(headerData.timestamp).toUTCString()
     : format(new Date(headerData.timestamp), 'yyyy-MM-dd HH:mm:ss');
+
   return (
     <div>
       <div className={styles['pd-block-details']}>
