@@ -226,16 +226,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
                         lookup: getLookupFn(decodededMetadata.metadata.value),
                       });
                     }
-                    // TODO: this takes around 10mB of memory, we should find a way to free it
-                    // const calculateObjectSizeInKB = (obj: any) => {
-                    //   const jsonString = JSON.stringify(obj);
-                    //   const encoder = new TextEncoder();
-                    //   const sizeInBytes = encoder.encode(jsonString).length;
-                    //   return sizeInBytes / 1024; // convert bytes to kilobytes
-                    // };
 
-                    // const metadataSize = calculateObjectSizeInKB(metadata);
-                    // console.log('metadataSize', metadataSize);
                     registry.setMetadata(metadata);
                     break;
                   }
@@ -295,27 +286,31 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
             results.forEach((blockData) => {
               if (blockData.status === 'fulfilled') {
                 const blockExtrinsics = (blockData?.value.body?.extrinsics?.slice(2) ?? []).reverse().map((extrinsic) => {
+                  const { id, blockNumber, extrinsicData, timestamp, isSuccess } = extrinsic;
+                  const { method, signer } = extrinsicData;
                   return {
-                    id: extrinsic.id,
-                    blockNumber: extrinsic.blockNumber,
-                    signer: extrinsic.extrinsicData.signer?.Id ?? '',
-                    timestamp: extrinsic.timestamp,
-                    isSuccess: extrinsic.isSuccess,
-                    method: extrinsic.extrinsicData.method.method,
-                    section: extrinsic.extrinsicData.method.section,
+                    id,
+                    blockNumber,
+                    timestamp,
+                    isSuccess,
+                    signer: signer?.Id ?? '',
+                    method: method.method,
+                    section: method.section,
                   };
                 },
                 );
+
+                const { value: { header: { number, hash, timestamp, identity }, body: { events } } } = blockData;
+
                 const newBlockData = {
-                  number: blockData.value.header.number,
-                  hash: blockData.value.header.hash,
-                  timestamp: blockData.value.header.timestamp,
-                  eventsLength: blockData.value.body.events.length,
-                  validator: blockData.value.header.identity.address.toString(),
+                  number,
+                  hash,
+                  timestamp,
+                  eventsLength: events.length,
+                  validator: identity.address.toString(),
                   extrinsics: blockExtrinsics,
-                  identity: blockData.value.header.identity,
+                  identity,
                 };
-                // blocksData.set(blockData.value.header.number, blockData.value);
 
                 blocksData.set(blockData.value.header.number, newBlockData);
               }
