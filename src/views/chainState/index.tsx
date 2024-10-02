@@ -296,6 +296,7 @@ const Query = (
 
     if (api) {
       try {
+        console.log(' tuka');
         // @TODO: fix types
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const subscription = (api.query as any)[querie.pallet][querie.storage]

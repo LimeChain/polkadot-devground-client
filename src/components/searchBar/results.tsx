@@ -8,7 +8,7 @@ import { PDLink } from '@components/pdLink';
 import { PDScrollArea } from '@components/pdScrollArea';
 import { cn } from '@utils/helpers';
 
-import type { IMappedBlockExtrinsic } from '@custom-types/block';
+import type { IExtrinsicStoreData } from '@custom-types/chain';
 
 interface IButtonProps {
   children: ReactNode;
@@ -44,10 +44,10 @@ const Button = (props: IButtonProps) => {
 interface IResultProps {
   results: {
     blockNumber: number | null;
-    extrinsics: IMappedBlockExtrinsic[];
+    extrinsics: IExtrinsicStoreData[];
   };
   type: string;
-  handleOpenModal: (e?: React.MouseEvent<HTMLDivElement>) => void;
+  handleOpenModal: (e: React.MouseEvent<HTMLDivElement>) => void;
   classNames?: string;
 }
 export const Results = (props: IResultProps) => {

@@ -15,18 +15,7 @@ import styles from '../styles.module.css';
 
 import { Row } from './row';
 
-interface Block {
-  header: {
-    identity: string | object;
-    hash: string | undefined;
-    number: number;
-    timestamp: number;
-  };
-  body: {
-    extrinsics: unknown[];
-    events: unknown[];
-  };
-}
+import type { IBlockStoreData } from '@custom-types/chain';
 
 export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
   const refScrollArea = useRef<HTMLDivElement>(null);
@@ -35,11 +24,13 @@ export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
   const [
     blocks,
     setBlocks,
-  ] = useState<Block[]>([]);
+  ] = useState<IBlockStoreData[]>([]);
 
-  const blocksData = useStoreChain?.use?.blocksData?.();
+  // const blocksData = useStoreChain?.use?.blocksData?.();
+  const blocksData = useStoreChain?.use?.blockDataNew?.();
   const bestBlock = useStoreChain?.use?.bestBlock?.();
-
+  // console.log('blocksData', blocksData);
+  // console.log('blocksDataNew', blocksDataNew);
   const rowVirtualizer = useVirtualizer({
     count: blocks.length,
     getScrollElement: () => refScrollArea?.current,
@@ -76,10 +67,10 @@ export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
                 return (
                   <Row
                     key={virtualIndex}
-                    blockNumber={block.header.number}
-                    eventsLength={block.body.events.length}
-                    extrinsicsLength={block.body.extrinsics.length}
-                    timestamp={block.header.timestamp}
+                    blockNumber={block.number}
+                    eventsLength={block.eventsLength}
+                    extrinsicsLength={block.extrinsics.length}
+                    timestamp={block.timestamp}
                     className={cn(
                       styles['pd-explorer-list'],
                       {

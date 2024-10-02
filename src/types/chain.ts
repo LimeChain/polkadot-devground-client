@@ -8,6 +8,7 @@ import type {
 } from '.papi/descriptors/dist';
 import type {
   PolkadotClient,
+  SS58String,
   TypedApi,
 } from 'polkadot-api';
 
@@ -77,3 +78,27 @@ export interface IRuntime {
 }
 
 export type TSmoldotChain = Chain | void;
+
+export interface IBlockStoreData {
+  number: number;
+  hash: string;
+  timestamp: number;
+  eventsLength: number;
+  validator: string;
+  extrinsics: IExtrinsicStoreData[];
+  identity: Identity;
+}
+export interface IExtrinsicStoreData {
+  id: string;
+  blockNumber: number;
+  signer: string;
+  timestamp: number;
+  isSuccess: boolean;
+  method: string;
+  section: string;
+}
+
+interface Identity {
+  name: string | undefined;
+  address: SS58String;
+}

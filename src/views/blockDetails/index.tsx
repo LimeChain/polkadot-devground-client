@@ -9,6 +9,8 @@ import { PageHeader } from '@components/pageHeader';
 import { PDLink } from '@components/pdLink';
 import { useStoreChain } from '@stores';
 import { formatNumber } from '@utils/helpers';
+import { getBlockDetailsWithPAPIRaw } from '@utils/rpc/getBlockDetails';
+import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
 import { BlockBody } from './blockBody';
 import { BlockHeader } from './blockHeader';
@@ -18,8 +20,9 @@ import type { IMappedBlock } from '@custom-types/block';
 
 const BlockDetails = () => {
   const { blockNumber } = useParams();
-  const data = useStoreChain?.use?.blocksData?.();
+  const data = useStoreChain?.use?.blockDataNew?.();
   const latestFinalizedBlock = useStoreChain.use.finalizedBlock?.();
+  const dynamicBuilder = useDynamicBuilder();
 
   const [
     blockData,
@@ -27,34 +30,23 @@ const BlockDetails = () => {
   ] = useState<IMappedBlock>();
 
   useEffect(() => {
-    if (blockNumber && data.size > 0) {
-      const block = data.get(Number(blockNumber));
-      if (!block) {
+    const fetchData = async () => {
+      const blockRaw = data.get(Number(blockNumber));
+      if (!blockRaw) {
         return;
       }
-
-      if (block.header.number <= (latestFinalizedBlock ?? 0)) {
-        setBlockData({
-          ...block,
-          header: {
-            ...block.header,
-            isFinalized: true,
-          },
-        });
-        return;
-      }
-
-      setBlockData({
-        ...block,
-        header: {
-          ...block.header,
-          isFinalized: false,
-        },
+      const block = await getBlockDetailsWithPAPIRaw({
+        blockNumber: blockRaw.number,
+        dynamicBuilder,
       });
-    }
+
+      setBlockData({ ...block, header: { ...block.header, identity: blockRaw.identity } });
+    };
+    void fetchData();
   }, [
     blockNumber,
     data,
+    dynamicBuilder,
     latestFinalizedBlock,
   ]);
 

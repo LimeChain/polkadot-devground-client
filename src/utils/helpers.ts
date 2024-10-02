@@ -65,10 +65,10 @@ export const stringifyBigIntValues = (_key: string, value: unknown) => {
   return typeof value === 'bigint' ? value.toString() : value;
 };
 
-export const debounce = (func:(...args:unknown[]) => unknown, wait: number) => {
-  let timeout:NodeJS.Timeout;
+export const debounce = (func: (...args: unknown[]) => unknown, wait: number) => {
+  let timeout: NodeJS.Timeout;
 
-  return (...args:unknown[]) => {
+  return (...args: unknown[]) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
       func(...args);
@@ -119,6 +119,7 @@ export const formatPrettyNumberString = (value: string = '') => {
 };
 
 export const truncateAddress = (address: string = '', chars: number = 3) => {
+  console.log('address mitko', address);
   return `${address.slice(0, chars)}...${address.slice(-chars)}`;
 };
 
@@ -138,7 +139,7 @@ export const formatTokenValue = (
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const findBlockByNumber = (blocksData: Map<number, any>, value: string) => {
   return Array.from(blocksData.values()).find(
-    (block) => block.header.number === Number(value),
+    (block) => block.number === Number(value),
   );
 };
 
@@ -154,7 +155,7 @@ export const findExtrinsicById = (blocksData: Map<number, any>, value: string) =
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getBlockNumberByHash = (blocksData: Map<number, any>, hash: string): any => {
   const block = Array.from(blocksData.values()).find(
-    (block) => block.header.hash === hash,
+    (block) => block.hash === hash,
   );
 
   return block?.header.number;

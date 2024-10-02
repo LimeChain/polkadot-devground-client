@@ -44,6 +44,7 @@ import { createSelectors } from '../createSelectors';
 import { sizeMiddleware } from '../sizeMiddleware';
 
 import type {
+  IBlockStoreData,
   IRuntime,
   TApi,
   TChain,
@@ -74,6 +75,8 @@ export interface StoreInterface {
   stakingApi: TStakingApi | null;
 
   blocksData: Map<number, Awaited<ReturnType<typeof getBlockDetailsWithPAPI>>>;
+  // TODO: fix types when we have the actual data
+  blockDataNew: Map<number, IBlockStoreData>;
   bestBlock: number | null;
   finalizedBlock: number | null;
   totalIssuance: bigint | null;
@@ -107,6 +110,7 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   stakingApi: null,
   smoldot: null,
   blocksData: new Map(),
+  blockDataNew: new Map(),
   bestBlock: null,
   finalizedBlock: null,
   totalIssuance: null,
@@ -161,6 +165,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
         get()?.actions?.resetStore?.();
 
         const blocksData = get()?.blocksData;
+        const blockDataNew = get()?.blockDataNew;
         const registry = get().registry;
 
         set({ chain });
@@ -226,6 +231,16 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
                         lookup: getLookupFn(decodededMetadata.metadata.value),
                       });
                     }
+                    // TODO: this takes around 10mB of memory, we should find a way to free it
+                    // const calculateObjectSizeInKB = (obj: any) => {
+                    //   const jsonString = JSON.stringify(obj);
+                    //   const encoder = new TextEncoder();
+                    //   const sizeInBytes = encoder.encode(jsonString).length;
+                    //   return sizeInBytes / 1024; // convert bytes to kilobytes
+                    // };
+
+                    // const metadataSize = calculateObjectSizeInKB(metadata);
+                    // console.log('metadataSize', metadataSize);
                     registry.setMetadata(metadata);
                     break;
                   }
@@ -281,15 +296,37 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
 
           }
 
-          Promise.allSettled(promises)
-            .then((results) => {
-              results.forEach((blockData) => {
-                if (blockData.status === 'fulfilled') {
-                  blocksData.set(blockData.value.header.number, blockData.value);
-                }
-              });
-              set({ bestBlock: bestBlock?.number, finalizedBlock: finalizedBlock?.number });
-            })
+          await Promise.allSettled(promises).then((results) => {
+            results.forEach((blockData) => {
+              if (blockData.status === 'fulfilled') {
+                const blockExtrinsics = (blockData?.value.body?.extrinsics?.slice(2) ?? []).reverse().map((extrinsic) => {
+                  return {
+                    id: extrinsic.id,
+                    blockNumber: extrinsic.blockNumber,
+                    signer: extrinsic.extrinsicData.signer?.Id ?? '',
+                    timestamp: extrinsic.timestamp,
+                    isSuccess: extrinsic.isSuccess,
+                    method: extrinsic.extrinsicData.method.method,
+                    section: extrinsic.extrinsicData.method.section,
+                  };
+                },
+                );
+                const newBlockData = {
+                  number: blockData.value.header.number,
+                  hash: blockData.value.header.hash,
+                  timestamp: blockData.value.header.timestamp,
+                  eventsLength: blockData.value.body.events.length,
+                  validator: blockData.value.header.identity.address.toString(),
+                  extrinsics: blockExtrinsics,
+                  identity: blockData.value.header.identity,
+                };
+                // blocksData.set(blockData.value.header.number, blockData.value);
+
+                blockDataNew.set(blockData.value.header.number, newBlockData);
+              }
+            });
+            set({ bestBlock: bestBlock?.number, finalizedBlock: finalizedBlock?.number });
+          })
             // prevent state crash on random smoldot error
             .catch((err) => {
               console.error(err);
@@ -304,7 +341,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
           const createSubscription = () => {
             const rawClientSubscription = rawClient.chainHead(
               true,
-              () => {},
+              () => { },
               (error) => {
                 console.log(error);
                 createSubscription();

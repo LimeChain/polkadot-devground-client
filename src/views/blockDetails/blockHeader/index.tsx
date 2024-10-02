@@ -8,6 +8,7 @@ import {
 import { CopyToClipboard } from '@components/copyToClipboard';
 import { Icon } from '@components/icon';
 import { ToggleButton } from '@components/toggleButton';
+import { useStoreChain } from '@stores';
 
 import styles from '../styles.module.css';
 
@@ -46,6 +47,8 @@ const DetailRow = (props: DetailRowProps) => {
 
 export const BlockHeader = (props: BlockHeaderProps) => {
   const { headerData } = props;
+  const latestFinalizedBlock = useStoreChain.use.finalizedBlock?.();
+  const isFinalized = headerData.number <= (latestFinalizedBlock ?? 0);
   const [
     isUTC,
     setIsUTC,
@@ -58,7 +61,6 @@ export const BlockHeader = (props: BlockHeaderProps) => {
   const formattedTimestamp = isUTC
     ? new Date(headerData.timestamp).toUTCString()
     : format(new Date(headerData.timestamp), 'yyyy-MM-dd HH:mm:ss');
-
   return (
     <div>
       <div className={styles['pd-block-details']}>
@@ -76,11 +78,11 @@ export const BlockHeader = (props: BlockHeaderProps) => {
         <p>Status</p>
         <div className="flex items-center gap-x-2">
           <Icon
-            className={headerData.isFinalized ? 'text-dev-green-600' : 'animate-rotate text-dev-yellow-700'}
-            name={headerData.isFinalized ? 'icon-checked' : 'icon-clock'}
+            className={isFinalized ? 'text-dev-green-600' : 'animate-rotate text-dev-yellow-700'}
+            name={isFinalized ? 'icon-checked' : 'icon-clock'}
             size={[16]}
           />
-          <p>{headerData.isFinalized ? 'Finalized' : 'Unfinalized'}</p>
+          <p>{isFinalized ? 'Finalized' : 'Unfinalized'}</p>
         </div>
       </div>
       <DetailRow

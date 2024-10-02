@@ -18,26 +18,27 @@ import {
   truncateAddress,
 } from '@utils/helpers';
 
-import type { IMappedBlock } from '@custom-types/block';
+import type { IBlockStoreData } from '@custom-types/chain';
 import type { ColumnDef } from '@tanstack/react-table';
 
 const LatestBlocks = () => {
   const navigate = useNavigate();
-  const blocksData = useStoreChain?.use?.blocksData?.();
+  // const blocksData = useStoreChain?.use?.blocksData?.();
+  const blocksData = useStoreChain?.use?.blockDataNew?.();
   const bestBlock = useStoreChain?.use?.bestBlock?.();
   const latestFinalizedBlock = useStoreChain?.use?.finalizedBlock?.();
   const chain = useStoreChain?.use?.chain?.();
 
   const columns = useMemo(() => {
-    const result: ColumnDef<IMappedBlock>[] = [
+    const result: ColumnDef<IBlockStoreData>[] = [
       {
-        accessorKey: 'header.number',
+        accessorKey: 'number',
         header: 'Block',
       },
       {
         header: 'Status',
         cell: ({ row }) => {
-          const isFinalized = latestFinalizedBlock && latestFinalizedBlock >= row.original.header.number;
+          const isFinalized = latestFinalizedBlock && latestFinalizedBlock >= row.original.number;
 
           return (
             <Icon
@@ -57,32 +58,32 @@ const LatestBlocks = () => {
         accessorKey: 'header.timestamp',
         header: 'Time',
         cell: ({ row }) => {
-          return row.original.header.timestamp
-            && formatDistanceToNowStrict(new Date(row.original.header.timestamp), { addSuffix: true });
+          return row.original.timestamp
+            && formatDistanceToNowStrict(new Date(row.original.timestamp), { addSuffix: true });
         },
       },
       {
         header: 'Extrinsics',
         cell: ({ row }) => {
-          return row.original.body.extrinsics.length;
+          return row.original.extrinsics.length;
         },
       },
       {
         header: 'Events',
         cell: ({ row }) => {
-          return row.original.body.events.length;
+          return row.original.eventsLength;
         },
       },
       {
         header: 'Validator',
         cell: ({ row }) => {
-          return truncateAddress(row.original.header.identity.address.toString() || '', 6);
+          return truncateAddress(row.original.identity.address.toString() || '', 6);
         },
       },
       {
         header: 'Block Hash',
         cell: ({ row }) => {
-          return truncateAddress(row.original.header.hash.toString() || '', 6);
+          return truncateAddress(row.original.hash.toString() || '', 6);
         },
       },
     ];
@@ -93,13 +94,13 @@ const LatestBlocks = () => {
   const [
     blocks,
     setBlocks,
-  ] = useState<IMappedBlock[]>([]);
+  ] = useState<IBlockStoreData[]>([]);
 
   const isLoading = blocks.length === 0;
 
   const goRouteId = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
     const dataIndex = Number(e.currentTarget.dataset.index);
-    const blockNumber = blocks[dataIndex].header.number;
+    const blockNumber = blocks[dataIndex].number;
     navigate(`/explorer/${blockNumber}`);
   }, [
     blocks,

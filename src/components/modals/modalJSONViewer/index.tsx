@@ -7,16 +7,15 @@ import {
 } from '../modal';
 
 import type {
+  IBlockExtrinsic,
   IMappedBlockEvent,
-  IMappedBlockExtrinsic,
 } from '@custom-types/block';
 
 interface IModalJSONViewer extends Pick<IModal, 'onClose'> {
-  jsonData: IMappedBlockExtrinsic | IMappedBlockEvent | null;
+  jsonData: IBlockExtrinsic | IMappedBlockEvent | undefined;
   title?: string;
   onClose: () => void;
 }
-
 export const ModalJSONViewer = (props: IModalJSONViewer) => {
   const {
     jsonData,

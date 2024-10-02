@@ -12,6 +12,7 @@ import { Tabs } from '@components/tabs';
 import { cn } from '@utils/helpers';
 
 import type {
+  IBlockExtrinsic,
   IMappedBlockBody,
   IMappedBlockEvent,
   IMappedBlockExtrinsic,
@@ -34,7 +35,7 @@ export const BlockBody = (props: BlockBodyProps) => {
   const [
     modalData,
     setModalData,
-  ] = useState<IMappedBlockEvent | IMappedBlockExtrinsic | null>(null);
+  ] = useState<IMappedBlockEvent | IBlockExtrinsic | undefined>(undefined);
   const [
     initialTab,
     setInitialTab,
@@ -51,12 +52,12 @@ export const BlockBody = (props: BlockBodyProps) => {
   const visibleExtrinsics = showMoreExtrinsics ? bodyData.extrinsics : bodyData.extrinsics.slice(0, 3);
   const visibleEvents = showMoreEvents ? bodyData.events : bodyData.events.slice(0, 3);
 
-  const handleOpenModal = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
+  const handleOpenModal = useCallback(async (e: React.MouseEvent<HTMLTableRowElement>) => {
     const type = e.currentTarget.getAttribute('data-type');
     const index = e.currentTarget.getAttribute('data-index');
 
     if (type === 'extrinsic' && index !== null) {
-      setModalData(bodyData.extrinsics[Number(index)]);
+      setModalData(bodyData.extrinsics[Number(index)].extrinsicData);
     } else if (type === 'event' && index !== null) {
       setModalData(bodyData.events[Number(index)]);
     }
@@ -148,10 +149,10 @@ export const BlockBody = (props: BlockBodyProps) => {
                         />
                       </td>
                       <td>
-                        {extrinsic.method.section}
+                        {extrinsic.extrinsicData.method.section}
                         {' '}
                         (
-                        {extrinsic.method.method}
+                        {extrinsic.extrinsicData.method.method}
                         )
                       </td>
                       <td>
