@@ -1,5 +1,3 @@
-import { useLocation } from 'react-router-dom';
-
 import {
   Icon,
   type SVGIconProps,
@@ -23,20 +21,19 @@ export const NavigationDropdownItem = ({
   ...linkProps
 }: INavigationDropdownItem) => {
 
-  const { pathname } = useLocation();
-
   return (
     <PDLink
       to={to}
       {...linkProps}
-      className={cn(
+      // eslint-disable-next-line react/jsx-no-bind
+      className={({ isActive }) => cn(
         'flex w-full items-center gap-3 px-4 py-[14px]',
         'font-geist font-body2-regular',
         'transition-colors',
         '!text-dev-white-200 dark:!text-dev-black-1000',
         'hover:bg-dev-black-800 dark:hover:bg-dev-purple-300',
         {
-          ['dark:bg-dev-purple-200 bg-dev-black-900']: pathname === to,
+          ['dark:bg-dev-purple-200 bg-dev-black-900']: isActive,
         },
         className,
       )}

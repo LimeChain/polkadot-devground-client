@@ -19,11 +19,12 @@ export const Navigation = (props: INavigation) => {
   }
 
   return (
-    <div className={cn(
-      'hidden items-center gap-3 md:flex',
-      'font-geist font-body2-regular',
-      classNames,
-    )}
+    <div
+      className={cn(
+        'hidden items-center gap-3 md:flex',
+        'font-geist font-body2-regular',
+        classNames,
+      )}
     >
       {
         NAVIGATION_ITEMS.map((item, index) => {
