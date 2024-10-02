@@ -11,6 +11,10 @@ export default {
         '18': '4.5rem',
       },
       keyframes: {
+        slideUpAndFade: {
+          '0%': { opacity: '0', transform: 'translateY(2px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
         fadeIn: {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
@@ -21,6 +25,7 @@ export default {
         }
       },
       animation: {
+        'slide-up-fade': 'slideUpAndFade 400ms cubic-bezier(0.16, 1, 0.3, 1)',
         'fade-in': 'fadeIn .5s ease-in-out forwards',
         'rotate': 'rotate 2s linear infinite',
       },

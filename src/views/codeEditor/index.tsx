@@ -135,14 +135,13 @@ const TypeScriptEditor = () => {
                   'px-10 py-2.5',
                 )}
                 tabsClassName={cn(
-                  'z-10 w-full py-4 pl-16',
+                  'w-full py-4 pl-16',
                   'dark:bg-dev-black-800',
                 )}
               >
                 <div
                   className="flex h-full"
                   data-title="Editor"
-
                 >
                   <MonacoEditor />
                 </div>

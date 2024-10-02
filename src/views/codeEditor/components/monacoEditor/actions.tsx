@@ -117,33 +117,37 @@ export const EditorActions = () => {
       className={cn(
         'absolute right-0 top-0',
         'flex items-center justify-between',
-        'z-20 p-4',
-        'dark:bg-dev-black-800',
+        'z-20 py-4 pl-14',
       )}
     >
-      <div className="flex gap-2">
-        <ActionButton iconName="icon-share" />
-        <ActionButton iconName="icon-save" />
+      <div className="flex gap-2 pr-2">
+        <ActionButton
+          iconName="icon-share"
+          toolTip="Share"
+        />
+        <ActionButton
+          iconName="icon-save"
+          toolTip="Save to GitHub"
+        />
         <ActionButton
           iconName="icon-download"
           onClick={handleDownload}
+          toolTip="Download"
         />
-        {
-          isRunning
-            ? (
-              <ActionButton
-                iconName="icon-pause"
-                onClick={handleStop}
-              />
-            )
-            : (
-              <ActionButton
-                fill="red"
-                iconName="icon-play"
-                onClick={handleRun}
-              />
-            )
-        }
+        {isRunning
+          ? (
+            <ActionButton
+              iconName="icon-pause"
+              onClick={handleStop}
+            />
+          )
+          : (
+            <ActionButton
+              fill="red"
+              iconName="icon-play"
+              onClick={handleRun}
+            />
+          )}
       </div>
 
     </div>
