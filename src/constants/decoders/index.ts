@@ -1,4 +1,4 @@
-import type { IDecoders } from "@constants/decoders/types";
+import type { IDecoders } from '@constants/decoders/types';
 
 export const decoders: IDecoders = {
   'blockHeader': {
@@ -6,9 +6,9 @@ export const decoders: IDecoders = {
       {
         name: 'Block Header',
         type: 'hex',
-        description: 'SCALE-encoded block header'
-      }
-    ]
+        description: 'SCALE-encoded block header',
+      },
+    ],
   },
   'extrinsics': {
     params: [
@@ -16,17 +16,17 @@ export const decoders: IDecoders = {
         name: 'Extrinsics',
         type: 'array',
         arrayItemType: 'string',
-        description: 'SCALE-encoded extrinsic'
-      }
-    ]
+        description: 'SCALE-encoded extrinsic',
+      },
+    ],
   },
   'metadata': {
     params: [
       {
         name: 'Metadata',
         type: 'hex',
-        description: 'SCALE-encoded metadata'
-      }
-    ]
-  }
-}
+        description: 'SCALE-encoded metadata',
+      },
+    ],
+  },
+};
