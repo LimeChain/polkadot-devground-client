@@ -14,7 +14,6 @@ import { snippets } from '@constants/snippets';
 import { cn } from '@utils/helpers';
 
 import NotFound from './components/notFound';
-import Search from './components/search';
 
 const Onboarding = () => {
   const [
