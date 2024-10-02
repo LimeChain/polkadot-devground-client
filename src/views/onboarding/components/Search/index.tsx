@@ -1,7 +1,13 @@
 import { Icon } from '@components/icon';
 import { cn } from '@utils/helpers';
 
-const Search = ({ onChange }) => {
+import type { ChangeEvent } from 'react';
+
+interface SearchProps {
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+}
+
+const Search = ({ onChange }: SearchProps) => {
 
   return (
     <div
@@ -18,9 +24,9 @@ const Search = ({ onChange }) => {
       >
         <Icon name="icon-search" />
         <input
-          type="text"
           onChange={onChange}
           placeholder={'Search by keyword'}
+          type="text"
           className={cn(
             'w-full bg-transparent',
             'caret-dev-pink-500 focus-visible:outline-none',

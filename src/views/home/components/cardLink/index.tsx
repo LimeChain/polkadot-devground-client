@@ -34,8 +34,8 @@ const CardLink: React.FC<CardLinkProps> = ({ to, iconName, title, description })
         )}
       />
       <Icon
-        name={iconName}
         className="mb-7 text-dev-pink-500"
+        name={iconName}
         size={[40]}
       />
       <h4 className="mb-2 font-h4-bold">
