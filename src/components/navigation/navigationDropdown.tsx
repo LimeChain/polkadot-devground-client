@@ -65,7 +65,6 @@ export const NavigationDropdown = ({
           'after:h-[3px] after:w-full after:bg-dev-pink-500',
           'after:opacity-0 after:transition-opacity',
           'flex items-center gap-1',
-          'text-dev-purple-50 sm:text-dev-black-1000 sm:dark:text-dev-purple-50',
           {
             ['after:opacity-100']: items.some((item) => String(item.to).startsWith(location.pathname)),
           },
@@ -86,7 +85,8 @@ export const NavigationDropdown = ({
         className={cn(
           'top-100 left-0 md:absolute',
           'flex flex-col gap-1 p-2',
-          'bg-dev-black-1000 dark:bg-dev-purple-50',
+          'bg-dev-purple-50 dark:bg-dev-black-1000',
+          'md:bg-dev-black-1000 md:dark:bg-dev-purple-50',
           'whitespace-nowrap',
           'min-w-[256px]',
           'transition-all duration-300',

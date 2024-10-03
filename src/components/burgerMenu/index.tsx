@@ -33,11 +33,6 @@ const BurgerMenu = () => {
     setIsOpen(!isOpen);
   }, [isOpen]);
 
-  const handleToggleTheme = useCallback(() => {
-    setIsOpen(false);
-    toggleTheme();
-  }, [toggleTheme]);
-
   useEventBus<IEventBusClickLink>('@@-click-link', () => {
     if (isOpen) {
       setIsOpen(false);
@@ -62,22 +57,23 @@ const BurgerMenu = () => {
       <div
         className={cn(
           'fixed right-0 top-0',
-          'px-5 pb-12 pt-6',
-          'size-full bg-dev-black-1000 shadow-lg',
+          'pb-12 pt-6',
+          'size-full ',
           'transition-transform duration-300 ease-in-out',
+          'bg-dev-purple-50 shadow-lg dark:bg-dev-black-1000',
           {
             ['transform translate-x-full']: !isOpen,
           },
         )}
       >
-        <PDScrollArea >
-          <div className="flex items-center justify-between text-dev-white-200">
+        <PDScrollArea className="px-5">
+          <div className="flex items-center justify-between">
             <div className="flex items-center">
               <Icon
                 name={currentChain.icon}
                 size={[28]}
               />
-              <h5 className="ml-1 mr-3 text-dev-white-200 font-h5-bold">
+              <h5 className="ml-1 mr-3 font-h5-bold">
                 {currentChain.name}
               </h5>
             </div>
@@ -91,20 +87,18 @@ const BurgerMenu = () => {
           <Navigation classNames="grid gap-2 mt-2" />
         </PDScrollArea>
         <button
-          onClick={handleToggleTheme}
-          type="button"
+          onClick={toggleTheme}
           className={cn(
-            'mt-2',
+            'mt-2 px-5',
             'flex items-center',
             'navSpacer',
           )}
         >
           <Icon
-            className="text-dev-purple-100"
             name={theme === 'light' ? 'icon-lightMode' : 'icon-darkMode'}
             size={[24]}
           />
-          <span className="ml-2 text-dev-white-200">
+          <span className="ml-2">
             {theme === 'light' ? 'Light Mode' : 'Dark Mode'}
           </span>
         </button>
