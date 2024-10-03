@@ -1,11 +1,8 @@
 import {
   useCallback,
   useEffect,
-  useMemo,
   useState,
 } from 'react';
-
-import { CallDocs } from '@components/callParam/callDocs';
 import { QueryButton } from '@components/callParam/queryButton';
 import { QueryFormContainer } from '@components/callParam/queryFormContainer';
 import { QueryResult } from '@components/callParam/queryResult';
@@ -14,8 +11,6 @@ import { QueryViewContainer } from '@components/callParam/queryViewContainer';
 import { Loader } from '@components/loader';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
-
-import type { TRelayApi } from '@custom-types/chain';
 import { decoders } from '@constants/decoders';
 import { DecoderParams } from '@components/callParam/decoderParams';
 import { blockHeaderCodec, decodeExtrinsic } from '@utils/codec';
