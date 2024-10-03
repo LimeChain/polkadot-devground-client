@@ -4,8 +4,8 @@ import {
 } from 'react';
 
 const breakpoints = {
-  mobile: 768,  // Change this value as per your needs
-  tablet: 1024,  // Change this value as per your needs
+  mobile: 768,
+  tablet: 1024,
 };
 
 export const useResponsive = () => {

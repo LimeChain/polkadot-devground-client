@@ -62,10 +62,9 @@ export const MobileChainSelect = () => {
     setIsOpen(!isOpen);
   }, [isOpen]);
 
-  // Filtered groups based on query
   const filteredGroups = filterChainsByGroup(query);
 
-  const handleSetChain = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSetChain = useCallback((e: React.MouseEvent<HTMLLIElement>) => {
     const chainId = e.currentTarget.getAttribute('data-chain-id') || '';
     const chain = ALL_CHAINS.find((c) => c.id === chainId);
 
@@ -142,41 +141,42 @@ export const MobileChainSelect = () => {
 
           <SearchChain />
 
-          {/* Render filtered groups and their chains */}
-          {Array.isArray(filteredGroups) && filteredGroups.length > 0
-            ? (
-              filteredGroups.map((group) => (
-                <div
-                  key={group.name}
-                  className="mt-6"
-                >
-                  <h3 className="text-pink-500">{group.name}</h3>
-                  <ul className="mt-2 space-y-2">
-                    {group.chains.map((chain) => (
-                      <li
-                        key={chain.name}
-                        className="flex items-center py-5"
-                        data-chain-id={chain.id}
-                        onClick={handleSetChain}
-                      >
-                        <Icon
-                          name={chain.icon}
-                          size={[28]}
-                        />
-                        <span className="ml-3">{chain.name}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))
-            )
-            : (
-              <p className="mt-2">
-                No results found for "
-                {query}
-                ".
-              </p>
-            )}
+          {
+            Array.from(filteredGroups) && filteredGroups.length > 0
+              ? (
+                filteredGroups.map((group) => (
+                  <div
+                    key={group.name}
+                    className="mt-6"
+                  >
+                    <h3 className="text-pink-500">{group.name}</h3>
+                    <ul className="mt-2 space-y-2">
+                      {group.chains.map((chain) => (
+                        <li
+                          key={chain.name}
+                          className="flex items-center py-5"
+                          data-chain-id={chain.id}
+                          onClick={handleSetChain}
+                        >
+                          <Icon
+                            name={chain.icon}
+                            size={[28]}
+                          />
+                          <span className="ml-3">{chain.name}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))
+              )
+              : (
+                <p className="mt-2">
+                  No results found for "
+                  {query}
+                  ".
+                </p>
+              )
+          }
         </PDScrollArea>
       </div>
     </>
