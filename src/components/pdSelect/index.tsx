@@ -23,6 +23,7 @@ export interface IPDSelect {
   emptyPlaceHolder?: string;
   placeholder?: string;
   disabled?: boolean;
+  className?: string;
 }
 
 export const PDSelect = ({
@@ -34,6 +35,7 @@ export const PDSelect = ({
   placeholder,
   emptyPlaceHolder = 'No Items',
   disabled = false,
+  className
 }: IPDSelect) => {
   const [
     container,
@@ -56,6 +58,7 @@ export const PDSelect = ({
       className={cn(
         'inline-flex w-full',
         'focus-within:z-50',
+        className
       )}
     >
       <SelectPrimitive.Root
