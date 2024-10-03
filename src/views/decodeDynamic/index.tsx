@@ -4,6 +4,8 @@ import {
   useMemo,
   useState,
 } from 'react';
+
+import { DecoderDynamicParams } from '@components/callParam/decoderDynamicParam';
 import { QueryButton } from '@components/callParam/queryButton';
 import { QueryFormContainer } from '@components/callParam/queryFormContainer';
 import { QueryResult } from '@components/callParam/queryResult';
@@ -12,22 +14,21 @@ import { QueryViewContainer } from '@components/callParam/queryViewContainer';
 import { Loader } from '@components/loader';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
-import { blockHeaderCodec, decodeExtrinsic } from '@utils/codec';
 import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
+
 import type { EnumVar } from '@polkadot-api/metadata-builders';
-import { DecoderDynamicParams } from '@components/callParam/decoderDynamicParam';
 
 const decoderTypes = [
   'Storage',
   'Runtime',
   'Extrinsic',
-]
+];
 
 const decoderTypeSelectItems = decoderTypes.map((decoder) => ({
   key: `decoder-${decoder}`,
   label: decoder,
-  value: decoder
-}))
+  value: decoder,
+}));
 
 interface IQuery {
   type: string;
@@ -41,12 +42,12 @@ const DecoderDynamic = () => {
   const chain = useStoreChain?.use?.chain?.();
   const metadata = useStoreChain?.use?.metadata?.();
   const lookup = useStoreChain?.use?.lookup?.();
-  const dynamicBuilder = useDynamicBuilder()
+  const dynamicBuilder = useDynamicBuilder();
 
   const [
     queries,
     setQueries,
-  ] = useState<IQuery[]>([])
+  ] = useState<IQuery[]>([]);
   const [
     callParams,
     setCallParams,
@@ -76,9 +77,9 @@ const DecoderDynamic = () => {
             label: pallet.name,
             value: pallet.name,
             key: `chainState-pallet-${pallet.name}`,
-          })) || []
+          })) || [];
 
-        setPallet(storageItems?.[0]?.value)
+        setPallet(storageItems?.[0]?.value);
         return storageItems;
 
       case 'Runtime':
@@ -88,9 +89,9 @@ const DecoderDynamic = () => {
             label: api.name,
             value: api.name,
             key: `api-select-${api.name}`,
-          })) || []
+          })) || [];
 
-        setPallet(runtimeItems?.[0]?.value)
+        setPallet(runtimeItems?.[0]?.value);
         return runtimeItems;
 
       case 'Extrinsic':
@@ -101,15 +102,18 @@ const DecoderDynamic = () => {
             label: pallet.name,
             value: pallet.name,
             key: `extrinsic-pallet-${pallet.name}`,
-          })) || []
+          })) || [];
 
-        setPallet(callItems?.[0]?.value)
+        setPallet(callItems?.[0]?.value);
         return callItems;
       default:
-        return []
+        return [];
     }
 
-  }, [decoderType, metadata])
+  }, [
+    decoderType,
+    metadata,
+  ]);
 
   const methodSelectItems = useMemo(() => {
     if (!metadata || !lookup) return [];
@@ -117,35 +121,35 @@ const DecoderDynamic = () => {
     switch (decoderType) {
       case 'Storage':
         const storageMethodItems = metadata?.pallets
-          ?.find(_pallet => _pallet.name === pallet)
+          ?.find((_pallet) => _pallet.name === pallet)
           ?.storage
           ?.items
           ?.map((item) => ({
             label: item.name,
             value: item.name,
             key: `chainState-call-${item.name}`,
-          })) || []
+          })) || [];
 
-        setMethod(storageMethodItems?.[0]?.value)
+        setMethod(storageMethodItems?.[0]?.value);
         return storageMethodItems;
 
       case 'Runtime':
         const runtimeMethodItems = metadata?.apis
-          ?.find(api => api.name === pallet)
+          ?.find((api) => api.name === pallet)
           ?.methods
           ?.map((item) => ({
             label: item.name,
             value: item.name,
             key: `chainState-call-${item.name}`,
-          })) || []
+          })) || [];
 
-        setMethod(runtimeMethodItems?.[0]?.value)
+        setMethod(runtimeMethodItems?.[0]?.value);
         return runtimeMethodItems;
 
       case 'Extrinsic':
         const extrinsicMethodCalls = metadata?.pallets
-          ?.find(_pallet => _pallet.name === pallet)
-          ?.calls
+          ?.find((_pallet) => _pallet.name === pallet)
+          ?.calls;
 
         if (typeof extrinsicMethodCalls === 'undefined') return [];
         const extrinsicMethodLookup = lookup(extrinsicMethodCalls) as EnumVar;
@@ -156,9 +160,9 @@ const DecoderDynamic = () => {
             label: item?.[0],
             value: item?.[0],
             key: `chainState-call-${item?.[0]}`,
-          })) || []
+          })) || [];
 
-        setMethod(extrinsicMethodItems[0].value)
+        setMethod(extrinsicMethodItems[0].value);
         return extrinsicMethodItems;
 
       default:
@@ -170,7 +174,7 @@ const DecoderDynamic = () => {
     decoderType,
     metadata,
     lookup,
-  ])
+  ]);
 
   // RESET STATES ON CHAIN CHANGE
   useEffect(() => {
@@ -178,14 +182,14 @@ const DecoderDynamic = () => {
   }, [chain.id]);
 
   const handleDecoderTypeSelect = useCallback((decoderSelected: string) => {
-    setDecoderType(decoderSelected)
-  }, [])
+    setDecoderType(decoderSelected);
+  }, []);
   const handlePalletSelect = useCallback((decoderSelected: string) => {
-    setPallet(decoderSelected)
-  }, [])
+    setPallet(decoderSelected);
+  }, []);
   const handleMethodSelect = useCallback((decoderSelected: string) => {
-    setMethod(decoderSelected)
-  }, [])
+    setMethod(decoderSelected);
+  }, []);
 
   const handleParamChange = useCallback((args: unknown) => {
     setCallParams(args as string);
@@ -195,8 +199,8 @@ const DecoderDynamic = () => {
     setQueries((queries) => ([
       {
         type: decoderType,
-        pallet: pallet,
-        method: method,
+        pallet,
+        method,
         args: callParams,
         id: crypto.randomUUID(),
       },
@@ -223,7 +227,7 @@ const DecoderDynamic = () => {
       <QueryFormContainer>
         <div className="grid w-full grid-cols-2 gap-4">
           <PDSelect
-            className='col-span-2'
+            className="col-span-2"
             emptyPlaceHolder="No decoders available"
             items={[decoderTypeSelectItems]}
             label="Select Decoder Type"
@@ -305,23 +309,23 @@ const Query = (
       switch (querie.type) {
         case 'Storage':
           setResult(dynamicBuilder?.buildStorage(querie.pallet, querie.method)
-            .dec(querie.args))
+            .dec(querie.args));
           break;
 
         case 'Runtime':
           setResult(dynamicBuilder?.buildRuntimeCall(querie.pallet, querie.method)
             .value
-            .dec(querie.args))
+            .dec(querie.args));
           break;
 
         case 'Extrinsic':
           setResult(dynamicBuilder?.buildCall(querie.pallet, querie.method)
             .codec
-            .dec(`0x${querie.args.slice(6)}`)) /* Remove the pallet/method location hex value from the args */
+            .dec(`0x${querie.args.slice(6)}`)); /* Remove the pallet/method location hex value from the args */
           break;
 
         default:
-          catchError()
+          catchError();
           break;
       }
 
