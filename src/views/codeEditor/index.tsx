@@ -12,12 +12,14 @@ import {
 } from 'react-resizable-panels';
 
 import { ErrorBoundary } from '@components/errorBoundary';
+import { MobileNotAllowed } from '@components/MobileNotAllowed';
 import { GithubButton } from '@components/githubButton';
 import { Tabs } from '@components/tabs';
 import { useStoreUI } from '@stores';
 import { cn } from '@utils/helpers';
 import { useResizeObserver } from '@utils/hooks/useResizeObserver';
 import { encodeCodeToBase64 } from '@utils/iframe';
+import { useResponsive } from 'src/hooks/useResponsive';
 import { SelectExample } from '@views/codeEditor/components/selectExample';
 
 import { ActionButton } from './components/actionButton';
@@ -44,6 +46,8 @@ const TypeScriptEditor = () => {
     isLoaded,
     setIsLoaded,
   ] = useState(false);
+
+  const { isDesktop } = useResponsive();
 
   const theme = useStoreUI?.use?.theme?.();
 
@@ -90,6 +94,10 @@ const TypeScriptEditor = () => {
     }
   }, []);
 
+  if (!isDesktop) {
+    return <MobileNotAllowed />;
+  }
+
   return (
     <div
       ref={refContainer}
@@ -129,30 +137,29 @@ const TypeScriptEditor = () => {
             >
               <EditorActions />
 
-              <Tabs
-                unmountOnHide={false}
-                tabClassName={cn(
-                  'px-10 py-2.5',
-                )}
-                tabsClassName={cn(
-                  'w-full py-4 pl-16',
-                  'dark:bg-dev-black-800',
-                )}
+            <Tabs
+              unmountOnHide={false}
+              tabClassName={cn(
+                'px-10 py-2.5',
+              )}
+              tabsClassName={cn(
+                'w-full py-4 pl-16',
+                'dark:bg-dev-black-800',
+              )}
+            >
+              <div
+                className="flex h-full"
+                data-title="Editor"
               >
-                <div
-                  className="flex h-full"
-                  data-title="Editor"
-                >
-                  <MonacoEditor />
-                </div>
-                <div
-                  className="flex h-full p-4 dark:bg-dev-black-800"
-                  data-title="Read me"
-                >
-                  Readme.md
-                </div>
-              </Tabs>
-            </div>
+                <MonacoEditor />
+              </div>
+              <div
+                className="flex h-full p-4 dark:bg-dev-black-800"
+                data-title="Read me"
+              >
+                Readme.md
+              </div>
+            </Tabs>
           </Panel>
           <PanelResizeHandle className="group relative top-20 w-4">
             <div

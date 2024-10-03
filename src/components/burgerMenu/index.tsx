@@ -36,10 +36,7 @@ export const BurgerMenu = () => {
   useEventBus<IEventBusClickLink>('@@-click-link', () => {
     if (isOpen) {
       setIsOpen(false);
-      console.log('Menu is closed');
     }
-
-    console.log('Hello World!');
   });
 
   if (isHomePage) {
@@ -90,7 +87,6 @@ export const BurgerMenu = () => {
           className={cn(
             'mt-2 px-5',
             'flex items-center',
-            'navSpacer',
           )}
         >
           <Icon

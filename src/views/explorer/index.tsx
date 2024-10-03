@@ -9,7 +9,7 @@ const Explorer = () => {
     <div
       className={cn(
         'disable-vertical-scroll',
-        'flex h-full flex-1 flex-col gap-12',
+        'flex h-full flex-1 flex-col gap-6 md:gap-12',
       )}
     >
       <SearchBar
