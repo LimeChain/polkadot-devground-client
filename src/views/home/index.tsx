@@ -1,9 +1,11 @@
-import { Icon } from '@components/icon';
-import { PDLink } from '@components/pdLink';
 import { HOME_LINKS } from '@constants/links';
 import { cn } from '@utils/helpers';
 
+import { CardLink } from './components/cardLink';
+
 const Home = () => {
+  const hasVisited = localStorage.getItem('hasVisitedOnboarding');
+
   return (
     <section className="flex h-full flex-col items-center justify-center">
       <div className="flex flex-col items-center">
@@ -28,46 +30,17 @@ const Home = () => {
         </p>
 
         <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-3">
+          <CardLink
+            description={'With devGround’s custom IDE, safely execute selected JavaScript snippets within the ecosystem.'}
+            iconName="icon-brackets"
+            title="Developer Console"
+            to={hasVisited ? '/code' : '/onboarding'}
+          />
           {HOME_LINKS.map((card) => (
-            <PDLink
+            <CardLink
               key={card.to}
-              to={card.to}
-              className={cn(
-                'group relative flex flex-1 flex-col p-6 !text-current',
-                'border border-transparent hover:border-dev-pink-500',
-                'transition-all duration-200 ease-linear',
-                'bg-dev-purple-100 dark:bg-dev-black-900',
-                'overflow-hidden',
-                'after:pointer-events-none after:absolute after:opacity-0 after:content-[""]',
-                'after:-right-3/4 after:-top-3/4 after:size-3/4 after:bg-dev-purple-500 after:blur-[150px]',
-                'after:transition-opacity after:duration-200',
-                'hover:after:opacity-100',
-              )}
-            >
-              <Icon
-                name="icon-linkArrow"
-                className={cn(
-                  'absolute right-4 top-4',
-                  'group-hover:-translate-y-1 group-hover:translate-x-1',
-                  'transition-transform duration-200 ease-linear',
-                )}
-              />
-              <Icon
-                className="mb-7 text-dev-pink-500"
-                name={card.iconName}
-                size={[40]}
-              />
-              <h4 className="mb-2 font-h4-bold">
-                {card.title}
-              </h4>
-              <p className={cn(
-                'font-geist text-dev-black-300 font-body2-regular',
-                'dark:text-dev-purple-300',
-              )}
-              >
-                {card.description}
-              </p>
-            </PDLink>
+              {...card}
+            />
           ))}
         </div>
       </div>

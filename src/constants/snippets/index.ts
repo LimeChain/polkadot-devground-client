@@ -52,21 +52,25 @@ import type { ICodeSnippet } from '@custom-types/codeSnippet';
 
 const snippet1: ICodeSnippet = {
   id: 1,
+  name: 'Snipped 1',
   code: Snippet1Code,
 };
 
 const snippet2: ICodeSnippet = {
   id: 2,
+  name: 'Snipped 2',
   code: Snippet2Code,
 };
 
 const snippet3: ICodeSnippet = {
   id: 3,
+  name: 'Snipped 3',
   code: Snippet3Code,
 };
 
 const snippet4: ICodeSnippet = {
   id: 4,
+  name: 'Snipped 4',
   code: `
   import { create } from "@shined/reactive";
   import { createRoot } from "react-dom/client";
