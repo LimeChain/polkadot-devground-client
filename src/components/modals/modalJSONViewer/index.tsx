@@ -6,13 +6,10 @@ import {
   Modal,
 } from '../modal';
 
-import type {
-  IBlockExtrinsic,
-  IMappedBlockEvent,
-} from '@custom-types/block';
+import type { JsonViewProps } from 'react18-json-view';
 
 interface IModalJSONViewer extends Pick<IModal, 'onClose'> {
-  jsonData: IBlockExtrinsic | IMappedBlockEvent | null;
+  jsonData: JsonViewProps['src'];
   title?: string;
   onClose: () => void;
 }

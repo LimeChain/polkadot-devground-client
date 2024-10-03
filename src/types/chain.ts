@@ -99,6 +99,6 @@ export interface IExtrinsicStoreData {
 }
 
 interface Identity {
-  name: string | undefined;
+  name?: string;
   address: SS58String;
 }

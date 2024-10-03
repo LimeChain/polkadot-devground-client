@@ -19,6 +19,7 @@ export interface IBlockExtrinsic {
     Id: string;
   };
 }
+
 export interface IMappedBlockExtrinsic {
 
   id: string;

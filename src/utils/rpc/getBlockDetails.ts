@@ -142,8 +142,6 @@ export const getBlockDetailsWithPAPI = async ({
       const _args = args as { now: string };
       // turn the time string of type "1,451,313,413,21" into a number
       timestamp = formatPrettyNumberString(_args?.now);
-      // only the timestamp is needed so we break the loop
-      // break;
     }
 
     extrinsics.push({
@@ -243,9 +241,8 @@ export const getBlockDetailsWithRawClient = async ({
       const _args = args as { now: string };
       // turn the time string of type "1,451,313,413,21" into a number
       timestamp = formatPrettyNumberString(_args?.now);
-      // only the timestamp is needed so we break the loop
-      // break;
     }
+
     extrinsics.push({
       ...extrinsic,
       id: `${blockNumber}-${i}`,

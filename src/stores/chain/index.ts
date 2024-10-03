@@ -284,34 +284,34 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
           Promise.allSettled(promises).then((results) => {
             results.forEach((blockData) => {
               if (blockData.status === 'fulfilled') {
-                const blockExtrinsics = (blockData?.value.body?.extrinsics?.slice(2) ?? []).reverse().map((extrinsic) => {
-                  const { id, blockNumber, extrinsicData, timestamp, isSuccess } = extrinsic;
-                  const { method, signer } = extrinsicData;
-                  return {
-                    id,
-                    blockNumber,
-                    timestamp,
-                    isSuccess,
-                    signer: signer?.Id ?? '',
-                    method: method.method,
-                    section: method.section,
-                  };
-                },
-                );
-
-                const { value: { header: { number, hash, timestamp, identity }, body: { events } } } = blockData;
+                const blockExtrinsics = (blockData?.value.body?.extrinsics?.slice(2) ?? [])
+                  .reverse()
+                  .map((extrinsic) => {
+                    const { id, blockNumber, extrinsicData, timestamp, isSuccess } = extrinsic;
+                    const { method, signer } = extrinsicData;
+                    return {
+                      id,
+                      blockNumber,
+                      timestamp,
+                      isSuccess,
+                      signer: signer?.Id ?? '',
+                      method: method.method,
+                      section: method.section,
+                    };
+                  },
+                  );
 
                 const newBlockData = {
-                  number,
-                  hash,
-                  timestamp,
-                  eventsLength: events.length,
-                  validator: identity.address.toString(),
+                  number: blockData.value.header.number,
+                  hash: blockData.value.header.hash,
+                  timestamp: blockData.value.header.timestamp,
+                  eventsLength: blockData.value.body.events.length,
+                  validator: blockData.value.header.identity.address.toString(),
                   extrinsics: blockExtrinsics,
-                  identity,
+                  identity: blockData.value.header.identity,
                 };
 
-                blocksData.set(blockData.value.header.number, newBlockData);
+                blocksData.set(newBlockData.number, newBlockData);
               }
             });
             set({ bestBlock: bestBlock?.number, finalizedBlock: finalizedBlock?.number });
