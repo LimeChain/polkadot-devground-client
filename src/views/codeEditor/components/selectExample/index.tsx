@@ -180,6 +180,9 @@ export const SelectExample = () => {
                         )}
                       >
                         <p className="font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000">
+                          Example:
+                          {' '}
+                          {snippet.id}
                           {snippet.name}
                         </p>
                         <p className="font-geist text-dev-white-1000 font-body3-regular dark:text-dev-black-300">

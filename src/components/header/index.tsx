@@ -8,7 +8,7 @@ import WalletSelectButton from '@components/walletSelectButton';
 import { useResponsive } from 'src/hooks/useResponsive';
 
 export const Header = () => {
-  const { isDesktop } = useResponsive();
+  const { isMobile } = useResponsive();
 
   return (
     <nav className="z-100 flex items-center justify-between px-6">
@@ -17,18 +17,19 @@ export const Header = () => {
         <Navigation />
       </div>
       {
-        isDesktop
+        isMobile
           ? (
+            <div className="flex gap-4">
+              <MobileChainSelect />
+              <BurgerMenu />
+            </div>
+          )
+          : (
+
             <div className="flex gap-5">
               <ChainSelectButton />
               <WalletSelectButton />
               <ToggleTheme />
-            </div>
-          )
-          : (
-            <div className="flex gap-4">
-              <MobileChainSelect />
-              <BurgerMenu />
             </div>
           )
       }
