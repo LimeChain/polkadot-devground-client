@@ -91,6 +91,7 @@ const BlockDetails = () => {
       <BlockHeader headerData={blockData.header} />
       <BlockBody
         blockNumber={blockData.header.number}
+        blockTimestamp={blockData.header.timestamp}
         bodyData={blockData.body}
       />
     </div>

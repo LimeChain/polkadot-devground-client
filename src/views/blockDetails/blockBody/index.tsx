@@ -21,10 +21,11 @@ import type {
 interface BlockBodyProps {
   bodyData: IMappedBlockBody;
   blockNumber: number;
+  blockTimestamp: number;
 }
 
 export const BlockBody = (props: BlockBodyProps) => {
-  const { bodyData, blockNumber } = props;
+  const { bodyData, blockNumber, blockTimestamp } = props;
   const [
     JSONViewerModal,
     toggleVisibility,
@@ -121,8 +122,9 @@ export const BlockBody = (props: BlockBodyProps) => {
             <tbody>
               {
                 visibleExtrinsics.map((extrinsic: IMappedBlockExtrinsic, extrinsicIndex: number) => {
-                  const timeAgo = extrinsic.timestamp && formatDistanceToNowStrict(
-                    new Date(extrinsic.timestamp),
+                  const extrinsicTimestamp = extrinsic.timestamp || blockTimestamp;
+                  const timeAgo = extrinsicTimestamp && formatDistanceToNowStrict(
+                    new Date(extrinsicTimestamp),
                     { addSuffix: true },
                   );
                   return (
