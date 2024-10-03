@@ -16,16 +16,16 @@ interface DefaultExamplesProps {
 export const DefaultExamples = (props: DefaultExamplesProps) => {
   const { toggleVisibility } = props;
   const [
-    searchQuery,
-    setSearchQuery,
-  ] = useState('');
-
-  const filteredSnippets = snippets.filter((snippet) =>
-    snippet.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+    filteredSnippets,
+    setFilteredSnippets,
+  ] = useState(snippets);
 
   const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+    const query = e.target.value;
+    const filtered = snippets.filter((snippet) =>
+      snippet.name.toLowerCase().includes(query.toLowerCase()),
+    );
+    setFilteredSnippets(filtered);
   }, []);
 
   return (
