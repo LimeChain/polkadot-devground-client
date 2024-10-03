@@ -16,7 +16,7 @@ import { cn } from '@utils/helpers';
 
 import type { IEventBusClickLink } from '@custom-types/eventBus';
 
-const BurgerMenu = () => {
+export const BurgerMenu = () => {
   const [
     isOpen,
     setIsOpen,
@@ -49,7 +49,6 @@ const BurgerMenu = () => {
   return (
     <>
       <button
-        className="ml-2"
         onClick={handleMenuClick}
       >
         <Icon name="icon-menu" />
@@ -106,5 +105,3 @@ const BurgerMenu = () => {
     </>
   );
 };
-
-export default BurgerMenu;

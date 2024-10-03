@@ -1,6 +1,7 @@
-import BurgerMenu from '@components/burgerMenu';
+import { BurgerMenu } from '@components/burgerMenu';
 import ChainSelectButton from '@components/chainSelectButton';
 import { Logo } from '@components/logo';
+import { MobileChainSelect } from '@components/mobileChainSelect';
 import { Navigation } from '@components/navigation';
 import { ToggleTheme } from '@components/toggleTheme';
 import WalletSelectButton from '@components/walletSelectButton';
@@ -18,8 +19,8 @@ export const Header = () => {
         <WalletSelectButton />
         <ToggleTheme />
       </div>
-      <div className="flex md:hidden">
-        <ChainSelectButton />
+      <div className="flex gap-4 md:hidden">
+        <MobileChainSelect />
         <BurgerMenu />
       </div>
     </nav>
