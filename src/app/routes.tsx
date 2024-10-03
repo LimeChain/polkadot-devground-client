@@ -6,6 +6,7 @@ import LatestBlocks from '@views/latestBlocks';
 import { NotFound } from '@views/notFound';
 import { RpcCalls } from '@views/rpcCalls';
 import Decoder from '@views/decode';
+import DecoderDynamic from '@views/decodeDynamic';
 
 const Home = lazy(() => import('../views/home'));
 const CodeEditor = lazy(() => import('../views/codeEditor'));
@@ -174,7 +175,7 @@ export const routes = () => ([
         children: [
           {
             path: '',
-            element: <Decoder />,
+            element: <DecoderDynamic />,
           },
         ],
       },
