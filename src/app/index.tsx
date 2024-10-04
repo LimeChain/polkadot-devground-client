@@ -52,9 +52,12 @@ export const App = () => {
     initStoreUI();
     initStoreChainClient();
     initStoreWallet();
+
     window.customPackages = {};
     Object.assign(window.customPackages, {
+      createClient,
       ...createClient,
+      papiDescriptors,
       ...papiDescriptors,
       ...getPolkadotSigner,
       connectInjectedExtension,

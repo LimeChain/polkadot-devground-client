@@ -36,6 +36,7 @@ import { Progress } from '@views/codeEditor/progress';
 import type {
   IEventBusIframeDestroy,
   IEventBusMonacoEditorExecuteSnippet,
+  IEventBusMonacoEditorLoadSnippet,
   IEventBusMonacoEditorUpdateCursorPosition,
 } from '@custom-types/eventBus';
 
@@ -377,6 +378,10 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
     });
     setIsReadOnly(false);
     refMonacoEditor.current?.focus();
+  });
+
+  useEventBus<IEventBusMonacoEditorLoadSnippet>('@@-monaco-editor-load-snippet', ({ data }) => {
+    void loadSnippet(data);
   });
 
   return (

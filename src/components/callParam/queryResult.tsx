@@ -35,6 +35,7 @@ export const QueryResult = ({
     resultIsLoading,
     setResultIsLoading,
   ] = useState(true);
+
   const theme = useStoreUI?.use?.theme?.();
 
   useEffect(() => {

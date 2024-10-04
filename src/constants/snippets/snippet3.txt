@@ -7,6 +7,7 @@ import {
 import { createRoot } from 'react-dom/client';
 import { chainSpec } from 'polkadot-api/chains/rococo_v2_2';
 import { getSmProvider } from 'polkadot-api/sm-provider';
+import { createClient, type PolkadotClient } from "polkadot-api";
 import { start } from 'polkadot-api/smoldot';
 
 import { connectInjectedExtension, getInjectedExtensions } from "polkadot-api/pjs-signer"

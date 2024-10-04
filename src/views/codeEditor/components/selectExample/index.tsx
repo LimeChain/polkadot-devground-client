@@ -1,27 +1,42 @@
+import { busDispatch } from '@pivanov/event-bus';
 import {
   useCallback,
   useEffect,
   useRef,
   useState,
 } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import {
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom';
 
 import { Icon } from '@components/icon';
 import { PDScrollArea } from '@components/pdScrollArea';
 import { snippets } from '@constants/snippets';
-import { cn } from '@utils/helpers';
+import {
+  cn,
+  sleep,
+} from '@utils/helpers';
+
+import type { IEventBusMonacoEditorLoadSnippet } from '@custom-types/eventBus';
 
 export const SelectExample = () => {
+  const navigate = useNavigate();
+
   const [
     isOpened,
     setIsOpened,
   ] = useState(false);
+
   const [
     type,
     setType,
   ] = useState('default');
+
   const [searchParams] = useSearchParams();
-  const selectSnipped = searchParams.get('s');
+  const selectedSnippet = searchParams.get('s');
+  const selectedSnippetName = snippets.find((snippet) => snippet.id === Number(selectedSnippet))?.name;
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleSetOpen = useCallback(() => {
@@ -32,9 +47,26 @@ export const SelectExample = () => {
     setType(e.currentTarget.textContent?.toLowerCase() || '');
   }, []);
 
-  const handleChangeExample = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleChangeExample = useCallback(async (e: React.MouseEvent<HTMLButtonElement>) => {
     const snippetIndex = Number(e.currentTarget.getAttribute('data-snippet-index'));
-    window.location.href = `/code?s=${snippetIndex}`;
+    navigate(`/code?s=${snippetIndex}`);
+    setIsOpened(false);
+
+    busDispatch({
+      type: '@@-monaco-editor-show-loading',
+    });
+
+    await sleep(400);
+
+    busDispatch<IEventBusMonacoEditorLoadSnippet>({
+      type: '@@-monaco-editor-load-snippet',
+      data: snippetIndex,
+    });
+
+    busDispatch({
+      type: '@@-monaco-editor-hide-loading',
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -53,7 +85,7 @@ export const SelectExample = () => {
   return (
     <div
       ref={containerRef}
-      className="relative w-6/12"
+      className="relative max-w-[50vw]"
     >
       <button
         onClick={handleSetOpen}
@@ -70,7 +102,7 @@ export const SelectExample = () => {
           },
         )}
       >
-        Select Example
+        {selectedSnippetName || 'Select Example'}
         <Icon
           name="icon-dropdownArrow"
           className={cn(
@@ -125,12 +157,10 @@ export const SelectExample = () => {
         </div>
 
         <PDScrollArea
-          className="h-72"
           verticalScrollClassNames="py-4"
           verticalScrollThumbClassNames="before:bg-dev-purple-700 dark:before:bg-dev-purple-300"
-          viewportClassNames="py-4"
         >
-          <ul>
+          <ul className="h-56 py-4">
             {
               type === 'default'
                 ? (
@@ -145,14 +175,12 @@ export const SelectExample = () => {
                           'transition-[background] duration-300',
                           'hover:bg-dev-black-900 hover:dark:bg-dev-purple-200',
                           {
-                            ['bg-dev-black-800 dark:bg-dev-purple-300']: selectSnipped === snippet.id.toString(),
+                            ['bg-dev-black-800 dark:bg-dev-purple-300']: selectedSnippet === snippet.id.toString(),
                           },
                         )}
                       >
                         <p className="font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000">
-                          Example: 
-                          {' '}
-                          {snippet.id}
+                          {snippet.name}
                         </p>
                         <p className="font-geist text-dev-white-1000 font-body3-regular dark:text-dev-black-300">
                           CUSTOM
