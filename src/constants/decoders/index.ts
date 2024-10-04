@@ -19,5 +19,14 @@ export const decoders: IDecoders = {
         description: 'SCALE-encoded extrinsic'
       }
     ]
+  },
+  'metadata': {
+    params: [
+      {
+        name: 'Metadata',
+        type: 'hex',
+        description: 'SCALE-encoded metadata'
+      }
+    ]
   }
 }

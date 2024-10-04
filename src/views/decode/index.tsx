@@ -13,7 +13,7 @@ import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
 import { decoders } from '@constants/decoders';
 import { DecoderParams } from '@components/callParam/decoderParams';
-import { blockHeaderCodec, decodeExtrinsic } from '@utils/codec';
+import { blockHeaderCodec, decodeExtrinsic, metadataCodec } from '@utils/codec';
 
 const decoderSelectItems = Object.keys(decoders).map(decoder => ({
   key: `decoder-${decoder}`,
@@ -177,6 +177,10 @@ const Query = (
         case 'extrinsics':
           setResult((querie.args.at(0)?.value as string[])
             ?.map((extrinsic) => decodeExtrinsic(extrinsic)))
+          break;
+
+        case 'metadata':
+          setResult(metadataCodec.dec(querie.args.at(0)?.value as string))
           break;
 
         default:
