@@ -338,7 +338,7 @@ const Query = (
       onRemove={handleUnsubscribe}
       path={`${querie.type}/${querie.pallet}/${querie.method}`}
       result={result}
-      title="Constant"
+      title="Decoded"
     />
   );
 };
