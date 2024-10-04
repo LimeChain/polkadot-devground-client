@@ -11,3 +11,11 @@ export interface IErrorItem {
   endLineNumber: number;
   endColumn: number;
 }
+
+declare global {
+  interface Window {
+    pivanov?: unknown; // for testing purposes
+    PDStoreSizes: Record<string, number>;
+    customPackages: Record<string, unknown>;
+  }
+}

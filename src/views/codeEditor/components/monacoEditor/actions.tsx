@@ -18,7 +18,10 @@ import { defaultImportMap } from '@views/codeEditor/constants';
 
 import { ActionButton } from '../actionButton';
 
-import type { IEventBusMonacoEditorUpdateCode } from '@custom-types/eventBus';
+import type {
+  IEventBusMonacoEditorLoadSnippet,
+  IEventBusMonacoEditorUpdateCode,
+} from '@custom-types/eventBus';
 
 export const EditorActions = () => {
   const refCode = useRef<string>('');
@@ -28,7 +31,7 @@ export const EditorActions = () => {
   ] = useState(false);
 
   const handleRun = useCallback(() => {
-    setIsRunning((state) => !state);
+    setIsRunning(true);
     busDispatch({
       type: '@@-monaco-editor-execute-snippet',
       data: refCode.current,
@@ -36,7 +39,7 @@ export const EditorActions = () => {
   }, []);
 
   const handleStop = useCallback(() => {
-    setIsRunning((state) => !state);
+    setIsRunning(false);
     busDispatch({
       type: '@@-iframe-destroy',
     });
@@ -105,36 +108,42 @@ export const EditorActions = () => {
     refCode.current = data;
   });
 
+  useEventBus<IEventBusMonacoEditorLoadSnippet>('@@-monaco-editor-load-snippet', () => {
+    handleStop();
+  });
+
   return (
     <div
       className={cn(
-        'absolute right-2 top-0',
+        'absolute right-0 top-0',
         'flex items-center justify-between',
-        'z-20 py-4 pl-14',
+        'z-20 p-4',
         'dark:bg-dev-black-800',
       )}
     >
-      <div className="flex gap-2 pr-2">
+      <div className="flex gap-2">
         <ActionButton iconName="icon-share" />
         <ActionButton iconName="icon-save" />
         <ActionButton
           iconName="icon-download"
           onClick={handleDownload}
         />
-        {isRunning
-          ? (
-            <ActionButton
-              iconName="icon-pause"
-              onClick={handleStop}
-            />
-          )
-          : (
-            <ActionButton
-              fill="red"
-              iconName="icon-play"
-              onClick={handleRun}
-            />
-          )}
+        {
+          isRunning
+            ? (
+              <ActionButton
+                iconName="icon-pause"
+                onClick={handleStop}
+              />
+            )
+            : (
+              <ActionButton
+                fill="red"
+                iconName="icon-play"
+                onClick={handleRun}
+              />
+            )
+        }
       </div>
 
     </div>

@@ -16,13 +16,14 @@ export const GithubButton = () => {
   const isAuthenticated = useStoreAuth.use.jwtToken?.();
 
   return (
-    <>
+    <div className="mb-4 flex h-16 items-center">
       <button
         disabled={authIsLoading}
         onClick={isAuthenticated ? logout : toggleVisibility}
         type="button"
         className={cn(
           'flex cursor-pointer items-center gap-1',
+          'ml-auto',
           'disabled:cursor-not-allowed disabled:opacity-50',
           'font-geist font-body1-bold',
         )}
@@ -35,6 +36,6 @@ export const GithubButton = () => {
         }
       </button>
       <GithubModal onClose={toggleVisibility} />
-    </>
+    </div>
   );
 };
