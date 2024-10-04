@@ -55,7 +55,7 @@ export const routes = () => ([
             element: <ChainState />,
           },
           {
-            path: 'contants',
+            path: 'constants',
             element: <Constants />,
           },
           {
