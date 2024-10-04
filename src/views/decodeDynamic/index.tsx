@@ -304,15 +304,20 @@ const Query = (
     try {
       switch (querie.type) {
         case 'Storage':
-          setResult(dynamicBuilder?.buildStorage(querie.pallet, querie.method).dec(querie.args))
+          setResult(dynamicBuilder?.buildStorage(querie.pallet, querie.method)
+            .dec(querie.args))
           break;
 
         case 'Runtime':
-          setResult(dynamicBuilder?.buildRuntimeCall(querie.pallet, querie.method).value.dec(querie.args))
+          setResult(dynamicBuilder?.buildRuntimeCall(querie.pallet, querie.method)
+            .value
+            .dec(querie.args))
           break;
 
         case 'Extrinsic':
-          setResult(dynamicBuilder?.buildCall(querie.pallet, querie.method).codec.dec(`0x${querie.args.slice(6)}`))
+          setResult(dynamicBuilder?.buildCall(querie.pallet, querie.method)
+            .codec
+            .dec(`0x${querie.args.slice(6)}`)) /* Remove the pallet/method location hex value from the args */
           break;
 
         default:
