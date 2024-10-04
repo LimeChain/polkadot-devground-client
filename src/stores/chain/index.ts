@@ -44,6 +44,7 @@ import { createSelectors } from '../createSelectors';
 import { sizeMiddleware } from '../sizeMiddleware';
 
 import type {
+  IBlockStoreData,
   IRuntime,
   TApi,
   TChain,
@@ -72,8 +73,7 @@ export interface StoreInterface {
   api: TApi | null;
   peopleApi: TPeopleApi | null;
   stakingApi: TStakingApi | null;
-
-  blocksData: Map<number, Awaited<ReturnType<typeof getBlockDetailsWithPAPI>>>;
+  blocksData: Map<number, IBlockStoreData>;
   bestBlock: number | null;
   finalizedBlock: number | null;
   totalIssuance: bigint | null;
@@ -269,7 +269,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
             const block = bestBlocks[i];
 
             // skip allready fetched blocks
-            const blockHashHasBeenFetched = blocksData.get(block.number)?.header?.hash === block.hash;
+            const blockHashHasBeenFetched = blocksData.get(block.number)?.hash === block.hash;
             if (blockHashHasBeenFetched) {
               continue;
             }
@@ -281,15 +281,41 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
 
           }
 
-          Promise.allSettled(promises)
-            .then((results) => {
-              results.forEach((blockData) => {
-                if (blockData.status === 'fulfilled') {
-                  blocksData.set(blockData.value.header.number, blockData.value);
-                }
-              });
-              set({ bestBlock: bestBlock?.number, finalizedBlock: finalizedBlock?.number });
-            })
+          Promise.allSettled(promises).then((results) => {
+            results.forEach((blockData) => {
+              if (blockData.status === 'fulfilled') {
+                const blockExtrinsics = (blockData?.value.body?.extrinsics?.slice(2) ?? [])
+                  .reverse()
+                  .map((extrinsic) => {
+                    const { id, blockNumber, extrinsicData, timestamp, isSuccess } = extrinsic;
+                    const { method, signer } = extrinsicData;
+                    return {
+                      id,
+                      blockNumber,
+                      timestamp,
+                      isSuccess,
+                      signer: signer?.Id ?? '',
+                      method: method.method,
+                      section: method.section,
+                    };
+                  },
+                  );
+
+                const newBlockData = {
+                  number: blockData.value.header.number,
+                  hash: blockData.value.header.hash,
+                  timestamp: blockData.value.header.timestamp,
+                  eventsLength: blockData.value.body.events.length,
+                  validator: blockData.value.header.identity.address.toString(),
+                  extrinsics: blockExtrinsics,
+                  identity: blockData.value.header.identity,
+                };
+
+                blocksData.set(newBlockData.number, newBlockData);
+              }
+            });
+            set({ bestBlock: bestBlock?.number, finalizedBlock: finalizedBlock?.number });
+          })
             // prevent state crash on random smoldot error
             .catch((err) => {
               console.error(err);
@@ -304,7 +330,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
           const createSubscription = () => {
             const rawClientSubscription = rawClient.chainHead(
               true,
-              () => {},
+              () => { },
               (error) => {
                 console.log(error);
                 createSubscription();

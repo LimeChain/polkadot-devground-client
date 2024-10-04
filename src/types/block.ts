@@ -15,16 +15,19 @@ interface IGenericExtrinsicMethod {
 export interface IBlockExtrinsic {
   isSigned: boolean;
   method: IGenericExtrinsicMethod;
-}
-export interface IMappedBlockExtrinsic extends IBlockExtrinsic {
   signer?: {
     Id: string;
   };
+}
+
+export interface IMappedBlockExtrinsic {
+
   id: string;
   blockNumber: number;
   timestamp: number;
   isSuccess: boolean;
   hash?: string;
+  extrinsicData: IBlockExtrinsic;
 }
 
 export interface IMappedBlockEvent {

@@ -9,6 +9,8 @@ import { PageHeader } from '@components/pageHeader';
 import { PDLink } from '@components/pdLink';
 import { useStoreChain } from '@stores';
 import { formatNumber } from '@utils/helpers';
+import { getBlockDetailsWithRawClient } from '@utils/rpc/getBlockDetails';
+import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
 import { BlockBody } from './blockBody';
 import { BlockHeader } from './blockHeader';
@@ -20,6 +22,7 @@ const BlockDetails = () => {
   const { blockNumber } = useParams();
   const data = useStoreChain?.use?.blocksData?.();
   const latestFinalizedBlock = useStoreChain.use.finalizedBlock?.();
+  const dynamicBuilder = useDynamicBuilder();
 
   const [
     blockData,
@@ -27,34 +30,23 @@ const BlockDetails = () => {
   ] = useState<IMappedBlock>();
 
   useEffect(() => {
-    if (blockNumber && data.size > 0) {
-      const block = data.get(Number(blockNumber));
-      if (!block) {
+    void (async () => {
+      const blockStore = data.get(Number(blockNumber));
+      if (!blockStore) {
         return;
       }
-
-      if (block.header.number <= (latestFinalizedBlock ?? 0)) {
-        setBlockData({
-          ...block,
-          header: {
-            ...block.header,
-            isFinalized: true,
-          },
-        });
-        return;
-      }
-
-      setBlockData({
-        ...block,
-        header: {
-          ...block.header,
-          isFinalized: false,
-        },
+      const block = await getBlockDetailsWithRawClient({
+        blockNumber: blockStore.number,
+        dynamicBuilder,
       });
-    }
+
+      setBlockData({ ...block, header: { ...block.header, identity: blockStore.identity } });
+    })();
+    // Removed data from dependencies as we expect this should be already in place when hitting this page
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     blockNumber,
-    data,
+    dynamicBuilder,
     latestFinalizedBlock,
   ]);
 
@@ -99,6 +91,7 @@ const BlockDetails = () => {
       <BlockHeader headerData={blockData.header} />
       <BlockBody
         blockNumber={blockData.header.number}
+        blockTimestamp={blockData.header.timestamp}
         bodyData={blockData.body}
       />
     </div>

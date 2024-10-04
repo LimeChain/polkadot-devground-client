@@ -19,18 +19,20 @@ import {
   cn,
   truncateAddress,
 } from '@utils/helpers';
+import { getBlockDetailsWithRawClient } from '@utils/rpc/getBlockDetails';
+import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
-import type {
-  IMappedBlock,
-  IMappedBlockExtrinsic,
-} from '@custom-types/block';
+import type { IBlockExtrinsic } from '@custom-types/block';
+import type { IExtrinsicStoreData } from '@custom-types/chain';
 import type { ColumnDef } from '@tanstack/react-table';
 
 const SignedExtrinsics = () => {
-  const refSelectedExtrinsic = useRef<IMappedBlockExtrinsic | undefined>();
+  const refSelectedExtrinsic = useRef<IBlockExtrinsic | undefined>();
 
   const blocksData = useStoreChain?.use?.blocksData?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
+  const dynamicBuilder = useDynamicBuilder();
+
   const [
     JSONViewerModal,
     toggleVisibility,
@@ -39,28 +41,31 @@ const SignedExtrinsics = () => {
   const [
     signedExtrinsics,
     setSignedExtrinsics,
-  ] = useState<IMappedBlockExtrinsic[]>([]);
+  ] = useState<IExtrinsicStoreData[]>([]);
   const isLoading = blocksData.size === 0;
 
-  const handleOpenModal = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
+  const handleOpenModal = useCallback(async (e: React.MouseEvent<HTMLTableRowElement>) => {
     const dataIndex = Number(e.currentTarget.dataset.index);
-    const typedRow = signedExtrinsics[dataIndex] as unknown as IMappedBlockExtrinsic | IMappedBlock;
+    const typedRow = signedExtrinsics[dataIndex] as unknown as IExtrinsicStoreData;
+    const extrinsicId = typedRow.id;
+    const extrinsicStore = signedExtrinsics.find((extrinsic) => extrinsic.id === extrinsicId);
+    if (!extrinsicStore) return;
 
-    if ('header' in typedRow) {
-      const blockNumber = typedRow.header.number;
-      refSelectedExtrinsic.current = signedExtrinsics.find((extrinsic) => extrinsic.blockNumber === blockNumber);
-    } else {
-      refSelectedExtrinsic.current = typedRow;
-    }
+    const block = await getBlockDetailsWithRawClient({
+      blockNumber: extrinsicStore.blockNumber,
+      dynamicBuilder,
+    });
+    refSelectedExtrinsic.current = block.body.extrinsics.find((extrinsic) => extrinsic.id === extrinsicId)?.extrinsicData;
     toggleVisibility();
   }, [
+    dynamicBuilder,
     signedExtrinsics,
     toggleVisibility,
   ]);
 
   useEffect(() => {
     const extrinsics = Array.from(blocksData.values())
-      .flatMap((block) => block?.body?.extrinsics?.slice(2) ?? [])
+      .flatMap((block) => block?.extrinsics ?? [])
       .reverse();
 
     setSignedExtrinsics(extrinsics);
@@ -70,7 +75,7 @@ const SignedExtrinsics = () => {
   ]);
 
   const columns = useMemo(() => {
-    const result: ColumnDef<IMappedBlockExtrinsic>[] = [
+    const result: ColumnDef<IExtrinsicStoreData>[] = [
       {
         header: 'Extrinsic ID',
         accessorKey: 'id',
@@ -83,7 +88,7 @@ const SignedExtrinsics = () => {
         header: 'Signer',
         accessorKey: 'signer',
         cell: ({ row }) => {
-          return truncateAddress(row.original.signer?.Id, 6);
+          return truncateAddress(row.original.signer, 6);
         },
       },
       {
@@ -116,7 +121,7 @@ const SignedExtrinsics = () => {
       },
       {
         header: 'Action',
-        accessorKey: 'method.method',
+        accessorKey: 'method',
       },
       {
         header: '',

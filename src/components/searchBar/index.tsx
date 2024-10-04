@@ -16,10 +16,13 @@ import {
 } from '@utils/helpers';
 import { useDebounce } from '@utils/hooks/useDebounce';
 import { useOnClickOutside } from '@utils/hooks/useOnClickOutside';
+import { getBlockDetailsWithRawClient } from '@utils/rpc/getBlockDetails';
+import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
 import { Results } from './results';
 
-import type { IMappedBlockExtrinsic } from '@custom-types/block';
+import type { IBlockExtrinsic } from '@custom-types/block';
+import type { IExtrinsicStoreData } from '@custom-types/chain';
 interface ISearchBarProps {
   label: string;
   type: 'all' | 'block' | 'extrinsics';
@@ -34,9 +37,10 @@ export const SearchBar = (props: ISearchBarProps) => {
 
   const refContainer = useRef<HTMLDivElement>(null);
   const refInput = useRef<HTMLInputElement>(null);
-  const refSelectedExtrinsic = useRef<IMappedBlockExtrinsic | null>(null);
+  const refSelectedExtrinsic = useRef<IBlockExtrinsic | null>(null);
 
   const blocksData = useStoreChain?.use?.blocksData?.();
+  const dynamicBuilder = useDynamicBuilder();
 
   const [
     showResults,
@@ -48,7 +52,7 @@ export const SearchBar = (props: ISearchBarProps) => {
     setResults,
   ] = useState({
     blockNumber: null,
-    extrinsics: [] as IMappedBlockExtrinsic[],
+    extrinsics: [] as IExtrinsicStoreData[],
   });
 
   const [
@@ -84,8 +88,8 @@ export const SearchBar = (props: ISearchBarProps) => {
     }
 
     setResults({
-      blockNumber: block?.header.number,
-      extrinsics: block?.body?.extrinsics,
+      blockNumber: block?.number,
+      extrinsics: block?.extrinsics,
     });
   }, [blocksData]);
 
@@ -105,12 +109,21 @@ export const SearchBar = (props: ISearchBarProps) => {
 
   useOnClickOutside(refContainer, handleClickOutside);
 
-  const handleOpenModal = useCallback((e?: React.MouseEvent<HTMLDivElement>) => {
-    const extrinsicId = e?.currentTarget.getAttribute('data-extrinsic-id');
-    refSelectedExtrinsic.current = results.extrinsics?.find((extrinsic) => extrinsic.id === extrinsicId) || null;
+  const handleOpenModal = useCallback(async (e: React.MouseEvent<HTMLDivElement>) => {
+    const extrinsicId = e.currentTarget.getAttribute('data-extrinsic-id');
 
+    const extrinsicStore = results.extrinsics.find((extrinsic) => extrinsic.id === extrinsicId);
+
+    if (!extrinsicStore) return;
+
+    const block = await getBlockDetailsWithRawClient({
+      blockNumber: extrinsicStore.blockNumber,
+      dynamicBuilder,
+    });
+    refSelectedExtrinsic.current = block.body.extrinsics.find((extrinsic) => extrinsic.id === extrinsicId)?.extrinsicData || null;
     toggleVisibility();
   }, [
+    dynamicBuilder,
     results,
     toggleVisibility,
   ]);
