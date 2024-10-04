@@ -206,7 +206,7 @@ const Query = (
       onRemove={handleUnsubscribe}
       path={`${querie.decoder}`}
       result={result}
-      title="Constant"
+      title="Decoded"
     />
   );
 };
