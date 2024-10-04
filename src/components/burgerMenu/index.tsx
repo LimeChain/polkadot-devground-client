@@ -14,7 +14,7 @@ import {
 } from '@stores';
 import { cn } from '@utils/helpers';
 
-import type { IEventBusClickLink } from '@custom-types/eventBus';
+import type { IEventBusNavLinkClick } from '@custom-types/eventBus';
 
 export const BurgerMenu = () => {
   const [
@@ -33,7 +33,7 @@ export const BurgerMenu = () => {
     setIsOpen(!isOpen);
   }, [isOpen]);
 
-  useEventBus<IEventBusClickLink>('@@-click-link', () => {
+  useEventBus<IEventBusNavLinkClick>('@@-navlink-click', () => {
     if (isOpen) {
       setIsOpen(false);
     }

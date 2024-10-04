@@ -15,24 +15,31 @@ import { SUPPORTED_CHAIN_GROUPS } from '@constants/chain';
 import { useStoreChain } from '@stores';
 import { cn } from '@utils/helpers';
 
-import type { ISupportedChainGroups } from '@custom-types/chain';
 import type {
-  IEventBusClickLink,
+  ISupportedChainGroups,
+  TChain,
+} from '@custom-types/chain';
+import type {
+  IEventBusNavLinkClick,
   IEventBusSearchChain,
   IEventBusSetChain,
 } from '@custom-types/eventBus';
 
 const filterChainsByGroup = (query: string) => {
-  // Return a mapped array of groups, filtered by chain name that matches the query
-  return Object.values(SUPPORTED_CHAIN_GROUPS)
-    .map((group) => ({
-      ...group,
-      chains: group.chains.filter((chain) =>
-        chain.name.toLowerCase().includes(query.toLowerCase()),
-      ),
-    }))
-    // Only include groups that have chains matching the query
-    .filter((group) => group.chains.length > 0);
+  return Object.values(SUPPORTED_CHAIN_GROUPS).reduce((acc: { chains: TChain[]; name: string }[], group) => {
+    const filteredChains = group.chains.filter((chain) =>
+      chain.name.toLowerCase().includes(query.toLowerCase()),
+    );
+
+    if (filteredChains.length > 0) {
+      acc.push({
+        ...group,
+        chains: filteredChains,
+      });
+    }
+
+    return acc;
+  }, []);
 };
 
 const CHAIN_GROUPS = Object.keys(SUPPORTED_CHAIN_GROUPS);
@@ -79,7 +86,7 @@ export const MobileChainSelect = () => {
     setIsOpen(false);
   }, [setChain]);
 
-  useEventBus<IEventBusClickLink>('@@-click-link', () => {
+  useEventBus<IEventBusNavLinkClick>('@@-navlink-click', () => {
     if (isOpen) {
       setIsOpen(false);
     }
@@ -142,7 +149,7 @@ export const MobileChainSelect = () => {
           <SearchChain />
 
           {
-            Array.from(filteredGroups) && filteredGroups.length > 0
+            filteredGroups.length > 0
               ? (
                 filteredGroups.map((group) => (
                   <div

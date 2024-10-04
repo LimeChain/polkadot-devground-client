@@ -10,7 +10,7 @@ import {
   NavigationLink,
 } from './navigationLink';
 
-import type { IEventBusClickLink } from '@custom-types/eventBus';
+import type { IEventBusNavLinkClick } from '@custom-types/eventBus';
 
 export type TNavItem = {
   type: 'link';
@@ -26,7 +26,7 @@ export const NavigationItem = ({
 }: TNavItem) => {
 
   const handleLinkClick = useCallback(() => {
-    busDispatch<IEventBusClickLink>({ type: '@@-click-link', data: 'Hello World!' });
+    busDispatch<IEventBusNavLinkClick>({ type: '@@-navlink-click' });
   }, []);
 
   return type === 'link'

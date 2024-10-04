@@ -10,24 +10,22 @@ const breakpoints = {
 
 export const useResponsive = () => {
   const [
-    isMobile,
-    setIsMobile,
-  ] = useState<boolean>(false);
-  const [
-    isTablet,
-    setIsTablet,
-  ] = useState<boolean>(false);
-  const [
-    isDesktop,
-    setIsDesktop,
-  ] = useState<boolean>(false);
+    responsiveState,
+    setResponsiveState,
+  ] = useState({
+    isMobile: false,
+    isTablet: false,
+    isDesktop: false,
+  });
 
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
-      setIsMobile(width < breakpoints.mobile);
-      setIsTablet(width >= breakpoints.mobile && width < breakpoints.tablet);
-      setIsDesktop(width >= breakpoints.tablet);
+      setResponsiveState({
+        isMobile: width < breakpoints.mobile,
+        isTablet: width >= breakpoints.mobile && width < breakpoints.tablet,
+        isDesktop: width >= breakpoints.tablet,
+      });
     };
 
     // Initial check
@@ -39,5 +37,5 @@ export const useResponsive = () => {
     };
   }, []);
 
-  return { isMobile, isTablet, isDesktop };
+  return responsiveState;
 };

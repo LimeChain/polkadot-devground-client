@@ -75,7 +75,6 @@ export interface IEventBusForksReceiveUpdate {
   };
 }
 
-export interface IEventBusClickLink {
-  type: '@@-click-link';
-  data: string;
+export interface IEventBusNavLinkClick {
+  type: '@@-navlink-click';
 }

@@ -1,6 +1,5 @@
 import {
   useCallback,
-  useEffect,
   useRef,
   useState,
 } from 'react';
@@ -8,6 +7,7 @@ import { useLocation } from 'react-router-dom';
 
 import { Icon } from '@components/icon';
 import { cn } from '@utils/helpers';
+import { useOnClickOutside } from '@utils/hooks/useOnClickOutside';
 
 import {
   type INavigationDropdownItem,
@@ -38,18 +38,7 @@ export const NavigationDropdown = ({
     setIsOpen(!isOpen);
   }, [isOpen]);
 
-  const handleClickOutside = useCallback((e: MouseEvent) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-      setIsOpen(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [handleClickOutside]);
+  useOnClickOutside(dropdownRef, toggleDropdown);
 
   return (
     <div

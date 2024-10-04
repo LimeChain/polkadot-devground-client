@@ -17,9 +17,9 @@ import { GithubButton } from '@components/githubButton';
 import { Tabs } from '@components/tabs';
 import { useStoreUI } from '@stores';
 import { cn } from '@utils/helpers';
+import { useResponsive } from '@utils/hooks/useResponsive';
 import { useResizeObserver } from '@utils/hooks/useResizeObserver';
 import { encodeCodeToBase64 } from '@utils/iframe';
-import { useResponsive } from 'src/hooks/useResponsive';
 import { SelectExample } from '@views/codeEditor/components/selectExample';
 
 import { ActionButton } from './components/actionButton';
