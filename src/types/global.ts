@@ -15,6 +15,7 @@ export interface IErrorItem {
 declare global {
   interface Window {
     pivanov?: unknown; // for testing purposes
+    storesSizes: Record<string, number>;
     PDStoreSizes: Record<string, number>;
     customPackages: Record<string, unknown>;
   }

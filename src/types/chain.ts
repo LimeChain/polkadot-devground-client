@@ -61,7 +61,7 @@ type TStakingChain = {
 type TChainBase = {
   name: string;
   id: TSupportedChain;
-  icon: `icon-chain-${TSupportedChain}`;
+  icon: `chain-${TSupportedChain}`;
 };
 
 export interface TChainSpecs extends Awaited<ReturnType<PolkadotClient['getChainSpecData']>> {
