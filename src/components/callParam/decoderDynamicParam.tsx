@@ -1,8 +1,6 @@
-import type { IDecoderParam } from '@constants/decoders/types';
-import { RpcParam } from './rpcParam';
-import styles from './styles.module.css';
-import { DecoderParam } from '@components/callParam/decoderParam';
 import { PrimitiveParam } from '@components/callParam/primitiveParam';
+
+import styles from './styles.module.css';
 
 interface IDecoderDynamicParams {
   onChange: (args: unknown) => void;
@@ -18,9 +16,9 @@ export const DecoderDynamicParams = ({ onChange }: IDecoderDynamicParams) => {
         <div className={styles['codecContainer']}>
           <div className={styles['codecGroup']}>
             <PrimitiveParam
-              primitive={{ value: 'str', type: 'primitive' }}
               onChange={onChange}
-              placeholder='hex'
+              placeholder="hex"
+              primitive={{ value: 'str', type: 'primitive' }}
             />
           </div>
         </div>

@@ -1,7 +1,7 @@
 import {
   blockHeader,
+  metadata,
   ScaleEnum,
-  metadata
 } from '@polkadot-api/substrate-bindings';
 import {
   Struct,

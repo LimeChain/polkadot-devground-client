@@ -1,7 +1,8 @@
-import type { IDecoderParam } from '@constants/decoders/types';
-import { RpcParam } from './rpcParam';
-import styles from './styles.module.css';
 import { DecoderParam } from '@components/callParam/decoderParam';
+
+import styles from './styles.module.css';
+
+import type { IDecoderParam } from '@constants/decoders/types';
 
 interface IDecoderParams {
   params: IDecoderParam[];
