@@ -94,7 +94,7 @@ export interface StoreInterface {
 }
 
 const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
-  chain: SUPPORTED_CHAINS['polkadot-asset-hub'],
+  chain: SUPPORTED_CHAINS['polkadot'],
   client: null,
   peopleClient: null,
   rawClient: null,
