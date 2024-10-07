@@ -46,7 +46,9 @@ export const PDSelect = ({
     }
   }, []);
 
-  const hasItems = items ? items.length > 0 : false;
+  const hasItems = items
+    ? items.some((group) => group?.length > 0)
+    : false;
 
   return (
     <div
@@ -74,7 +76,7 @@ export const PDSelect = ({
             placeholder={(
               <SelectPlaceholder
                 label={label}
-                value={placeholder || emptyPlaceHolder}
+                value={hasItems ? placeholder : emptyPlaceHolder}
               />
             )}
             asChild
