@@ -34,7 +34,7 @@ export const initSmoldotChains = async ({
 }) => {
   const isParachain = chain.isParaChain;
   let newChain: TSmoldotChain, peopleChain: TSmoldotChain;
-  let stakingChain: TSmoldotChain = null as unknown as TSmoldotChain;
+  // const stakingChain: TSmoldotChain = null as unknown as TSmoldotChain;
 
   if (isParachain) {
     const relayChain = await smoldot.addChain({
@@ -60,15 +60,15 @@ export const initSmoldotChains = async ({
 
     assert(peopleChain, `peopleChain is not defined for ${chain.name}`);
 
-    if (chain.hasStaking) {
-      stakingChain = await smoldot.addChain({
-        chainSpec: CHAIN_SPECS[chain.stakingChainId],
-        potentialRelayChains: [relayChain],
-      })
-        .catch(console.error);
+    // if (chain.hasStaking) {
+    //   stakingChain = await smoldot.addChain({
+    //     chainSpec: CHAIN_SPECS[chain.stakingChainId],
+    //     potentialRelayChains: [relayChain],
+    //   })
+    //     .catch(console.error);
 
-      assert(stakingChain, `stakingChain is not defined for ${chain.name}`);
-    }
+    //   assert(stakingChain, `stakingChain is not defined for ${chain.name}`);
+    // }
 
   } else {
     newChain = await smoldot.addChain({
@@ -86,22 +86,22 @@ export const initSmoldotChains = async ({
 
     assert(peopleChain, `peopleChain is not defined for ${chain.name}`);
 
-    if (chain.hasStaking) {
-      stakingChain = await smoldot?.addChain({
-        chainSpec: CHAIN_SPECS[chain.stakingChainId],
-        potentialRelayChains: [newChain],
-      })
-        .catch(console.error);
+    // if (chain.hasStaking) {
+    //   stakingChain = await smoldot?.addChain({
+    //     chainSpec: CHAIN_SPECS[chain.stakingChainId],
+    //     potentialRelayChains: [newChain],
+    //   })
+    //     .catch(console.error);
 
-      assert(stakingChain, `stakingChain is not defined for ${chain.name}`);
-    }
+    //   assert(stakingChain, `stakingChain is not defined for ${chain.name}`);
+    // }
 
   }
 
   return {
     newChain,
     peopleChain,
-    stakingChain,
+    // stakingChain,
   };
 };
 
@@ -166,7 +166,7 @@ export const getSystemDigestData = async (api: TApi, at: string) => {
   return digestData;
 };
 
-export const getInvulnerables = async (api: TypedApi<TParaChainDecsriptor>, at: string) => {
+export const getInvulnerables = async (api: TPeopleApi, at: string) => {
   assert(api, 'Api prop is not defined');
   assert(at, 'At prop is not defined');
   checkIfCompatable(

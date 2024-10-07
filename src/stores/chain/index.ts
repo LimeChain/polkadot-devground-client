@@ -33,7 +33,6 @@ import {
   getRuntime,
   initSmoldotChains,
   subscribeToRuntime,
-  subscribeToStakedTokens,
   subscribeToTotalIssuance,
 } from '@utils/papi';
 import { assert } from '@utils/papi/helpers';
@@ -49,8 +48,8 @@ import type {
   TChain,
   TChainSpecs,
   TPeopleApi,
+  TPeopleChainDecsriptor,
   TStakingApi,
-  TStakingChainDecsriptor,
 } from '@custom-types/chain';
 import type {
   ChainSpecData,
@@ -95,7 +94,7 @@ export interface StoreInterface {
 }
 
 const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
-  chain: SUPPORTED_CHAINS['polkadot'],
+  chain: SUPPORTED_CHAINS['polkadot-asset-hub'],
   client: null,
   peopleClient: null,
   rawClient: null,
@@ -117,6 +116,9 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   metadata: null,
   lookup: null,
 };
+
+const MAX_RETRIES = 3;
+let retriesSoFar = 0;
 
 const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain', (set, get) => ({
   ...initialState,
@@ -171,7 +173,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
         const {
           newChain,
           peopleChain,
-          stakingChain,
+          // stakingChain,
         } = await initSmoldotChains({
           smoldot,
           chain,
@@ -179,7 +181,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
 
         // init clients and typed apis
         const newClient = createClient(getSmProvider(newChain));
-        // const newClient = createClient(withLogsRecorder(line => console.log(line), getSmProvider(newChain)));
+        // const newClient = createClient(withLogsRecorder((line) => console.log(line), getSmProvider(newChain)));
         set({ client: newClient });
         const api = newClient.getTypedApi(CHAIN_DESCRIPTORS[chain.id]);
         set({ api });
@@ -187,17 +189,17 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
         const isPeopleParaChain = chain.id === chain.peopleChainId;
         const newPeopleClient = isPeopleParaChain ? newClient : createClient(getSmProvider(peopleChain));
         set({ peopleClient: newPeopleClient });
-        const peopleApi = newPeopleClient.getTypedApi(CHAIN_DESCRIPTORS[chain.peopleChainId]);
+        const peopleApi = newPeopleClient.getTypedApi(CHAIN_DESCRIPTORS[chain.peopleChainId] as TPeopleChainDecsriptor);
         set({ peopleApi });
 
         // check if the chain has staking pallet (rococo doesn't have)
-        const hasStakingInformation = chain.hasStaking && stakingChain;
-        if (hasStakingInformation) {
-          const stakingClient = createClient(getSmProvider(stakingChain));
-          set({ stakingClient });
-          const stakingApi = stakingClient.getTypedApi(CHAIN_DESCRIPTORS[chain.stakingChainId] as TStakingChainDecsriptor);
-          set({ stakingApi });
-        }
+        // const hasStakingInformation = chain.hasStaking && stakingChain;
+        // if (hasStakingInformation) {
+        //   const stakingClient = createClient(getSmProvider(stakingChain));
+        //   set({ stakingClient });
+        //   const stakingApi = stakingClient.getTypedApi(CHAIN_DESCRIPTORS[chain.stakingChainId] as TStakingChainDecsriptor);
+        //   set({ stakingApi });
+        // }
 
         await Promise.allSettled([
           { type: 'chainSpecs', data: await newClient.getChainSpecData() },
@@ -250,12 +252,12 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
         getExpectedBlockTime(api, chain, (blockTime) => set({ blockTime }))
           .catch(console.error);
 
-        if (hasStakingInformation) {
-          const stakingApi = get()?.stakingApi;
-          assert(stakingApi, 'Staking Api is not defined');
-          subscribeToStakedTokens(stakingApi, (totalStake) => set({ totalStake }))
-            .catch(console.error);
-        }
+        // if (hasStakingInformation) {
+        //   const stakingApi = get()?.stakingApi;
+        //   assert(stakingApi, 'Staking Api is not defined');
+        //   subscribeToStakedTokens(stakingApi, (totalStake) => set({ totalStake }))
+        //     .catch(console.error);
+        // }
 
         // subscribe to chain head
         newClient.bestBlocks$.subscribe(async (bestBlocks) => {
@@ -305,12 +307,17 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
                   hash: blockData.value.header.hash,
                   timestamp: blockData.value.header.timestamp,
                   eventsLength: blockData.value.body.events.length,
-                  validator: blockData.value.header.identity.address.toString(),
+                  validator: blockData.value.header.identity?.address?.toString?.(),
                   extrinsics: blockExtrinsics,
                   identity: blockData.value.header.identity,
                 };
 
-                blocksData.set(newBlockData.number, newBlockData);
+                if (typeof newBlockData.number == 'number') {
+                  blocksData.set(newBlockData.number, newBlockData);
+                }
+              } else {
+                console.log(blockData);
+
               }
             });
             set({ bestBlock: bestBlock?.number, finalizedBlock: finalizedBlock?.number });
@@ -344,10 +351,22 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
 
         }
 
+        // RESET RETRIES AMOUNT ON SUCCESSFUL CHAIN SET
+        retriesSoFar = 0;
+
       } catch (err) {
-        // TODO: HANDLE INFINITE LOOP CASE
-        console.log('Unpredicted Error, reseting chain store...', err);
-        get()?.actions?.setChain?.(get()?.chain);
+        // TODO: Show error to the user
+        // PREVENT INFINITY LOOP ON CHAIN SWITCH
+        retriesSoFar += 1;
+
+        if (retriesSoFar <= MAX_RETRIES) {
+          console.log('Unpredicted Error, reseting chain store...', err);
+          console.log(`Retries left: ${MAX_RETRIES - retriesSoFar}`, err);
+          get()?.actions?.setChain?.(get()?.chain);
+        } else {
+          console.log('Maximum chain set retries has been reached!');
+          // SITE IS UNRESPONSIVE AT THAT POINT because of smoldot panik
+        }
       }
     },
   },

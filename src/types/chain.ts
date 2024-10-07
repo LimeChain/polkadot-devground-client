@@ -2,6 +2,9 @@ import { type Chain } from 'polkadot-api/smoldot';
 
 import type {
   dot,
+  dot_asset_hub,
+  dot_bridge_hub,
+  dot_collectives,
   dotpeople,
   rococo,
   rococo_people,
@@ -25,15 +28,28 @@ export type TSupportedChains = {
 
 type TSupportedStakingChain = 'polkadot';
 export type TSupportedRelayChain = 'polkadot' | 'rococo';
-export type TSupportedParaChain = 'polkadot-people' | 'rococo-people';
+export type TSupportedParaChain =
+  'polkadot-people' |
+  'polkadot-asset-hub' |
+  'polkadot-bridge-hub' |
+  'polkadot-collectives' |
+  'rococo-people';
 export type TSupportedChain = TSupportedRelayChain | TSupportedParaChain;
 
 export type TRelayChainDecsriptor = typeof dot | typeof rococo;
 export type TStakingChainDecsriptor = typeof dot;
-export type TParaChainDecsriptor = typeof dotpeople | typeof rococo_people;
+export type TParaChainDecsriptor =
+  typeof dotpeople |
+  typeof dot_asset_hub |
+  typeof dot_bridge_hub |
+  typeof dot_collectives |
+  typeof rococo_people;
+export type TPeopleChainDecsriptor =
+  typeof dotpeople |
+  typeof rococo_people;
 
 export type TApi = TypedApi<TRelayChainDecsriptor | TParaChainDecsriptor>;
-export type TPeopleApi = TypedApi<TParaChainDecsriptor>;
+export type TPeopleApi = TypedApi<TPeopleChainDecsriptor>;
 export type TRelayApi = TypedApi<TRelayChainDecsriptor>;
 export type TStakingApi = TypedApi<TStakingChainDecsriptor>;
 
@@ -80,13 +96,13 @@ export interface IRuntime {
 export type TSmoldotChain = Chain | void;
 
 export interface IBlockStoreData {
-  number: number;
+  number?: number;
   hash: string;
   timestamp: number;
   eventsLength: number;
-  validator: string;
+  validator?: string;
   extrinsics: IExtrinsicStoreData[];
-  identity: Identity;
+  identity?: Identity;
 }
 export interface IExtrinsicStoreData {
   id: string;
