@@ -31,7 +31,6 @@ import {
 import {
   getExpectedBlockTime,
   getMetadata,
-  getRuntime,
   initSmoldotChains,
   subscribeToRuntime,
   subscribeToStakedTokens,
@@ -200,10 +199,19 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
           set({ stakingApi });
         }
 
+        // update spec_version on runtime update
+        subscribeToRuntime(api, (runtime) => set({ runtime }))
+          .catch(console.error);
+
+        subscribeToTotalIssuance(api, (totalIssuance) => set({ totalIssuance }))
+          .catch(console.error);
+
+        getExpectedBlockTime(api, chain, (blockTime) => set({ blockTime }))
+          .catch(console.error);
+
         await Promise.allSettled([
           { type: 'chainSpecs', data: await newClient.getChainSpecData() },
           { type: 'metadata', data: await getMetadata(api) },
-          { type: 'runtime', data: await getRuntime(api) },
         ])
           .then((results) => {
             results.forEach((result) => {
@@ -230,25 +238,12 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
                     break;
                   }
 
-                  case 'runtime':
-                    set({ runtime: result.value.data as Awaited<ReturnType<typeof getRuntime>> });
-                    break;
                   default:
                     break;
                 }
               }
             });
           })
-          .catch(console.error);
-
-        // update spec_version on runtime update
-        subscribeToRuntime(api, (runtime) => set({ runtime }))
-          .catch(console.error);
-
-        subscribeToTotalIssuance(api, (totalIssuance) => set({ totalIssuance }))
-          .catch(console.error);
-
-        getExpectedBlockTime(api, chain, (blockTime) => set({ blockTime }))
           .catch(console.error);
 
         if (hasStakingInformation) {
