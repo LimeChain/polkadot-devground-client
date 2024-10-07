@@ -66,7 +66,7 @@ export const ChainStateBlock = ({ type }: TChainStateBlockProps) => {
       break;
 
     case 'blockTime':
-      if (chainData) {
+      if (showData) {
         const blockTimeSec = Number(chainData) / 1000;
         data = blockTimeSec;
       }
