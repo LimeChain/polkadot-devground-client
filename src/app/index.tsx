@@ -1,3 +1,4 @@
+import { getAnalytics } from 'firebase/analytics';
 import { createClient } from 'polkadot-api';
 import {
   connectInjectedExtension,
@@ -20,10 +21,12 @@ import {
   useStoreUI,
   useStoreWallet,
 } from '@stores';
+import { analyticsApp } from 'firebaseConfig';
 
 import { routes } from './routes';
 
 export const App = () => {
+  getAnalytics(analyticsApp);
   const refTimeout = useRef<NodeJS.Timeout>();
   const refRoutes = useRef(createBrowserRouter(routes()));
 
