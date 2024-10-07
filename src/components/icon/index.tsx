@@ -22,7 +22,7 @@ export const Icon = forwardRef(
       fill,
       className,
       testId,
-      externalURL = '',
+      externalURL = '/svg-sprite.svg',
       style,
     } = props;
 

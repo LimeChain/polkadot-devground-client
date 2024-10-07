@@ -1,0 +1,10 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M22.3636 0H1.63636C0.732625 0 0 0.732625 0 1.63636V22.3636C0 23.2674 0.732625 24 1.63636 24H22.3636C23.2674 24 24 23.2674 24 22.3636V1.63636C24 0.732625 23.2674 0 22.3636 0Z" fill="url(#svg-subwallet-gradiend)"/>
+  <path d="M17.4545 9.73651V7.46575L8.36202 3.81836L6.54545 4.74086L6.55503 11.8086L13.3576 14.5477L9.72447 16.0946V14.8983L8.0565 14.2213L6.55503 14.9309V19.2595L8.36362 20.182L17.4545 16.0805V13.171L9.27273 9.89619V7.90927L15.7642 10.5029L17.4545 9.73651Z" fill="white"/>
+  <defs>
+  <linearGradient id="svg-subwallet-gradiend" x1="12" y1="0" x2="12" y2="24" gradientUnits="userSpaceOnUse">
+  <stop stop-color="#004BFF"/>
+  <stop offset="1" stop-color="#4CEAAC"/>
+  </linearGradient>
+  </defs>
+</svg>

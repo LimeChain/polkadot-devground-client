@@ -40,7 +40,7 @@ export const StoreSizeViewer = () => {
 
     refTimeout.current = setTimeout(() => {
       // make sure it's new object ;)
-      const sortedEntries = Object.entries(window.PDStoreSizes).sort((a, b) => b[1] - a[1]);
+      const sortedEntries = Object.entries(window.storesSizes).sort((a, b) => b[1] - a[1]);
       setData(Object.fromEntries(sortedEntries));
     }, 100);
   }, []);
@@ -48,6 +48,11 @@ export const StoreSizeViewer = () => {
   useEventBus<IEventBusStoreSize>('@@-store-size', () => {
     handleData();
   });
+
+  useEffect(() => {
+    handleData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -105,19 +110,23 @@ export const StoreSizeViewer = () => {
   return (
     <div
       onMouseDown={handleMouseDown}
-      className={cn(
-        'fixed left-1/2 z-[9999] translate-x-[-50%]',
-        'flex flex-col',
-        'p-2',
-        'rounded-md border border-gray-300',
-        'text-xs text-gray-800',
-        'bg-white shadow-md',
-        'cursor-grab active:cursor-grabbing',
-      )}
-      style={{
-        left: `${position.x}px`,
-        top: `${position.y}px`,
-      }}
+      className={
+        cn(
+          'fixed left-1/2 z-[9999] translate-x-[-50%]',
+          'flex flex-col',
+          'p-2',
+          'rounded-md border border-gray-300',
+          'text-xs text-gray-800',
+          'bg-white shadow-md',
+          'cursor-grab active:cursor-grabbing',
+        )
+      }
+      style={
+        {
+          left: `${position.x}px`,
+          top: `${position.y}px`,
+        }
+      }
     >
       {
         Object.entries(data).map(([
@@ -129,7 +138,7 @@ export const StoreSizeViewer = () => {
             <div key={store}>
               {store}
               :
-              {sizeFormatted.value} 
+              {sizeFormatted.value}
               {' '}
               {sizeFormatted.unit}
             </div>
