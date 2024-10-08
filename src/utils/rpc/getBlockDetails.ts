@@ -19,9 +19,13 @@ import {
 import { assert } from '@utils/papi/helpers';
 
 import type { IMappedBlockExtrinsic } from '@custom-types/block';
+import type { TPeopleApi } from '@custom-types/chain';
 import type { BlockDetails } from '@custom-types/rawClientReturnTypes';
 import type { RuntimeVersion } from '@polkadot/types/interfaces';
-import type { HexString } from 'polkadot-api';
+import type {
+  FixedSizeBinary,
+  HexString,
+} from 'polkadot-api';
 import type { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
 const getBlockValidator = async ({
@@ -54,28 +58,33 @@ const getBlockValidator = async ({
   let authors = [];
 
   if (isParaChain) {
-    authors = await getInvulnerables(peopleApi, blockHash);
+    authors = await getInvulnerables(api as TPeopleApi, blockHash)
+      .catch();
   } else {
-    authors = await getValidators(api, blockHash);
+    authors = await getValidators(api, blockHash)
+      .catch();
   }
 
   const address = !isParaChain ? authors[authorIndex] : authors[authorIndex % authors.length];
 
   let identity;
 
-  identity = await getIdentity(peopleApi, address);
+  identity = await getIdentity(peopleApi, address)
+    .catch();
   if (identity) {
-    identity = identity?.[0]?.info?.display?.value?.asText?.();
+    identity = (identity?.[0]?.info?.display?.value as FixedSizeBinary<2>)?.asText?.();
   }
 
-  const superIdentity = await getSuperIdentity(peopleApi, address);
+  const superIdentity = await getSuperIdentity(peopleApi, address)
+    .catch();
 
   if (superIdentity?.[0] && !identity) {
-    identity = await getIdentity(peopleApi, superIdentity[0]);
+    identity = await getIdentity(peopleApi, superIdentity[0])
+      .catch();
 
     if (identity) {
-      const _identity = identity?.[0]?.info?.display?.value?.asText?.();
-      const _superIdentity = superIdentity?.[1]?.value?.asText?.();
+      const _identity = (identity?.[0]?.info?.display?.value as FixedSizeBinary<2>)?.asText?.();
+      const _superIdentity = (superIdentity?.[1]?.value as FixedSizeBinary<2>)?.asText?.();
 
       if (_identity) {
         if (_superIdentity) {
@@ -284,4 +293,3 @@ export const getBlockDetailsWithRawClient = async ({
     },
   };
 };
-

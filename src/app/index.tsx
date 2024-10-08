@@ -4,7 +4,7 @@ import {
   connectInjectedExtension,
   getInjectedExtensions,
 } from 'polkadot-api/pjs-signer';
-import * as getPolkadotSigner from 'polkadot-api/signer';
+import { getPolkadotSigner } from 'polkadot-api/signer';
 import {
   useEffect,
   useRef,
