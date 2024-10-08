@@ -17,14 +17,14 @@ import {
 export interface INavigationDropdown extends React.ComponentProps<'button'> {
   title: string;
   items: INavigationDropdownItem[];
-  handleClick?: () => void;
+  onLinkClick?: () => void;
 }
 
 export const NavigationDropdown = ({
   title,
   items,
   className,
-  handleClick,
+  onLinkClick,
   ...props
 }: INavigationDropdown) => {
   const [
@@ -37,6 +37,11 @@ export const NavigationDropdown = ({
   const toggleDropdown = useCallback(() => {
     setIsOpen(!isOpen);
   }, [isOpen]);
+
+  const handleLinkClick = useCallback(() => {
+    setIsOpen(false);
+    onLinkClick?.();
+  }, [onLinkClick]);
 
   useOnClickOutside(dropdownRef, () => {
     setIsOpen(false);
@@ -90,7 +95,7 @@ export const NavigationDropdown = ({
             return (
               <NavigationDropdownItem
                 key={`nav-dropdown-item-${item.to}-${index}`}
-                onClick={handleClick}
+                onClick={handleLinkClick}
                 {...item}
               />
             );

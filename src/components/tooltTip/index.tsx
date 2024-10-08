@@ -20,7 +20,7 @@ export const ToolTip = (props: ToolTipProps) => {
           <Tooltip.Content
             sideOffset={5}
             className={cn(
-              'p-2',
+              'z-[999] p-2',
               'rounded-lg',
               'font-geist font-body3-bold',
               'bg-dev-purple-700 dark:bg-white',

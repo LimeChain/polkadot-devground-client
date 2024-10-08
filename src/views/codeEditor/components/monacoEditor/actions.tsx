@@ -139,6 +139,7 @@ export const EditorActions = () => {
             <ActionButton
               iconName="icon-pause"
               onClick={handleStop}
+              toolTip="Stop execution"
             />
           )
           : (
@@ -146,10 +147,10 @@ export const EditorActions = () => {
               fill="red"
               iconName="icon-play"
               onClick={handleRun}
+              toolTip="Run"
             />
           )}
       </div>
-
     </div>
   );
 };

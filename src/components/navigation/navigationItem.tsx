@@ -33,13 +33,12 @@ export const NavigationItem = ({
     ? (
       <NavigationLink
         {...linkProps}
-        onClick={handleLinkClick}
       />
     )
     : (
       <NavigationDropdown
         {...linkProps}
-        handleClick={handleLinkClick}
+        onLinkClick={handleLinkClick}
       />
     );
 };

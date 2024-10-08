@@ -193,14 +193,13 @@ const TypeScriptEditor = () => {
                       'border border-b-0 border-dev-purple-300 dark:border-dev-black-800',
                     )}
                     >
-
-                      <ActionButton
-                        iconName="icon-externalLink"
-                        onClick={shareCode}
-                      />
                       <ActionButton
                         iconName="icon-export"
+                      />
+                      <ActionButton
+                        iconName="icon-clipboard"
                         onClick={shareCode}
+                        toolTip="Share"
                       />
                     </div>
                     <Panel
