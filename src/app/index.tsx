@@ -66,7 +66,7 @@ export const App = () => {
       ...createClient,
       papiDescriptors,
       ...papiDescriptors,
-      ...getPolkadotSigner,
+      getPolkadotSigner,
       connectInjectedExtension,
       getInjectedExtensions,
     });
