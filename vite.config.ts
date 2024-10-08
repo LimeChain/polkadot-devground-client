@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => {
       }),
       VitePWA({
         includeAssets: [
-          'favicon.png',
+          'favicon.ico',
           'robots.txt',
           'apple-touch-icon.png',
           'safari-pinned-tab.svg',
@@ -38,6 +38,18 @@ export default defineConfig(({ mode }) => {
           lang: 'en-EN',
           background_color: '#FFFFFF',
           display: 'standalone',
+          icons: [
+            {
+              src: '/android-chrome-192x192.png',
+              sizes: '192x192',
+              type: 'image/png',
+            },
+            {
+              src: '/android-chrome-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+            },
+          ],
         },
         workbox: {
           cleanupOutdatedCaches: true,
