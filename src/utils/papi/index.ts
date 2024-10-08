@@ -34,7 +34,7 @@ export const initSmoldotChains = async ({
 }) => {
   const isParachain = chain.isParaChain;
   let newChain: TSmoldotChain, peopleChain: TSmoldotChain;
-  // const stakingChain: TSmoldotChain = null as unknown as TSmoldotChain;
+  // let stakingChain: TSmoldotChain = null as unknown as TSmoldotChain;
 
   if (isParachain) {
     const relayChain = await smoldot.addChain({

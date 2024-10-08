@@ -138,7 +138,7 @@ export const ChainSelector = () => {
               ? (
                 <ul
                   className={cn(
-                    'grid gap-2 [&>li]:h-[64px]',
+                    'grid gap-2',
                     'lg:grid-cols-4',
                     'md:grid-cols-2',
                     'grid-cols-1',
@@ -153,7 +153,7 @@ export const ChainSelector = () => {
                             onClick={handleSetChain}
                             type="button"
                             className={cn(
-                              'flex w-full items-center gap-3 p-4',
+                              'flex h-full w-full items-center gap-3 p-4',
                               'transition-colors',
                               'hover:bg-dev-purple-200 dark:hover:bg-dev-black-800',
                             )}
