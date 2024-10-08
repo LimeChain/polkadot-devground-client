@@ -3,6 +3,8 @@ import {
   useEffect,
   useState,
 } from 'react';
+
+import { DecoderParams } from '@components/callParam/decoderParams';
 import { QueryButton } from '@components/callParam/queryButton';
 import { QueryFormContainer } from '@components/callParam/queryFormContainer';
 import { QueryResult } from '@components/callParam/queryResult';
@@ -10,16 +12,19 @@ import { QueryResultContainer } from '@components/callParam/queryResultContainer
 import { QueryViewContainer } from '@components/callParam/queryViewContainer';
 import { Loader } from '@components/loader';
 import { PDSelect } from '@components/pdSelect';
-import { useStoreChain } from '@stores';
 import { decoders } from '@constants/decoders';
-import { DecoderParams } from '@components/callParam/decoderParams';
-import { blockHeaderCodec, decodeExtrinsic, metadataCodec } from '@utils/codec';
+import { useStoreChain } from '@stores';
+import {
+  blockHeaderCodec,
+  decodeExtrinsic,
+  metadataCodec,
+} from '@utils/codec';
 
-const decoderSelectItems = Object.keys(decoders).map(decoder => ({
+const decoderSelectItems = Object.keys(decoders).map((decoder) => ({
   key: `decoder-${decoder}`,
   label: decoder,
-  value: decoder
-}))
+  value: decoder,
+}));
 
 interface IDecoderParam {
   name: string;
@@ -38,11 +43,11 @@ const Decoder = () => {
   const [
     decoder,
     setDecoder,
-  ] = useState(decoderSelectItems.at(0)!.value)
+  ] = useState(decoderSelectItems.at(0)!.value);
   const [
     queries,
     setQueries,
-  ] = useState<IQuery[]>([])
+  ] = useState<IQuery[]>([]);
   const [
     callParams,
     setCallParams,
@@ -50,9 +55,9 @@ const Decoder = () => {
 
   useEffect(() => {
     if (decoder) {
-      setCallParams(decoders[decoder].params.map(param => ({ name: param.name, value: undefined })))
+      setCallParams(decoders[decoder].params.map((param) => ({ name: param.name, value: undefined })));
     }
-  }, [decoder])
+  }, [decoder]);
 
   // RESET STATES ON CHAIN CHANGE
   useEffect(() => {
@@ -60,8 +65,8 @@ const Decoder = () => {
   }, [chain.id]);
 
   const handleDecoderSelect = useCallback((decoderSelected: string) => {
-    setDecoder(decoderSelected)
-  }, [])
+    setDecoder(decoderSelected);
+  }, []);
 
   const handleRpcParamChange = useCallback((index: number, args: unknown) => {
     setCallParams((params) => {
@@ -81,7 +86,7 @@ const Decoder = () => {
   const handleDecode = useCallback(() => {
     setQueries((queries) => ([
       {
-        decoder: decoder,
+        decoder,
         args: callParams,
         id: crypto.randomUUID(),
       },
@@ -90,7 +95,7 @@ const Decoder = () => {
 
   }, [
     callParams,
-    decoder
+    decoder,
   ]);
 
   const handleStorageUnsubscribe = useCallback((id: string) => {
@@ -120,8 +125,8 @@ const Decoder = () => {
           && decoders?.[decoder]?.params?.length > 0 && (
             <DecoderParams
               key={`rpc-param-${decoder}`}
-              params={decoders[decoder].params}
               onChange={handleRpcParamChange}
+              params={decoders[decoder].params}
             />
           )
         }
@@ -171,20 +176,20 @@ const Query = (
     try {
       switch (querie.decoder) {
         case 'blockHeader':
-          setResult(blockHeaderCodec.dec(querie.args.at(0)?.value as string))
+          setResult(blockHeaderCodec.dec(querie.args.at(0)?.value as string));
           break;
 
         case 'extrinsics':
           setResult((querie.args.at(0)?.value as string[])
-            ?.map((extrinsic) => decodeExtrinsic(extrinsic)))
+            ?.map((extrinsic) => decodeExtrinsic(extrinsic)));
           break;
 
         case 'metadata':
-          setResult(metadataCodec.dec(querie.args.at(0)?.value as string))
+          setResult(metadataCodec.dec(querie.args.at(0)?.value as string));
           break;
 
         default:
-          catchError()
+          catchError();
           break;
       }
 

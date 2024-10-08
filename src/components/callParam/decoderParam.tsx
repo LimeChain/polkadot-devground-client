@@ -1,16 +1,7 @@
-import {
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
-
-import { PDSelect } from '@components/pdSelect';
-
 import { PrimitiveParam } from './primitiveParam';
 import { SequenceParam } from './sequenceParam';
 
 import type { ICallArgs } from '.';
-import type { IRpcCallParam } from '@constants/rpcCalls/types';
 import type { IDecoderParam } from '@constants/decoders/types';
 
 export interface IDecoderParamProps extends ICallArgs {

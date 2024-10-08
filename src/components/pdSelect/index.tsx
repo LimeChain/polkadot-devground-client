@@ -35,7 +35,7 @@ export const PDSelect = ({
   placeholder,
   emptyPlaceHolder = 'No Items',
   disabled = false,
-  className
+  className,
 }: IPDSelect) => {
   const [
     container,
@@ -58,7 +58,7 @@ export const PDSelect = ({
       className={cn(
         'inline-flex w-full',
         'focus-within:z-50',
-        className
+        className,
       )}
     >
       <SelectPrimitive.Root

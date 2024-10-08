@@ -45,7 +45,7 @@
     "monaco-editor": "0.50.0",
     "nanoid": "5.0.7",
     "pako": "2.1.0",
-    "polkadot-api": "0.13.2",
+    "polkadot-api": "1.4.0",
     "prettier": "3.3.2",
     "prism-themes": "1.9.0",
     "prismjs": "1.29.0",
