@@ -85,12 +85,12 @@ export const ChainStateBlock = ({ type }: TChainStateBlockProps) => {
 
   return (
     <div className={cn(
-      'grid grid-cols-[16px_1fr] items-center gap-2',
+      'grid grid-cols-[16px_1fr] items-center gap-3',
     )}
     >
       <Icon
         name={chainStateBlockData?.[type]?.icon}
-        size={[16]}
+        size={[18]}
       />
       <div className="flex flex-col overflow-hidden">
         <span className={cn(

@@ -55,7 +55,7 @@ const BlockDetails = () => {
   }
 
   return (
-    <div className="grid gap-8">
+    <div className="disable-horizontal-scroll grid gap-8">
       <div className="flex items-center justify-between">
         <PageHeader
           blockNumber={formatNumber(blockData.header.number)}
@@ -94,6 +94,32 @@ const BlockDetails = () => {
         blockTimestamp={blockData.header.timestamp}
         bodyData={blockData.body}
       />
+      <div className="flex justify-center gap-6 md:hidden">
+        <PDLink
+          className={styles['pd-link-btn']}
+          rel="noopener noreferrer"
+          target="_blank"
+          to={`https://polkadot.subscan.io/block/${blockData.header.number}`}
+        >
+          Polkadot Subscan
+          <Icon
+            name="icon-openLink"
+            size={[16]}
+          />
+        </PDLink>
+        <PDLink
+          className={styles['pd-link-btn']}
+          rel="noopener noreferrer"
+          target="_blank"
+          to={`https://polkadot.statescan.io/#/blocks/${blockData.header.number}`}
+        >
+          Polkadot Statescan
+          <Icon
+            name="icon-openLink"
+            size={[16]}
+          />
+        </PDLink>
+      </div>
     </div>
   );
 };

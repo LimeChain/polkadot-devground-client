@@ -1,22 +1,22 @@
 export const chainStateBlockData = {
   'bestBlock': {
     name: 'Latest Block',
-    icon: 'icon-newBlock',
+    icon: 'icon-block',
   },
   'finalizedBlock': {
-    name: 'Finalised Block',
-    icon: 'icon-blocks',
+    name: 'Finalized Block',
+    icon: 'icon-blockChecked',
   },
   'totalIssuance': {
     name: 'Total Issuance',
-    icon: 'icon-transfer',
+    icon: 'icon-shieldPlus',
   },
   'totalStake': {
     name: 'Total Staked',
-    icon: 'icon-transfer',
+    icon: 'icon-stackedCoins',
   },
   'blockTime': {
     name: 'Block Target',
-    icon: 'icon-transfer',
+    icon: 'icon-timer',
   },
 };

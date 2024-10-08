@@ -13,10 +13,12 @@ import {
 
 import { ErrorBoundary } from '@components/errorBoundary';
 import { GithubButton } from '@components/githubButton';
+import { MobileNotAllowed } from '@components/MobileNotAllowed';
 import { Tabs } from '@components/tabs';
 import { useStoreUI } from '@stores';
 import { cn } from '@utils/helpers';
 import { useResizeObserver } from '@utils/hooks/useResizeObserver';
+import { useResponsive } from '@utils/hooks/useResponsive';
 import { encodeCodeToBase64 } from '@utils/iframe';
 import { SelectExample } from '@views/codeEditor/components/selectExample';
 
@@ -44,6 +46,8 @@ const TypeScriptEditor = () => {
     isLoaded,
     setIsLoaded,
   ] = useState(false);
+
+  const { isDesktop } = useResponsive();
 
   const theme = useStoreUI?.use?.theme?.();
 
@@ -90,6 +94,10 @@ const TypeScriptEditor = () => {
     }
   }, []);
 
+  if (!isDesktop) {
+    return <MobileNotAllowed />;
+  }
+
   return (
     <div
       ref={refContainer}
@@ -135,14 +143,13 @@ const TypeScriptEditor = () => {
                   'px-10 py-2.5',
                 )}
                 tabsClassName={cn(
-                  'z-10 w-full py-4 pl-16',
+                  'w-full py-4 pl-16',
                   'dark:bg-dev-black-800',
                 )}
               >
                 <div
                   className="flex h-full"
                   data-title="Editor"
-
                 >
                   <MonacoEditor />
                 </div>
@@ -186,14 +193,13 @@ const TypeScriptEditor = () => {
                       'border border-b-0 border-dev-purple-300 dark:border-dev-black-800',
                     )}
                     >
-
-                      <ActionButton
-                        iconName="icon-externalLink"
-                        onClick={shareCode}
-                      />
                       <ActionButton
                         iconName="icon-export"
+                      />
+                      <ActionButton
+                        iconName="icon-clipboard"
                         onClick={shareCode}
+                        toolTip="Share"
                       />
                     </div>
                     <Panel

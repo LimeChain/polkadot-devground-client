@@ -185,7 +185,6 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
                               'border-2 border-dev-green-700 text-dev-black-1000 dark:text-white',
                               'bg-green-600/10',
                               {
-                                ['bg-dev-black-900 border-transparent text-white']: !item.isFinalized,
                                 ['opacity-0 animate-fade-in animation-duration-500 animation-delay-500']: refLatestBlockHash.current === item.blockHash,
                               },
                             )}
@@ -228,10 +227,6 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
                                   <div
                                     className={cn(
                                       'ml-auto flex items-center justify-center rounded-full bg-dev-green-600/30',
-                                      'size-full max-h-8 max-w-8',
-                                      {
-                                        ['bg-dev-black-800']: !item.isFinalized,
-                                      },
                                     )}
                                   >
                                     {ClipboardIcon}
