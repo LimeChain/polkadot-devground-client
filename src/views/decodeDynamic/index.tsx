@@ -69,7 +69,7 @@ const DecoderDynamic = () => {
     if (!metadata) return [];
 
     switch (decoderType) {
-      case 'Storage':
+      case 'Storage': {
         const storageItems = metadata?.pallets
           ?.filter((p) => p.storage)
           ?.sort((a, b) => a.name.localeCompare(b.name))
@@ -81,8 +81,9 @@ const DecoderDynamic = () => {
 
         setPallet(storageItems?.[0]?.value);
         return storageItems;
+      }
 
-      case 'Runtime':
+      case 'Runtime': {
         const runtimeItems = metadata?.apis
           ?.sort((a, b) => a.name.localeCompare(b.name))
           ?.map((api) => ({
@@ -93,8 +94,9 @@ const DecoderDynamic = () => {
 
         setPallet(runtimeItems?.[0]?.value);
         return runtimeItems;
+      }
 
-      case 'Extrinsic':
+      case 'Extrinsic': {
         const callItems = metadata?.pallets
           ?.filter((p) => p.calls)
           ?.sort((a, b) => a.name.localeCompare(b.name))
@@ -106,6 +108,8 @@ const DecoderDynamic = () => {
 
         setPallet(callItems?.[0]?.value);
         return callItems;
+      }
+
       default:
         return [];
     }
@@ -119,7 +123,7 @@ const DecoderDynamic = () => {
     if (!metadata || !lookup) return [];
 
     switch (decoderType) {
-      case 'Storage':
+      case 'Storage': {
         const storageMethodItems = metadata?.pallets
           ?.find((_pallet) => _pallet.name === pallet)
           ?.storage
@@ -132,8 +136,9 @@ const DecoderDynamic = () => {
 
         setMethod(storageMethodItems?.[0]?.value);
         return storageMethodItems;
+      }
 
-      case 'Runtime':
+      case 'Runtime': {
         const runtimeMethodItems = metadata?.apis
           ?.find((api) => api.name === pallet)
           ?.methods
@@ -145,8 +150,8 @@ const DecoderDynamic = () => {
 
         setMethod(runtimeMethodItems?.[0]?.value);
         return runtimeMethodItems;
-
-      case 'Extrinsic':
+      }
+      case 'Extrinsic': {
         const extrinsicMethodCalls = metadata?.pallets
           ?.find((_pallet) => _pallet.name === pallet)
           ?.calls;
@@ -164,6 +169,7 @@ const DecoderDynamic = () => {
 
         setMethod(extrinsicMethodItems[0].value);
         return extrinsicMethodItems;
+      }
 
       default:
         return [];
