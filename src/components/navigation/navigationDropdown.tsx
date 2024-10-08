@@ -38,7 +38,9 @@ export const NavigationDropdown = ({
     setIsOpen(!isOpen);
   }, [isOpen]);
 
-  useOnClickOutside(dropdownRef, toggleDropdown);
+  useOnClickOutside(dropdownRef, () => {
+    setIsOpen(false);
+  });
 
   return (
     <div
