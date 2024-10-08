@@ -33,6 +33,7 @@ export const NavigationItem = ({
     ? (
       <NavigationLink
         {...linkProps}
+        onLinkClick={handleLinkClick}
       />
     )
     : (

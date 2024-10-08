@@ -20,6 +20,7 @@ export interface IPDLink {
   className?: string | ((props: NavLinkRenderProps) => string);
   rel?: string;
   style?: CSSProperties;
+  onClick?: () => void;
 }
 
 export const PDLink = (props: IPDLink) => {

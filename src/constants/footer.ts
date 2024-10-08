@@ -39,7 +39,7 @@ export const footerLinks: IFooterLinkProps[] = [
       name: 'logo-github',
     },
     className: 'navSpacer ml-5',
-    text: 'LimeChain',
+    text: 'devGround',
   },
   {
     linkProps: {
