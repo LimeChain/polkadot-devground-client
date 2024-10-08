@@ -14,7 +14,7 @@ export const MobileNotAllowed = () => {
         <h1 className="text-center text-2xl font-bold">Visit Desktop Site</h1>
         <p className="mt-4 text-center font-geist font-body1-regular">For the best experience, please visit the console from your personal computer</p>
         <PDLink
-          to="/"
+          to="/explorer"
           className={cn(
             'mb-2 mt-10 w-full p-4 text-center transition-colors ',
             'font-geist text-white font-body2-bold',

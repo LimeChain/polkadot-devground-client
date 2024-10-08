@@ -6,13 +6,16 @@ import { cn } from '@utils/helpers';
 
 export interface INavigationLink extends IPDLink {
   title: string;
+  onLinkClick?: () => void;
 }
 
-export const NavigationLink = ({ title, ...props }: INavigationLink) => {
+export const NavigationLink = (props: INavigationLink) => {
+  const { title, onLinkClick } = props;
 
   return (
     <PDLink
       {...props}
+      onClick={onLinkClick}
       // eslint-disable-next-line react/jsx-no-bind
       className={({ isActive }) => cn(
         'relative p-2',
