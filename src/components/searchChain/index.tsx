@@ -9,13 +9,13 @@ import {
 import type { IEventBusSearchChain } from '@custom-types/eventBus';
 
 export const SearchChain = () => {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const refInput = useRef<HTMLInputElement>(null);
 
   const handleOnChange = () => {
-    if (inputRef.current) {
+    if (refInput.current) {
       busDispatch<IEventBusSearchChain>({
         type: '@@-search-chain',
-        data: inputRef.current.value,
+        data: refInput.current.value,
       });
     }
   };
@@ -24,7 +24,7 @@ export const SearchChain = () => {
 
   return (
     <input
-      ref={inputRef}
+      ref={refInput}
       onChange={debouncedHandleOnChange}
       placeholder="Search Parachain"
       type="text"

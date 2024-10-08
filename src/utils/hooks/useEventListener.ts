@@ -25,14 +25,14 @@ import type { RefObject } from 'react';
  * @example
  * ```tsx
  * // Example 2: Attach a document event listener with options
- * const elementRef = useRef(document);
- * useEventListener('click', handleClick, elementRef, { capture: true });
+ * const refElement = useRef(document);
+ * useEventListener('click', handleClick, refElement, { capture: true });
  * ```
  * @example
  * ```tsx
  * // Example 3: Attach an element event listener
- * const buttonRef = useRef<HTMLButtonElement>(null);
- * useEventListener('click', handleButtonClick, buttonRef);
+ * const refButton = useRef<HTMLButtonElement>(null);
+ * useEventListener('click', handleButtonClick, refButton);
  * ```
  */
 const useEventListener = <

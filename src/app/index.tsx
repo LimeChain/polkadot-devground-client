@@ -46,6 +46,7 @@ export const App = () => {
   const initStoreUI = useStoreUI.use.init?.();
   const {
     resetStore: resetStoreUI,
+    setWindowSize,
   } = useStoreUI.use.actions();
 
   const initStoreWallet = useStoreWallet.use.init?.();
@@ -81,6 +82,14 @@ export const App = () => {
       resetStoreWallet();
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('resize', setWindowSize);
+    return () => {
+      window.removeEventListener('resize', setWindowSize);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

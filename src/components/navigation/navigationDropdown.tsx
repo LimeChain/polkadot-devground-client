@@ -32,7 +32,7 @@ export const NavigationDropdown = ({
     setIsOpen,
   ] = useState(false);
   const location = useLocation();
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const refDropdown = useRef<HTMLDivElement>(null);
 
   const toggleDropdown = useCallback(() => {
     setIsOpen(!isOpen);
@@ -43,13 +43,13 @@ export const NavigationDropdown = ({
     onLinkClick?.();
   }, [onLinkClick]);
 
-  useOnClickOutside(dropdownRef, () => {
+  useOnClickOutside(refDropdown, () => {
     setIsOpen(false);
   });
 
   return (
     <div
-      ref={dropdownRef}
+      ref={refDropdown}
       className="relative"
     >
       <button

@@ -5,10 +5,10 @@ import { MobileChainSelect } from '@components/mobileChainSelect';
 import { Navigation } from '@components/navigation';
 import { ToggleTheme } from '@components/toggleTheme';
 import WalletSelectButton from '@components/walletSelectButton';
-import { useResponsive } from '@utils/hooks/useResponsive';
+import { useStoreUI } from '@stores';
 
 export const Header = () => {
-  const { isMobile } = useResponsive();
+  const isMobile = useStoreUI?.use?.isMobile?.();
   return (
     <nav className="z-100 flex items-center justify-between px-6">
       <div className="flex items-center gap-8">

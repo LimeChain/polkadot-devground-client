@@ -20,7 +20,7 @@ interface AppProps {
 
 const App = (props: AppProps) => {
   const { api, client, signer } = props;
-  const inputRef = useRef('5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7');
+  const refInput = useRef('5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7');
   const [txStatus, setTxStatus] = useState({
     text: '',
     link: '',
@@ -32,7 +32,7 @@ const App = (props: AppProps) => {
     setTxSent(true);
     try {
       api.tx.Balances.transfer_allow_death({
-        dest: MultiAddress.Id(inputRef.current),
+        dest: MultiAddress.Id(refInput.current),
         value: 100n,
       })
         .signSubmitAndWatch(signer)
@@ -63,9 +63,9 @@ const App = (props: AppProps) => {
         Receiver of 100n ROC
         <input
           id="address"
-          placeholder={inputRef.current}
+          placeholder={refInput.current}
           onChange={(event) => {
-            inputRef.current = event.currentTarget.value;
+            refInput.current = event.currentTarget.value;
           }}
         />
       </label>

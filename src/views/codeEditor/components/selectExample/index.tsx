@@ -33,7 +33,7 @@ export const SelectExample = () => {
   const selectedSnippet = searchParams.get('s');
   const selectedSnippetName = snippets.find((snippet) => snippet.id === Number(selectedSnippet))?.name;
 
-  const containerRef = useRef<HTMLDivElement>(null);
+  const refContainer = useRef<HTMLDivElement>(null);
 
   const handleSetOpen = useCallback(() => {
     setIsOpened((prev) => !prev);
@@ -63,7 +63,7 @@ export const SelectExample = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (refContainer.current && !refContainer.current.contains(event.target as Node)) {
         setIsOpened(false);
       }
     };
@@ -76,7 +76,7 @@ export const SelectExample = () => {
 
   return (
     <div
-      ref={containerRef}
+      ref={refContainer}
       className="relative max-w-[50vw]"
     >
       <button

@@ -18,7 +18,6 @@ import { Tabs } from '@components/tabs';
 import { useStoreUI } from '@stores';
 import { cn } from '@utils/helpers';
 import { useResizeObserver } from '@utils/hooks/useResizeObserver';
-import { useResponsive } from '@utils/hooks/useResponsive';
 import { encodeCodeToBase64 } from '@utils/iframe';
 import { SelectExample } from '@views/codeEditor/components/selectExample';
 
@@ -47,7 +46,7 @@ const TypeScriptEditor = () => {
     setIsLoaded,
   ] = useState(false);
 
-  const { isDesktop } = useResponsive();
+  const isDesktop = useStoreUI?.use?.isDesktop?.();
 
   const theme = useStoreUI?.use?.theme?.();
 
