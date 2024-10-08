@@ -23,7 +23,7 @@ const Table = <T,>(props: TableProps<T>): React.ReactElement => {
     onRowClick,
   } = props;
 
-  const tableContainerRef = useRef<HTMLDivElement>(null);
+  const refTableContainer = useRef<HTMLDivElement>(null);
 
   const table = useReactTable({
     data,
@@ -33,14 +33,14 @@ const Table = <T,>(props: TableProps<T>): React.ReactElement => {
 
   const rowVirtualizer = useVirtualizer({
     count: table.getRowModel().rows.length,
-    getScrollElement: () => tableContainerRef.current,
+    getScrollElement: () => refTableContainer.current,
     estimateSize: () => 45,
     overscan: 2,
   });
 
   return (
     <PDScrollArea
-      ref={tableContainerRef}
+      ref={refTableContainer}
       className="h-full"
       verticalScrollClassNames="pt-8"
     >

@@ -11,10 +11,10 @@ export const useDebounce = <T>(
   wait: number,
 ): DebouncedCallback<T> => {
   const refTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const callbackRef = useRef<DebouncedCallback<T>>(callback);
+  const refCallback = useRef<DebouncedCallback<T>>(callback);
 
   useEffect(() => {
-    callbackRef.current = callback;
+    refCallback.current = callback;
   }, [callback]);
 
   const debounced = useCallback((event: T) => {
@@ -22,7 +22,7 @@ export const useDebounce = <T>(
       clearTimeout(refTimeout.current);
     }
     refTimeout.current = setTimeout(() => {
-      callbackRef.current(event);
+      refCallback.current(event);
     }, wait);
   }, [wait]);
 

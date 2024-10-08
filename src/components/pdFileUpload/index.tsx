@@ -15,7 +15,7 @@ import type { ICallArgs } from '@components/callParam';
 interface IPDFileUpload extends ICallArgs {}
 
 export const PDFileUpload = ({ onChange }: IPDFileUpload) => {
-  const inputRef = useRef<HTMLLabelElement>(null);
+  const refInput = useRef<HTMLLabelElement>(null);
   const inputId = crypto.randomUUID();
   const [
     fileUploaded,
@@ -53,9 +53,9 @@ export const PDFileUpload = ({ onChange }: IPDFileUpload) => {
       e.preventDefault();
     };
 
-    const element = inputRef?.current;
+    const element = refInput?.current;
 
-    if (inputRef) {
+    if (refInput) {
       element?.addEventListener('drop', handleDrop);
       element?.addEventListener('dragover', handleDragOver);
     }
@@ -70,7 +70,7 @@ export const PDFileUpload = ({ onChange }: IPDFileUpload) => {
 
   return (
     <label
-      ref={inputRef}
+      ref={refInput}
       htmlFor={inputId}
       className={cn(
         'flex w-full cursor-pointer flex-col items-center justify-center gap-3',
