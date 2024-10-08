@@ -10,11 +10,11 @@ export interface INavigationLink extends IPDLink {
 }
 
 export const NavigationLink = (props: INavigationLink) => {
-  const { title, onLinkClick } = props;
+  const { title, onLinkClick, ...rest } = props;
 
   return (
     <PDLink
-      {...props}
+      {...rest}
       onClick={onLinkClick}
       // eslint-disable-next-line react/jsx-no-bind
       className={({ isActive }) => cn(

@@ -20,13 +20,15 @@ export interface INavigationDropdown extends React.ComponentProps<'button'> {
   onLinkClick?: () => void;
 }
 
-export const NavigationDropdown = ({
-  title,
-  items,
-  className,
-  onLinkClick,
-  ...props
-}: INavigationDropdown) => {
+export const NavigationDropdown = (props: INavigationDropdown) => {
+  const {
+    title,
+    items,
+    className,
+    onLinkClick,
+    ...rest
+  } = props;
+
   const [
     isOpen,
     setIsOpen,
@@ -53,7 +55,7 @@ export const NavigationDropdown = ({
       className="relative"
     >
       <button
-        {...props}
+        {...rest}
         onClick={toggleDropdown}
         className={cn(
           'relative px-2 py-2',
