@@ -84,7 +84,7 @@ export interface StoreInterface {
   registry: TypeRegistry;
 
   actions: {
-    resetStore: () => void;
+    resetStore: () => Promise<void>;
     setChain: (chain: TChain) => void;
   };
 
@@ -133,43 +133,53 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
   ...initialState,
   actions: {
     resetStore: async () => {
+      const client = get()?.client;
+      const rawClient = get()?.rawClient;
+      const peopleClient = get()?.peopleClient;
+      const stakingClient = get()?.stakingClient;
+
+      // clean up subscrptions / destroy old clients
       try {
-        const client = get()?.client;
-        const rawClient = get()?.rawClient;
-        const peopleClient = get()?.peopleClient;
-        const stakingClient = get()?.stakingClient;
-
-        // clean up subscrptions / destroy old clients
         client?.destroy?.();
-        rawClient?.destroy?.();
-        peopleClient?.destroy?.();
-        stakingClient?.destroy?.();
-
-        const smoldot = get()?.smoldot;
-        await smoldot?.terminate?.();
-
-      } catch (error) {
-        console.log(error);
-
-      } finally {
-        const smoldot = get()?.smoldot;
-        const blocksData = get()?.blocksData;
-        const registry = get().registry;
-
-        // reset data
-        blocksData?.clear?.();
-        registry?.clearCache?.();
-
-        set({
-          ...initialState,
-          smoldot,
-        });
-
+      } catch (err) {
+        console.log('client destroy error');
       }
+      try {
+        rawClient?.destroy?.();
+      } catch (err) {
+        console.log('rawClient destroy error');
+      }
+      try {
+        peopleClient?.destroy?.();
+      } catch (err) {
+        console.log('peopleClient destroy error');
+      }
+      try {
+        stakingClient?.destroy?.();
+      } catch (err) {
+        console.log('stakingClient destroy error');
+      }
+
+      const smoldot = get()?.smoldot;
+
+      await smoldot?.terminate?.().catch();
+
+      const blocksData = get()?.blocksData;
+      const registry = get().registry;
+
+      // reset data
+      blocksData?.clear?.();
+      registry?.clearCache?.();
+
+      set({
+        ...initialState,
+        smoldot,
+      });
+
     },
     setChain: async (chain: TChain) => {
       try {
-        get()?.actions?.resetStore?.();
+        await get()?.actions?.resetStore?.();
         set({ chain });
 
         const smoldot = startSmoldot();
