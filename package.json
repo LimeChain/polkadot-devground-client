@@ -31,7 +31,8 @@
     "add-paseo": "npx papi add paseo -n paseo",
     "add-paseo-asset-hub": "npx papi add paseo_asset_hub -n paseo_asset_hub",
 
-    "add-descriptors": "npm run add-polkadot && npm run add-polkadot-people && npm run add-polkadot-asset-hub && npm run add-polkadot-bridge-hub && npm run add-polkadot-collectives && npm run add-rococo && npm run add-rococo-people && npm run add-rococo-asset-hub && npm run add-rococo-bridge-hub && npm run add-kusama && npm run add-kusama-people && npm run add-kusama-asset-hub && npm run add-kusama-bridge-hub && npm run add-kusama && npm run add-kusama-people && npm run add-kusama-asset-hub && npm run add-kusama-bridge-hub && npm run add-westend && npm run add-westend-people && npm run add-westend-asset-hub && npm run add-westend-bridge-hub && npm run add-paseo && npm run add-paseo-asset-hub",
+    "add-descriptors": "npm run add-polkadot && npm run add-polkadot-people && npm run add-polkadot-asset-hub && npm run add-polkadot-bridge-hub && npm run add-polkadot-collectives && npm run add-rococo && npm run add-rococo-people && npm run add-rococo-asset-hub && npm run add-rococo-bridge-hub && npm run add-kusama && npm run add-kusama-people && npm run add-kusama-asset-hub && npm run add-kusama-bridge-hub && npm run add-westend && npm run add-westend-people && npm run add-westend-asset-hub && npm run add-westend-bridge-hub && npm run add-westend-collectives && npm run add-paseo && npm run add-paseo-asset-hub",
+
     "remove-descriptors": "rm -rf node_modules .papi",
     "lint": "npm run tsc && eslint . --ext .ts,.tsx --no-cache",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",

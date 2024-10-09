@@ -12,10 +12,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install dependencies
         run: npm ci
-      - name: Add Polkadot Descriptors
-        run: npm run add-descriptors
       - name: Check lint rules
         run: npm run lint
+      - name: Add Polkadot Descriptors
+        run: npm run add-descriptors
       - name: Build
         run: npm run build
         env:
