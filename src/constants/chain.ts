@@ -358,7 +358,7 @@ export const CHAIN_WEBSOCKET_URLS: { [key in TSupportedChain]: string } = {
   'polkadot-bridge-hub': 'wss://polkadot-bridge-hub-rpc.polkadot.io',
   'polkadot-collectives': 'wss://polkadot-collectives-rpc.polkadot.io',
   westend: 'wss://westend-rpc.polkadot.io',
-  'westend-people': 'wss://polkadot-people-rpc.polkadot.io',
+  'westend-people': 'wss://westend-people-rpc.polkadot.io',
   'westend-asset-hub': 'wss://westend-asset-hub-rpc.polkadot.io',
   'westend-bridge-hub': 'wss://westend-bridge-hub-rpc.polkadot.io',
   'westend-collectives': 'wss://westend-collectives-rpc.polkadot.io',

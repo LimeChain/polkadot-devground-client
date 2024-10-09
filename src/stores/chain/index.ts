@@ -30,12 +30,10 @@ import {
 import {
   getExpectedBlockTime,
   getMetadata,
-  getRuntime,
   initSmoldotChains,
   subscribeToRuntime,
   subscribeToTotalIssuance,
 } from '@utils/papi';
-import { assert } from '@utils/papi/helpers';
 import { getBlockDetailsWithPAPI } from '@utils/rpc/getBlockDetails';
 
 import { createSelectors } from '../createSelectors';
@@ -117,8 +115,19 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   lookup: null,
 };
 
-const MAX_RETRIES = 3;
+const MAX_RETRIES = 5;
 let retriesSoFar = 0;
+
+const startSmoldot = () => {
+  return startFromWorker(
+    new Worker(new URL('polkadot-api/smoldot/worker', import.meta.url), {
+      type: 'module',
+    }),
+    {
+      forbitWs: true,
+    },
+  );
+};
 
 const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain', (set, get) => ({
   ...initialState,
@@ -136,6 +145,9 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
         peopleClient?.destroy?.();
         stakingClient?.destroy?.();
 
+        const smoldot = get()?.smoldot;
+        await smoldot?.terminate?.();
+
       } catch (error) {
         console.log(error);
 
@@ -151,8 +163,6 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
         set({
           ...initialState,
           smoldot,
-          finalizedBlock: undefined,
-          bestBlock: undefined,
         });
 
       }
@@ -160,20 +170,16 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
     setChain: async (chain: TChain) => {
       try {
         get()?.actions?.resetStore?.();
+        set({ chain });
+
+        const smoldot = startSmoldot();
+        set({ smoldot });
 
         const blocksData = get()?.blocksData;
         const registry = get().registry;
 
-        set({ chain });
-
-        const smoldot = get()?.smoldot;
-        assert(smoldot, 'Smoldot is not defined');
-
-        // init relay chain / people chain
         const {
           newChain,
-          peopleChain,
-          // stakingChain,
         } = await initSmoldotChains({
           smoldot,
           chain,
@@ -187,7 +193,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
         set({ api });
 
         const isPeopleParaChain = chain.id === chain.peopleChainId;
-        const newPeopleClient = isPeopleParaChain ? newClient : createClient(getSmProvider(peopleChain));
+        const newPeopleClient = isPeopleParaChain ? newClient : createClient(getWsProvider(CHAIN_WEBSOCKET_URLS[chain.peopleChainId]));
         set({ peopleClient: newPeopleClient });
         const peopleApi = newPeopleClient.getTypedApi(CHAIN_DESCRIPTORS[chain.peopleChainId] as TPeopleChainDecsriptor);
         set({ peopleApi });
@@ -201,10 +207,20 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
         //   set({ stakingApi });
         // }
 
+        // update spec_version on runtime update
+        await subscribeToRuntime(api, (runtime) => set({ runtime }))
+          .catch(console.error);
+
+        subscribeToTotalIssuance(api, (totalIssuance) => set({ totalIssuance }))
+          .catch(console.error);
+
+        getExpectedBlockTime(api, chain, (blockTime) => set({ blockTime }))
+          .catch(console.error);
+
         await Promise.allSettled([
           { type: 'chainSpecs', data: await newClient.getChainSpecData() },
           { type: 'metadata', data: await getMetadata(api) },
-          { type: 'runtime', data: await getRuntime(api) },
+          // { type: 'runtime', data: await getRuntime(api) },
         ])
           .then((results) => {
             results.forEach((result) => {
@@ -231,25 +247,15 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
                     break;
                   }
 
-                  case 'runtime':
-                    set({ runtime: result.value.data as Awaited<ReturnType<typeof getRuntime>> });
-                    break;
+                  // case 'runtime':
+                  //   set({ runtime: result.value.data as Awaited<ReturnType<typeof getRuntime>> });
+                  //   break;
                   default:
                     break;
                 }
               }
             });
           })
-          .catch(console.error);
-
-        // update spec_version on runtime update
-        subscribeToRuntime(api, (runtime) => set({ runtime }))
-          .catch(console.error);
-
-        subscribeToTotalIssuance(api, (totalIssuance) => set({ totalIssuance }))
-          .catch(console.error);
-
-        getExpectedBlockTime(api, chain, (blockTime) => set({ blockTime }))
           .catch(console.error);
 
         // if (hasStakingInformation) {
@@ -294,7 +300,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
                       id,
                       blockNumber,
                       timestamp,
-                      isSuccess,
+                      isSuccess: isSuccess || false,
                       signer: signer?.Id ?? '',
                       method: method.method,
                       section: method.section,
@@ -339,6 +345,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
               () => { },
               (error) => {
                 console.log(error);
+                rawClientSubscription?.unfollow?.();
                 createSubscription();
               },
             );
@@ -372,13 +379,6 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
   },
   init: async () => {
     try {
-      const smoldot = startFromWorker(
-        new Worker(new URL('polkadot-api/smoldot/worker', import.meta.url), {
-          type: 'module',
-        }),
-      );
-      set({ smoldot });
-
       get().actions.setChain(get().chain);
 
     } catch (err) {

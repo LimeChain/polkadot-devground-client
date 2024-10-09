@@ -33,7 +33,8 @@ export const initSmoldotChains = async ({
   chain: TChain;
 }) => {
   const isParachain = chain.isParaChain;
-  let newChain: TSmoldotChain, peopleChain: TSmoldotChain;
+  // let newChain: TSmoldotChain, peopleChain: TSmoldotChain;
+  let newChain: TSmoldotChain;
   // let stakingChain: TSmoldotChain = null as unknown as TSmoldotChain;
 
   if (isParachain) {
@@ -52,13 +53,13 @@ export const initSmoldotChains = async ({
 
     assert(newChain, `newChain is not defined for ${chain.name}`);
 
-    peopleChain = await smoldot.addChain({
-      chainSpec: CHAIN_SPECS[chain.peopleChainId],
-      potentialRelayChains: [relayChain],
-    })
-      .catch(console.error);
+    // peopleChain = await smoldot.addChain({
+    //   chainSpec: CHAIN_SPECS[chain.peopleChainId],
+    //   potentialRelayChains: [relayChain],
+    // })
+    //   .catch(console.error);
 
-    assert(peopleChain, `peopleChain is not defined for ${chain.name}`);
+    // assert(peopleChain, `peopleChain is not defined for ${chain.name}`);
 
     // if (chain.hasStaking) {
     //   stakingChain = await smoldot.addChain({
@@ -78,13 +79,13 @@ export const initSmoldotChains = async ({
 
     assert(newChain, `newChain is not defined for ${chain.name}`);
 
-    peopleChain = await smoldot.addChain({
-      chainSpec: CHAIN_SPECS[chain.peopleChainId],
-      potentialRelayChains: [newChain],
-    })
-      .catch(console.error);
+    // peopleChain = await smoldot.addChain({
+    //   chainSpec: CHAIN_SPECS[chain.peopleChainId],
+    //   potentialRelayChains: [newChain],
+    // })
+    //   .catch(console.error);
 
-    assert(peopleChain, `peopleChain is not defined for ${chain.name}`);
+    // assert(peopleChain, `peopleChain is not defined for ${chain.name}`);
 
     // if (chain.hasStaking) {
     //   stakingChain = await smoldot?.addChain({
@@ -100,7 +101,7 @@ export const initSmoldotChains = async ({
 
   return {
     newChain,
-    peopleChain,
+    // peopleChain,
     // stakingChain,
   };
 };
@@ -108,10 +109,9 @@ export const initSmoldotChains = async ({
 export const getMetadata = async (api: TApi) => {
   assert(api, 'Api prop is not defined');
 
-  const v14 = await api.apis.Metadata.metadata_at_version(14);
   const v15 = await api.apis.Metadata.metadata_at_version(15);
 
-  return v15 || v14;
+  return v15;
 };
 
 export const getRuntime = async (api: TApi) => {

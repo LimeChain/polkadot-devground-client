@@ -64,7 +64,7 @@ export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
                 return (
                   <Row
                     key={virtualIndex}
-                    blockNumber={block.number}
+                    blockNumber={block.number!}
                     eventsLength={block.eventsLength}
                     extrinsicsLength={block.extrinsics.length}
                     timestamp={block.timestamp}
