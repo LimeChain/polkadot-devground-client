@@ -78,7 +78,7 @@ export const App = () => {
     return () => {
       resetStoreAuth();
       resetStoreUI();
-      resetStoreChain();
+      void resetStoreChain();
       resetStoreWallet();
     };
 

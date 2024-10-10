@@ -35,12 +35,15 @@ const BlockDetails = () => {
       if (!blockStore) {
         return;
       }
-      const block = await getBlockDetailsWithRawClient({
-        blockNumber: blockStore.number,
-        dynamicBuilder,
-      });
 
-      setBlockData({ ...block, header: { ...block.header, identity: blockStore.identity } });
+      if (typeof blockStore.number === 'number') {
+        const block = await getBlockDetailsWithRawClient({
+          blockNumber: blockStore.number,
+          dynamicBuilder,
+        });
+
+        setBlockData({ ...block, header: { ...block.header, identity: blockStore.identity } });
+      }
     })();
     // Removed data from dependencies as we expect this should be already in place when hitting this page
     // eslint-disable-next-line react-hooks/exhaustive-deps

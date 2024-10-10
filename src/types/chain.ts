@@ -2,9 +2,25 @@ import { type Chain } from 'polkadot-api/smoldot';
 
 import type {
   dot,
+  dot_asset_hub,
+  dot_bridge_hub,
+  dot_collectives,
   dotpeople,
+  kusama,
+  kusama_asset_hub,
+  kusama_bridge_hub,
+  kusama_people,
+  paseo,
+  paseo_asset_hub,
   rococo,
+  rococo_asset_hub,
+  rococo_bridge_hub,
   rococo_people,
+  westend,
+  westend_asset_hub,
+  westend_bridge_hub,
+  westend_collectives,
+  westend_people,
 } from '.papi/descriptors/dist';
 import type {
   PolkadotClient,
@@ -23,17 +39,72 @@ export type TSupportedChains = {
   [key in TSupportedChain]: TChain
 };
 
-type TSupportedStakingChain = 'polkadot';
-export type TSupportedRelayChain = 'polkadot' | 'rococo';
-export type TSupportedParaChain = 'polkadot-people' | 'rococo-people';
+type TSupportedStakingChain =
+  | 'polkadot'
+  | 'kusama'
+  | 'paseo'
+  | 'westend';
+export type TSupportedRelayChain =
+  | 'polkadot'
+  | 'rococo'
+  | 'kusama'
+  | 'paseo'
+  | 'westend';
+export type TSupportedParaChain =
+  | 'polkadot-people'
+  | 'polkadot-asset-hub'
+  | 'polkadot-bridge-hub'
+  | 'polkadot-collectives'
+  | 'rococo-people'
+  | 'rococo-asset-hub'
+  | 'rococo-bridge-hub'
+  | 'kusama-people'
+  | 'kusama-asset-hub'
+  | 'kusama-bridge-hub'
+  | 'westend-people'
+  | 'westend-asset-hub'
+  | 'westend-bridge-hub'
+  | 'westend-collectives'
+  | 'paseo-asset-hub';
 export type TSupportedChain = TSupportedRelayChain | TSupportedParaChain;
+export type TRelayChainDecsriptor =
+  | typeof dot
+  | typeof rococo
+  | typeof kusama
+  | typeof paseo
+  | typeof westend;
 
-export type TRelayChainDecsriptor = typeof dot | typeof rococo;
-export type TStakingChainDecsriptor = typeof dot;
-export type TParaChainDecsriptor = typeof dotpeople | typeof rococo_people;
+export type TStakingChainDecsriptor =
+  | typeof dot
+  | typeof kusama
+  | typeof paseo
+  | typeof westend;
+
+export type TParaChainDecsriptor =
+  | typeof dotpeople
+  | typeof dot_asset_hub
+  | typeof dot_bridge_hub
+  | typeof dot_collectives
+  | typeof rococo_people
+  | typeof rococo_asset_hub
+  | typeof rococo_bridge_hub
+  | typeof kusama_people
+  | typeof kusama_asset_hub
+  | typeof kusama_bridge_hub
+  | typeof westend_people
+  | typeof westend_asset_hub
+  | typeof westend_bridge_hub
+  | typeof westend_collectives
+  | typeof paseo_asset_hub;
+
+export type TPeopleChainDecsriptor =
+  | typeof dotpeople
+  | typeof rococo_people
+  | typeof kusama_people
+  | typeof westend_people;
 
 export type TApi = TypedApi<TRelayChainDecsriptor | TParaChainDecsriptor>;
-export type TPeopleApi = TypedApi<TParaChainDecsriptor>;
+export type TPeopleApi = TypedApi<TPeopleChainDecsriptor>;
 export type TRelayApi = TypedApi<TRelayChainDecsriptor>;
 export type TStakingApi = TypedApi<TStakingChainDecsriptor>;
 
@@ -80,13 +151,13 @@ export interface IRuntime {
 export type TSmoldotChain = Chain | void;
 
 export interface IBlockStoreData {
-  number: number;
+  number?: number;
   hash: string;
   timestamp: number;
   eventsLength: number;
-  validator: string;
+  validator?: string;
   extrinsics: IExtrinsicStoreData[];
-  identity: Identity;
+  identity?: Identity;
 }
 export interface IExtrinsicStoreData {
   id: string;
