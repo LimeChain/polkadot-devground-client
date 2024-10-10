@@ -146,7 +146,6 @@ const Extrinsics = () => {
             callCodec.codec.enc(callArgs),
           ),
         );
-
         setEncodedCall(_encodedCall);
 
       } catch (err) {

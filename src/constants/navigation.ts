@@ -51,6 +51,16 @@ export const NAVIGATION_ITEMS: TNavItem[] = [
           to: '/extrinsics',
           icon: 'logo-github',
         },
+        {
+          title: 'Decoder',
+          to: '/decoder',
+          icon: 'logo-github',
+        },
+        {
+          title: 'Decoder Dynamic',
+          to: '/decoder-dynamic',
+          icon: 'logo-github',
+        },
       ],
     },
     type: 'dropdown',
