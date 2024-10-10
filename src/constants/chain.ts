@@ -1,22 +1,3 @@
-import { chainSpec as kusamaChainSpec } from 'polkadot-api/chains/ksmcc3';
-import { chainSpec as kusamaAssetHubChainSpec } from 'polkadot-api/chains/ksmcc3_asset_hub';
-import { chainSpec as kusamaBridgeHubChainSpec } from 'polkadot-api/chains/ksmcc3_bridge_hub';
-import { chainSpec as kusamaPeopleChainSpec } from 'polkadot-api/chains/ksmcc3_people';
-import { chainSpec as paseoChainSpec } from 'polkadot-api/chains/paseo';
-import { chainSpec as paseoAssetHubChainSpec } from 'polkadot-api/chains/paseo_asset_hub';
-import { chainSpec as polkadotChainSpec } from 'polkadot-api/chains/polkadot';
-import { chainSpec as polkadotAssetHubChainSpec } from 'polkadot-api/chains/polkadot_asset_hub';
-import { chainSpec as polkadotBridgeHubChainSpec } from 'polkadot-api/chains/polkadot_bridge_hub';
-import { chainSpec as polkadotCollectivesChainSpec } from 'polkadot-api/chains/polkadot_collectives';
-import { chainSpec as polkadotPeopleChainSpec } from 'polkadot-api/chains/polkadot_people';
-import { chainSpec as rococoChainSpec } from 'polkadot-api/chains/rococo_v2_2';
-import { chainSpec as rococoPeopleChainSpec } from 'polkadot-api/chains/rococo_v2_2_people';
-import { chainSpec as westendChainSpec } from 'polkadot-api/chains/westend2';
-import { chainSpec as westendAssetHubChainSpec } from 'polkadot-api/chains/westend2_asset_hub';
-import { chainSpec as westendBridgeHubChainSpec } from 'polkadot-api/chains/westend2_bridge_hub';
-import { chainSpec as westendCollectivesChainSpec } from 'polkadot-api/chains/westend2_collectives';
-import { chainSpec as westendPeopleChainSpec } from 'polkadot-api/chains/westend2_people';
-
 import {
   dot,
   dot_asset_hub,
@@ -292,28 +273,28 @@ export const SUPPORTED_CHAIN_GROUPS: ISupportedChainGroups = {
 };
 
 export const CHAIN_SPECS: {
-  [key in TSupportedChain]: string
+  [key in TSupportedChain]: () => Promise<string>
 } = {
-  polkadot: polkadotChainSpec,
-  'polkadot-people': polkadotPeopleChainSpec,
-  'polkadot-asset-hub': polkadotAssetHubChainSpec,
-  'polkadot-bridge-hub': polkadotBridgeHubChainSpec,
-  'polkadot-collectives': polkadotCollectivesChainSpec,
-  kusama: kusamaChainSpec,
-  'kusama-people': kusamaPeopleChainSpec,
-  'kusama-asset-hub': kusamaAssetHubChainSpec,
-  'kusama-bridge-hub': kusamaBridgeHubChainSpec,
-  rococo: rococoChainSpec,
-  'rococo-people': rococoPeopleChainSpec,
-  'rococo-asset-hub': rococoPeopleChainSpec,
-  'rococo-bridge-hub': rococoPeopleChainSpec,
-  westend: westendChainSpec,
-  'westend-people': westendPeopleChainSpec,
-  'westend-asset-hub': westendAssetHubChainSpec,
-  'westend-bridge-hub': westendBridgeHubChainSpec,
-  'westend-collectives': westendCollectivesChainSpec,
-  paseo: paseoChainSpec,
-  'paseo-asset-hub': paseoAssetHubChainSpec,
+  polkadot: () => import('polkadot-api/chains/polkadot').then((res) => res.chainSpec),
+  'polkadot-people': () => import('polkadot-api/chains/polkadot_people').then((res) => res.chainSpec),
+  'polkadot-asset-hub': () => import('polkadot-api/chains/polkadot_asset_hub').then((res) => res.chainSpec),
+  'polkadot-bridge-hub': () => import('polkadot-api/chains/polkadot_bridge_hub').then((res) => res.chainSpec),
+  'polkadot-collectives': () => import('polkadot-api/chains/polkadot_collectives').then((res) => res.chainSpec),
+  kusama: () => import('polkadot-api/chains/ksmcc3').then((res) => res.chainSpec),
+  'kusama-people': () => import('polkadot-api/chains/ksmcc3_people').then((res) => res.chainSpec),
+  'kusama-asset-hub': () => import('polkadot-api/chains/ksmcc3_people').then((res) => res.chainSpec),
+  'kusama-bridge-hub': () => import('polkadot-api/chains/ksmcc3_bridge_hub').then((res) => res.chainSpec),
+  rococo: () => import('polkadot-api/chains/rococo_v2_2').then((res) => res.chainSpec),
+  'rococo-people': () => import('polkadot-api/chains/rococo_v2_2_people').then((res) => res.chainSpec),
+  'rococo-asset-hub': () => import('polkadot-api/chains/rococo_v2_2_asset_hub').then((res) => res.chainSpec),
+  'rococo-bridge-hub': () => import('polkadot-api/chains/rococo_v2_2_bridge_hub').then((res) => res.chainSpec),
+  westend: () => import('polkadot-api/chains/westend2').then((res) => res.chainSpec),
+  'westend-people': () => import('polkadot-api/chains/westend2_people').then((res) => res.chainSpec),
+  'westend-asset-hub': () => import('polkadot-api/chains/westend2_asset_hub').then((res) => res.chainSpec),
+  'westend-bridge-hub': () => import('polkadot-api/chains/westend2_bridge_hub').then((res) => res.chainSpec),
+  'westend-collectives': () => import('polkadot-api/chains/westend2_collectives').then((res) => res.chainSpec),
+  paseo: () => import('polkadot-api/chains/paseo').then((res) => res.chainSpec),
+  'paseo-asset-hub': () => import('polkadot-api/chains/paseo_asset_hub').then((res) => res.chainSpec),
 };
 
 const RELAY_CHAIN_DESCRIPTORS: {

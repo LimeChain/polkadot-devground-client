@@ -190,6 +190,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
 
         const {
           newChain,
+          // peopleChain,
         } = await initSmoldotChains({
           smoldot,
           chain,
@@ -204,6 +205,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
 
         const isPeopleParaChain = chain.id === chain.peopleChainId;
         const newPeopleClient = isPeopleParaChain ? newClient : createClient(getWsProvider(CHAIN_WEBSOCKET_URLS[chain.peopleChainId]));
+        // const newPeopleClient = isPeopleParaChain ? newClient : createClient(getSmProvider(peopleChain));
         set({ peopleClient: newPeopleClient });
         const peopleApi = newPeopleClient.getTypedApi(CHAIN_DESCRIPTORS[chain.peopleChainId] as TPeopleChainDecsriptor);
         set({ peopleApi });

@@ -9,7 +9,7 @@ const Explorer = () => {
     <div
       className={cn(
         'disable-vertical-scroll',
-        'flex h-full flex-1 flex-col gap-6 md:gap-12',
+        'flex h-full flex-1 flex-col gap-6 lg:gap-8',
       )}
     >
       <SearchBar
@@ -19,14 +19,12 @@ const Explorer = () => {
 
       <div className={cn(
         'grid gap-4',
-        'p-3 md:p-6',
+        'p-3 lg:p-6',
         'bg-dev-purple-100 dark:bg-dev-black-900',
-        'grid-cols-2 md:grid-cols-3 lg:grid-cols-5',
+        'grid-cols-2 lg:grid-cols-4',
       )}
       >
-        <span className="hidden md:grid">
-          <ChainStateBlock type="blockTime" />
-        </span>
+        <ChainStateBlock type="blockTime" />
         <ChainStateBlock type="bestBlock" />
         <ChainStateBlock type="finalizedBlock" />
         <ChainStateBlock type="totalIssuance" />

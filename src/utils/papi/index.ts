@@ -39,14 +39,14 @@ export const initSmoldotChains = async ({
 
   if (isParachain) {
     const relayChain = await smoldot.addChain({
-      chainSpec: CHAIN_SPECS[chain.relayChainId],
+      chainSpec: await CHAIN_SPECS[chain.relayChainId](),
     })
       .catch(console.error);
 
     assert(relayChain, `RelayChain is not defined for ${chain.name}`);
 
     newChain = await smoldot.addChain({
-      chainSpec: CHAIN_SPECS[chain.id],
+      chainSpec: await CHAIN_SPECS[chain.id](),
       potentialRelayChains: [relayChain],
     })
       .catch(console.error);
@@ -73,7 +73,7 @@ export const initSmoldotChains = async ({
 
   } else {
     newChain = await smoldot.addChain({
-      chainSpec: CHAIN_SPECS[chain.id],
+      chainSpec: await CHAIN_SPECS[chain.id](),
     })
       .catch(console.error);
 
