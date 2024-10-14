@@ -39,6 +39,8 @@ export type TSupportedChains = {
   [key in TSupportedChain]: TChain
 };
 
+export type TExternalExplorer = 'subscan' | 'statescan';
+
 type TSupportedStakingChain =
   | 'polkadot'
   | 'kusama'

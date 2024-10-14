@@ -65,7 +65,8 @@ const getBlockValidator = async ({
       .catch();
   }
 
-  const address = !isParaChain ? authors[authorIndex] : authors[authorIndex % authors.length];
+  // TODO parachain validator index is not correct
+  const address = isParaChain ? authors[authorIndex % authors.length] : authors[authorIndex];
 
   let identity;
 

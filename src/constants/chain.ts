@@ -20,6 +20,7 @@ import {
 
 import type {
   ISupportedChainGroups,
+  TExternalExplorer,
   TParaChainDecsriptor,
   TRelayChainDecsriptor,
   TSupportedChain,
@@ -353,4 +354,73 @@ export const CHAIN_WEBSOCKET_URLS: { [key in TSupportedChain]: string } = {
   'rococo-bridge-hub': 'wss://rococo-bridge-hub-rpc.polkadot.io',
   'paseo': 'wss://pas-rpc.stakeworld.io',
   'paseo-asset-hub': 'wss://pas-rpc.stakeworld.io/assethub',
+};
+
+export const CHAIN_EXPLORERS: {
+  [key in TSupportedChain]: {
+    [key in TExternalExplorer]?: string;
+  }
+} = {
+  polkadot: {
+    subscan: 'https://polkadot.subscan.io',
+    statescan: 'https://www.statescan.io',
+  },
+  'polkadot-people': {
+    subscan: 'https://people-polkadot.subscan.io',
+  },
+  'polkadot-asset-hub': {
+    subscan: 'https://assethub-polkadot.subscan.io',
+  },
+  'polkadot-bridge-hub': {
+    subscan: 'https://bridgehub-polkadot.subscan.io',
+    statescan: 'https://bridgehub-polkadot.statescan.io',
+  },
+  'polkadot-collectives': {
+    subscan: 'https://collectives-polkadot.subscan.io',
+    statescan: 'https://collectives.statescan.io',
+  },
+  rococo: {
+    subscan: 'https://rococo.subscan.io',
+  },
+  'rococo-people': {},
+  'rococo-asset-hub': {
+    subscan: 'https://assethub-rococo.subscan.io',
+  },
+  'rococo-bridge-hub': {
+    subscan: 'https://bridgehub-rococo.subscan.io',
+  },
+  'westend': {
+    subscan: 'https://westend.subscan.io',
+  },
+  'westend-people': {},
+  'westend-asset-hub': {
+    subscan: 'https://assethub-westend.subscan.io',
+  },
+  'westend-bridge-hub': {
+    subscan: 'https://bridgehub-westend.subscan.io',
+  },
+  'westend-collectives': {
+    statescan: 'https://westend-collectives.statescan.io',
+  },
+  'kusama': {
+    subscan: 'https://kusama.subscan.io',
+    statescan: 'https://kusama.statescan.io',
+  },
+  'kusama-people': {
+    subscan: 'https://people-kusama.subscan.io',
+    statescan: 'https://people-kusama.statescan.io',
+  },
+  'kusama-asset-hub': {
+    subscan: 'https://assethub-kusama.subscan.io',
+  },
+  'kusama-bridge-hub': {
+    subscan: 'https://bridgehub-kusama.subscan.io',
+    statescan: 'https://bridgehub-kusama.statescan.io',
+  },
+  paseo: {
+    subscan: 'https://paseo.subscan.io',
+  },
+  'paseo-asset-hub': {
+    subscan: 'https://assethub-paseo.subscan.io',
+  },
 };

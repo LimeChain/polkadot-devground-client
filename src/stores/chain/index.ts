@@ -349,12 +349,13 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
         const wsUrl = CHAIN_WEBSOCKET_URLS[chain.id];
         if (wsUrl) {
           const rawClient = createSubstrateClient(getWsProvider(wsUrl));
+
           set({ rawClient });
 
           const createSubscription = () => {
             const rawClientSubscription = rawClient.chainHead(
               true,
-              () => { },
+              () => {},
               (error) => {
                 console.log(error);
                 rawClientSubscription?.unfollow?.();
