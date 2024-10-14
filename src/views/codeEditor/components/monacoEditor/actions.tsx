@@ -15,6 +15,7 @@ import {
   mergeImportMap,
 } from '@utils/iframe';
 import { defaultImportMap } from '@views/codeEditor/constants';
+// import { useStoreSnippet } from 'src/stores/users';
 
 import { ActionButton } from '../actionButton';
 
@@ -24,6 +25,8 @@ import type {
 } from '@custom-types/eventBus';
 
 export const EditorActions = () => {
+  // const { uploadSnippet, getUserSnippets } = useStoreSnippet.use.actions();
+
   const refCode = useRef<string>('');
   const [
     isRunning,
@@ -124,10 +127,12 @@ export const EditorActions = () => {
       <div className="flex gap-2 pr-2">
         <ActionButton
           iconName="icon-share"
+          // onClick={getUserSnippets}
           toolTip="Share"
         />
         <ActionButton
           iconName="icon-save"
+          // onClick={uploadSnippet}
           toolTip="Save to GitHub"
         />
         <ActionButton
