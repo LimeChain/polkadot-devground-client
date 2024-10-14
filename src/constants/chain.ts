@@ -236,15 +236,15 @@ export const SUPPORTED_CHAIN_GROUPS: ISupportedChainGroups = {
       SUPPORTED_CHAINS['polkadot-collectives'],
     ],
   },
-  'rococo': {
-    name: 'Rococo & Parachains',
-    chains: [
-      SUPPORTED_CHAINS['rococo'],
-      SUPPORTED_CHAINS['rococo-people'],
-      SUPPORTED_CHAINS['rococo-asset-hub'],
-      SUPPORTED_CHAINS['rococo-bridge-hub'],
-    ],
-  },
+  // 'rococo': {
+  //   name: 'Rococo & Parachains',
+  //   chains: [
+  //     SUPPORTED_CHAINS['rococo'],
+  //     SUPPORTED_CHAINS['rococo-people'],
+  //     SUPPORTED_CHAINS['rococo-asset-hub'],
+  //     SUPPORTED_CHAINS['rococo-bridge-hub'],
+  //   ],
+  // },
   'kusama': {
     name: 'Kusama & Parachains',
     chains: [
