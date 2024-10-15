@@ -45,6 +45,12 @@ const Extrinsics = () => {
     signer,
     setSigner,
   ] = useState(accounts.at(0)?.polkadotSigner);
+
+  // apply / reset signer on wallet connect / disconnect
+  useEffect(() => {
+    setSigner(accounts?.at(0)?.polkadotSigner);
+  }, [accounts]);
+
   const palletsWithCalls = useMemo(() => metadata?.pallets?.filter((p) => p.calls)?.sort((a, b) => a.name.localeCompare(b.name)), [metadata]);
   const palletSelectItems = useMemo(() => palletsWithCalls?.map((pallet) => ({
     label: pallet.name,

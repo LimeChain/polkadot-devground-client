@@ -27,7 +27,7 @@ import { routes } from './routes';
 
 export const App = () => {
   // TODO: Change this when we have new domain
-  if (window.location.origin === 'https://polkadot-js-dev.web.app') {
+  if (window.location.origin === 'https://devground.xyz') {
     getAnalytics(analyticsApp);
   }
   const refTimeout = useRef<NodeJS.Timeout>();
