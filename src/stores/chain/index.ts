@@ -131,9 +131,15 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
     resetStore: async () => {
       const client = get()?.client;
       const rawClient = get()?.rawClient;
+      const rawClientSubscription = get()?.rawClientSubscription;
       const peopleClient = get()?.peopleClient;
 
       // clean up subscrptions / destroy old clients
+      try {
+        rawClientSubscription?.unfollow?.();
+      } catch (err) {
+        console.log('rawClientSubscription unfollow error');
+      }
       try {
         client?.destroy?.();
       } catch (err) {
@@ -288,8 +294,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
                       method: method.method,
                       section: method.section,
                     };
-                  },
-                  );
+                  });
 
                 const newBlockData = {
                   number: blockData.value.header.number,
@@ -306,10 +311,13 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
                 }
               } else {
                 console.log(blockData);
-
               }
             });
-            set({ bestBlock: bestBlock?.number, finalizedBlock: finalizedBlock?.number });
+            // UPDATE STORE AFTER GETTING THE DATA
+            set({
+              bestBlock: bestBlock?.number,
+              finalizedBlock: finalizedBlock?.number,
+            });
           })
             // prevent state crash on random smoldot error
             .catch((err) => {

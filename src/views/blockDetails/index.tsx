@@ -68,6 +68,8 @@ const BlockDetails = () => {
         setBlockData({
           ...block, header: {
             ...block.header,
+            // BUG FIX UNTILL SOLVED FOR KUSAMA ASSET HUB TIMESTAMP EXTRINSIC
+            timestamp: blockStore.timestamp,
             // HIDE IDENTITY FOR PARACHAINS SINCE IT HAS INCORRECT LOGIC
             identity: chain.isRelayChain ? blockStore.identity : undefined,
           },
