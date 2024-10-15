@@ -194,7 +194,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
       void checkTheme(theme);
       void triggerValidation();
     },
-    () => {},
+    () => { },
     (userFacingMessage, error) => {
       console.error('Custom error handling:', userFacingMessage, error);
     },
@@ -223,7 +223,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
     void fetchType(refSnippet.current);
   };
 
-  const loadSnippet = useCallback(async (snippetIndex: number | null) => {
+  const loadSnippet = useCallback(async (snippetIndex: number | string | null) => {
     clearTimeout(refTimeout.current);
 
     busDispatch({
@@ -241,6 +241,11 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
     });
 
     let code = 'console.log("Hello, World!");';
+
+    if (typeof snippetIndex === 'string') {
+      code = snippetIndex;
+    }
+
     if (!!snippetIndex) {
       const selectedCodeSnippet = snippets.find((f) => f.id === snippetIndex) || snippets[0];
       refSnippetIndex.current = String(selectedCodeSnippet.id);
