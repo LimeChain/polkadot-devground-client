@@ -28,7 +28,6 @@ const Explorer = () => {
         <ChainStateBlock type="bestBlock" />
         <ChainStateBlock type="finalizedBlock" />
         <ChainStateBlock type="totalIssuance" />
-        {/* <ChainStateBlock type="totalStake" /> */}
       </div>
 
       <div className="flex size-full flex-col gap-8 overflow-hidden lg:flex-row">

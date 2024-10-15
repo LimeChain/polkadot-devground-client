@@ -38,7 +38,7 @@ const getBlockValidator = async ({
   const api = baseStoreChain.getState().api as StoreInterface['api'];
   const chain = baseStoreChain.getState().chain as StoreInterface['chain'];
 
-  const isParaChain = chain.isParaChain;
+  const isRelayChain = chain.isRelayChain;
 
   assert(api, 'Api is not defined');
   assert(peopleApi, 'peopleApi is not defined');
@@ -49,24 +49,24 @@ const getBlockValidator = async ({
 
   let authorIndex = 0;
 
-  if (isParaChain) {
-    authorIndex = Number(auraDigestCodec.dec(digestData).slotNumber);
-  } else {
+  if (isRelayChain) {
     authorIndex = babeDigestCodec.dec(digestData).value;
+  } else {
+    authorIndex = Number(auraDigestCodec.dec(digestData).slotNumber);
   }
 
   let authors = [];
 
-  if (isParaChain) {
-    authors = await getInvulnerables(api as TPeopleApi, blockHash)
+  if (isRelayChain) {
+    authors = await getValidators(api, blockHash)
       .catch();
   } else {
-    authors = await getValidators(api, blockHash)
+    authors = await getInvulnerables(api as TPeopleApi, blockHash)
       .catch();
   }
 
   // TODO parachain validator index is not correct
-  const address = isParaChain ? authors[authorIndex % authors.length] : authors[authorIndex];
+  const address = isRelayChain ? authors[authorIndex] : authors[authorIndex % authors.length];
 
   let identity;
 

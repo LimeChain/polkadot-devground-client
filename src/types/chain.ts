@@ -37,11 +37,6 @@ export type TSupportedChains = {
 
 export type TExternalExplorer = 'subscan' | 'statescan';
 
-type TSupportedStakingChain =
-  | 'polkadot'
-  | 'kusama'
-  | 'paseo'
-  | 'westend';
 export type TSupportedRelayChain =
   | 'polkadot'
   | 'kusama'
@@ -62,12 +57,6 @@ export type TSupportedParaChain =
   | 'paseo-asset-hub';
 export type TSupportedChain = TSupportedRelayChain | TSupportedParaChain;
 export type TRelayChainDecsriptor =
-  | typeof dot
-  | typeof kusama
-  | typeof paseo
-  | typeof westend;
-
-export type TStakingChainDecsriptor =
   | typeof dot
   | typeof kusama
   | typeof paseo
@@ -95,27 +84,17 @@ export type TPeopleChainDecsriptor =
 export type TApi = TypedApi<TRelayChainDecsriptor | TParaChainDecsriptor>;
 export type TPeopleApi = TypedApi<TPeopleChainDecsriptor>;
 export type TRelayApi = TypedApi<TRelayChainDecsriptor>;
-export type TStakingApi = TypedApi<TStakingChainDecsriptor>;
 
 export type TChain = TRelayChain | TParaChain;
-type TRelayChain = TChainBase & TStakingChain & {
+type TRelayChain = TChainBase & {
   isRelayChain: true;
-  isParaChain?: false;
   peopleChainId: TSupportedParaChain;
 };
 
-type TParaChain = TChainBase & TStakingChain & {
-  isParaChain: true;
+type TParaChain = TChainBase & {
   isRelayChain?: false;
   relayChainId: TSupportedRelayChain;
   peopleChainId: TSupportedParaChain;
-};
-
-type TStakingChain = {
-  hasStaking: true;
-  stakingChainId: TSupportedStakingChain;
-} | {
-  hasStaking: false;
 };
 
 type TChainBase = {

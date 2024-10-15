@@ -47,7 +47,6 @@ import type {
   TChainSpecs,
   TPeopleApi,
   TPeopleChainDecsriptor,
-  TStakingApi,
 } from '@custom-types/chain';
 import type {
   ChainSpecData,
@@ -61,14 +60,12 @@ export interface StoreInterface {
 
   client: PolkadotClient | null;
   peopleClient: PolkadotClient | null;
-  stakingClient: PolkadotClient | null;
 
   rawClient: SubstrateClient | null;
   rawClientSubscription: FollowResponse | null;
 
   api: TApi | null;
   peopleApi: TPeopleApi | null;
-  stakingApi: TStakingApi | null;
   blocksData: Map<number, IBlockStoreData>;
   bestBlock: number | null;
   finalizedBlock: number | null;
@@ -97,10 +94,8 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   peopleClient: null,
   rawClient: null,
   rawClientSubscription: null,
-  stakingClient: null,
   api: null,
   peopleApi: null,
-  stakingApi: null,
   smoldot: null,
   blocksData: new Map(),
   bestBlock: null,
@@ -136,7 +131,6 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
       const client = get()?.client;
       const rawClient = get()?.rawClient;
       const peopleClient = get()?.peopleClient;
-      const stakingClient = get()?.stakingClient;
 
       // clean up subscrptions / destroy old clients
       try {
@@ -153,11 +147,6 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
         peopleClient?.destroy?.();
       } catch (err) {
         console.log('peopleClient destroy error');
-      }
-      try {
-        stakingClient?.destroy?.();
-      } catch (err) {
-        console.log('stakingClient destroy error');
       }
 
       const smoldot = get()?.smoldot;
@@ -198,6 +187,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
 
         // init clients and typed apis
         const newClient = createClient(getSmProvider(newChain));
+        // CLIENT WITH LOGS
         // const newClient = createClient(withLogsRecorder((line) => console.log(line), getSmProvider(newChain)));
         set({ client: newClient });
         const api = newClient.getTypedApi(CHAIN_DESCRIPTORS[chain.id]);
@@ -209,15 +199,6 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
         set({ peopleClient: newPeopleClient });
         const peopleApi = newPeopleClient.getTypedApi(CHAIN_DESCRIPTORS[chain.peopleChainId] as TPeopleChainDecsriptor);
         set({ peopleApi });
-
-        // check if the chain has staking pallet (rococo doesn't have)
-        // const hasStakingInformation = chain.hasStaking && stakingChain;
-        // if (hasStakingInformation) {
-        //   const stakingClient = createClient(getSmProvider(stakingChain));
-        //   set({ stakingClient });
-        //   const stakingApi = stakingClient.getTypedApi(CHAIN_DESCRIPTORS[chain.stakingChainId] as TStakingChainDecsriptor);
-        //   set({ stakingApi });
-        // }
 
         // update spec_version on runtime update
         await subscribeToRuntime(api, (runtime) => set({ runtime }))
@@ -232,7 +213,6 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
         await Promise.allSettled([
           { type: 'chainSpecs', data: await newClient.getChainSpecData() },
           { type: 'metadata', data: await getMetadata(api) },
-          // { type: 'runtime', data: await getRuntime(api) },
         ])
           .then((results) => {
             results.forEach((result) => {
@@ -259,9 +239,6 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
                     break;
                   }
 
-                  // case 'runtime':
-                  //   set({ runtime: result.value.data as Awaited<ReturnType<typeof getRuntime>> });
-                  //   break;
                   default:
                     break;
                 }
@@ -269,13 +246,6 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
             });
           })
           .catch(console.error);
-
-        // if (hasStakingInformation) {
-        //   const stakingApi = get()?.stakingApi;
-        //   assert(stakingApi, 'Staking Api is not defined');
-        //   subscribeToStakedTokens(stakingApi, (totalStake) => set({ totalStake }))
-        //     .catch(console.error);
-        // }
 
         // subscribe to chain head
         newClient.bestBlocks$.subscribe(async (bestBlocks) => {
@@ -385,7 +355,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
           get()?.actions?.setChain?.(get()?.chain);
         } else {
           console.log('Maximum chain set retries has been reached!');
-          // SITE IS UNRESPONSIVE AT THAT POINT because of smoldot panik
+          // SITE IS UNRESPONSIVE AT THAT POINT because of smoldot's panik
         }
       }
     },
