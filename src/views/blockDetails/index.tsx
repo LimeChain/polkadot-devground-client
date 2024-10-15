@@ -65,7 +65,13 @@ const BlockDetails = () => {
           dynamicBuilder,
         });
 
-        setBlockData({ ...block, header: { ...block.header, identity: blockStore.identity } });
+        setBlockData({
+          ...block, header: {
+            ...block.header,
+            // HIDE IDENTITY FOR PARACHAINS SINCE IT HAS INCORRECT LOGIC
+            identity: chain.isRelayChain ? blockStore.identity : undefined,
+          },
+        });
       }
     })();
     // Removed data from dependencies as we expect this should be already in place when hitting this page
