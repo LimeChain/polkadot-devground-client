@@ -28,6 +28,8 @@ import type {
   TSupportedRelayChain,
 } from '@custom-types/chain';
 
+export const MAX_CHAIN_SET_RETRIES = 5;
+
 export const SUPPORTED_CHAINS: TSupportedChains = {
   polkadot: {
     name: 'Polkadot',

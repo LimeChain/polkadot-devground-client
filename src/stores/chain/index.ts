@@ -20,11 +20,13 @@ import { getSmProvider } from 'polkadot-api/sm-provider';
 import { type Client } from 'polkadot-api/smoldot';
 import { startFromWorker } from 'polkadot-api/smoldot/from-worker';
 import { getWsProvider } from 'polkadot-api/ws-provider/web';
+import { toast } from 'react-hot-toast';
 import { create } from 'zustand';
 
 import {
   CHAIN_DESCRIPTORS,
   CHAIN_WEBSOCKET_URLS,
+  MAX_CHAIN_SET_RETRIES,
   SUPPORTED_CHAINS,
 } from '@constants/chain';
 import {
@@ -110,7 +112,6 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   lookup: null,
 };
 
-const MAX_RETRIES = 5;
 let retriesSoFar = 0;
 
 const startSmoldot = () => {
@@ -345,17 +346,18 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
         retriesSoFar = 0;
 
       } catch (err) {
-        // TODO: Show error to the user
-        // PREVENT INFINITY LOOP ON CHAIN SWITCH
         retriesSoFar += 1;
 
-        if (retriesSoFar <= MAX_RETRIES) {
+        if (retriesSoFar <= MAX_CHAIN_SET_RETRIES) {
           console.log('Unpredicted Error, reseting chain store...', err);
-          console.log(`Retries left: ${MAX_RETRIES - retriesSoFar}`, err);
+          console.log(`Retries left: ${MAX_CHAIN_SET_RETRIES - retriesSoFar}`, err);
           get()?.actions?.setChain?.(get()?.chain);
         } else {
-          console.log('Maximum chain set retries has been reached!');
           // SITE IS UNRESPONSIVE AT THAT POINT because of smoldot's panik
+          console.log('Maximum chain set retries has been reached!');
+          toast.error(`Error connecting to ${chain.name}!\nPlease refresh the page.`, {
+            duration: 5 * 1000,
+          });
         }
       }
     },
