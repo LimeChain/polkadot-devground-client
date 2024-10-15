@@ -12,10 +12,6 @@ import type {
   kusama_people,
   paseo,
   paseo_asset_hub,
-  rococo,
-  rococo_asset_hub,
-  rococo_bridge_hub,
-  rococo_people,
   westend,
   westend_asset_hub,
   westend_bridge_hub,
@@ -48,7 +44,6 @@ type TSupportedStakingChain =
   | 'westend';
 export type TSupportedRelayChain =
   | 'polkadot'
-  | 'rococo'
   | 'kusama'
   | 'paseo'
   | 'westend';
@@ -57,9 +52,6 @@ export type TSupportedParaChain =
   | 'polkadot-asset-hub'
   | 'polkadot-bridge-hub'
   | 'polkadot-collectives'
-  | 'rococo-people'
-  | 'rococo-asset-hub'
-  | 'rococo-bridge-hub'
   | 'kusama-people'
   | 'kusama-asset-hub'
   | 'kusama-bridge-hub'
@@ -71,7 +63,6 @@ export type TSupportedParaChain =
 export type TSupportedChain = TSupportedRelayChain | TSupportedParaChain;
 export type TRelayChainDecsriptor =
   | typeof dot
-  | typeof rococo
   | typeof kusama
   | typeof paseo
   | typeof westend;
@@ -87,9 +78,6 @@ export type TParaChainDecsriptor =
   | typeof dot_asset_hub
   | typeof dot_bridge_hub
   | typeof dot_collectives
-  | typeof rococo_people
-  | typeof rococo_asset_hub
-  | typeof rococo_bridge_hub
   | typeof kusama_people
   | typeof kusama_asset_hub
   | typeof kusama_bridge_hub
@@ -101,7 +89,6 @@ export type TParaChainDecsriptor =
 
 export type TPeopleChainDecsriptor =
   | typeof dotpeople
-  | typeof rococo_people
   | typeof kusama_people
   | typeof westend_people;
 

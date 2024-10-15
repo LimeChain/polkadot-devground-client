@@ -5,12 +5,11 @@ import {
   dot_collectives,
   dotpeople,
   kusama,
+  kusama_asset_hub,
+  kusama_bridge_hub,
+  kusama_people,
   paseo,
   paseo_asset_hub,
-  rococo,
-  rococo_asset_hub,
-  rococo_bridge_hub,
-  rococo_people,
   westend,
   westend_asset_hub,
   westend_bridge_hub,
@@ -78,41 +77,6 @@ export const SUPPORTED_CHAINS: TSupportedChains = {
     peopleChainId: 'polkadot-people',
     hasStaking: true,
     stakingChainId: 'polkadot',
-  },
-  rococo: {
-    name: 'Rococo',
-    id: 'rococo',
-    icon: 'chain-rococo',
-    isRelayChain: true,
-    peopleChainId: 'rococo-people',
-    hasStaking: false,
-  },
-  'rococo-people': {
-    name: 'Rococo People',
-    id: 'rococo-people',
-    icon: 'chain-rococo-people',
-    isParaChain: true,
-    relayChainId: 'rococo',
-    peopleChainId: 'rococo-people',
-    hasStaking: false,
-  },
-  'rococo-asset-hub': {
-    name: 'Rococo Asset Hub',
-    id: 'rococo-asset-hub',
-    icon: 'chain-rococo-asset-hub',
-    isParaChain: true,
-    relayChainId: 'rococo',
-    peopleChainId: 'rococo-people',
-    hasStaking: false,
-  },
-  'rococo-bridge-hub': {
-    name: 'Rococo Bridge Hub',
-    id: 'rococo-bridge-hub',
-    icon: 'chain-rococo-bridge-hub',
-    isParaChain: true,
-    relayChainId: 'rococo',
-    peopleChainId: 'rococo-people',
-    hasStaking: false,
   },
   kusama: {
     name: 'Kusama',
@@ -236,15 +200,6 @@ export const SUPPORTED_CHAIN_GROUPS: ISupportedChainGroups = {
       SUPPORTED_CHAINS['polkadot-collectives'],
     ],
   },
-  // 'rococo': {
-  //   name: 'Rococo & Parachains',
-  //   chains: [
-  //     SUPPORTED_CHAINS['rococo'],
-  //     SUPPORTED_CHAINS['rococo-people'],
-  //     SUPPORTED_CHAINS['rococo-asset-hub'],
-  //     SUPPORTED_CHAINS['rococo-bridge-hub'],
-  //   ],
-  // },
   'kusama': {
     name: 'Kusama & Parachains',
     chains: [
@@ -285,10 +240,6 @@ export const CHAIN_SPECS: {
   'kusama-people': async () => await import('polkadot-api/chains/ksmcc3_people').then((res) => res.chainSpec),
   'kusama-asset-hub': async () => await import('polkadot-api/chains/ksmcc3_people').then((res) => res.chainSpec),
   'kusama-bridge-hub': async () => await import('polkadot-api/chains/ksmcc3_bridge_hub').then((res) => res.chainSpec),
-  rococo: async () => await import('polkadot-api/chains/rococo_v2_2').then((res) => res.chainSpec),
-  'rococo-people': async () => await import('polkadot-api/chains/rococo_v2_2_people').then((res) => res.chainSpec),
-  'rococo-asset-hub': async () => await import('polkadot-api/chains/rococo_v2_2_asset_hub').then((res) => res.chainSpec),
-  'rococo-bridge-hub': async () => await import('polkadot-api/chains/rococo_v2_2_bridge_hub').then((res) => res.chainSpec),
   westend: async () => await import('polkadot-api/chains/westend2').then((res) => res.chainSpec),
   'westend-people': async () => await import('polkadot-api/chains/westend2_people').then((res) => res.chainSpec),
   'westend-asset-hub': async () => await import('polkadot-api/chains/westend2_asset_hub').then((res) => res.chainSpec),
@@ -302,7 +253,6 @@ const RELAY_CHAIN_DESCRIPTORS: {
   [key in TSupportedRelayChain]: TRelayChainDecsriptor
 } = {
   polkadot: dot,
-  rococo,
   kusama,
   westend,
   paseo,
@@ -319,12 +269,9 @@ const PARA_CHAIN_DESCRIPTORS: {
   'westend-asset-hub': westend_asset_hub,
   'westend-bridge-hub': westend_bridge_hub,
   'westend-collectives': westend_collectives,
-  'rococo-people': rococo_people,
-  'rococo-asset-hub': rococo_asset_hub,
-  'rococo-bridge-hub': rococo_bridge_hub,
-  'kusama-people': rococo_people,
-  'kusama-asset-hub': rococo_asset_hub,
-  'kusama-bridge-hub': rococo_bridge_hub,
+  'kusama-people': kusama_people,
+  'kusama-asset-hub': kusama_asset_hub,
+  'kusama-bridge-hub': kusama_bridge_hub,
   'paseo-asset-hub': paseo_asset_hub,
 };
 
@@ -348,10 +295,6 @@ export const CHAIN_WEBSOCKET_URLS: { [key in TSupportedChain]: string } = {
   'kusama-people': 'wss://kusama-people-rpc.polkadot.io',
   'kusama-asset-hub': 'wss://kusama-asset-hub-rpc.polkadot.io',
   'kusama-bridge-hub': 'wss://kusama-bridge-hub-rpc.polkadot.io',
-  rococo: 'wss://rococo-rpc.polkadot.io',
-  'rococo-people': 'wss://rococo-people-rpc.polkadot.io',
-  'rococo-asset-hub': 'wss://rococo-asset-hub-rpc.polkadot.io',
-  'rococo-bridge-hub': 'wss://rococo-bridge-hub-rpc.polkadot.io',
   'paseo': 'wss://pas-rpc.stakeworld.io',
   'paseo-asset-hub': 'wss://pas-rpc.stakeworld.io/assethub',
 };
@@ -378,16 +321,6 @@ export const CHAIN_EXPLORERS: {
   'polkadot-collectives': {
     subscan: 'https://collectives-polkadot.subscan.io',
     statescan: 'https://collectives.statescan.io',
-  },
-  rococo: {
-    subscan: 'https://rococo.subscan.io',
-  },
-  'rococo-people': {},
-  'rococo-asset-hub': {
-    subscan: 'https://assethub-rococo.subscan.io',
-  },
-  'rococo-bridge-hub': {
-    subscan: 'https://bridgehub-rococo.subscan.io',
   },
   'westend': {
     subscan: 'https://westend.subscan.io',
