@@ -20,23 +20,22 @@ import { getSmProvider } from 'polkadot-api/sm-provider';
 import { type Client } from 'polkadot-api/smoldot';
 import { startFromWorker } from 'polkadot-api/smoldot/from-worker';
 import { getWsProvider } from 'polkadot-api/ws-provider/web';
+import { toast } from 'react-hot-toast';
 import { create } from 'zustand';
 
 import {
   CHAIN_DESCRIPTORS,
   CHAIN_WEBSOCKET_URLS,
+  MAX_CHAIN_SET_RETRIES,
   SUPPORTED_CHAINS,
 } from '@constants/chain';
 import {
   getExpectedBlockTime,
   getMetadata,
-  getRuntime,
   initSmoldotChains,
   subscribeToRuntime,
-  subscribeToStakedTokens,
   subscribeToTotalIssuance,
 } from '@utils/papi';
-import { assert } from '@utils/papi/helpers';
 import { getBlockDetailsWithPAPI } from '@utils/rpc/getBlockDetails';
 
 import { createSelectors } from '../createSelectors';
@@ -49,8 +48,7 @@ import type {
   TChain,
   TChainSpecs,
   TPeopleApi,
-  TStakingApi,
-  TStakingChainDecsriptor,
+  TPeopleChainDecsriptor,
 } from '@custom-types/chain';
 import type {
   ChainSpecData,
@@ -64,14 +62,12 @@ export interface StoreInterface {
 
   client: PolkadotClient | null;
   peopleClient: PolkadotClient | null;
-  stakingClient: PolkadotClient | null;
 
   rawClient: SubstrateClient | null;
   rawClientSubscription: FollowResponse | null;
 
   api: TApi | null;
   peopleApi: TPeopleApi | null;
-  stakingApi: TStakingApi | null;
   blocksData: Map<number, IBlockStoreData>;
   bestBlock: number | null;
   finalizedBlock: number | null;
@@ -87,7 +83,7 @@ export interface StoreInterface {
   registry: TypeRegistry;
 
   actions: {
-    resetStore: () => void;
+    resetStore: () => Promise<void>;
     setChain: (chain: TChain) => void;
   };
 
@@ -100,10 +96,8 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   peopleClient: null,
   rawClient: null,
   rawClientSubscription: null,
-  stakingClient: null,
   api: null,
   peopleApi: null,
-  stakingApi: null,
   smoldot: null,
   blocksData: new Map(),
   bestBlock: null,
@@ -118,60 +112,75 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   lookup: null,
 };
 
+let retriesSoFar = 0;
+
+const startSmoldot = () => {
+  return startFromWorker(
+    new Worker(new URL('polkadot-api/smoldot/worker', import.meta.url), {
+      type: 'module',
+    }),
+    {
+      forbitWs: true,
+    },
+  );
+};
+
 const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain', (set, get) => ({
   ...initialState,
   actions: {
     resetStore: async () => {
+      const client = get()?.client;
+      const rawClient = get()?.rawClient;
+      const peopleClient = get()?.peopleClient;
+
+      // clean up subscrptions / destroy old clients
       try {
-        const client = get()?.client;
-        const rawClient = get()?.rawClient;
-        const peopleClient = get()?.peopleClient;
-        const stakingClient = get()?.stakingClient;
-
-        // clean up subscrptions / destroy old clients
         client?.destroy?.();
-        rawClient?.destroy?.();
-        peopleClient?.destroy?.();
-        stakingClient?.destroy?.();
-
-      } catch (error) {
-        console.log(error);
-
-      } finally {
-        const smoldot = get()?.smoldot;
-        const blocksData = get()?.blocksData;
-        const registry = get().registry;
-
-        // reset data
-        blocksData?.clear?.();
-        registry?.clearCache?.();
-
-        set({
-          ...initialState,
-          smoldot,
-          finalizedBlock: undefined,
-          bestBlock: undefined,
-        });
-
+      } catch (err) {
+        console.log('client destroy error');
       }
+      try {
+        rawClient?.destroy?.();
+      } catch (err) {
+        console.log('rawClient destroy error');
+      }
+      try {
+        peopleClient?.destroy?.();
+      } catch (err) {
+        console.log('peopleClient destroy error');
+      }
+
+      const smoldot = get()?.smoldot;
+
+      await smoldot?.terminate?.().catch();
+
+      const blocksData = get()?.blocksData;
+      const registry = get().registry;
+
+      // reset data
+      blocksData?.clear?.();
+      registry?.clearCache?.();
+
+      set({
+        ...initialState,
+        smoldot,
+      });
+
     },
     setChain: async (chain: TChain) => {
       try {
-        get()?.actions?.resetStore?.();
+        await get()?.actions?.resetStore?.();
+        set({ chain });
+
+        const smoldot = startSmoldot();
+        set({ smoldot });
 
         const blocksData = get()?.blocksData;
         const registry = get().registry;
 
-        set({ chain });
-
-        const smoldot = get()?.smoldot;
-        assert(smoldot, 'Smoldot is not defined');
-
-        // init relay chain / people chain
         const {
           newChain,
-          peopleChain,
-          stakingChain,
+          // peopleChain,
         } = await initSmoldotChains({
           smoldot,
           chain,
@@ -179,30 +188,32 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
 
         // init clients and typed apis
         const newClient = createClient(getSmProvider(newChain));
-        // const newClient = createClient(withLogsRecorder(line => console.log(line), getSmProvider(newChain)));
+        // CLIENT WITH LOGS
+        // const newClient = createClient(withLogsRecorder((line) => console.log(line), getSmProvider(newChain)));
         set({ client: newClient });
         const api = newClient.getTypedApi(CHAIN_DESCRIPTORS[chain.id]);
         set({ api });
 
         const isPeopleParaChain = chain.id === chain.peopleChainId;
-        const newPeopleClient = isPeopleParaChain ? newClient : createClient(getSmProvider(peopleChain));
+        const newPeopleClient = isPeopleParaChain ? newClient : createClient(getWsProvider(CHAIN_WEBSOCKET_URLS[chain.peopleChainId]));
+        // const newPeopleClient = isPeopleParaChain ? newClient : createClient(getSmProvider(peopleChain));
         set({ peopleClient: newPeopleClient });
-        const peopleApi = newPeopleClient.getTypedApi(CHAIN_DESCRIPTORS[chain.peopleChainId]);
+        const peopleApi = newPeopleClient.getTypedApi(CHAIN_DESCRIPTORS[chain.peopleChainId] as TPeopleChainDecsriptor);
         set({ peopleApi });
 
-        // check if the chain has staking pallet (rococo doesn't have)
-        const hasStakingInformation = chain.hasStaking && stakingChain;
-        if (hasStakingInformation) {
-          const stakingClient = createClient(getSmProvider(stakingChain));
-          set({ stakingClient });
-          const stakingApi = stakingClient.getTypedApi(CHAIN_DESCRIPTORS[chain.stakingChainId] as TStakingChainDecsriptor);
-          set({ stakingApi });
-        }
+        // update spec_version on runtime update
+        await subscribeToRuntime(api, (runtime) => set({ runtime }))
+          .catch(console.error);
+
+        subscribeToTotalIssuance(api, (totalIssuance) => set({ totalIssuance }))
+          .catch(console.error);
+
+        getExpectedBlockTime(api, chain, (blockTime) => set({ blockTime }))
+          .catch(console.error);
 
         await Promise.allSettled([
           { type: 'chainSpecs', data: await newClient.getChainSpecData() },
           { type: 'metadata', data: await getMetadata(api) },
-          { type: 'runtime', data: await getRuntime(api) },
         ])
           .then((results) => {
             results.forEach((result) => {
@@ -229,9 +240,6 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
                     break;
                   }
 
-                  case 'runtime':
-                    set({ runtime: result.value.data as Awaited<ReturnType<typeof getRuntime>> });
-                    break;
                   default:
                     break;
                 }
@@ -239,23 +247,6 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
             });
           })
           .catch(console.error);
-
-        // update spec_version on runtime update
-        subscribeToRuntime(api, (runtime) => set({ runtime }))
-          .catch(console.error);
-
-        subscribeToTotalIssuance(api, (totalIssuance) => set({ totalIssuance }))
-          .catch(console.error);
-
-        getExpectedBlockTime(api, chain, (blockTime) => set({ blockTime }))
-          .catch(console.error);
-
-        if (hasStakingInformation) {
-          const stakingApi = get()?.stakingApi;
-          assert(stakingApi, 'Staking Api is not defined');
-          subscribeToStakedTokens(stakingApi, (totalStake) => set({ totalStake }))
-            .catch(console.error);
-        }
 
         // subscribe to chain head
         newClient.bestBlocks$.subscribe(async (bestBlocks) => {
@@ -292,7 +283,7 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
                       id,
                       blockNumber,
                       timestamp,
-                      isSuccess,
+                      isSuccess: isSuccess || false,
                       signer: signer?.Id ?? '',
                       method: method.method,
                       section: method.section,
@@ -305,12 +296,17 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
                   hash: blockData.value.header.hash,
                   timestamp: blockData.value.header.timestamp,
                   eventsLength: blockData.value.body.events.length,
-                  validator: blockData.value.header.identity.address.toString(),
+                  validator: blockData.value.header.identity?.address?.toString?.(),
                   extrinsics: blockExtrinsics,
                   identity: blockData.value.header.identity,
                 };
 
-                blocksData.set(newBlockData.number, newBlockData);
+                if (typeof newBlockData.number == 'number') {
+                  blocksData.set(newBlockData.number, newBlockData);
+                }
+              } else {
+                console.log(blockData);
+
               }
             });
             set({ bestBlock: bestBlock?.number, finalizedBlock: finalizedBlock?.number });
@@ -324,14 +320,16 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
         const wsUrl = CHAIN_WEBSOCKET_URLS[chain.id];
         if (wsUrl) {
           const rawClient = createSubstrateClient(getWsProvider(wsUrl));
+
           set({ rawClient });
 
           const createSubscription = () => {
             const rawClientSubscription = rawClient.chainHead(
               true,
-              () => { },
+              () => {},
               (error) => {
                 console.log(error);
+                rawClientSubscription?.unfollow?.();
                 createSubscription();
               },
             );
@@ -344,22 +342,28 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
 
         }
 
+        // RESET RETRIES AMOUNT ON SUCCESSFUL CHAIN SET
+        retriesSoFar = 0;
+
       } catch (err) {
-        // TODO: HANDLE INFINITE LOOP CASE
-        console.log('Unpredicted Error, reseting chain store...', err);
-        get()?.actions?.setChain?.(get()?.chain);
+        retriesSoFar += 1;
+
+        if (retriesSoFar <= MAX_CHAIN_SET_RETRIES) {
+          console.log('Unpredicted Error, reseting chain store...', err);
+          console.log(`Retries left: ${MAX_CHAIN_SET_RETRIES - retriesSoFar}`, err);
+          get()?.actions?.setChain?.(get()?.chain);
+        } else {
+          // SITE IS UNRESPONSIVE AT THAT POINT because of smoldot's panik
+          console.log('Maximum chain set retries has been reached!');
+          toast.error(`Error connecting to ${chain.name}!\nPlease refresh the page.`, {
+            duration: 5 * 1000,
+          });
+        }
       }
     },
   },
   init: async () => {
     try {
-      const smoldot = startFromWorker(
-        new Worker(new URL('polkadot-api/smoldot/worker', import.meta.url), {
-          type: 'module',
-        }),
-      );
-      set({ smoldot });
-
       get().actions.setChain(get().chain);
 
     } catch (err) {

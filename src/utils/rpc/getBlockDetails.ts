@@ -38,7 +38,7 @@ const getBlockValidator = async ({
   const api = baseStoreChain.getState().api as StoreInterface['api'];
   const chain = baseStoreChain.getState().chain as StoreInterface['chain'];
 
-  const isParaChain = chain.isParaChain;
+  const isRelayChain = chain.isRelayChain;
 
   assert(api, 'Api is not defined');
   assert(peopleApi, 'peopleApi is not defined');
@@ -49,23 +49,24 @@ const getBlockValidator = async ({
 
   let authorIndex = 0;
 
-  if (isParaChain) {
-    authorIndex = Number(auraDigestCodec.dec(digestData).slotNumber);
-  } else {
+  if (isRelayChain) {
     authorIndex = babeDigestCodec.dec(digestData).value;
+  } else {
+    authorIndex = Number(auraDigestCodec.dec(digestData).slotNumber);
   }
 
   let authors = [];
 
-  if (isParaChain) {
-    authors = await getInvulnerables(api as TPeopleApi, blockHash)
+  if (isRelayChain) {
+    authors = await getValidators(api, blockHash)
       .catch();
   } else {
-    authors = await getValidators(api, blockHash)
+    authors = await getInvulnerables(api as TPeopleApi, blockHash)
       .catch();
   }
 
-  const address = !isParaChain ? authors[authorIndex] : authors[authorIndex % authors.length];
+  // TODO parachain validator index is not correct
+  const address = isRelayChain ? authors[authorIndex] : authors[authorIndex % authors.length];
 
   let identity;
 
@@ -125,7 +126,7 @@ export const getBlockDetailsWithPAPI = async ({
     extrinsicsRaw,
     events,
     identity,
-  ] = await Promise.all([
+  ] = await Promise.allSettled([
     client?.getBlockHeader(blockHash),
     client?.getBlockBody(blockHash),
     api && getSystemEvents(api, blockHash),
@@ -136,7 +137,7 @@ export const getBlockDetailsWithPAPI = async ({
   let timestamp: number = 0;
 
   const extrinsics: IMappedBlockExtrinsic[] = [];
-  extrinsicsRaw?.forEach((e, i) => {
+  extrinsicsRaw.status === 'fulfilled' && extrinsicsRaw?.value.forEach((e, i) => {
     const extrinsic = decodeExtrinsic(e);
     const {
       method: {
@@ -167,7 +168,7 @@ export const getBlockDetailsWithPAPI = async ({
     });
   });
 
-  events?.forEach((ev) => {
+  events.status === 'fulfilled' && events.value?.forEach((ev) => {
     if (ev.event.type === 'System') {
       const extrinsicIsSuccess = ev.event.value.type === 'ExtrinsicSuccess';
       const extrinsicIndex = ev.phase.value || 0;
@@ -180,13 +181,14 @@ export const getBlockDetailsWithPAPI = async ({
       hash: blockHash,
       timestamp,
       runtime,
-      identity,
-      ...blockHeader,
+      identity: identity.status === 'fulfilled' ? identity.value : undefined,
+      ...(blockHeader.status === 'fulfilled' ? blockHeader.value : {}),
+      // ...blockHeader,
     },
     body: {
       extrinsics,
       // eventsCount: events.length,
-      events,
+      events: events.status === 'fulfilled' ? events.value : [],
     },
   };
 };
@@ -214,7 +216,7 @@ export const getBlockDetailsWithRawClient = async ({
     block,
     runtime,
     storage,
-  ] = await Promise.all([
+  ] = await Promise.allSettled([
     rawClient?.request('chain_getBlock', [blockHash]) as Promise<BlockDetails>,
     rawClient?.request('state_getRuntimeVersion', [blockHash]) as Promise<RuntimeVersion>,
     rawClient?.request('state_getStorage', [
@@ -226,10 +228,20 @@ export const getBlockDetailsWithRawClient = async ({
   assert(block, 'Failed to fetch block details');
   assert(runtime, 'Failed to fetch runtime version');
 
-  const blockHeader = block.block.header;
-  const blockHeaderNumber = Number(block.block.header.number);
-  const extrinsicsRaw: HexString[] = block.block.extrinsics;
-  const events = storageCodec.dec(storage) as Awaited<ReturnType<typeof getSystemEvents>>;
+  const blockValue = block.status === 'fulfilled' ? block.value : undefined;
+
+  const blockHeader = blockValue?.block.header;
+  const blockHeaderNumber = Number(blockValue?.block?.header?.number || 0);
+  const extrinsicsRaw: HexString[] = blockValue?.block.extrinsics || [];
+  const storageValue = storage.status === 'fulfilled' ? storage.value : '0x';
+
+  let events: Awaited<ReturnType<typeof getSystemEvents>> = [];
+
+  try {
+    events = storageCodec.dec(storageValue) as Awaited<ReturnType<typeof getSystemEvents>>;
+  } catch (error) {
+    console.log('Could not decode storage value');
+  }
 
   // Initialize timestamp variable
   let timestamp: number = 0;
@@ -274,6 +286,8 @@ export const getBlockDetailsWithRawClient = async ({
     }
   });
 
+  const runtimeValue = runtime.status === 'fulfilled' ? runtime.value : undefined;
+
   return {
     header: {
       ...blockHeader,
@@ -281,10 +295,10 @@ export const getBlockDetailsWithRawClient = async ({
       hash: blockHash,
       timestamp,
       runtime: {
-        spec_name: runtime.specName.toString(),
-        spec_version: Number(runtime.specVersion),
+        spec_name: runtimeValue?.specName.toString(),
+        spec_version: Number(runtimeValue?.specVersion || 0),
       },
-      extrinsicRoot: block.block.header.extrinsicsRoot,
+      extrinsicRoot: blockValue?.block?.header?.extrinsicsRoot,
     },
     body: {
       extrinsics,

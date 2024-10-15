@@ -12,7 +12,7 @@ export const defaultImportMap = {
     '@shined/react-use': 'https://esm.sh/@shined/react-use',
     'polkadot-api': 'https://esm.sh/polkadot-api@1.4.0',
     'polkadot-api/signer': 'https://esm.sh/polkadot-api@1.4.0/signer',
-    'polkadot-api/chains/rococo_v2_2': 'https://esm.sh/polkadot-api@1.4.0/chains/rococo_v2_2',
+    'polkadot-api/chains/westend': 'https://esm.sh/polkadot-api@1.4.0/chains/westend2',
     'polkadot-api/sm-provider': 'https://esm.sh/polkadot-api@1.4.0/sm-provider',
     'polkadot-api/smoldot': 'https://esm.sh/polkadot-api@1.4.0/smoldot',
     'polkadot-api/pjs-signer': 'https://esm.sh/polkadot-api@1.4.0/pjs-signer',
