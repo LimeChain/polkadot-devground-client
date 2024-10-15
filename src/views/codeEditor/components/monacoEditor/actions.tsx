@@ -15,7 +15,7 @@ import {
   mergeImportMap,
 } from '@utils/iframe';
 import { defaultImportMap } from '@views/codeEditor/constants';
-// import { useStoreSnippet } from 'src/stores/users';
+import { useStoreGists } from 'src/stores/gists';
 
 import { ActionButton } from '../actionButton';
 
@@ -25,7 +25,7 @@ import type {
 } from '@custom-types/eventBus';
 
 export const EditorActions = () => {
-  // const { uploadSnippet, getUserSnippets } = useStoreSnippet.use.actions();
+  const { uploadSnippet } = useStoreGists.use.actions();
 
   const refCode = useRef<string>('');
   const [
@@ -132,7 +132,7 @@ export const EditorActions = () => {
         />
         <ActionButton
           iconName="icon-save"
-          // onClick={uploadSnippet}
+          onClick={uploadSnippet}
           toolTip="Save to GitHub"
         />
         <ActionButton
