@@ -15,3 +15,17 @@ export const preferedTheme = () => {
 
   return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 };
+
+const breakpoints = {
+  mobile: 768,
+  tablet: 1024,
+};
+
+export const getWindowSize = () => {
+  const width = window.innerWidth;
+  return {
+    isMobile: width < breakpoints.mobile,
+    isTablet: width >= breakpoints.mobile && width < breakpoints.tablet,
+    isDesktop: width >= breakpoints.tablet,
+  };
+};

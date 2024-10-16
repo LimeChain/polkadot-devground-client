@@ -5,7 +5,6 @@ import { useStoreUI } from '@stores';
 import { cn } from '@utils/helpers';
 
 export const ToggleTheme = () => {
-
   const { toggleTheme } = useStoreUI.use.actions();
   const theme = useStoreUI.use.theme?.();
 
@@ -26,7 +25,7 @@ export const ToggleTheme = () => {
     >
       <Icon
         className="text-dev-black-600 dark:text-dev-purple-100"
-        name={theme ? 'icon-lightMode' : 'icon-darkMode'}
+        name={theme === 'light' ? 'icon-lightMode' : 'icon-darkMode'}
         size={[24]}
       />
     </button>

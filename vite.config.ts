@@ -1,11 +1,11 @@
 import { resolve } from 'path';
 
+import svgSpritePlugin from '@pivanov/vite-plugin-svg-sprite';
 import react from '@vitejs/plugin-react-swc';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
-import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig(({ mode }) => {
@@ -17,19 +17,20 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       tsconfigPaths(),
-      createSvgIconsPlugin({
-        iconDirs: [resolve(process.cwd(), 'src/assets/images/icons')],
+      svgSpritePlugin({
+        iconDirs: [resolve(process.cwd(), 'src/assets/svgs')],
         symbolId: '[dir]-[name]',
-        customDomId: 'svg-sprite',
+        svgDomId: 'svg-sprite',
+        fileName: 'svg-sprite.svg',
       }),
       VitePWA({
         includeAssets: [
-          'favicon.png',
+          'favicon.ico',
           'robots.txt',
           'apple-touch-icon.png',
           'safari-pinned-tab.svg',
         ],
-        registerType: 'prompt',
+        registerType: 'autoUpdate',
         manifest: {
           name: 'polkadot-devground',
           description: '...',
@@ -37,11 +38,23 @@ export default defineConfig(({ mode }) => {
           lang: 'en-EN',
           background_color: '#FFFFFF',
           display: 'standalone',
+          icons: [
+            {
+              src: '/android-chrome-192x192.png',
+              sizes: '192x192',
+              type: 'image/png',
+            },
+            {
+              src: '/android-chrome-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+            },
+          ],
         },
         workbox: {
           cleanupOutdatedCaches: true,
           globPatterns: ['**/*.{js,css,json,ico,png,jpg,jpeg,svg}'],
-          navigateFallback: null,
+          navigateFallback: 'index.html',
           maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 6 MB limit
         },
       }),

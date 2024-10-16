@@ -12,16 +12,20 @@ import {
 } from 'react-resizable-panels';
 
 import { ErrorBoundary } from '@components/errorBoundary';
+import { GithubButton } from '@components/githubButton';
+import { MobileNotAllowed } from '@components/MobileNotAllowed';
 import { Tabs } from '@components/tabs';
+import { useStoreUI } from '@stores';
 import { cn } from '@utils/helpers';
+import { useResizeObserver } from '@utils/hooks/useResizeObserver';
 import { encodeCodeToBase64 } from '@utils/iframe';
+import { SelectExample } from '@views/codeEditor/components/selectExample';
 
 import { ActionButton } from './components/actionButton';
 import { DebugPanel } from './components/debugPanel';
 import { Iframe } from './components/iframe';
 import { MonacoEditor } from './components/monacoEditor';
 import { EditorActions } from './components/monacoEditor/actions';
-import { SnippetsSwitcher } from './components/snippetsSwitcher';
 
 import type {
   IEventBusMonacoEditorShowPreview,
@@ -29,13 +33,22 @@ import type {
 } from '@custom-types/eventBus';
 
 const TypeScriptEditor = () => {
+  const refContainer = useRef<HTMLDivElement>(null);
   const refCode = useRef<string>('');
   const refTimeout = useRef<NodeJS.Timeout>();
   const refCanPreview = useRef(false);
+
+  const [refContainerDimensions] = useResizeObserver(refContainer);
+  const containerWidth = refContainerDimensions?.width;
+
   const [
     isLoaded,
     setIsLoaded,
   ] = useState(false);
+
+  const isDesktop = useStoreUI?.use?.isDesktop?.();
+
+  const theme = useStoreUI?.use?.theme?.();
 
   useEventBus<IEventBusMonacoEditorShowPreview>('@@-monaco-editor-show-preview', ({ data }) => {
     refCanPreview.current = data;
@@ -80,10 +93,16 @@ const TypeScriptEditor = () => {
     }
   }, []);
 
+  if (!isDesktop) {
+    return <MobileNotAllowed />;
+  }
+
   return (
-    <div className="max-w-screen flex h-full flex-col gap-y-4 overflow-hidden px-8 pb-4 pt-8">
-      <SnippetsSwitcher />
-      <div className="relative flex flex-1">
+    <div
+      ref={refContainer}
+      className="max-w-screen flex h-full flex-col gap-y-4 overflow-hidden px-8 pb-4 pt-8"
+    >
+      <div className="relative z-10 flex flex-1">
         <PanelGroup
           autoSaveId="persistence"
           direction="horizontal"
@@ -96,40 +115,53 @@ const TypeScriptEditor = () => {
           )}
         >
           <Panel
-            className="relative flex flex-col border border-dev-purple-300 dark:border-dev-black-800"
             defaultSize={50}
             id="left"
-            minSize={30}
+            minSize={containerWidth ? ((580 / containerWidth) * 100) : 30}
             order={1}
+            className={cn(
+              'relative',
+              'flex flex-col gap-y-4',
+            )}
           >
-            <EditorActions />
+            <SelectExample />
 
-            <Tabs
-              unmountOnHide={false}
-              tabClassName={cn(
-                'px-10 py-2.5',
-              )}
-              tabsClassName={cn(
-                'z-10 w-full py-4 pl-16',
-                'dark:bg-dev-black-800',
+            <div
+              className={cn(
+                'relative z-10 flex-1',
+                {
+                  ['border border-dev-purple-300 dark:border-dev-black-800']: theme === 'light',
+                },
               )}
             >
-              <div
-                className="flex h-full"
-                data-title="Editor"
+              <EditorActions />
 
+              <Tabs
+                unmountOnHide={false}
+                tabClassName={cn(
+                  'px-10 py-2.5',
+                )}
+                tabsClassName={cn(
+                  'w-full py-4 pl-16',
+                  'dark:bg-dev-black-800',
+                )}
               >
-                <MonacoEditor />
-              </div>
-              <div
-                className="flex h-full p-4 dark:bg-dev-black-800"
-                data-title="Read me"
-              >
-                Readme.md
-              </div>
-            </Tabs>
+                <div
+                  className="flex h-full"
+                  data-title="Editor"
+                >
+                  <MonacoEditor />
+                </div>
+                <div
+                  className="flex h-full p-4 dark:bg-dev-black-800"
+                  data-title="Read me"
+                >
+                  Readme.md
+                </div>
+              </Tabs>
+            </div>
           </Panel>
-          <PanelResizeHandle className="group relative w-4">
+          <PanelResizeHandle className="group relative top-20 w-4">
             <div
               className={cn(
                 'absolute left-1/2 top-0',
@@ -148,8 +180,10 @@ const TypeScriptEditor = () => {
           >
             <PanelGroup
               autoSaveId="persistence"
+              className="flex flex-col"
               direction="vertical"
             >
+              <GithubButton />
               {
                 refCanPreview.current && (
                   <>
@@ -158,14 +192,13 @@ const TypeScriptEditor = () => {
                       'border border-b-0 border-dev-purple-300 dark:border-dev-black-800',
                     )}
                     >
-
-                      <ActionButton
-                        iconName="icon-externalLink"
-                        onClick={shareCode}
-                      />
                       <ActionButton
                         iconName="icon-export"
+                      />
+                      <ActionButton
+                        iconName="icon-clipboard"
                         onClick={shareCode}
+                        toolTip="Share"
                       />
                     </div>
                     <Panel

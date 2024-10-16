@@ -32,7 +32,7 @@ export const Row = (props: IRowProps) => {
   const timeAgo = timestamp && formatDistanceToNowStrict(
     new Date(timestamp),
     { addSuffix: true },
-  );
+  ).replace('seconds', ' secs');
 
   return (
     <PDLink

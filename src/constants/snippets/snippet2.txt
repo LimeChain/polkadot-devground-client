@@ -4,11 +4,11 @@ import {
   useState,
 } from 'react';
 import { createRoot } from 'react-dom/client';
-import { chainSpec } from 'polkadot-api/chains/rococo_v2_2';
+import { chainSpec } from 'polkadot-api/chains/westend2';
 import { getSmProvider } from 'polkadot-api/sm-provider';
 import { start } from 'polkadot-api/smoldot';
 import { createClient, type PolkadotClient } from "polkadot-api";
-import { MultiAddress, rococo } from '@polkadot-api/descriptors';
+import { MultiAddress, westend } from '@polkadot-api/descriptors';
 
 import { connectInjectedExtension, getInjectedExtensions, type PolkadotSigner } from "polkadot-api/pjs-signer"
 
@@ -20,7 +20,7 @@ interface AppProps {
 
 const App = (props: AppProps) => {
   const { api, client, signer } = props;
-  const inputRef = useRef('5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7');
+  const refInput = useRef('5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7');
   const [txStatus, setTxStatus] = useState({
     text: '',
     link: '',
@@ -32,7 +32,7 @@ const App = (props: AppProps) => {
     setTxSent(true);
     try {
       api.tx.Balances.transfer_allow_death({
-        dest: MultiAddress.Id(inputRef.current),
+        dest: MultiAddress.Id(refInput.current),
         value: 100n,
       })
         .signSubmitAndWatch(signer)
@@ -41,7 +41,7 @@ const App = (props: AppProps) => {
 
           setTxStatus({
             text: `Tx Stasus: ${type} / Tx Hash: ${txHash.slice(0, 4)}...${txHash.slice(-4)}`,
-            link: `https://rococo.subscan.io/extrinsic/${txHash}`,
+            link: `https://westend.subscan.io/extrinsic/${txHash}`,
           });
         })
         .add(() => {
@@ -60,12 +60,12 @@ const App = (props: AppProps) => {
   return (
     <div className="flex size-full flex-col items-center justify-center gap-4 bg-blue-100 p-4">
       <label htmlFor="address" className="flex w-full flex-col gap-2">
-        Receiver of 100n ROC
+        Receiver of 100n WND
         <input
           id="address"
-          placeholder={inputRef.current}
+          placeholder={refInput.current}
           onChange={(event) => {
-            inputRef.current = event.currentTarget.value;
+            refInput.current = event.currentTarget.value;
           }}
         />
       </label>

@@ -1,45 +1,69 @@
+import { busDispatch } from '@pivanov/event-bus';
 import {
   useCallback,
   useEffect,
   useRef,
   useState,
 } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import {
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom';
 
 import { Icon } from '@components/icon';
 import { PDScrollArea } from '@components/pdScrollArea';
+import { Tabs } from '@components/tabs';
 import { snippets } from '@constants/snippets';
-import { cn } from '@utils/helpers';
+import {
+  cn,
+  sleep,
+} from '@utils/helpers';
+
+import type { IEventBusMonacoEditorLoadSnippet } from '@custom-types/eventBus';
 
 export const SelectExample = () => {
+  const navigate = useNavigate();
+
   const [
     isOpened,
     setIsOpened,
   ] = useState(false);
-  const [
-    type,
-    setType,
-  ] = useState('default');
+
   const [searchParams] = useSearchParams();
-  const selectSnipped = searchParams.get('s');
-  const containerRef = useRef<HTMLDivElement>(null);
+  const selectedSnippet = searchParams.get('s');
+  const selectedSnippetName = snippets.find((snippet) => snippet.id === Number(selectedSnippet))?.name;
+
+  const refContainer = useRef<HTMLDivElement>(null);
 
   const handleSetOpen = useCallback(() => {
     setIsOpened((prev) => !prev);
   }, []);
 
-  const handleSetType = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    setType(e.currentTarget.textContent?.toLowerCase() || '');
-  }, []);
-
-  const handleChangeExample = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleChangeExample = useCallback(async (e: React.MouseEvent<HTMLButtonElement>) => {
     const snippetIndex = Number(e.currentTarget.getAttribute('data-snippet-index'));
-    window.location.href = `/code?s=${snippetIndex}`;
+    navigate(`/code?s=${snippetIndex}`);
+    setIsOpened(false);
+
+    busDispatch({
+      type: '@@-monaco-editor-show-loading',
+    });
+
+    await sleep(400);
+
+    busDispatch<IEventBusMonacoEditorLoadSnippet>({
+      type: '@@-monaco-editor-load-snippet',
+      data: snippetIndex,
+    });
+
+    busDispatch({
+      type: '@@-monaco-editor-hide-loading',
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (refContainer.current && !refContainer.current.contains(event.target as Node)) {
         setIsOpened(false);
       }
     };
@@ -52,8 +76,8 @@ export const SelectExample = () => {
 
   return (
     <div
-      ref={containerRef}
-      className="relative w-6/12"
+      ref={refContainer}
+      className="relative max-w-[50vw]"
     >
       <button
         onClick={handleSetOpen}
@@ -70,7 +94,7 @@ export const SelectExample = () => {
           },
         )}
       >
-        Select Example
+        {selectedSnippetName || 'Select Example'}
         <Icon
           name="icon-dropdownArrow"
           className={cn(
@@ -83,7 +107,7 @@ export const SelectExample = () => {
       </button>
 
       <div className={cn(
-        'absolute top-20 z-50 w-full p-2',
+        'absolute top-18 z-50 w-full p-2',
         'bg-dev-black-1000 dark:bg-dev-purple-50',
         'pointer-events-none -translate-y-2',
         'transition-all',
@@ -93,49 +117,29 @@ export const SelectExample = () => {
         },
       )}
       >
-        <div className="flex gap-2 border-b border-dev-purple-700 px-2 font-geist dark:border-dev-purple-300 dark:text-dev-black-800">
-          <button
-            onClick={handleSetType}
-            className={cn(
-              'px-2 py-2.5 hover:border-dev-pink-500',
-              'text-dev-white-400 hover:text-dev-white-200 dark:text-dev-black-800 dark:hover:text-dev-black-1000',
-              'border-b-2 border-b-transparent hover:border-b-dev-pink-500',
-              'transform transition-colors duration-300 ease-in-out',
-              {
-                ['border-dev-pink-500']: type === 'custom',
-              },
-            )}
-          >
-            Custom
-          </button>
-          <button
-            onClick={handleSetType}
-            className={cn(
-              'px-2 py-2.5 hover:border-dev-pink-500',
-              'text-dev-white-400 hover:text-dev-white-200 dark:text-dev-black-800 dark:hover:text-dev-black-1000',
-              'border-b-2 border-b-transparent hover:border-b-dev-pink-500',
-              'transform transition-colors duration-300 ease-in-out',
-              {
-                ['border-dev-pink-500']: type === 'default',
-              },
-            )}
-          >
-            Default
-          </button>
-        </div>
+        <Tabs
+          tabClassName={cn(
+            'mb-2 px-10 py-2.5',
+            'text-dev-white-400 hover:text-dev-white-200 dark:text-dev-black-800 dark:hover:text-dev-black-1000',
+          )}
 
-        <PDScrollArea
-          className="h-72"
-          verticalScrollClassNames="py-4"
-          verticalScrollThumbClassNames="before:bg-dev-purple-700 dark:before:bg-dev-purple-300"
-          viewportClassNames="py-4"
         >
-          <ul>
-            {
-              type === 'default'
-                ? (
+          <div data-title="Custom">
+            <li className="font-geist text-dev-white-1000 font-body1-regular dark:text-dev-black-300">
+              No examples found
+            </li>
+          </div>
+          <div data-title="Default">
+            <PDScrollArea
+              verticalScrollClassNames="py-4"
+              verticalScrollThumbClassNames="before:bg-dev-purple-700 dark:before:bg-dev-purple-300"
+            >
+              <ul className="max-h-56 ">
+                {
                   snippets.map((snippet) => (
-                    <li key={snippet.id}>
+                    <li
+                      key={snippet.id}
+                    >
                       <button
                         data-snippet-index={snippet.id}
                         onClick={handleChangeExample}
@@ -145,14 +149,12 @@ export const SelectExample = () => {
                           'transition-[background] duration-300',
                           'hover:bg-dev-black-900 hover:dark:bg-dev-purple-200',
                           {
-                            ['bg-dev-black-800 dark:bg-dev-purple-300']: selectSnipped === snippet.id.toString(),
+                            ['bg-dev-black-800 dark:bg-dev-purple-300']: selectedSnippet === snippet.id.toString(),
                           },
                         )}
                       >
                         <p className="font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000">
-                          Example: 
-                          {' '}
-                          {snippet.id}
+                          {snippet.name}
                         </p>
                         <p className="font-geist text-dev-white-1000 font-body3-regular dark:text-dev-black-300">
                           CUSTOM
@@ -160,15 +162,11 @@ export const SelectExample = () => {
                       </button>
                     </li>
                   ))
-                )
-                : (
-                  <li className="font-geist text-dev-white-1000 font-body1-regular dark:text-dev-black-300">
-                    No examples found
-                  </li>
-                )
-            }
-          </ul>
-        </PDScrollArea>
+                }
+              </ul>
+            </PDScrollArea>
+          </div>
+        </Tabs>
       </div>
     </div>
   );

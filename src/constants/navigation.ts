@@ -3,7 +3,7 @@ import type { TNavItem } from '@components/navigation/navigationItem';
 export const NAVIGATION_ITEMS: TNavItem[] = [
   {
     linkProps: {
-      title: 'Explore',
+      title: 'Explorer',
       to: '/explorer',
     },
     type: 'link',

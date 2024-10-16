@@ -48,7 +48,9 @@ export const PDSelect = ({
     }
   }, []);
 
-  const hasItems = items ? items.length > 0 : false;
+  const hasItems = items
+    ? items.some((group) => group?.length > 0)
+    : false;
 
   return (
     <div
@@ -77,7 +79,7 @@ export const PDSelect = ({
             placeholder={(
               <SelectPlaceholder
                 label={label}
-                value={placeholder || emptyPlaceHolder}
+                value={hasItems ? placeholder : emptyPlaceHolder}
               />
             )}
             asChild
@@ -110,7 +112,7 @@ export const PDSelect = ({
           <SelectPrimitive.Content
             position="popper"
             className={cn(
-              'z-50 flex w-full max-w-96 flex-col gap-1 p-2',
+              'z-100 flex w-full max-w-96 flex-col gap-1 p-2',
               'bg-dev-black-1000 dark:bg-white',
               'text-white dark:text-black',
               'font-geist font-body2-regular',

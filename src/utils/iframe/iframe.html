@@ -88,8 +88,9 @@
     <script>
       window.onerror = function (msg, url, lineNo, columnNo, error) {
         var title = 'Error ocurred.'
-        var content = `<h3>${title}</h3><pre>${error.toString()}</pre>`
-        document.getElementById('root').innerHTML = content
+        var content = `<div class="p-3"><h3 class="text-red-500 text-sm">${title}</h3><pre class="text-sm">${error.toString()}</pre></div>`
+        document.getElementById('root').innerHTML = content;
+        console.log(error.toString());
         return true;
       }
     </script>

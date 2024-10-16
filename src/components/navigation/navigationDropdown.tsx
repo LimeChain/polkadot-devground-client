@@ -1,7 +1,13 @@
+import {
+  useCallback,
+  useRef,
+  useState,
+} from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { Icon } from '@components/icon';
 import { cn } from '@utils/helpers';
+import { useOnClickOutside } from '@utils/hooks/useOnClickOutside';
 
 import {
   type INavigationDropdownItem,
@@ -11,29 +17,52 @@ import {
 export interface INavigationDropdown extends React.ComponentProps<'button'> {
   title: string;
   items: INavigationDropdownItem[];
+  onLinkClick?: () => void;
 }
 
-export const NavigationDropdown = ({
-  title,
-  items,
-  className,
-  ...props
-}: INavigationDropdown) => {
+export const NavigationDropdown = (props: INavigationDropdown) => {
+  const {
+    title,
+    items,
+    className,
+    onLinkClick,
+    ...rest
+  } = props;
 
+  const [
+    isOpen,
+    setIsOpen,
+  ] = useState(false);
   const location = useLocation();
+  const refDropdown = useRef<HTMLDivElement>(null);
+
+  const toggleDropdown = useCallback(() => {
+    setIsOpen(!isOpen);
+  }, [isOpen]);
+
+  const handleLinkClick = useCallback(() => {
+    setIsOpen(false);
+    onLinkClick?.();
+  }, [onLinkClick]);
+
+  useOnClickOutside(refDropdown, () => {
+    setIsOpen(false);
+  });
 
   return (
-    <div className="group relative">
+    <div
+      ref={refDropdown}
+      className="relative"
+    >
       <button
-        {...props}
+        {...rest}
+        onClick={toggleDropdown}
         className={cn(
-          'group',
           'relative px-2 py-2',
           'after:absolute after:bottom-0 after:left-0 after:content-[""]',
           'after:h-[3px] after:w-full after:bg-dev-pink-500',
           'after:opacity-0 after:transition-opacity',
           'flex items-center gap-1',
-          'text-dev-purple-50 sm:text-dev-black-1000 sm:dark:text-dev-purple-50',
           {
             ['after:opacity-100']: items.some((item) => String(item.to).startsWith(location.pathname)),
           },
@@ -42,19 +71,25 @@ export const NavigationDropdown = ({
       >
         {title}
         <Icon
-          className="transition-transform group-focus-within:rotate-180"
           name="icon-dropdownArrow"
           size={[16]}
+          className={cn(
+            'transition-transform duration-300',
+            { 'rotate-180': isOpen },
+          )}
         />
       </button>
       <ul
         className={cn(
-          'top-100 absolute left-0',
+          'top-100 left-0 md:absolute',
           'flex flex-col gap-1 p-2',
-          'bg-dev-black-1000 dark:bg-dev-purple-50',
+          'bg-dev-purple-50 dark:bg-dev-black-1000',
+          'md:bg-dev-black-1000 md:dark:bg-dev-purple-50',
           'whitespace-nowrap',
           'min-w-[256px]',
-          'hidden group-focus-within:flex',
+          'transition-all duration-300',
+          { 'hidden': !isOpen, 'flex': isOpen },
+          'animate-slide-down-fade',
         )}
       >
         {
@@ -62,6 +97,7 @@ export const NavigationDropdown = ({
             return (
               <NavigationDropdownItem
                 key={`nav-dropdown-item-${item.to}-${index}`}
+                onClick={handleLinkClick}
                 {...item}
               />
             );

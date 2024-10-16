@@ -19,9 +19,13 @@ import {
 import { assert } from '@utils/papi/helpers';
 
 import type { IMappedBlockExtrinsic } from '@custom-types/block';
+import type { TPeopleApi } from '@custom-types/chain';
 import type { BlockDetails } from '@custom-types/rawClientReturnTypes';
 import type { RuntimeVersion } from '@polkadot/types/interfaces';
-import type { HexString } from 'polkadot-api';
+import type {
+  FixedSizeBinary,
+  HexString,
+} from 'polkadot-api';
 import type { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
 const getBlockValidator = async ({
@@ -34,7 +38,7 @@ const getBlockValidator = async ({
   const api = baseStoreChain.getState().api as StoreInterface['api'];
   const chain = baseStoreChain.getState().chain as StoreInterface['chain'];
 
-  const isParaChain = chain.isParaChain;
+  const isRelayChain = chain.isRelayChain;
 
   assert(api, 'Api is not defined');
   assert(peopleApi, 'peopleApi is not defined');
@@ -45,37 +49,43 @@ const getBlockValidator = async ({
 
   let authorIndex = 0;
 
-  if (isParaChain) {
-    authorIndex = Number(auraDigestCodec.dec(digestData).slotNumber);
-  } else {
+  if (isRelayChain) {
     authorIndex = babeDigestCodec.dec(digestData).value;
+  } else {
+    authorIndex = Number(auraDigestCodec.dec(digestData).slotNumber);
   }
 
   let authors = [];
 
-  if (isParaChain) {
-    authors = await getInvulnerables(peopleApi, blockHash);
+  if (isRelayChain) {
+    authors = await getValidators(api, blockHash)
+      .catch();
   } else {
-    authors = await getValidators(api, blockHash);
+    authors = await getInvulnerables(api as TPeopleApi, blockHash)
+      .catch();
   }
 
-  const address = !isParaChain ? authors[authorIndex] : authors[authorIndex % authors.length];
+  // TODO parachain validator index is not correct
+  const address = isRelayChain ? authors[authorIndex] : authors[authorIndex % authors.length];
 
   let identity;
 
-  identity = await getIdentity(peopleApi, address);
+  identity = await getIdentity(peopleApi, address)
+    .catch();
   if (identity) {
-    identity = identity?.[0]?.info?.display?.value?.asText?.();
+    identity = (identity?.[0]?.info?.display?.value as FixedSizeBinary<2>)?.asText?.();
   }
 
-  const superIdentity = await getSuperIdentity(peopleApi, address);
+  const superIdentity = await getSuperIdentity(peopleApi, address)
+    .catch();
 
   if (superIdentity?.[0] && !identity) {
-    identity = await getIdentity(peopleApi, superIdentity[0]);
+    identity = await getIdentity(peopleApi, superIdentity[0])
+      .catch();
 
     if (identity) {
-      const _identity = identity?.[0]?.info?.display?.value?.asText?.();
-      const _superIdentity = superIdentity?.[1]?.value?.asText?.();
+      const _identity = (identity?.[0]?.info?.display?.value as FixedSizeBinary<2>)?.asText?.();
+      const _superIdentity = (superIdentity?.[1]?.value as FixedSizeBinary<2>)?.asText?.();
 
       if (_identity) {
         if (_superIdentity) {
@@ -116,7 +126,7 @@ export const getBlockDetailsWithPAPI = async ({
     extrinsicsRaw,
     events,
     identity,
-  ] = await Promise.all([
+  ] = await Promise.allSettled([
     client?.getBlockHeader(blockHash),
     client?.getBlockBody(blockHash),
     api && getSystemEvents(api, blockHash),
@@ -127,42 +137,49 @@ export const getBlockDetailsWithPAPI = async ({
   let timestamp: number = 0;
 
   const extrinsics: IMappedBlockExtrinsic[] = [];
-  extrinsicsRaw?.forEach((e, i) => {
+  extrinsicsRaw.status === 'fulfilled' && extrinsicsRaw?.value.forEach((e, i) => {
     const extrinsic = decodeExtrinsic(e);
-    const {
-      method: {
-        method,
-        section,
-        args,
-      },
-    } = extrinsic;
 
-    const isTimeStampExtrinsic = method === 'set' && section === 'timestamp';
-    if (isTimeStampExtrinsic) {
-      const _args = args as { now: string };
-      // turn the time string of type "1,451,313,413,21" into a number
-      timestamp = formatPrettyNumberString(_args?.now);
+    // EXTRINSIC DECODING CAN FAIL
+    if (extrinsic) {
+      const {
+        method: {
+          method,
+          section,
+          args,
+        },
+      } = extrinsic;
+
+      const isTimeStampExtrinsic = method === 'set' && section === 'timestamp';
+      if (isTimeStampExtrinsic) {
+        const _args = args as { now: string };
+        // turn the time string of type "1,451,313,413,21" into a number
+        timestamp = formatPrettyNumberString(_args?.now);
+      }
+
+      extrinsics.push({
+        id: `${blockNumber}-${i}`,
+        blockNumber: blockNumber || 0,
+        // assume a success by default (updated later)
+        isSuccess: true,
+        // the timestamp is always the first extrinsic
+        // so we can assume the timestamp will be populated
+        // after the if statement above
+        timestamp,
+        extrinsicData: extrinsic,
+      });
     }
 
-    extrinsics.push({
-
-      id: `${blockNumber}-${i}`,
-      blockNumber: blockNumber || 0,
-      // assume a success by default (updated later)
-      isSuccess: true,
-      // the timestamp is always the first extrinsic
-      // so we can assume the timestamp will be populated
-      // after the if statement above
-      timestamp,
-      extrinsicData: extrinsic,
-    });
   });
 
-  events?.forEach((ev) => {
+  events.status === 'fulfilled' && events.value?.forEach((ev) => {
     if (ev.event.type === 'System') {
       const extrinsicIsSuccess = ev.event.value.type === 'ExtrinsicSuccess';
       const extrinsicIndex = ev.phase.value || 0;
-      extrinsics[extrinsicIndex].isSuccess = extrinsicIsSuccess;
+
+      if (extrinsics[extrinsicIndex]) {
+        extrinsics[extrinsicIndex].isSuccess = extrinsicIsSuccess;
+      }
     }
   });
 
@@ -171,13 +188,14 @@ export const getBlockDetailsWithPAPI = async ({
       hash: blockHash,
       timestamp,
       runtime,
-      identity,
-      ...blockHeader,
+      identity: identity.status === 'fulfilled' ? identity.value : undefined,
+      ...(blockHeader.status === 'fulfilled' ? blockHeader.value : {}),
+      // ...blockHeader,
     },
     body: {
       extrinsics,
       // eventsCount: events.length,
-      events,
+      events: events.status === 'fulfilled' ? events.value : [],
     },
   };
 };
@@ -205,7 +223,7 @@ export const getBlockDetailsWithRawClient = async ({
     block,
     runtime,
     storage,
-  ] = await Promise.all([
+  ] = await Promise.allSettled([
     rawClient?.request('chain_getBlock', [blockHash]) as Promise<BlockDetails>,
     rawClient?.request('state_getRuntimeVersion', [blockHash]) as Promise<RuntimeVersion>,
     rawClient?.request('state_getStorage', [
@@ -217,10 +235,20 @@ export const getBlockDetailsWithRawClient = async ({
   assert(block, 'Failed to fetch block details');
   assert(runtime, 'Failed to fetch runtime version');
 
-  const blockHeader = block.block.header;
-  const blockHeaderNumber = Number(block.block.header.number);
-  const extrinsicsRaw: HexString[] = block.block.extrinsics;
-  const events = storageCodec.dec(storage) as Awaited<ReturnType<typeof getSystemEvents>>;
+  const blockValue = block.status === 'fulfilled' ? block.value : undefined;
+
+  const blockHeader = blockValue?.block.header;
+  const blockHeaderNumber = Number(blockValue?.block?.header?.number || 0);
+  const extrinsicsRaw: HexString[] = blockValue?.block.extrinsics || [];
+  const storageValue = storage.status === 'fulfilled' ? storage.value : '0x';
+
+  let events: Awaited<ReturnType<typeof getSystemEvents>> = [];
+
+  try {
+    events = storageCodec.dec(storageValue) as Awaited<ReturnType<typeof getSystemEvents>>;
+  } catch (error) {
+    console.log('Could not decode storage value');
+  }
 
   // Initialize timestamp variable
   let timestamp: number = 0;
@@ -228,42 +256,52 @@ export const getBlockDetailsWithRawClient = async ({
   const extrinsics: IMappedBlockExtrinsic[] = [];
   extrinsicsRaw?.forEach((e, i) => {
     const extrinsic = decodeExtrinsic(e);
-    const {
-      method: {
-        method,
-        section,
-        args,
-      },
-    } = extrinsic;
 
-    const isTimeStampExtrinsic = method === 'set' && section === 'timestamp';
-    if (isTimeStampExtrinsic) {
-      const _args = args as { now: string };
-      // turn the time string of type "1,451,313,413,21" into a number
-      timestamp = formatPrettyNumberString(_args?.now);
+    // EXTRINSIC DECODING CAN FAIL
+    if (extrinsic) {
+      const {
+        method: {
+          method,
+          section,
+          args,
+        },
+      } = extrinsic;
+
+      const isTimeStampExtrinsic = method === 'set' && section === 'timestamp';
+      if (isTimeStampExtrinsic) {
+        const _args = args as { now: string };
+        // turn the time string of type "1,451,313,413,21" into a number
+        timestamp = formatPrettyNumberString(_args?.now);
+      }
+
+      extrinsics.push({
+        ...extrinsic,
+        id: `${blockNumber}-${i}`,
+        blockNumber: blockNumber || 0,
+        // assume a success by default (updated later)
+        isSuccess: true,
+        // the timestamp is always the first extrinsic
+        // so we can assume the timestamp will be populated
+        // after the if statement above
+        timestamp,
+        extrinsicData: extrinsic,
+      });
     }
 
-    extrinsics.push({
-      ...extrinsic,
-      id: `${blockNumber}-${i}`,
-      blockNumber: blockNumber || 0,
-      // assume a success by default (updated later)
-      isSuccess: true,
-      // the timestamp is always the first extrinsic
-      // so we can assume the timestamp will be populated
-      // after the if statement above
-      timestamp,
-      extrinsicData: extrinsic,
-    });
   });
 
   events?.forEach((ev) => {
     if (ev.event.type === 'System') {
       const extrinsicIsSuccess = ev.event.value.type === 'ExtrinsicSuccess';
       const extrinsicIndex = ev.phase.value || 0;
-      extrinsics[extrinsicIndex].isSuccess = extrinsicIsSuccess;
+
+      if (extrinsics[extrinsicIndex]) {
+        extrinsics[extrinsicIndex].isSuccess = extrinsicIsSuccess;
+      }
     }
   });
+
+  const runtimeValue = runtime.status === 'fulfilled' ? runtime.value : undefined;
 
   return {
     header: {
@@ -272,10 +310,10 @@ export const getBlockDetailsWithRawClient = async ({
       hash: blockHash,
       timestamp,
       runtime: {
-        spec_name: runtime.specName.toString(),
-        spec_version: Number(runtime.specVersion),
+        spec_name: runtimeValue?.specName.toString(),
+        spec_version: Number(runtimeValue?.specVersion || 0),
       },
-      extrinsicRoot: block.block.header.extrinsicsRoot,
+      extrinsicRoot: blockValue?.block?.header?.extrinsicsRoot,
     },
     body: {
       extrinsics,
@@ -284,4 +322,3 @@ export const getBlockDetailsWithRawClient = async ({
     },
   };
 };
-

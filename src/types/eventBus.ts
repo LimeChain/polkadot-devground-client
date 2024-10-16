@@ -9,6 +9,11 @@ export interface IEventBusStoreSize {
   type: '@@-store-size';
 }
 
+export interface IEventBusMonacoEditorLoadSnippet {
+  type: '@@-monaco-editor-load-snippet';
+  data: number;
+}
+
 export interface IEventBusMonacoEditorShowPreview {
   type: '@@-monaco-editor-show-preview';
   data: boolean;
@@ -68,4 +73,8 @@ export interface IEventBusForksReceiveUpdate {
     canGoToEnd: boolean;
     keepScrollToEnd: boolean;
   };
+}
+
+export interface IEventBusNavLinkClick {
+  type: '@@-navlink-click';
 }

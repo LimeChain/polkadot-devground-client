@@ -71,7 +71,7 @@ export const Tabs = (props: TabsProps) => {
       <div
         className={cn(
           'relative',
-          'flex items-center gap-x-4 overflow-hidden',
+          'flex items-center gap-x-4',
           'font-body2-regular',
           tabsClassName,
         )}
@@ -95,6 +95,7 @@ export const Tabs = (props: TabsProps) => {
                 onClick={handleTabChange}
                 className={cn(
                   'group',
+                  'min-w-fit',
                   'cursor-pointer',
                   'relative flex items-center',
                   'px-0.5 py-1',

@@ -84,7 +84,7 @@ export const BlockBody = (props: BlockBodyProps) => {
   ]);
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-4 overflow-auto">
       <Tabs
         initialTab={initialTab}
         onChange={setInitialTab}
@@ -93,7 +93,6 @@ export const BlockBody = (props: BlockBodyProps) => {
         unmountOnHide={false}
       >
         <div
-          className="overflow-x-auto"
           data-title="Extrinsics"
         >
           <table className="w-full">
@@ -185,7 +184,6 @@ export const BlockBody = (props: BlockBodyProps) => {
           }
         </div>
         <div
-          className="overflow-x-auto"
           data-title="Events"
         >
           <table className="w-full">

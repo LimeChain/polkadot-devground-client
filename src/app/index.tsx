@@ -1,9 +1,10 @@
+import { getAnalytics } from 'firebase/analytics';
 import { createClient } from 'polkadot-api';
 import {
   connectInjectedExtension,
   getInjectedExtensions,
 } from 'polkadot-api/pjs-signer';
-import * as getPolkadotSigner from 'polkadot-api/signer';
+import { getPolkadotSigner } from 'polkadot-api/signer';
 import {
   useEffect,
   useRef,
@@ -20,10 +21,15 @@ import {
   useStoreUI,
   useStoreWallet,
 } from '@stores';
+import { analyticsApp } from 'firebaseConfig';
 
 import { routes } from './routes';
 
 export const App = () => {
+  // TODO: Change this when we have new domain
+  if (window.location.origin === 'https://devground.xyz') {
+    getAnalytics(analyticsApp);
+  }
   const refTimeout = useRef<NodeJS.Timeout>();
   const refRoutes = useRef(createBrowserRouter(routes()));
 
@@ -40,6 +46,7 @@ export const App = () => {
   const initStoreUI = useStoreUI.use.init?.();
   const {
     resetStore: resetStoreUI,
+    setWindowSize,
   } = useStoreUI.use.actions();
 
   const initStoreWallet = useStoreWallet.use.init?.();
@@ -52,11 +59,14 @@ export const App = () => {
     initStoreUI();
     initStoreChainClient();
     initStoreWallet();
+
     window.customPackages = {};
     Object.assign(window.customPackages, {
+      createClient,
       ...createClient,
+      papiDescriptors,
       ...papiDescriptors,
-      ...getPolkadotSigner,
+      getPolkadotSigner,
       connectInjectedExtension,
       getInjectedExtensions,
     });
@@ -68,10 +78,18 @@ export const App = () => {
     return () => {
       resetStoreAuth();
       resetStoreUI();
-      resetStoreChain();
+      void resetStoreChain();
       resetStoreWallet();
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('resize', setWindowSize);
+    return () => {
+      window.removeEventListener('resize', setWindowSize);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   Helmet,
@@ -7,7 +6,6 @@ import {
 import { Toaster } from 'react-hot-toast';
 
 import { ReactPortal } from '@components/reactPortal';
-import { ReloadPrompt } from '@components/reloadPrompt';
 import { StoreSizeViewer } from '@components/storeSizeViewer';
 
 import { App } from './app';
@@ -16,8 +14,6 @@ import './assets/fonts/fonts.css';
 import './assets/workers/monaco-worker';
 import './assets/styles/index.css';
 import './services/axiosSetup';
-
-import 'virtual:svg-icons-register';
 
 createRoot(document.getElementById('pd-root')!).render(
   <HelmetProvider>
@@ -34,7 +30,6 @@ createRoot(document.getElementById('pd-root')!).render(
           duration: 2000,
         }}
       />
-      <ReloadPrompt />
     </ReactPortal>
   </HelmetProvider>,
 );
