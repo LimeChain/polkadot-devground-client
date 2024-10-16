@@ -139,40 +139,47 @@ export const getBlockDetailsWithPAPI = async ({
   const extrinsics: IMappedBlockExtrinsic[] = [];
   extrinsicsRaw.status === 'fulfilled' && extrinsicsRaw?.value.forEach((e, i) => {
     const extrinsic = decodeExtrinsic(e);
-    const {
-      method: {
-        method,
-        section,
-        args,
-      },
-    } = extrinsic;
 
-    const isTimeStampExtrinsic = method === 'set' && section === 'timestamp';
-    if (isTimeStampExtrinsic) {
-      const _args = args as { now: string };
-      // turn the time string of type "1,451,313,413,21" into a number
-      timestamp = formatPrettyNumberString(_args?.now);
+    // EXTRINSIC DECODING CAN FAIL
+    if (extrinsic) {
+      const {
+        method: {
+          method,
+          section,
+          args,
+        },
+      } = extrinsic;
+
+      const isTimeStampExtrinsic = method === 'set' && section === 'timestamp';
+      if (isTimeStampExtrinsic) {
+        const _args = args as { now: string };
+        // turn the time string of type "1,451,313,413,21" into a number
+        timestamp = formatPrettyNumberString(_args?.now);
+      }
+
+      extrinsics.push({
+        id: `${blockNumber}-${i}`,
+        blockNumber: blockNumber || 0,
+        // assume a success by default (updated later)
+        isSuccess: true,
+        // the timestamp is always the first extrinsic
+        // so we can assume the timestamp will be populated
+        // after the if statement above
+        timestamp,
+        extrinsicData: extrinsic,
+      });
     }
 
-    extrinsics.push({
-
-      id: `${blockNumber}-${i}`,
-      blockNumber: blockNumber || 0,
-      // assume a success by default (updated later)
-      isSuccess: true,
-      // the timestamp is always the first extrinsic
-      // so we can assume the timestamp will be populated
-      // after the if statement above
-      timestamp,
-      extrinsicData: extrinsic,
-    });
   });
 
   events.status === 'fulfilled' && events.value?.forEach((ev) => {
     if (ev.event.type === 'System') {
       const extrinsicIsSuccess = ev.event.value.type === 'ExtrinsicSuccess';
       const extrinsicIndex = ev.phase.value || 0;
-      extrinsics[extrinsicIndex].isSuccess = extrinsicIsSuccess;
+
+      if (extrinsics[extrinsicIndex]) {
+        extrinsics[extrinsicIndex].isSuccess = extrinsicIsSuccess;
+      }
     }
   });
 
@@ -249,40 +256,48 @@ export const getBlockDetailsWithRawClient = async ({
   const extrinsics: IMappedBlockExtrinsic[] = [];
   extrinsicsRaw?.forEach((e, i) => {
     const extrinsic = decodeExtrinsic(e);
-    const {
-      method: {
-        method,
-        section,
-        args,
-      },
-    } = extrinsic;
 
-    const isTimeStampExtrinsic = method === 'set' && section === 'timestamp';
-    if (isTimeStampExtrinsic) {
-      const _args = args as { now: string };
-      // turn the time string of type "1,451,313,413,21" into a number
-      timestamp = formatPrettyNumberString(_args?.now);
+    // EXTRINSIC DECODING CAN FAIL
+    if (extrinsic) {
+      const {
+        method: {
+          method,
+          section,
+          args,
+        },
+      } = extrinsic;
+
+      const isTimeStampExtrinsic = method === 'set' && section === 'timestamp';
+      if (isTimeStampExtrinsic) {
+        const _args = args as { now: string };
+        // turn the time string of type "1,451,313,413,21" into a number
+        timestamp = formatPrettyNumberString(_args?.now);
+      }
+
+      extrinsics.push({
+        ...extrinsic,
+        id: `${blockNumber}-${i}`,
+        blockNumber: blockNumber || 0,
+        // assume a success by default (updated later)
+        isSuccess: true,
+        // the timestamp is always the first extrinsic
+        // so we can assume the timestamp will be populated
+        // after the if statement above
+        timestamp,
+        extrinsicData: extrinsic,
+      });
     }
 
-    extrinsics.push({
-      ...extrinsic,
-      id: `${blockNumber}-${i}`,
-      blockNumber: blockNumber || 0,
-      // assume a success by default (updated later)
-      isSuccess: true,
-      // the timestamp is always the first extrinsic
-      // so we can assume the timestamp will be populated
-      // after the if statement above
-      timestamp,
-      extrinsicData: extrinsic,
-    });
   });
 
   events?.forEach((ev) => {
     if (ev.event.type === 'System') {
       const extrinsicIsSuccess = ev.event.value.type === 'ExtrinsicSuccess';
       const extrinsicIndex = ev.phase.value || 0;
-      extrinsics[extrinsicIndex].isSuccess = extrinsicIsSuccess;
+
+      if (extrinsics[extrinsicIndex]) {
+        extrinsics[extrinsicIndex].isSuccess = extrinsicIsSuccess;
+      }
     }
   });
 
