@@ -2,12 +2,14 @@ import {
   busDispatch,
   useEventBus,
 } from '@pivanov/event-bus';
+import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import {
   useCallback,
   useRef,
   useState,
 } from 'react';
 
+import { ModalSaveExample } from '@components/modals/modalSaveExample';
 import { downloadZip } from '@utils/downloadZip';
 import { cn } from '@utils/helpers';
 import {
@@ -22,12 +24,19 @@ import { ActionButton } from '../actionButton';
 import type {
   IEventBusMonacoEditorLoadSnippet,
   IEventBusMonacoEditorUpdateCode,
+  IEventBusMonacoEditorUploadExample,
 } from '@custom-types/eventBus';
 
 export const EditorActions = () => {
   const { uploadSnippet } = useStoreGists.use.actions();
 
+  const [
+    SaveExampleModal,
+    toggleVisibility,
+  ] = useToggleVisibility(ModalSaveExample);
+
   const refCode = useRef<string>('');
+
   const [
     isRunning,
     setIsRunning,
@@ -116,6 +125,16 @@ export const EditorActions = () => {
     handleStop();
   });
 
+  useEventBus<IEventBusMonacoEditorUploadExample>('@@-monaco-editor-upload-example', ({ data }) => {
+    uploadSnippet(
+      {
+        name: data.name,
+        description: data.description,
+        code: refCode.current,
+      },
+    );
+  });
+
   return (
     <div
       className={cn(
@@ -127,12 +146,12 @@ export const EditorActions = () => {
       <div className="flex gap-2 pr-2">
         <ActionButton
           iconName="icon-share"
-          // onClick={getUserSnippets}
+          // onClick={ }
           toolTip="Share"
         />
         <ActionButton
           iconName="icon-save"
-          onClick={uploadSnippet}
+          onClick={toggleVisibility}
           toolTip="Save to GitHub"
         />
         <ActionButton
@@ -157,6 +176,7 @@ export const EditorActions = () => {
             />
           )}
       </div>
+      <SaveExampleModal onClose={toggleVisibility} />
     </div>
   );
 };

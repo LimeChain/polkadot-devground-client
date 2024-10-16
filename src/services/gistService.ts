@@ -1,11 +1,11 @@
 import axios from 'axios';
 
 import { SERVER_URL } from '@constants/auth';
-import { snippets } from '@constants/snippets';
 
 import authService from './authService';
 
-const uploadSnippet = async () => {
+const uploadSnippet = async (data) => {
+  console.log('uploadSnippet', data);
   try {
     const jwtToken = await authService.getJwtToken();
     if (!jwtToken) {
@@ -13,21 +13,15 @@ const uploadSnippet = async () => {
       return;
     }
 
-    const snippet = snippets[0].code;
     const files = {
       'snippet.tsx': {
-        content: snippet,
-      },
-      'package.json': {
-        content: 'snippet2 content',
-      },
-      'readme.txt': {
-        content: 'readme content',
+        content: data.code,
       },
     };
 
     const body = {
-      description: 'Snippet description',
+      name: data.name,
+      description: data.description,
       files,
       publicGist: true,
     };
@@ -40,6 +34,7 @@ const uploadSnippet = async () => {
 
 const getUserGists = async () => {
   const jwtToken = await authService.getJwtToken();
+
   if (!jwtToken) {
     console.log('no jwt token');
     return;

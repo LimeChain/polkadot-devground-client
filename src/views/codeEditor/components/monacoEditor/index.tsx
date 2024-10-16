@@ -15,6 +15,7 @@ import {
 import { getSingletonHighlighter } from 'shiki/index.mjs';
 
 import { snippets } from '@constants/snippets';
+import gistService from '@services/gistService';
 import { useStoreUI } from '@stores';
 import {
   cn,
@@ -112,6 +113,13 @@ const checkTheme = async (theme: string) => {
   monaco.editor.setTheme(currentTheme);
 };
 
+// Utility to handle showing/hiding preview based on code content
+const triggerPreview = (code: string) => {
+  busDispatch({
+    type: '@@-monaco-editor-show-preview',
+    data: code.includes('createRoot'),
+  });
+};
 interface IMonacoEditorProps {
   classNames?: string;
 }
@@ -226,57 +234,51 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
   const loadSnippet = useCallback(async (snippetIndex: number | string | null) => {
     clearTimeout(refTimeout.current);
 
-    busDispatch({
-      type: '@@-problems-message',
-      data: [],
-    });
+    // Reset bus states
+    busDispatch({ type: '@@-problems-message', data: [] });
+    busDispatch({ type: '@@-console-message-reset' });
+    busDispatch({ type: '@@-monaco-editor-types-progress', data: 0 });
 
-    busDispatch({
-      type: '@@-console-message-reset',
-    });
-
-    busDispatch({
-      type: '@@-monaco-editor-types-progress',
-      data: 0,
-    });
-
+    // Default code snippet
     let code = 'console.log("Hello, World!");';
 
-    if (typeof snippetIndex === 'string') {
-      code = snippetIndex;
+    // Handle null snippetIndex (default snippet)
+    if (snippetIndex === null) {
+      refSnippet.current = await formatCode(code);
+      createNewModel(refSnippet.current);
+      triggerPreview(refSnippet.current);
+      refTimeout.current = setTimeout(() => {
+        busDispatch({ type: '@@-monaco-editor-hide-loading' });
+      }, 400);
+      return;
     }
 
-    if (!!snippetIndex) {
-      const selectedCodeSnippet = snippets.find((f) => f.id === snippetIndex) || snippets[0];
-      refSnippetIndex.current = String(selectedCodeSnippet.id);
-
-      // const isTempVersionExist = await storageExists(STORAGE_CACHE_NAME, `${STORAGE_PREFIX}-${snippetIndex}`);
-      code = selectedCodeSnippet.code;
-
-      // if (isTempVersionExist) {
-      //   const existingCode = await storageGetItem<string>(STORAGE_CACHE_NAME, `${STORAGE_PREFIX}-${snippetIndex}`);
-      //   code = existingCode || code;
-      // }
-
-      setSearchParam('s', snippetIndex);
+    try {
+      // Handle object snippetIndex (i.e., gist content)
+      if (typeof snippetIndex === 'object' && snippetIndex.id) {
+        const snippetContent = await gistService.getGistContent(snippetIndex.id);
+        code = snippetContent || code;
+        setSearchParam('s', snippetIndex.id);
+      } else {
+        // Handle string or number snippetIndex
+        const selectedSnippet = snippets.find((f) => f.id === snippetIndex) || snippets[0];
+        code = selectedSnippet.code;
+        refSnippetIndex.current = String(selectedSnippet.id);
+        setSearchParam('s', snippetIndex);
+      }
+    } catch (error) {
+      console.error('Error loading snippet:', error);
     }
 
     refSnippet.current = await formatCode(code);
     createNewModel(refSnippet.current);
+    triggerPreview(refSnippet.current);
 
-    busDispatch({
-      type: '@@-monaco-editor-show-preview',
-      data: refSnippet.current.includes('createRoot'),
-    });
-
-    refTimeout.current = setTimeout(async () => {
-      busDispatch({
-        type: '@@-monaco-editor-hide-loading',
-      });
+    // Hide loading after delay
+    refTimeout.current = setTimeout(() => {
+      busDispatch({ type: '@@-monaco-editor-hide-loading' });
     }, 400);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [snippets]);
 
   const updateMonacoCursorPositon = useCallback((currentPosition: monaco.Position) => {
     if (currentPosition) {

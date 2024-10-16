@@ -11,7 +11,6 @@ import {
 } from 'react-router-dom';
 
 import { Icon } from '@components/icon';
-import { PDScrollArea } from '@components/pdScrollArea';
 import { Tabs } from '@components/tabs';
 import { snippets } from '@constants/snippets';
 import {
@@ -19,6 +18,7 @@ import {
   sleep,
 } from '@utils/helpers';
 import { CustomExamples } from '@views/codeEditor/components/customExamples';
+import { SnippetList } from '@views/codeEditor/components/selectExample/snippetList';
 
 import type { IEventBusMonacoEditorLoadSnippet } from '@custom-types/eventBus';
 
@@ -129,41 +129,10 @@ export const SelectExample = () => {
             <CustomExamples />
           </div>
           <div data-title="Default">
-            <PDScrollArea
-              verticalScrollClassNames="py-4"
-              verticalScrollThumbClassNames="before:bg-dev-purple-700 dark:before:bg-dev-purple-300"
-            >
-              <ul className="max-h-56 ">
-                {
-                  snippets.map((snippet) => (
-                    <li
-                      key={snippet.id}
-                    >
-                      <button
-                        data-snippet-index={snippet.id}
-                        onClick={handleChangeExample}
-                        className={cn(
-                          'flex w-full items-center justify-between',
-                          'px-4 py-3.5',
-                          'transition-[background] duration-300',
-                          'hover:bg-dev-black-900 hover:dark:bg-dev-purple-200',
-                          {
-                            ['bg-dev-black-800 dark:bg-dev-purple-300']: selectedSnippet === snippet.id.toString(),
-                          },
-                        )}
-                      >
-                        <p className="font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000">
-                          {snippet.name}
-                        </p>
-                        <p className="font-geist text-dev-white-1000 font-body3-regular dark:text-dev-black-300">
-                          CUSTOM
-                        </p>
-                      </button>
-                    </li>
-                  ))
-                }
-              </ul>
-            </PDScrollArea>
+            <SnippetList
+              handleChangeExample={handleChangeExample}
+              snippets={snippets}
+            />
           </div>
         </Tabs>
       </div>

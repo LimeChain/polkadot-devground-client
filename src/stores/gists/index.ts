@@ -24,9 +24,10 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
 const baseStore = create<StoreInterface>()((set) => ({
   ...initialState,
   actions: {
-    uploadSnippet: async () => {
+    uploadSnippet: async (data) => {
+      console.log('uploadSnippet', data);
       try {
-        await gistService.uploadSnippet();
+        await gistService.uploadSnippet(data);
       } catch (error) {
         console.error('Error uploading snippet', error);
         throw error;
@@ -41,17 +42,21 @@ const baseStore = create<StoreInterface>()((set) => ({
     loadSnippet: async (id: string) => {
 
       try {
-        const data = await gistService.getGistContent(id);
+        const snippetContent = await gistService.getGistContent(id);
 
         busDispatch<IEventBusMonacoEditorLoadSnippet>({
           type: '@@-monaco-editor-load-snippet',
-          data,
+          data: {
+            id,
+            code: snippetContent,
+          },
         });
       } catch (error) {
         console.error('Error loading snippet', error);
         throw error;
       }
     },
+
     resetStore: () => set({ ...initialState }),
   },
 

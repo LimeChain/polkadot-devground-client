@@ -134,7 +134,7 @@ const TypeScriptEditor = () => {
                 },
               )}
             >
-              <EditorActions />
+              <EditorActions shareCode={shareCode} />
 
               <Tabs
                 unmountOnHide={false}

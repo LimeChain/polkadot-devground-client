@@ -11,12 +11,23 @@ export interface IEventBusStoreSize {
 
 export interface IEventBusMonacoEditorLoadSnippet {
   type: '@@-monaco-editor-load-snippet';
-  data: number | string;
+  data: number | {
+    id: string;
+    code: string;
+  };
 }
 
 export interface IEventBusMonacoEditorShowPreview {
   type: '@@-monaco-editor-show-preview';
   data: boolean;
+}
+
+export interface IEventBusMonacoEditorUploadExample {
+  type: '@@-monaco-editor-upload-example';
+  data: {
+    name: string;
+    description: string;
+  };
 }
 
 export interface IEventBusMonacoEditorUpdateCode {
