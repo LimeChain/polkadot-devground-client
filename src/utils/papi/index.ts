@@ -1,13 +1,22 @@
+import { createClient as createSubstrateClient } from '@polkadot-api/substrate-client';
 import {
   type Binary,
   CompatibilityLevel,
+  createClient,
   type FixedSizeBinary,
+  type PolkadotClient,
   type SS58String,
   type TypedApi,
 } from 'polkadot-api';
-import { type Client } from 'polkadot-api/smoldot';
+import { getSmProvider } from 'polkadot-api/sm-provider';
+import { getWsProvider } from 'polkadot-api/ws-provider/web';
 
-import { CHAIN_SPECS } from '@constants/chain';
+import {
+  CHAIN_SPECS,
+  CHAIN_WEBSOCKET_URLS,
+} from '@constants/chain';
+import { baseStoreChain } from '@stores';
+import { getBlockDetailsWithPAPI } from '@utils/rpc/getBlockDetails';
 
 import {
   assert,
@@ -21,68 +30,182 @@ import type {
   TParaChainDecsriptor,
   TPeopleApi,
   TRelayChainDecsriptor,
-  TSmoldotChain,
+  TSupportedChain,
 } from '@custom-types/chain';
+import type { SmoldotChainProps } from '@custom-types/papi';
+import type { ZustandSet } from 'src/stores/sizeMiddleware';
 
-export const initSmoldotChains = async ({
+export const initSmoldotChain = async ({
   smoldot,
   chain,
+  potentialRelayChain,
+}: SmoldotChainProps) => {
+  const relayChain = potentialRelayChain
+    ? await initSmoldotChain({
+      smoldot,
+      chain: potentialRelayChain,
+    })
+    : undefined;
+  const smoldotChain = await smoldot.addChain({
+    chainSpec: await CHAIN_SPECS[chain](),
+    potentialRelayChains: relayChain ? [relayChain] : [],
+  });
+
+  return smoldotChain;
+};
+
+export const getSmoldotChainClient = async ({
+  smoldot,
+  chain,
+  potentialRelayChain,
+}: SmoldotChainProps) => {
+  return createClient(
+    getSmProvider(
+      await initSmoldotChain({
+        smoldot,
+        chain,
+        potentialRelayChain,
+      }),
+    ),
+  );
+};
+
+export const getWsChainClient = async ({
+  chain,
 }: {
-  smoldot: Client;
-  chain: TChain;
+  chain: TSupportedChain;
 }) => {
-  const isRelayChain = chain.isRelayChain;
-  // let newChain: TSmoldotChain, peopleChain: TSmoldotChain;
-  let newChain: TSmoldotChain;
+  return createClient(
+    getWsProvider(
+      CHAIN_WEBSOCKET_URLS[chain],
+    ),
+  );
+};
 
-  if (isRelayChain) {
-    newChain = await smoldot.addChain({
-      chainSpec: await CHAIN_SPECS[chain.id](),
-    })
-      .catch(console.error);
+export const subscribeToBestBlocks = ({
+  client,
+  set,
+}: {
+  client: PolkadotClient;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  set: ZustandSet<any>;
+}) => {
+  const blocksData = baseStoreChain.getState()?.blocksData;
 
-    assert(newChain, `newChain is not defined for ${chain.name}`);
+  const subscription = client.bestBlocks$.subscribe({
+    // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
+    next(bestBlocks) {
+      const bestBlock = bestBlocks.at(0);
+      const finalizedBlock = bestBlocks.at(-1);
 
-    // USED FOR SMOLDOT PEOPLE CLIENT
-    // peopleChain = await smoldot.addChain({
-    //   chainSpec: CHAIN_SPECS[chain.peopleChainId],
-    //   potentialRelayChains: [newChain],
-    // })
-    //   .catch(console.error);
+      const promises = [];
+      // get block data starting from finalized to best block
+      for (let i = bestBlocks.length - 1; i >= 0; i--) {
+        const block = bestBlocks[i];
 
-    // assert(peopleChain, `peopleChain is not defined for ${chain.name}`);
+        // skip allready fetched blocks
+        const blockHashHasBeenFetched = blocksData.get(block.number)?.hash === block.hash;
+        if (blockHashHasBeenFetched) {
+          continue;
+        }
 
-  } else {
-    const relayChain = await smoldot.addChain({
-      chainSpec: await CHAIN_SPECS[chain.relayChainId](),
-    })
-      .catch(console.error);
+        promises.push(getBlockDetailsWithPAPI({
+          blockHash: block.hash,
+          blockNumber: block.number,
+        }));
 
-    assert(relayChain, `RelayChain is not defined for ${chain.name}`);
+      }
 
-    newChain = await smoldot.addChain({
-      chainSpec: await CHAIN_SPECS[chain.id](),
-      potentialRelayChains: [relayChain],
-    })
-      .catch(console.error);
+      Promise.allSettled(promises).then((results) => {
+        results.forEach((blockData) => {
+          if (blockData.status === 'fulfilled') {
+            const blockExtrinsics = (blockData?.value.body?.extrinsics?.slice(2) ?? [])
+              .reverse()
+              .map((extrinsic) => {
+                const { id, blockNumber, extrinsicData, timestamp, isSuccess } = extrinsic;
+                const { method, signer } = extrinsicData;
+                return {
+                  id,
+                  blockNumber,
+                  timestamp,
+                  isSuccess: isSuccess || false,
+                  signer: signer?.Id ?? '',
+                  method: method.method,
+                  section: method.section,
+                };
+              });
 
-    assert(newChain, `newChain is not defined for ${chain.name}`);
+            const newBlockData = {
+              number: blockData.value.header.number,
+              hash: blockData.value.header.hash,
+              timestamp: blockData.value.header.timestamp,
+              eventsLength: blockData.value.body.events.length,
+              validator: blockData.value.header.identity?.address?.toString?.(),
+              extrinsics: blockExtrinsics,
+              identity: blockData.value.header.identity,
+            };
 
-    // USED FOR SMOLDOT PEOPLE CLIENT
-    // peopleChain = await smoldot.addChain({
-    //   chainSpec: CHAIN_SPECS[chain.peopleChainId],
-    //   potentialRelayChains: [relayChain],
-    // })
-    //   .catch(console.error);
+            if (typeof newBlockData.number == 'number') {
+              blocksData.set(newBlockData.number, newBlockData);
+            }
+          } else {
+            console.log(blockData);
+          }
+        });
+        // UPDATE STORE AFTER GETTING THE DATA
+        set({
+          bestBlock: bestBlock?.number,
+          finalizedBlock: finalizedBlock?.number,
+        });
+      })
+        // prevent state crash on random smoldot error
+        .catch((err) => {
+          console.error(err);
+        });
+    },
+    // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
+    error(err) {
+      console.log('Unexpected best blocks subscription error!', err.message);
+      subscription.unsubscribe();
+      // RETRY SUBSCRIBING TO CHAIN HEAD
+      subscribeToBestBlocks({ client, set });
+    },
+  });
+};
 
-    // assert(peopleChain, `peopleChain is not defined for ${chain.name}`);
-
+export const createSubstrateWsClient = ({
+  chain,
+  set,
+}: {
+  chain: TSupportedChain;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  set: ZustandSet<any>;
+}) => {
+  const wsUrl = CHAIN_WEBSOCKET_URLS[chain];
+  if (!wsUrl) {
+    return;
   }
 
-  return {
-    newChain,
-    // peopleChain,
-  };
+  const rawClient = createSubstrateClient(getWsProvider(wsUrl));
+  set({ rawClient });
+
+  const rawClientSubscription = rawClient.chainHead(
+    true,
+    () => {},
+    async (error) => {
+      console.log('Unexpected Raw client subscription error', error);
+      rawClientSubscription.unfollow();
+      rawClient.destroy();
+
+      // RETRY TO CONNECT
+      createSubstrateWsClient({
+        set,
+        chain,
+      });
+    },
+  );
+
+  set({ rawClientSubscription });
 };
 
 export const getMetadata = async (api: TApi) => {

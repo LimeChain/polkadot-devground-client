@@ -1,4 +1,7 @@
-import { type Chain } from 'polkadot-api/smoldot';
+import {
+  type Chain,
+  type Client,
+} from 'polkadot-api/smoldot';
 
 import type {
   dot,
@@ -18,6 +21,7 @@ import type {
   westend_collectives,
   westend_people,
 } from '.papi/descriptors/dist';
+import type { getSmoldotChainClient } from '@utils/papi';
 import type {
   PolkadotClient,
   SS58String,
@@ -43,19 +47,21 @@ export type TSupportedRelayChain =
   | 'paseo'
   | 'westend';
 export type TSupportedParaChain =
-  | 'polkadot-people'
   | 'polkadot-asset-hub'
   | 'polkadot-bridge-hub'
   | 'polkadot-collectives'
-  | 'kusama-people'
   | 'kusama-asset-hub'
   | 'kusama-bridge-hub'
-  | 'westend-people'
   | 'westend-asset-hub'
   | 'westend-bridge-hub'
   | 'westend-collectives'
   | 'paseo-asset-hub';
-export type TSupportedChain = TSupportedRelayChain | TSupportedParaChain;
+export type TSupportedPeopleChain =
+  | 'polkadot-people'
+  | 'kusama-people'
+  | 'westend-people'
+  | 'paseo-people';
+export type TSupportedChain = TSupportedRelayChain | TSupportedParaChain | TSupportedPeopleChain;
 export type TRelayChainDecsriptor =
   | typeof dot
   | typeof kusama
@@ -85,22 +91,14 @@ export type TApi = TypedApi<TRelayChainDecsriptor | TParaChainDecsriptor>;
 export type TPeopleApi = TypedApi<TPeopleChainDecsriptor>;
 export type TRelayApi = TypedApi<TRelayChainDecsriptor>;
 
-export type TChain = TRelayChain | TParaChain;
-type TRelayChain = TChainBase & {
-  isRelayChain: true;
-  peopleChainId: TSupportedParaChain;
-};
-
-type TParaChain = TChainBase & {
-  isRelayChain?: false;
-  relayChainId: TSupportedRelayChain;
-  peopleChainId: TSupportedParaChain;
-};
-
-type TChainBase = {
+export type TChain = {
   name: string;
   id: TSupportedChain;
+  peopleChainId: TSupportedPeopleChain;
+  isRelayChain?: true;
   icon: `chain-${TSupportedChain}`;
+  client: (smoldot: Client) => ReturnType<typeof getSmoldotChainClient>;
+  peopleClient: (smoldot: Client) => ReturnType<typeof getSmoldotChainClient>;
 };
 
 export interface TChainSpecs extends Awaited<ReturnType<PolkadotClient['getChainSpecData']>> {

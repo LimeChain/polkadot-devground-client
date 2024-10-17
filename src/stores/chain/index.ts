@@ -12,31 +12,26 @@ import {
   type V14,
   type V15,
 } from '@polkadot-api/substrate-bindings';
-import { createClient as createSubstrateClient } from '@polkadot-api/substrate-client';
 import { type PolkadotClient } from 'polkadot-api';
-import { createClient } from 'polkadot-api';
 // import { withLogsRecorder } from 'polkadot-api/logs-provider';
-import { getSmProvider } from 'polkadot-api/sm-provider';
 import { type Client } from 'polkadot-api/smoldot';
 import { startFromWorker } from 'polkadot-api/smoldot/from-worker';
-import { getWsProvider } from 'polkadot-api/ws-provider/web';
 import { toast } from 'react-hot-toast';
 import { create } from 'zustand';
 
 import {
   CHAIN_DESCRIPTORS,
-  CHAIN_WEBSOCKET_URLS,
   MAX_CHAIN_SET_RETRIES,
   SUPPORTED_CHAINS,
 } from '@constants/chain';
 import {
+  createSubstrateWsClient,
   getExpectedBlockTime,
   getMetadata,
-  initSmoldotChains,
+  subscribeToBestBlocks,
   subscribeToRuntime,
   subscribeToTotalIssuance,
 } from '@utils/papi';
-import { getBlockDetailsWithPAPI } from '@utils/rpc/getBlockDetails';
 
 import { createSelectors } from '../createSelectors';
 import { sizeMiddleware } from '../sizeMiddleware';
@@ -119,9 +114,9 @@ const startSmoldot = () => {
     new Worker(new URL('polkadot-api/smoldot/worker', import.meta.url), {
       type: 'module',
     }),
-    {
-      forbitWs: true,
-    },
+    // {
+    //   forbitWs: true,
+    // },
   );
 };
 
@@ -181,31 +176,17 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
         const smoldot = startSmoldot();
         set({ smoldot });
 
-        const blocksData = get()?.blocksData;
         const registry = get().registry;
 
-        const {
-          newChain,
-          // peopleChain,
-        } = await initSmoldotChains({
-          smoldot,
-          chain,
-        });
-
         // init clients and typed apis
-        const newClient = createClient(getSmProvider(newChain));
-        // CLIENT WITH LOGS
-        // const newClient = createClient(withLogsRecorder((line) => console.log(line), getSmProvider(newChain)));
-        set({ client: newClient });
-        const api = newClient.getTypedApi(CHAIN_DESCRIPTORS[chain.id]);
-        set({ api });
+        const newClient = await chain.client(smoldot);
+        const api = newClient.getTypedApi(CHAIN_DESCRIPTORS[chain.id]!);
+        set({ client: newClient, api });
 
-        const isPeopleParaChain = chain.id === chain.peopleChainId;
-        const newPeopleClient = isPeopleParaChain ? newClient : createClient(getWsProvider(CHAIN_WEBSOCKET_URLS[chain.peopleChainId]));
-        // const newPeopleClient = isPeopleParaChain ? newClient : createClient(getSmProvider(peopleChain));
-        set({ peopleClient: newPeopleClient });
+        // poeple client is needed for address identity
+        const newPeopleClient = await chain.peopleClient(smoldot);
         const peopleApi = newPeopleClient.getTypedApi(CHAIN_DESCRIPTORS[chain.peopleChainId] as TPeopleChainDecsriptor);
-        set({ peopleApi });
+        set({ peopleClient: newPeopleClient, peopleApi });
 
         // update spec_version on runtime update
         await subscribeToRuntime(api, (runtime) => set({ runtime }))
@@ -254,101 +235,17 @@ const baseStore = create<StoreInterface>()(sizeMiddleware<StoreInterface>('chain
           })
           .catch(console.error);
 
-        // subscribe to chain head
-        newClient.bestBlocks$.subscribe(async (bestBlocks) => {
-          const bestBlock = bestBlocks.at(0);
-          const finalizedBlock = bestBlocks.at(-1);
-
-          const promises = [];
-          // get block data starting from finalized to best block
-          for (let i = bestBlocks.length - 1; i >= 0; i--) {
-            const block = bestBlocks[i];
-
-            // skip allready fetched blocks
-            const blockHashHasBeenFetched = blocksData.get(block.number)?.hash === block.hash;
-            if (blockHashHasBeenFetched) {
-              continue;
-            }
-
-            promises.push(getBlockDetailsWithPAPI({
-              blockHash: block.hash,
-              blockNumber: block.number,
-            }));
-
-          }
-
-          Promise.allSettled(promises).then((results) => {
-            results.forEach((blockData) => {
-              if (blockData.status === 'fulfilled') {
-                const blockExtrinsics = (blockData?.value.body?.extrinsics?.slice(2) ?? [])
-                  .reverse()
-                  .map((extrinsic) => {
-                    const { id, blockNumber, extrinsicData, timestamp, isSuccess } = extrinsic;
-                    const { method, signer } = extrinsicData;
-                    return {
-                      id,
-                      blockNumber,
-                      timestamp,
-                      isSuccess: isSuccess || false,
-                      signer: signer?.Id ?? '',
-                      method: method.method,
-                      section: method.section,
-                    };
-                  });
-
-                const newBlockData = {
-                  number: blockData.value.header.number,
-                  hash: blockData.value.header.hash,
-                  timestamp: blockData.value.header.timestamp,
-                  eventsLength: blockData.value.body.events.length,
-                  validator: blockData.value.header.identity?.address?.toString?.(),
-                  extrinsics: blockExtrinsics,
-                  identity: blockData.value.header.identity,
-                };
-
-                if (typeof newBlockData.number == 'number') {
-                  blocksData.set(newBlockData.number, newBlockData);
-                }
-              } else {
-                console.log(blockData);
-              }
-            });
-            // UPDATE STORE AFTER GETTING THE DATA
-            set({
-              bestBlock: bestBlock?.number,
-              finalizedBlock: finalizedBlock?.number,
-            });
-          })
-            // prevent state crash on random smoldot error
-            .catch((err) => {
-              console.error(err);
-            });
+        // SUBSCRIBE TO CHAIN HEAD
+        subscribeToBestBlocks({
+          client: newClient,
+          set,
         });
 
-        const wsUrl = CHAIN_WEBSOCKET_URLS[chain.id];
-        if (wsUrl) {
-          const rawClient = createSubstrateClient(getWsProvider(wsUrl));
-
-          set({ rawClient });
-
-          const createSubscription = () => {
-            const rawClientSubscription = rawClient.chainHead(
-              true,
-              () => {},
-              (error) => {
-                console.log(error);
-                rawClientSubscription?.unfollow?.();
-                createSubscription();
-              },
-            );
-
-            set({ rawClientSubscription });
-
-          };
-
-          createSubscription();
-
-        }
+        // CREATE RAW CLIENT AND SUBSCRIPTION
+        createSubstrateWsClient({
+          chain: chain.id,
+          set,
+        });
 
         // RESET RETRIES AMOUNT ON SUCCESSFUL CHAIN SET
         retriesSoFar = 0;
