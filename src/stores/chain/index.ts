@@ -114,9 +114,9 @@ const startSmoldot = () => {
     new Worker(new URL('polkadot-api/smoldot/worker', import.meta.url), {
       type: 'module',
     }),
-    // {
-    //   forbitWs: true,
-    // },
+    {
+      forbitWs: true,
+    },
   );
 };
 
