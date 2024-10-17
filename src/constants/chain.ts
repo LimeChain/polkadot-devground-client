@@ -16,55 +16,107 @@ import {
   westend_collectives,
   westend_people,
 } from '@polkadot-api/descriptors';
+import {
+  getSmoldotChainClient,
+  getWsChainClient,
+} from '@utils/papi';
 
 import type {
   ISupportedChainGroups,
   TExternalExplorer,
   TParaChainDecsriptor,
+  TPeopleChainDecsriptor,
   TRelayChainDecsriptor,
   TSupportedChain,
   TSupportedChains,
   TSupportedParaChain,
+  TSupportedPeopleChain,
   TSupportedRelayChain,
 } from '@custom-types/chain';
+import type { Client } from 'polkadot-api/dist/reexports/smoldot';
 
 export const MAX_CHAIN_SET_RETRIES = 5;
 
-export const SUPPORTED_CHAINS: TSupportedChains = {
+export const SUPPORTED_CHAINS: Omit<TSupportedChains, 'paseo-people'> = {
   polkadot: {
     name: 'Polkadot',
     id: 'polkadot',
     icon: 'chain-polkadot',
     isRelayChain: true,
     peopleChainId: 'polkadot-people',
+    client: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'polkadot',
+    }),
+    peopleClient: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'polkadot-people',
+      potentialRelayChain: 'polkadot',
+    }),
   },
   'polkadot-people': {
     name: 'Polkadot People',
     id: 'polkadot-people',
     icon: 'chain-polkadot-people',
-    relayChainId: 'polkadot',
     peopleChainId: 'polkadot-people',
+    client: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'polkadot-people',
+      potentialRelayChain: 'polkadot',
+    }),
+    peopleClient: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'polkadot-people',
+      potentialRelayChain: 'polkadot',
+    }),
   },
   'polkadot-asset-hub': {
     name: 'Polkadot Asset Hub',
     id: 'polkadot-asset-hub',
     icon: 'chain-polkadot-asset-hub',
-    relayChainId: 'polkadot',
     peopleChainId: 'polkadot-people',
+    client: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'polkadot-asset-hub',
+      potentialRelayChain: 'polkadot',
+    }),
+    peopleClient: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'polkadot-people',
+      potentialRelayChain: 'polkadot',
+    }),
   },
   'polkadot-bridge-hub': {
     name: 'Polkadot Bridge Hub',
     id: 'polkadot-bridge-hub',
     icon: 'chain-polkadot-bridge-hub',
-    relayChainId: 'polkadot',
     peopleChainId: 'polkadot-people',
+    client: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'polkadot-bridge-hub',
+      potentialRelayChain: 'polkadot',
+    }),
+    peopleClient: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'polkadot-bridge-hub',
+      potentialRelayChain: 'polkadot',
+    }),
   },
   'polkadot-collectives': {
     name: 'Polkadot Collectives',
     id: 'polkadot-collectives',
     icon: 'chain-polkadot-collectives',
-    relayChainId: 'polkadot',
     peopleChainId: 'polkadot-people',
+    client: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'polkadot-collectives',
+      potentialRelayChain: 'polkadot',
+    }),
+    peopleClient: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'polkadot-people',
+      potentialRelayChain: 'polkadot',
+    }),
   },
   kusama: {
     name: 'Kusama',
@@ -72,27 +124,63 @@ export const SUPPORTED_CHAINS: TSupportedChains = {
     icon: 'chain-kusama',
     isRelayChain: true,
     peopleChainId: 'kusama-people',
+    client: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'kusama',
+    }),
+    peopleClient: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'kusama-people',
+      potentialRelayChain: 'kusama',
+    }),
   },
   'kusama-people': {
     name: 'Kusama People',
     id: 'kusama-people',
     icon: 'chain-kusama-people',
-    relayChainId: 'kusama',
     peopleChainId: 'kusama-people',
+    client: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'kusama-people',
+      potentialRelayChain: 'kusama',
+    }),
+    peopleClient: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'kusama-people',
+      potentialRelayChain: 'kusama',
+    }),
   },
   'kusama-asset-hub': {
     name: 'Kusama Asset Hub',
     id: 'kusama-asset-hub',
     icon: 'chain-kusama-asset-hub',
-    relayChainId: 'kusama',
     peopleChainId: 'kusama-people',
+    client: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'kusama-asset-hub',
+      potentialRelayChain: 'kusama',
+    }),
+    peopleClient: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'kusama-people',
+      potentialRelayChain: 'kusama',
+    }),
   },
   'kusama-bridge-hub': {
     name: 'Kusama Bridge Hub',
     id: 'kusama-bridge-hub',
     icon: 'chain-kusama-bridge-hub',
-    relayChainId: 'kusama',
     peopleChainId: 'kusama-people',
+    client: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'kusama-bridge-hub',
+      potentialRelayChain: 'kusama',
+    }),
+    peopleClient: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'kusama-people',
+      potentialRelayChain: 'kusama',
+    }),
   },
   westend: {
     name: 'Westend',
@@ -100,50 +188,107 @@ export const SUPPORTED_CHAINS: TSupportedChains = {
     icon: 'chain-westend',
     isRelayChain: true,
     peopleChainId: 'westend-people',
+    client: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'westend',
+    }),
+    peopleClient: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'westend-people',
+      potentialRelayChain: 'westend',
+    }),
   },
   'westend-people': {
     name: 'Westend People',
     id: 'westend-people',
     icon: 'chain-westend-people',
-    relayChainId: 'westend',
     peopleChainId: 'westend-people',
+    client: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'westend-people',
+      potentialRelayChain: 'westend',
+    }),
+    peopleClient: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'westend-people',
+      potentialRelayChain: 'westend',
+    }),
   },
   'westend-asset-hub': {
     name: 'Westend Asset Hub',
     id: 'westend-asset-hub',
     icon: 'chain-westend-asset-hub',
-    relayChainId: 'westend',
     peopleChainId: 'westend-people',
+    client: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'westend-asset-hub',
+      potentialRelayChain: 'westend',
+    }),
+    peopleClient: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'westend-people',
+      potentialRelayChain: 'westend',
+    }),
   },
   'westend-bridge-hub': {
     name: 'Westend Bridge Hub',
     id: 'westend-bridge-hub',
     icon: 'chain-westend-bridge-hub',
-    relayChainId: 'westend',
     peopleChainId: 'westend-people',
+    client: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'westend-bridge-hub',
+      potentialRelayChain: 'westend',
+    }),
+    peopleClient: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'westend-people',
+      potentialRelayChain: 'westend',
+    }),
   },
   'westend-collectives': {
     name: 'Westend Collectives',
     id: 'westend-collectives',
     icon: 'chain-polkadot-collectives',
-    relayChainId: 'westend',
     peopleChainId: 'westend-people',
+    client: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'westend-collectives',
+      potentialRelayChain: 'westend',
+    }),
+    peopleClient: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'westend-people',
+      potentialRelayChain: 'westend',
+    }),
   },
   paseo: {
     name: 'Paseo',
     id: 'paseo',
     icon: 'chain-paseo',
     isRelayChain: true,
-    // suport for paseo people?
     peopleChainId: 'polkadot-people',
+    client: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'paseo',
+    }),
+    peopleClient: async () => getWsChainClient({
+      chain: 'paseo-people',
+    }),
   },
   'paseo-asset-hub': {
     name: 'Paseo Asset Hub',
     id: 'paseo-asset-hub',
     icon: 'chain-paseo-asset-hub',
-    relayChainId: 'paseo',
-    // suport for paseo people?
     peopleChainId: 'polkadot-people',
+    client: async (smoldot: Client) => getSmoldotChainClient({
+      smoldot,
+      chain: 'paseo-asset-hub',
+      potentialRelayChain: 'paseo',
+    }),
+    peopleClient: async () => getWsChainClient({
+      chain: 'paseo-people',
+    }),
   },
 };
 
@@ -204,6 +349,7 @@ export const CHAIN_SPECS: {
   'westend-bridge-hub': async () => await import('polkadot-api/chains/westend2_bridge_hub').then((res) => res.chainSpec),
   'westend-collectives': async () => await import('polkadot-api/chains/westend2_collectives').then((res) => res.chainSpec),
   paseo: async () => await import('polkadot-api/chains/paseo').then((res) => res.chainSpec),
+  'paseo-people': async () => '',
   'paseo-asset-hub': async () => await import('polkadot-api/chains/paseo_asset_hub').then((res) => res.chainSpec),
 };
 
@@ -217,7 +363,7 @@ const RELAY_CHAIN_DESCRIPTORS: {
 };
 
 const PARA_CHAIN_DESCRIPTORS: {
-  [key in TSupportedParaChain]: TParaChainDecsriptor
+  [key in TSupportedParaChain | TSupportedPeopleChain]: TParaChainDecsriptor | TPeopleChainDecsriptor | null
 } = {
   'polkadot-people': dotpeople,
   'polkadot-asset-hub': dot_asset_hub,
@@ -231,6 +377,7 @@ const PARA_CHAIN_DESCRIPTORS: {
   'kusama-asset-hub': kusama_asset_hub,
   'kusama-bridge-hub': kusama_bridge_hub,
   'paseo-asset-hub': paseo_asset_hub,
+  'paseo-people': null,
 };
 
 export const CHAIN_DESCRIPTORS = {
@@ -254,6 +401,7 @@ export const CHAIN_WEBSOCKET_URLS: { [key in TSupportedChain]: string } = {
   'kusama-asset-hub': 'wss://kusama-asset-hub-rpc.polkadot.io',
   'kusama-bridge-hub': 'wss://kusama-bridge-hub-rpc.polkadot.io',
   'paseo': 'wss://pas-rpc.stakeworld.io',
+  'paseo-people': 'wss://people-paseo.rpc.amforc.com',
   'paseo-asset-hub': 'wss://pas-rpc.stakeworld.io/assethub',
 };
 
@@ -311,6 +459,7 @@ export const CHAIN_EXPLORERS: {
   paseo: {
     subscan: 'https://paseo.subscan.io',
   },
+  'paseo-people': {},
   'paseo-asset-hub': {
     subscan: 'https://assethub-paseo.subscan.io',
   },

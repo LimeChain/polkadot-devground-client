@@ -4,7 +4,7 @@ import { calculateObjectSize } from '@utils/internal';
 
 import type { IEventBusStoreSize } from '@custom-types/eventBus';
 
-type ZustandSet<T> = (state: Partial<T> | ((state: T) => Partial<T>)) => void;
+export type ZustandSet<T> = (state: Partial<T> | ((state: T) => Partial<T>)) => void;
 type ZustandGet<T> = () => T;
 type ZustandApi<T> = {
   setState: ZustandSet<T>;
