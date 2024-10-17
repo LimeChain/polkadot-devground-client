@@ -35,7 +35,7 @@ export const RpcParam = (props: IRpcParam) => {
           primitive={{ value: props.param.primitiveType || 'u64', type: 'primitive' }}
         />
       );
-      
+
     case 'string':
     case 'hex':
       return (

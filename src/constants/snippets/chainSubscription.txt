@@ -5,7 +5,7 @@ import {
   useState,
 } from 'react';
 import { createRoot } from 'react-dom/client';
-import { chainSpec } from 'polkadot-api/chains/westend2';
+import { chainSpec } from 'polkadot-api/chains/westend';
 import { getSmProvider } from 'polkadot-api/sm-provider';
 import { createClient, type PolkadotClient } from "polkadot-api";
 import { start } from 'polkadot-api/smoldot';
