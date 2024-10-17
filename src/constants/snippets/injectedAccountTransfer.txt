@@ -7,54 +7,62 @@ import { createRoot } from 'react-dom/client';
 import { chainSpec } from 'polkadot-api/chains/westend2';
 import { getSmProvider } from 'polkadot-api/sm-provider';
 import { start } from 'polkadot-api/smoldot';
-import { createClient, type PolkadotClient } from "polkadot-api";
+import { createClient, type PolkadotClient, type TypedApi} from "polkadot-api";
 import { MultiAddress, westend } from '@polkadot-api/descriptors';
 
 import { connectInjectedExtension, getInjectedExtensions, type PolkadotSigner } from "polkadot-api/pjs-signer"
 
 interface AppProps {
-  api: any;
+  api: TypedApi<westend>;
   client: PolkadotClient;
   signer: PolkadotSigner;
 }
 
 const App = (props: AppProps) => {
   const { api, client, signer } = props;
-  const refInput = useRef('5EFnjjDGnWfxVdFPFtbycHP9vew6JbpqGamDqcUg8qfP7tu7');
+  const refInput = useRef('');
   const [txStatus, setTxStatus] = useState({
     text: '',
     link: '',
   });
-  const [txSent, setTxSent] = useState(false);
+
+  const [txLoading, setTxLoading] = useState(false);
 
   const handleOnClick = useCallback(() => {
-    console.log('click');
-    setTxSent(true);
-    try {
-      api.tx.Balances.transfer_allow_death({
-        dest: MultiAddress.Id(refInput.current),
-        value: 100n,
-      })
-        .signSubmitAndWatch(signer)
-        .subscribe(({ txHash, type }) => {
-          console.log(`Tx Stasus: ${type} / Tx Hash: ${txHash}`);
+    setTxLoading(true);
 
-          setTxStatus({
-            text: `Tx Stasus: ${type} / Tx Hash: ${txHash.slice(0, 4)}...${txHash.slice(-4)}`,
-            link: `https://westend.subscan.io/extrinsic/${txHash}`,
-          });
-        })
-        .add(() => {
-          console.log('END');
-          setTxSent(false)
-          client.destroy();
+    api.tx.Balances.transfer_allow_death({
+      dest: MultiAddress.Id(refInput.current),
+      value: 100n,
+    })
+    .signSubmitAndWatch(signer)
+    .subscribe({
+      // HANDLE TX DATA
+      next({ txHash, type }) {
+        setTxStatus({
+          text: `Tx Stasus: ${type} / Tx Hash: ${txHash.slice(0, 4)}...${txHash.slice(-4)}`,
+          link: `https://westend.subscan.io/extrinsic/${txHash}`,
         });
-    } catch (err) {
-      console.log('click error');
-      setTxSent(false)
 
-      console.log(err);
-    }
+        console.log('tx type:' , type)
+        console.log('tx hash:' , txHash)
+      },
+      // CLEAN UP AFTER COMPLETION
+      complete() {
+        // (OPTIONAL) DESTROY CLIENT ON COMPLETION
+        // console.log('Shutting down smoldot...');
+        // client.destroy();
+
+        console.log('Tx was completed successfully!');
+        setTxLoading(false);
+      },
+      // HANDLE TX ERROR
+      error(err) {
+        setTxLoading(false);
+
+        console.log("Unexpected error", err.message);
+      }
+    })
   }, []);
 
   return (
@@ -63,14 +71,14 @@ const App = (props: AppProps) => {
         Receiver of 100n WND
         <input
           id="address"
-          placeholder={refInput.current}
+          placeholder={"Receiver Address"}
           onChange={(event) => {
             refInput.current = event.currentTarget.value;
           }}
         />
       </label>
       <button
-        disabled={txSent}
+        disabled={txLoading}
         onClick={handleOnClick}
         className="disabled:cursor-not-allowed disabled:opacity-50"
       >
@@ -92,18 +100,18 @@ const App = (props: AppProps) => {
 };
 
 (async () => {
+  // START SMOLDOT AND CREATE A CHAIN CLIENT
   const smoldot = start();
   const chain = await smoldot.addChain({ chainSpec });
   const provider = getSmProvider(chain);
   const client = createClient(provider);
+  const api = client.getTypedApi(westend);
 
-  const api = client.getTypedApi(rococo);
-
+  // GET A SIGNER FROM AN INJECTED EXTENSION
   const extensions = getInjectedExtensions() || [];
   const selectedExtension = await connectInjectedExtension(
     extensions[0]
   );
-
   const accounts = selectedExtension.getAccounts();
   const signer = accounts[0].polkadotSigner;
 
