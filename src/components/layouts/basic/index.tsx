@@ -51,6 +51,7 @@ export const LayoutBasic = (props: ILayoutBasic) => {
             'pb-8 pt-4',
             'lg:pb-16 lg:pt-8',
             'px-6 lg:px-14',
+            '[&>*:first-child]:h-full',
             classNames,
           )}
         >
