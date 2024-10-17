@@ -34,7 +34,7 @@ export const NAVIGATION_ITEMS: TNavItem[] = [
         {
           title: 'Constants',
           to: '/constants',
-          icon: 'logo-github',
+          icon: 'icon-chart',
         },
         {
           title: 'RPC Calls',
@@ -49,7 +49,17 @@ export const NAVIGATION_ITEMS: TNavItem[] = [
         {
           title: 'Extrinsics',
           to: '/extrinsics',
-          icon: 'logo-github',
+          icon: 'icon-zipFile',
+        },
+        {
+          title: 'Decoder',
+          to: '/decoder',
+          icon: 'icon-database',
+        },
+        {
+          title: 'Decoder Dynamic',
+          to: '/decoder-dynamic',
+          icon: 'icon-databaseRepeat',
         },
       ],
     },

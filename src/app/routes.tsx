@@ -19,6 +19,8 @@ const Constants = lazy(() => import('../views/constants'));
 const RuntimeCalls = lazy(() => import('../views/runtimeCalls'));
 const Onboarding = lazy(() => import('../views/onboarding'));
 const LatestBlocks = lazy(() => import('../views/latestBlocks'));
+const Decoder = lazy(() => import('../views/decode'));
+const DecoderDynamic = lazy(() => import('../views/decodeDynamic'));
 
 export const routes = () => ([
   {
@@ -63,6 +65,14 @@ export const routes = () => ([
           {
             path: 'rpc-calls',
             element: <RpcCalls />,
+          },
+          {
+            path: 'decoder',
+            element: <Decoder/>,
+          },
+          {
+            path: 'decoder-dynamic',
+            element: <DecoderDynamic/>,
           },
         ],
       },

@@ -1,5 +1,6 @@
 import {
   blockHeader,
+  metadata,
   ScaleEnum,
 } from '@polkadot-api/substrate-bindings';
 import {
@@ -32,3 +33,4 @@ export const babeDigestCodec = ScaleEnum({
 
 export const auraDigestCodec = Struct({ slotNumber: u64 });
 export const blockHeaderCodec = blockHeader;
+export const metadataCodec = metadata;
