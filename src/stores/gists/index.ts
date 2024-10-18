@@ -1,56 +1,52 @@
-import { busDispatch } from '@pivanov/event-bus';
+import toast from 'react-hot-toast';
 import { create } from 'zustand';
 
 import authService from '@services/authService';
 import gistService from '@services/gistService';
 import { createSelectors } from 'src/stores/createSelectors';
 
-import type { IEventBusMonacoEditorLoadSnippet } from '@custom-types/eventBus';
-
 interface StoreInterface {
   gists: any[];
+  isUploading: boolean;
   actions: {
     resetStore: () => void;
-    uploadSnippet: () => void;
-    getSnippets: () => void;
+    uploadCustomExample: (data) => void;
+    getCustomExamples: () => void;
   };
   init: () => Promise<void>;
 }
 
 const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   gists: [],
+  isUploading: false,
 };
 
 const baseStore = create<StoreInterface>()((set) => ({
   ...initialState,
   actions: {
-    uploadSnippet: async (data) => {
-      console.log('uploadSnippet', data);
+    uploadCustomExample: async (data) => {
       try {
-        await gistService.uploadSnippet(data);
+        set({ isUploading: true });
+        await gistService.uploadCustomExample(data);
+        toast.success('Snippet uploaded');
       } catch (error) {
         console.error('Error uploading snippet', error);
-        throw error;
+        toast.error('Error uploading snippet');
+      } finally {
+        set({ isUploading: false });
       }
     },
 
-    getSnippets: async () => {
+    getCustomExamples: async () => {
       const data = await gistService.getUserGists();
       set({ gists: data });
     },
 
-    loadSnippet: async (id: string) => {
-
+    loadCustomExampleContent: async (id: string) => {
       try {
         const snippetContent = await gistService.getGistContent(id);
 
-        busDispatch<IEventBusMonacoEditorLoadSnippet>({
-          type: '@@-monaco-editor-load-snippet',
-          data: {
-            id,
-            code: snippetContent,
-          },
-        });
+        return snippetContent?.code;
       } catch (error) {
         console.error('Error loading snippet', error);
         throw error;

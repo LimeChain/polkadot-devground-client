@@ -4,32 +4,29 @@ import { SERVER_URL } from '@constants/auth';
 
 import authService from './authService';
 
-const uploadSnippet = async (data) => {
-  console.log('uploadSnippet', data);
-  try {
-    const jwtToken = await authService.getJwtToken();
-    if (!jwtToken) {
-      console.log('no jwt token');
-      return;
-    }
-
-    const files = {
-      'snippet.tsx': {
-        content: data.code,
-      },
-    };
-
-    const body = {
-      name: data.name,
-      description: data.description,
-      files,
-      publicGist: true,
-    };
-    await axios.post(`${SERVER_URL}/gists`, body);
-  } catch (error) {
-    console.log('error', error);
+const uploadCustomExample = async (data) => {
+  const jwtToken = await authService.getJwtToken();
+  if (!jwtToken) {
+    console.log('no jwt token');
+    return;
   }
 
+  const files = {
+    'snippet.tsx': {
+      content: data.code,
+    },
+    'description.txt': {
+      content: data.description,
+    },
+  };
+
+  const body = {
+    name: data.exampleName,
+    files,
+    publicGist: true,
+  };
+
+  await axios.post(`${SERVER_URL}/gists`, body);
 };
 
 const getUserGists = async () => {
@@ -58,15 +55,17 @@ const getGistContent = async (id: string) => {
   try {
     const { data } = await axios.get(`${SERVER_URL}/gists/${id}`, { withCredentials: true });
 
-    // Return the content of the snippet.tsx file from the gist
-    return data['snippet.tsx'].content;
+    return {
+      code: data['snippet.tsx'].content,
+      description: data['description.txt'].content,
+    };
   } catch (error) {
     console.log('error', error);
   }
 };
 
 export default {
-  uploadSnippet,
+  uploadCustomExample,
   getUserGists,
   getGistContent,
 };

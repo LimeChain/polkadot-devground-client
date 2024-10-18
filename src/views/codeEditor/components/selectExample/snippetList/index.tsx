@@ -2,8 +2,7 @@ import { PDScrollArea } from '@components/pdScrollArea';
 import { cn } from '@utils/helpers';
 
 export const SnippetList = (props) => {
-
-  const { snippets, handleChangeExample } = props;
+  const { snippets, type, handleChangeExample } = props;
 
   return (
     <PDScrollArea
@@ -12,12 +11,13 @@ export const SnippetList = (props) => {
     >
       <ul className="max-h-56 ">
         {
-          snippets.map((snippet) => (
+          snippets?.map((snippet) => (
             <li
               key={snippet.id}
             >
               <button
-                data-snippet-index={snippet.id}
+                data-example-index={snippet.id}
+                data-example-type={type}
                 onClick={handleChangeExample}
                 className={cn(
                   'flex w-full items-center justify-between',

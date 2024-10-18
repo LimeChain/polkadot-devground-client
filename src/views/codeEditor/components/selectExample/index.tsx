@@ -17,13 +17,15 @@ import {
   cn,
   sleep,
 } from '@utils/helpers';
-import { CustomExamples } from '@views/codeEditor/components/customExamples';
 import { SnippetList } from '@views/codeEditor/components/selectExample/snippetList';
+import { useStoreGists } from 'src/stores/gists';
 
 import type { IEventBusMonacoEditorLoadSnippet } from '@custom-types/eventBus';
 
 export const SelectExample = () => {
   const navigate = useNavigate();
+  const gists = useStoreGists.use.gists();
+  const { getCustomExamples, loadCustomExampleContent } = useStoreGists.use.actions();
 
   const [
     isOpened,
@@ -41,8 +43,14 @@ export const SelectExample = () => {
   }, []);
 
   const handleChangeExample = useCallback(async (e: React.MouseEvent<HTMLButtonElement>) => {
-    const snippetIndex = Number(e.currentTarget.getAttribute('data-snippet-index'));
-    navigate(`/code?s=${snippetIndex}`);
+    const id = e.currentTarget.getAttribute('data-example-index');
+    const type = e.currentTarget.getAttribute('data-example-type');
+
+    if (type === 'default') {
+      navigate(`/code?d=${id}`);
+    } else {
+      navigate(`/code?c=${id}`);
+    }
     setIsOpened(false);
 
     busDispatch({
@@ -53,7 +61,7 @@ export const SelectExample = () => {
 
     busDispatch<IEventBusMonacoEditorLoadSnippet>({
       type: '@@-monaco-editor-load-snippet',
-      data: snippetIndex,
+      data: id,
     });
 
     busDispatch({
@@ -74,6 +82,10 @@ export const SelectExample = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    getCustomExamples();
+  }, [getCustomExamples]);
 
   return (
     <div
@@ -125,13 +137,18 @@ export const SelectExample = () => {
           )}
 
         >
-          <div data-title="Custom">
-            <CustomExamples />
-          </div>
           <div data-title="Default">
             <SnippetList
               handleChangeExample={handleChangeExample}
               snippets={snippets}
+              type="default"
+            />
+          </div>
+          <div data-title="Custom">
+            <SnippetList
+              handleChangeExample={handleChangeExample}
+              snippets={gists}
+              type="custom"
             />
           </div>
         </Tabs>
