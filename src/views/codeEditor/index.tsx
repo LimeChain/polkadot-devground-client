@@ -1,10 +1,8 @@
 import { useEventBus } from '@pivanov/event-bus';
 import {
-  useCallback,
   useRef,
   useState,
 } from 'react';
-import { toast } from 'react-hot-toast';
 import {
   Panel,
   PanelGroup,
@@ -18,7 +16,6 @@ import { Tabs } from '@components/tabs';
 import { useStoreUI } from '@stores';
 import { cn } from '@utils/helpers';
 import { useResizeObserver } from '@utils/hooks/useResizeObserver';
-import { encodeCodeToBase64 } from '@utils/iframe';
 import { SelectExample } from '@views/codeEditor/components/selectExample';
 
 import { ActionButton } from './components/actionButton';
@@ -28,6 +25,7 @@ import { MonacoEditor } from './components/monacoEditor';
 import { EditorActions } from './components/monacoEditor/actions';
 
 import type {
+  IEventBusMonacoEditorLoadSnippet,
   IEventBusMonacoEditorShowPreview,
   IEventBusMonacoEditorUpdateCode,
 } from '@custom-types/eventBus';
@@ -40,6 +38,11 @@ const TypeScriptEditor = () => {
 
   const [refContainerDimensions] = useResizeObserver(refContainer);
   const containerWidth = refContainerDimensions?.width;
+
+  const [
+    exampleDescription,
+    setExampleDescription,
+  ] = useState<string>('');
 
   const [
     isLoaded,
@@ -70,28 +73,9 @@ const TypeScriptEditor = () => {
     refCode.current = data;
   });
 
-  const shareCode = useCallback(async () => {
-    const toastId = 'copy-to-clipboard';
-    toast.dismiss(toastId);
-
-    const encodedCode = encodeCodeToBase64(refCode.current);
-    const sharedUrl = `${window.location.origin}${window.location.pathname}/${encodedCode}`;
-
-    try {
-      await navigator.clipboard.writeText(sharedUrl);
-      toast.success((
-        <span>
-          Copied
-          {' '}
-          <strong>URL</strong>
-          {' '}
-          to clipboard
-        </span>
-      ), { id: toastId });
-    } catch (err) {
-      toast.error('Oops. Something went wrong', { id: toastId });
-    }
-  }, []);
+  useEventBus<IEventBusMonacoEditorLoadSnippet>('@@-monaco-editor-load-snippet', ({ data }) => {
+    setExampleDescription(data.description);
+  });
 
   if (!isDesktop) {
     return <MobileNotAllowed />;
@@ -134,7 +118,7 @@ const TypeScriptEditor = () => {
                 },
               )}
             >
-              <EditorActions shareCode={shareCode} />
+              <EditorActions />
 
               <Tabs
                 unmountOnHide={false}
@@ -156,7 +140,7 @@ const TypeScriptEditor = () => {
                   className="flex h-full p-4 dark:bg-dev-black-800"
                   data-title="Read me"
                 >
-                  Readme.md
+                  {exampleDescription}
                 </div>
               </Tabs>
             </div>
@@ -197,7 +181,6 @@ const TypeScriptEditor = () => {
                       />
                       <ActionButton
                         iconName="icon-clipboard"
-                        onClick={shareCode}
                         toolTip="Share"
                       />
                     </div>

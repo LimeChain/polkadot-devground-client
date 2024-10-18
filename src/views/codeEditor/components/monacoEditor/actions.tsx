@@ -17,19 +17,15 @@ import {
   mergeImportMap,
 } from '@utils/iframe';
 import { defaultImportMap } from '@views/codeEditor/constants';
-import { useStoreGists } from 'src/stores/gists';
 
 import { ActionButton } from '../actionButton';
 
 import type {
   IEventBusMonacoEditorLoadSnippet,
   IEventBusMonacoEditorUpdateCode,
-  IEventBusMonacoEditorUploadExample,
 } from '@custom-types/eventBus';
 
 export const EditorActions = () => {
-  const { uploadSnippet } = useStoreGists.use.actions();
-
   const [
     SaveExampleModal,
     toggleVisibility,
@@ -124,16 +120,6 @@ export const EditorActions = () => {
     handleStop();
   });
 
-  useEventBus<IEventBusMonacoEditorUploadExample>('@@-monaco-editor-upload-example', ({ data }) => {
-    uploadSnippet(
-      {
-        name: data.name,
-        description: data.description,
-        code: refCode.current,
-      },
-    );
-  });
-
   return (
     <div
       className={cn(
@@ -145,7 +131,6 @@ export const EditorActions = () => {
       <div className="flex gap-2 pr-2">
         <ActionButton
           iconName="icon-share"
-          // onClick={ }
           toolTip="Share"
         />
         <ActionButton
@@ -175,7 +160,10 @@ export const EditorActions = () => {
             />
           )}
       </div>
-      <SaveExampleModal onClose={toggleVisibility} />
+      <SaveExampleModal
+        code={refCode.current}
+        onClose={toggleVisibility}
+      />
     </div>
   );
 };
