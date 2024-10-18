@@ -22,7 +22,7 @@ import {
   useStoreWallet,
 } from '@stores';
 import { analyticsApp } from 'firebaseConfig';
-import { useStoreGists } from 'src/stores/gists';
+import { useStoreCustomExamples } from 'src/stores/customExamples';
 
 import { routes } from './routes';
 
@@ -55,8 +55,8 @@ export const App = () => {
     resetStore: resetStoreWallet,
   } = useStoreWallet.use.actions();
 
-  const initStoreGists = useStoreGists.use.init?.();
-  const { resetStore: resetStoreGists } = useStoreGists.use.actions();
+  const initStoreCustomExamples = useStoreCustomExamples.use.init?.();
+  const { resetStore: resetStoreGists } = useStoreCustomExamples.use.actions();
 
   useEffect(() => {
     const initializeStores = async () => {
@@ -64,7 +64,7 @@ export const App = () => {
       initStoreUI();
       initStoreChainClient();
       initStoreWallet();
-      await initStoreGists();
+      await initStoreCustomExamples();
 
       window.customPackages = {};
       Object.assign(window.customPackages, {

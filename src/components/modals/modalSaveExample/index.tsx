@@ -5,7 +5,7 @@ import {
 } from 'react';
 
 import { cn } from '@utils/helpers';
-import { useStoreGists } from 'src/stores/gists';
+import { useStoreCustomExamples } from 'src/stores/customExamples';
 
 import {
   type IModal,
@@ -20,8 +20,8 @@ interface IModalGithubLogin extends Pick<IModal, 'onClose'> {
 
 export const ModalSaveExample = (props: IModalGithubLogin) => {
   const { onClose, code } = props;
-  const { uploadCustomExample } = useStoreGists.use.actions();
-  const isUploading = useStoreGists.use.isUploading();
+  const { uploadCustomExample } = useStoreCustomExamples.use.actions();
+  const isUploading = useStoreCustomExamples.use.isUploading();
 
   const [
     exampleName,

@@ -1,8 +1,16 @@
 import { PDScrollArea } from '@components/pdScrollArea';
 import { cn } from '@utils/helpers';
 
-export const SnippetList = (props) => {
-  const { snippets, type, handleChangeExample } = props;
+import type { ICodeExample } from 'src/types/codeSnippet';
+interface ExamplesListProps {
+  examples: ICodeExample[];
+  selectedExample: string;
+  type: string;
+  handleChangeExample: (e: React.MouseEvent<HTMLButtonElement>) => void;
+}
+
+export const ExamplesList = (props: ExamplesListProps) => {
+  const { examples, selectedExample, type, handleChangeExample } = props;
 
   return (
     <PDScrollArea
@@ -11,12 +19,12 @@ export const SnippetList = (props) => {
     >
       <ul className="max-h-56 ">
         {
-          snippets?.map((snippet) => (
+          examples?.map((example) => (
             <li
-              key={snippet.id}
+              key={example.id}
             >
               <button
-                data-example-index={snippet.id}
+                data-example-index={example.id}
                 data-example-type={type}
                 onClick={handleChangeExample}
                 className={cn(
@@ -24,13 +32,13 @@ export const SnippetList = (props) => {
                   'px-4 py-3.5',
                   'transition-[background] duration-300',
                   'hover:bg-dev-black-900 hover:dark:bg-dev-purple-200',
-                  // {
-                  //   ['bg-dev-black-800 dark:bg-dev-purple-300']: selectedSnippet === snippet.id.toString(),
-                  // },
+                  {
+                    ['bg-dev-black-800 dark:bg-dev-purple-300']: selectedExample === example.name,
+                  },
                 )}
               >
                 <p className="font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000">
-                  {snippet.name}
+                  {example.name}
                 </p>
                 <p className="font-geist text-dev-white-1000 font-body3-regular dark:text-dev-black-300">
                   CUSTOM

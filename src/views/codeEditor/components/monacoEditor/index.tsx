@@ -32,7 +32,7 @@ import {
 } from '@views/codeEditor/helpers';
 import { monacoEditorConfig } from '@views/codeEditor/monaco-editor-config';
 import { Progress } from '@views/codeEditor/progress';
-import { useStoreGists } from 'src/stores/gists';
+import { useStoreCustomExamples } from 'src/stores/customExamples';
 
 import type {
   IEventBusIframeDestroy,
@@ -140,7 +140,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
   ] = useState(false);
 
   const theme = useStoreUI.use.theme?.();
-  const { loadCustomExampleContent } = useStoreGists.use.actions();
+  const { loadCustomExampleContent } = useStoreCustomExamples.use.actions();
 
   const triggerValidation = useCallback(async () => {
     if (refModel.current) {
@@ -237,6 +237,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
     const isDefault = !!getSearchParam('d');
     const isCustom = !!getSearchParam('c');
 
+    console.log('Loading example:', exampleId);
     // Reset bus states
     busDispatch({ type: '@@-problems-message', data: [] });
     busDispatch({ type: '@@-console-message-reset' });
@@ -261,7 +262,6 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
       setSearchParam('c', exampleId);
     }
 
-    console.log('Loading example:', exampleId);
     refSnippetIndex.current = String(exampleId);
     refSnippet.current = await formatCode(code);
     createNewModel(refSnippet.current);
@@ -289,6 +289,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
 
     // Load examples if either defaultId or customId is present
     if (defaultId) {
+      console.log(defaultId);
       void loadExample(defaultId);
     } else if (customId) {
       void loadExample(customId);

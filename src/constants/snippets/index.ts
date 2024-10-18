@@ -5,26 +5,26 @@ import ChainSubscriptionSnippet from './chainSubscription.txt?raw';
 import GetChainSpecificDataSnippet from './getChainSpecificData.txt?raw';
 /* eslint-enable */
 
-import type { ICodeSnippet } from '@custom-types/codeSnippet';
-const snippet1: ICodeSnippet = {
+import type { ICodeExample } from '@custom-types/codeSnippet';
+const snippet1: ICodeExample = {
   id: 1,
   name: 'Balance transfer from a test account',
   code: TestAccountTransferSnippet,
 };
 
-const snippet2: ICodeSnippet = {
+const snippet2: ICodeExample = {
   id: 2,
   name: 'Balance transfer from an injected account',
   code: InjectedAccountTransferSnippet,
 };
 
-const snippet3: ICodeSnippet = {
+const snippet3: ICodeExample = {
   id: 3,
   name: 'Subscribe to chain data',
   code: ChainSubscriptionSnippet,
 };
 
-const snippet4: ICodeSnippet = {
+const snippet4: ICodeExample = {
   id: 4,
   name: 'Get chain specific data',
   code: GetChainSpecificDataSnippet,

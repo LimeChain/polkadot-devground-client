@@ -11,12 +11,7 @@ export interface IEventBusStoreSize {
 
 export interface IEventBusMonacoEditorLoadSnippet {
   type: '@@-monaco-editor-load-snippet';
-  data: {
-    id: string;
-    code: string;
-    type: string;
-    description: string;
-  } | number;
+  data: string;
 }
 
 export interface IEventBusMonacoEditorShowPreview {
@@ -26,7 +21,7 @@ export interface IEventBusMonacoEditorShowPreview {
 
 export interface IEventBusMonacoEditorUpdateCode {
   type: '@@-monaco-editor-update-code';
-  data: string;
+  data: string | null;
 }
 
 export interface IEventBusMonacoEditorUpdateCursorPosition {

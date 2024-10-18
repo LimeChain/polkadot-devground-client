@@ -5,19 +5,22 @@ import authService from '@services/authService';
 import gistService from '@services/gistService';
 import { createSelectors } from 'src/stores/createSelectors';
 
+import type { ICodeExample } from '@custom-types/codeSnippet';
+
 interface StoreInterface {
-  gists: any[];
+  examples: ICodeExample[];
   isUploading: boolean;
   actions: {
     resetStore: () => void;
     uploadCustomExample: (data) => void;
+    loadCustomExampleContent: (id: string) => Promise<string>;
     getCustomExamples: () => void;
   };
   init: () => Promise<void>;
 }
 
 const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
-  gists: [],
+  examples: [],
   isUploading: false,
 };
 
@@ -39,7 +42,7 @@ const baseStore = create<StoreInterface>()((set) => ({
 
     getCustomExamples: async () => {
       const data = await gistService.getUserGists();
-      set({ gists: data });
+      set({ examples: data });
     },
 
     loadCustomExampleContent: async (id: string) => {
@@ -66,6 +69,6 @@ const baseStore = create<StoreInterface>()((set) => ({
   },
 }));
 
-export const baseStoreGists = baseStore;
-export const useStoreGists = createSelectors(baseStore);
+export const baseStoreCustomExamples = baseStore;
+export const useStoreCustomExamples = createSelectors(baseStore);
 
