@@ -1,37 +1,65 @@
-import { busDispatch } from '@pivanov/event-bus';
-import { useRef } from 'react';
+import { useEventBus } from '@pivanov/event-bus';
+import {
+  useCallback,
+  useState,
+} from 'react';
 
 import { cn } from '@utils/helpers';
+import { useStoreGists } from 'src/stores/gists';
 
 import {
   type IModal,
   Modal,
 } from '../modal';
 
-import type { IEventBusMonacoEditorUploadExample } from '@custom-types/eventBus';
+import type { IUploadExampleModalClose } from '@custom-types/eventBus';
 
-interface IModalGithubLogin extends Pick<IModal, 'onClose'> { }
+interface IModalGithubLogin extends Pick<IModal, 'onClose'> {
+  code: string;
+}
 
-export const ModalSaveExample = ({ onClose }: IModalGithubLogin) => {
-  const exampleNameRef = useRef<HTMLInputElement>(null);
-  const descriptionRef = useRef<HTMLTextAreaElement>(null);
+export const ModalSaveExample = (props: IModalGithubLogin) => {
+  const { onClose, code } = props;
+  const { uploadCustomExample } = useStoreGists.use.actions();
+  const isUploading = useStoreGists.use.isUploading();
 
-  const handleSubmit = async () => {
-    const exampleName = exampleNameRef.current?.value;
-    const description = descriptionRef.current?.value;
+  const [
+    exampleName,
+    setExampleName,
+  ] = useState('');
+  const [
+    description,
+    setDescription,
+  ] = useState('');
 
+  const handleSubmit = useCallback(async () => {
     if (!exampleName || !description) {
       return;
     }
 
-    busDispatch<IEventBusMonacoEditorUploadExample>({
-      type: '@@-monaco-editor-upload-example',
-      data: {
-        name: exampleName,
-        description,
-      },
+    uploadCustomExample({
+      code,
+      description,
+      exampleName,
     });
-  };
+  }, [
+    code,
+    description,
+    exampleName,
+    uploadCustomExample,
+  ]);
+
+  const handleExampleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setExampleName(e.target.value);
+  }, []);
+
+  const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setDescription(e.target.value);
+  }, []);
+
+  useEventBus<IUploadExampleModalClose>('@@-close-upload-example-modal', () => {
+    onClose();
+  });
 
   return (
     <Modal
@@ -43,11 +71,12 @@ export const ModalSaveExample = ({ onClose }: IModalGithubLogin) => {
         'dark:border-dev-purple-700',
       )}
     >
-      <h5 className="self-start font-h5-bold">Save Example</h5>
+      <h5 className="self-start font-h5-bold">Upload Example</h5>
       <div className="flex flex-col">
         <input
-          ref={exampleNameRef}
+          onChange={handleExampleNameChange}
           placeholder="Enter Example Name"
+          value={exampleName}
           className={cn(
             'mb-6 p-4',
             'border border-dev-white-900',
@@ -56,8 +85,9 @@ export const ModalSaveExample = ({ onClose }: IModalGithubLogin) => {
           )}
         />
         <textarea
-          ref={descriptionRef}
+          onChange={handleDescriptionChange}
           placeholder="Enter Description"
+          value={description}
           className={cn(
             'mb-6 p-4',
             'border border-dev-white-900',
@@ -66,16 +96,17 @@ export const ModalSaveExample = ({ onClose }: IModalGithubLogin) => {
           )}
         />
         <button
-          // disabled={!exampleNameRef.current?.value || !descriptionRef.current?.value}
+          disabled={!exampleName || !description}
           onClick={handleSubmit}
           className={cn(
             'mb-2 mt-6 p-4 transition-colors',
             'font-geist text-white font-body2-bold',
             'bg-dev-pink-500',
             'hover:bg-dev-pink-400',
+            { 'opacity-50 cursor-not-allowed': !exampleName || !description },
           )}
         >
-          Submit
+          {isUploading ? 'Submitting' : 'Submit'}
         </button>
         <button
           onClick={onClose}
