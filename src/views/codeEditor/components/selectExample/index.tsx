@@ -124,11 +124,6 @@ export const SelectExample = () => {
           )}
 
         >
-          <div data-title="Custom">
-            <li className="font-geist text-dev-white-1000 font-body1-regular dark:text-dev-black-300">
-              No examples found
-            </li>
-          </div>
           <div data-title="Default">
             <PDScrollArea
               verticalScrollClassNames="py-4"
@@ -165,6 +160,11 @@ export const SelectExample = () => {
                 }
               </ul>
             </PDScrollArea>
+          </div>
+          <div data-title="Custom">
+            <li className="font-geist text-dev-white-1000 font-body1-regular dark:text-dev-black-300">
+              No examples found
+            </li>
           </div>
         </Tabs>
       </div>
