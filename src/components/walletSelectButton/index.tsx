@@ -70,13 +70,13 @@ const WalletSelectButton = () => {
               onClick={toggleVisibility}
               type="button"
               className={cn(
-                'min-h-10 items-center px-6 py-1 transition-colors',
+                'min-h-10 items-center px-6 py-2.5 transition-colors',
                 'font-geist text-white font-h5-regular',
                 'bg-dev-pink-500 ',
                 'hover:bg-dev-pink-400',
               )}
             >
-              <h5 className="ml-1 mr-3 font-body2-bold">
+              <h5 className="font-body2-bold">
                 Connect wallet
               </h5>
             </button>
