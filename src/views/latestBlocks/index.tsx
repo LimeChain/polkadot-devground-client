@@ -77,7 +77,8 @@ const LatestBlocks = () => {
       {
         header: 'Validator',
         cell: ({ row }) => {
-          return truncateAddress(row.original.identity!.address.toString() || '', 6);
+          // IF THE BLOCK IS NOT PINNED (ITS A WRONG FORK) THE IDENTITY WOULD BE "UNDEFINED"
+          return truncateAddress(row.original.identity?.address?.toString?.() || '', 6);
         },
       },
       {
