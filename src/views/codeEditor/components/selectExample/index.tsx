@@ -17,26 +17,28 @@ import {
   cn,
   sleep,
 } from '@utils/helpers';
-import { SnippetList } from '@views/codeEditor/components/selectExample/snippetList';
-import { useStoreGists } from 'src/stores/gists';
+import { ExamplesList } from '@views/codeEditor/components/selectExample/snippetList';
+import { useStoreCustomExamples } from 'src/stores/customExamples';
 
 import type { IEventBusMonacoEditorLoadSnippet } from '@custom-types/eventBus';
 
 export const SelectExample = () => {
-  const navigate = useNavigate();
-  const gists = useStoreGists.use.gists();
-  const { getCustomExamples, loadCustomExampleContent } = useStoreGists.use.actions();
+  const refContainer = useRef<HTMLDivElement>(null);
 
   const [
     isOpened,
     setIsOpened,
   ] = useState(false);
 
-  const [searchParams] = useSearchParams();
-  const selectedSnippet = searchParams.get('s');
-  const selectedSnippetName = snippets.find((snippet) => snippet.id === Number(selectedSnippet))?.name;
+  const [
+    selectedSnippet,
+    setSelectedSnippet,
+  ] = useState<string>('');
 
-  const refContainer = useRef<HTMLDivElement>(null);
+  const customExamples = useStoreCustomExamples.use.examples();
+  const { getCustomExamples } = useStoreCustomExamples.use.actions();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const handleSetOpen = useCallback(() => {
     setIsOpened((prev) => !prev);
@@ -84,8 +86,30 @@ export const SelectExample = () => {
   }, []);
 
   useEffect(() => {
+    const defaultExampleParam = searchParams.get('d');
+    const customExampleParam = searchParams.get('c');
+
+    if (defaultExampleParam) {
+      const example = snippets.find((snippet) => snippet.id === Number(defaultExampleParam));
+      if (example) {
+        setSelectedSnippet(example.name);
+      }
+    } else if (customExampleParam) {
+      const exampleName = customExamples.find((example) => example.id === customExampleParam)?.name;
+      if (exampleName) {
+        setSelectedSnippet(exampleName);
+      }
+    }
+  }, [
+    customExamples,
+    searchParams,
+  ]);
+
+  useEffect(() => {
     getCustomExamples();
-  }, [getCustomExamples]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div
@@ -107,7 +131,7 @@ export const SelectExample = () => {
           },
         )}
       >
-        {selectedSnippetName || 'Select Example'}
+        {selectedSnippet || 'Select Example'}
         <Icon
           name="icon-dropdownArrow"
           className={cn(
@@ -138,16 +162,18 @@ export const SelectExample = () => {
 
         >
           <div data-title="Default">
-            <SnippetList
+            <ExamplesList
+              examples={snippets}
               handleChangeExample={handleChangeExample}
-              snippets={snippets}
+              selectedExample={selectedSnippet}
               type="default"
             />
           </div>
           <div data-title="Custom">
-            <SnippetList
+            <ExamplesList
+              examples={customExamples}
               handleChangeExample={handleChangeExample}
-              snippets={gists}
+              selectedExample={selectedSnippet}
               type="custom"
             />
           </div>
