@@ -1,3 +1,4 @@
+import { busDispatch } from '@pivanov/event-bus';
 import toast from 'react-hot-toast';
 import { create } from 'zustand';
 
@@ -6,6 +7,7 @@ import gistService from '@services/gistService';
 import { createSelectors } from 'src/stores/createSelectors';
 
 import type { ICodeExample } from '@custom-types/codeSnippet';
+import type { IUploadExampleModalClose } from '@custom-types/eventBus';
 
 interface StoreInterface {
   examples: ICodeExample[];
@@ -30,7 +32,9 @@ const baseStore = create<StoreInterface>()((set) => ({
     uploadCustomExample: async (data) => {
       try {
         set({ isUploading: true });
-        await gistService.uploadCustomExample(data);
+        const newExamples = await gistService.uploadCustomExample(data);
+        set({ examples: newExamples?.data });
+        busDispatch<IUploadExampleModalClose>('@@-close-upload-example-modal');
         toast.success('Snippet uploaded');
       } catch (error) {
         console.error('Error uploading snippet', error);

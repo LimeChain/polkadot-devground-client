@@ -24,25 +24,15 @@ import { Iframe } from './components/iframe';
 import { MonacoEditor } from './components/monacoEditor';
 import { EditorActions } from './components/monacoEditor/actions';
 
-import type {
-  IEventBusMonacoEditorLoadSnippet,
-  IEventBusMonacoEditorShowPreview,
-  IEventBusMonacoEditorUpdateCode,
-} from '@custom-types/eventBus';
+import type { IEventBusMonacoEditorShowPreview } from '@custom-types/eventBus';
 
 const TypeScriptEditor = () => {
   const refContainer = useRef<HTMLDivElement>(null);
-  const refCode = useRef<string>('');
   const refTimeout = useRef<NodeJS.Timeout>();
   const refCanPreview = useRef(false);
 
   const [refContainerDimensions] = useResizeObserver(refContainer);
   const containerWidth = refContainerDimensions?.width;
-
-  const [
-    exampleDescription,
-    setExampleDescription,
-  ] = useState<string>('');
 
   const [
     isLoaded,
@@ -67,14 +57,6 @@ const TypeScriptEditor = () => {
   useEventBus('@@-monaco-editor-show-loading', () => {
     clearTimeout(refTimeout.current);
     setIsLoaded(false);
-  });
-
-  useEventBus<IEventBusMonacoEditorUpdateCode>('@@-monaco-editor-update-code', ({ data }) => {
-    refCode.current = data;
-  });
-
-  useEventBus<IEventBusMonacoEditorLoadSnippet>('@@-monaco-editor-load-snippet', ({ data }) => {
-    setExampleDescription(data.description);
   });
 
   if (!isDesktop) {
@@ -140,7 +122,7 @@ const TypeScriptEditor = () => {
                   className="flex h-full p-4 dark:bg-dev-black-800"
                   data-title="Read me"
                 >
-                  {exampleDescription}
+                  {/* {codeDescription} */}
                 </div>
               </Tabs>
             </div>

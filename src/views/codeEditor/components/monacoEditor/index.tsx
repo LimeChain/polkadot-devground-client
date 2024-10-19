@@ -237,7 +237,6 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
     const isDefault = !!getSearchParam('d');
     const isCustom = !!getSearchParam('c');
 
-    console.log('Loading example:', exampleId);
     // Reset bus states
     busDispatch({ type: '@@-problems-message', data: [] });
     busDispatch({ type: '@@-console-message-reset' });
@@ -292,6 +291,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
       console.log(defaultId);
       void loadExample(defaultId);
     } else if (customId) {
+
       void loadExample(customId);
     } else {
       void loadExample('1');
