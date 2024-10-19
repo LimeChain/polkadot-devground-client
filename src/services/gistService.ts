@@ -26,7 +26,8 @@ const uploadCustomExample = async (data) => {
     publicGist: true,
   };
 
-  await axios.post(`${SERVER_URL}/gists`, body);
+  const examples = await axios.post(`${SERVER_URL}/gists`, body);
+  return examples;
 };
 
 const getUserGists = async () => {
