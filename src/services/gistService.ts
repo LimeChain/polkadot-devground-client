@@ -65,8 +65,21 @@ const getGistContent = async (id: string) => {
   }
 };
 
+const deleteExample = async (id: string) => {
+  const jwtToken = await authService.getJwtToken();
+  if (!jwtToken) {
+    console.log('no jwt token');
+    return;
+  }
+
+  const { data } = await axios.delete(`${SERVER_URL}/gists/${id}`, { withCredentials: true });
+  console.log('data', data);
+  return data;
+};
+
 export default {
   uploadCustomExample,
   getUserGists,
   getGistContent,
+  deleteExample,
 };

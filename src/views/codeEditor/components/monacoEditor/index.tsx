@@ -14,7 +14,6 @@ import {
 } from 'react';
 import { getSingletonHighlighter } from 'shiki/index.mjs';
 
-import { snippets } from '@constants/snippets';
 import { useStoreUI } from '@stores';
 import {
   cn,
@@ -232,36 +231,38 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
     void fetchType(refSnippet.current);
   };
 
-  const loadExample = useCallback(async (exampleId: string) => {
+  const loadExample = useCallback(async (id: string, type: string) => {
     clearTimeout(refTimeout.current);
-    const isDefault = !!getSearchParam('d');
-    const isCustom = !!getSearchParam('c');
-
     // Reset bus states
     busDispatch({ type: '@@-problems-message', data: [] });
     busDispatch({ type: '@@-console-message-reset' });
     busDispatch({ type: '@@-monaco-editor-types-progress', data: 0 });
 
     // Default code snippet
-    let code = 'console.log("Hello, World!");';
+    if (!id) {
+      const code = 'console.log("Hello, World!");';
+      refSnippetIndex.current = String(id);
+      refSnippet.current = await formatCode(code);
+      createNewModel(refSnippet.current);
+      triggerPreview(refSnippet.current);
 
-    // Handle default snippet
-    if (isDefault) {
-      const selectedSnippet = snippets.find((f) => f.id === Number(exampleId)) || snippets[0];
-      code = selectedSnippet.code;
-      refSnippetIndex.current = String(selectedSnippet.id);
-      setSearchParam('d', exampleId);
+      // Hide loading after delay
+      refTimeout.current = setTimeout(() => {
+        busDispatch({ type: '@@-monaco-editor-hide-loading' });
+      }, 400);
+
+      return;
     }
 
-    // Handle custom snippet
-    if (isCustom) {
-      code = await loadCustomExampleContent(exampleId);
+    const code = await loadCustomExampleContent(id, type);
 
-      refSnippetIndex.current = exampleId;
-      setSearchParam('c', exampleId);
+    if (type === 'default') {
+      setSearchParam('d', id);
+    } else {
+      setSearchParam('c', id);
     }
 
-    refSnippetIndex.current = String(exampleId);
+    refSnippetIndex.current = String(id);
     refSnippet.current = await formatCode(code);
     createNewModel(refSnippet.current);
     triggerPreview(refSnippet.current);
@@ -288,13 +289,12 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
 
     // Load examples if either defaultId or customId is present
     if (defaultId) {
-      console.log(defaultId);
-      void loadExample(defaultId);
+      void loadExample(defaultId, 'default');
     } else if (customId) {
 
-      void loadExample(customId);
+      void loadExample(customId, 'custom');
     } else {
-      void loadExample('1');
+      void loadExample();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -392,7 +392,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
   });
 
   useEventBus<IEventBusMonacoEditorLoadSnippet>('@@-monaco-editor-load-snippet', ({ data }) => {
-    void loadExample(data);
+    void loadExample(data.id, data.type);
   });
 
   return (
