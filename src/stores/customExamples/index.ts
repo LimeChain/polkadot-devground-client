@@ -1,14 +1,19 @@
 import { busDispatch } from '@pivanov/event-bus';
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import { create } from 'zustand';
 
 import { snippets } from '@constants/snippets';
-import authService from '@services/authService';
 import gistService from '@services/gistService';
 import { createSelectors } from 'src/stores/createSelectors';
 
 import type { ICodeExample } from '@custom-types/codeSnippet';
 import type { IUploadExampleModalClose } from '@custom-types/eventBus';
+
+interface UploadCustomExampleData {
+  code: string;
+  description: string;
+  exampleName: string;
+}
 
 interface StoreInterface {
   examples: ICodeExample[];
@@ -16,12 +21,11 @@ interface StoreInterface {
   exampleDescription: string;
   actions: {
     resetStore: () => void;
-    uploadCustomExample: (data) => void;
+    uploadCustomExample: (data: UploadCustomExampleData) => void;
     loadCustomExampleContent: (id: string, type: string) => Promise<string>;
     getCustomExamples: () => void;
     deleteExample: (id: string) => void;
   };
-  init: () => Promise<void>;
 }
 
 const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
@@ -55,7 +59,7 @@ const baseStore = create<StoreInterface>()((set) => ({
 
     loadCustomExampleContent: async (id: string, type: string) => {
       if (type === 'default') {
-        const selectedSnippet = snippets.find((f) => f.id === Number(id)) || snippets[0];
+        const selectedSnippet = snippets.find((f) => f.id === id) || snippets[0];
         set({ exampleDescription: selectedSnippet.description });
         return selectedSnippet.code;
       }
@@ -84,15 +88,6 @@ const baseStore = create<StoreInterface>()((set) => ({
     },
 
     resetStore: () => set({ ...initialState }),
-  },
-
-  init: async () => {
-    try {
-      const jwtToken = await authService.getJwtToken();
-    } catch (error) {
-      console.error('Error initializing auth store', error);
-      throw error;
-    }
   },
 }));
 

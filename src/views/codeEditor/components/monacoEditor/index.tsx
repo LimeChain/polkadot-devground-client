@@ -294,7 +294,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
 
       void loadExample(customId, 'custom');
     } else {
-      void loadExample();
+      void loadExample('1', 'default');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

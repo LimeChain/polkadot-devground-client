@@ -113,7 +113,9 @@ export const EditorActions = () => {
   }, []);
 
   useEventBus<IEventBusMonacoEditorUpdateCode>('@@-monaco-editor-update-code', ({ data }) => {
-    refCode.current = data;
+    if (data !== null) {
+      refCode.current = data;
+    }
   });
 
   useEventBus<IEventBusMonacoEditorLoadSnippet>('@@-monaco-editor-load-snippet', () => {

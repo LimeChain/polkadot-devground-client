@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 import { Icon } from '@components/icon';
 import { PDScrollArea } from '@components/pdScrollArea';
 import { cn } from '@utils/helpers';
@@ -15,6 +17,12 @@ interface ExamplesListProps {
 export const ExamplesList = (props: ExamplesListProps) => {
   const { examples, selectedExample, type, editable = false, handleChangeExample } = props;
   const { deleteExample } = useStoreCustomExamples.use.actions();
+
+  const handleDeleteExample = useCallback((e: React.MouseEvent<HTMLSpanElement>) => {
+    e.stopPropagation();
+    const id = e.currentTarget.getAttribute('data-example-index');
+    deleteExample(id as string);
+  }, [deleteExample]);
 
   return (
     <PDScrollArea
@@ -59,12 +67,12 @@ export const ExamplesList = (props: ExamplesListProps) => {
                   )}
                   >
                     <Icon
-                      className="hover:text-dev-white-200"
                       name="icon-pen"
                       size={[16]}
                     />
                     <span
-                      onClick={() => deleteExample(example.id)}
+                      data-example-index={example.id}
+                      onClick={handleDeleteExample}
                     >
                       <Icon
                         name="icon-trash"
