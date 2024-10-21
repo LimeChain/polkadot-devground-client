@@ -11,11 +11,14 @@ import { useStoreChain } from '@stores';
 import { polymorphicComponent } from '@utils/components';
 import { cn } from '@utils/helpers';
 import { useMergedRefs } from '@utils/hooks/useMergedRefs';
+import { getBlockDetailsWithRawClient } from '@utils/rpc/getBlockDetails';
+import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
 import styles from '../styles.module.css';
 
 import { Row } from './row';
 
+import type { IMappedBlockExtrinsic } from '@custom-types/block';
 import type { IBlockStoreData } from '@custom-types/chain';
 
 export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
@@ -29,6 +32,8 @@ export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
 
   const blocksData = useStoreChain?.use?.blocksData?.();
   const bestBlock = useStoreChain?.use?.bestBlock?.();
+  const dynamicBuilder = useDynamicBuilder();
+  const chain = useStoreChain?.use?.chain?.();
 
   const isConnectingToChain = !!!bestBlock;
 
@@ -41,12 +46,64 @@ export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
   const rowItems = rowVirtualizer.getVirtualItems();
 
   useEffect(() => {
-    const blocksArray = Array.from(blocksData.values()).reverse();
+    const updateBlocks = async () => {
+      const blocksArray = Array.from(blocksData.values()).reverse();
 
-    setBlocks(blocksArray);
+      const updatedBlocks = await Promise.all(
+        blocksArray.map(async (blockStore) => {
+          const blockNumber = blockStore?.number;
+
+          if (!blockStore || typeof blockNumber !== 'number') {
+            return blockStore;
+          }
+
+          try {
+            const block = await getBlockDetailsWithRawClient({
+              blockNumber,
+              dynamicBuilder,
+            });
+
+            const mappedExtrinsics: IMappedBlockExtrinsic[] = block.body.extrinsics.map((extrinsic: IMappedBlockExtrinsic) => {
+              const { extrinsicData } = extrinsic;
+
+              return {
+                id: extrinsic.id,
+                blockNumber: extrinsic.blockNumber,
+                timestamp: extrinsic.timestamp,
+                isSuccess: extrinsic.isSuccess,
+                hash: extrinsic.hash,
+                extrinsicData: {
+                  ...extrinsicData,
+                  signer: extrinsicData.signer ? { Id: extrinsicData.signer.Id } : undefined,
+                },
+              };
+            });
+
+            return {
+              ...blockStore,
+              extrinsics: mappedExtrinsics,
+              header: {
+                ...block.header,
+                timestamp: blockStore.timestamp,
+                identity: chain.isRelayChain ? blockStore.identity : undefined,
+              },
+            };
+          } catch (error) {
+            console.error('Error fetching block details:', error);
+            return blockStore;
+          }
+        }),
+      );
+
+      setBlocks(updatedBlocks as IBlockStoreData[]);
+    };
+
+    void updateBlocks();
   }, [
     blocksData,
     bestBlock,
+    dynamicBuilder,
+    chain.isRelayChain,
   ]);
 
   return (
