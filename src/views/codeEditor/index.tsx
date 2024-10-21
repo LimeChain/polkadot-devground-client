@@ -17,6 +17,7 @@ import { useStoreUI } from '@stores';
 import { cn } from '@utils/helpers';
 import { useResizeObserver } from '@utils/hooks/useResizeObserver';
 import { SelectExample } from '@views/codeEditor/components/selectExample';
+import { useStoreCustomExamples } from 'src/stores/customExamples';
 
 import { ActionButton } from './components/actionButton';
 import { DebugPanel } from './components/debugPanel';
@@ -33,6 +34,7 @@ const TypeScriptEditor = () => {
 
   const [refContainerDimensions] = useResizeObserver(refContainer);
   const containerWidth = refContainerDimensions?.width;
+  const exampleDescription = useStoreCustomExamples.use.exampleDescription();
 
   const [
     isLoaded,
@@ -122,7 +124,7 @@ const TypeScriptEditor = () => {
                   className="flex h-full p-4 dark:bg-dev-black-800"
                   data-title="Read me"
                 >
-                  {/* {codeDescription} */}
+                  {exampleDescription}
                 </div>
               </Tabs>
             </div>

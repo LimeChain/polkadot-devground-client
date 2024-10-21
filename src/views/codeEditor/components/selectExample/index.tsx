@@ -63,7 +63,10 @@ export const SelectExample = () => {
 
     busDispatch<IEventBusMonacoEditorLoadSnippet>({
       type: '@@-monaco-editor-load-snippet',
-      data: id,
+      data: {
+        id,
+        type,
+      },
     });
 
     busDispatch({
@@ -174,6 +177,7 @@ export const SelectExample = () => {
               handleChangeExample={handleChangeExample}
               selectedExample={selectedSnippet}
               type="custom"
+              editable
             />
           </div>
         </Tabs>
