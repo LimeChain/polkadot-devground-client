@@ -11,7 +11,6 @@ export const GithubButton = () => {
     toggleVisibility,
   ] = useToggleVisibility(ModalGithubLogin);
 
-  const { name, avatar } = useStoreAuth?.use?.user?.() || {};
   const { logout } = useStoreAuth.use.actions();
   const authIsLoading = useStoreAuth.use.jwtTokenIsLoading?.();
   const isAuthenticated = useStoreAuth.use.jwtToken?.();

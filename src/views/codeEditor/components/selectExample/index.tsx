@@ -10,6 +10,7 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 
+import { ExampleNotFound } from '@components/exampleNotFound';
 import { Icon } from '@components/icon';
 import { Tabs } from '@components/tabs';
 import { snippets } from '@constants/snippets';
@@ -45,14 +46,15 @@ export const SelectExample = () => {
   }, []);
 
   const handleChangeExample = useCallback(async (e: React.MouseEvent<HTMLButtonElement>) => {
-    const id = e.currentTarget.getAttribute('data-example-index');
-    const type = e.currentTarget.getAttribute('data-example-type');
+    const id = e.currentTarget.getAttribute('data-example-index') || '';
+    const type = e.currentTarget.getAttribute('data-example-type') || '';
 
     if (type === 'default') {
       navigate(`/code?d=${id}`);
     } else {
       navigate(`/code?c=${id}`);
     }
+
     setIsOpened(false);
 
     busDispatch({
@@ -92,17 +94,15 @@ export const SelectExample = () => {
     const defaultExampleParam = searchParams.get('d');
     const customExampleParam = searchParams.get('c');
 
+    let exampleName = '';
+
     if (defaultExampleParam) {
-      const example = snippets.find((snippet) => snippet.id === Number(defaultExampleParam));
-      if (example) {
-        setSelectedSnippet(example.name);
-      }
+      exampleName = snippets.find((snippet) => snippet.id === defaultExampleParam)?.name || '';
     } else if (customExampleParam) {
-      const exampleName = customExamples.find((example) => example.id === customExampleParam)?.name;
-      if (exampleName) {
-        setSelectedSnippet(exampleName);
-      }
+      exampleName = customExamples.find((example) => example.id === customExampleParam)?.name || '';
     }
+
+    setSelectedSnippet(exampleName || '');
   }, [
     customExamples,
     searchParams,
@@ -172,13 +172,22 @@ export const SelectExample = () => {
             />
           </div>
           <div data-title="Custom">
-            <ExamplesList
-              examples={customExamples}
-              handleChangeExample={handleChangeExample}
-              selectedExample={selectedSnippet}
-              type="custom"
-              editable
-            />
+            {
+              customExamples?.length >= 1
+                ? (
+                  <ExamplesList
+                    examples={customExamples}
+                    handleChangeExample={handleChangeExample}
+                    selectedExample={selectedSnippet}
+                    type="custom"
+                    editable
+                  />
+                )
+                : (
+                  console.log('customExamples', customExamples),
+                  <ExampleNotFound />
+                )
+            }
           </div>
         </Tabs>
       </div>

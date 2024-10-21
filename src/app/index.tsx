@@ -55,7 +55,6 @@ export const App = () => {
     resetStore: resetStoreWallet,
   } = useStoreWallet.use.actions();
 
-  const initStoreCustomExamples = useStoreCustomExamples.use.init?.();
   const { resetStore: resetStoreGists } = useStoreCustomExamples.use.actions();
 
   useEffect(() => {
@@ -64,7 +63,6 @@ export const App = () => {
       initStoreUI();
       initStoreChainClient();
       initStoreWallet();
-      await initStoreCustomExamples();
 
       window.customPackages = {};
       Object.assign(window.customPackages, {

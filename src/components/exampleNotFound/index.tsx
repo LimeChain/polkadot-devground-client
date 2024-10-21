@@ -2,7 +2,7 @@ import { Icon } from '@components/icon';
 import { useStoreAuth } from '@stores';
 import { cn } from '@utils/helpers';
 
-export const NotFound = () => {
+export const ExampleNotFound = () => {
   const isAuthenticated = useStoreAuth.use.jwtToken?.();
   const { authorize } = useStoreAuth.use.actions();
 

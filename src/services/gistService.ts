@@ -4,14 +4,24 @@ import { SERVER_URL } from '@constants/auth';
 
 import authService from './authService';
 
-const uploadCustomExample = async (data) => {
+interface GistFile {
+  content: string;
+}
+
+interface UploadCustomExampleData {
+  code: string;
+  description: string;
+  exampleName: string;
+}
+
+const uploadCustomExample = async (data: UploadCustomExampleData) => {
   const jwtToken = await authService.getJwtToken();
   if (!jwtToken) {
     console.log('no jwt token');
     return;
   }
 
-  const files = {
+  const files: { [key: string]: GistFile } = {
     'snippet.tsx': {
       content: data.code,
     },
@@ -73,7 +83,6 @@ const deleteExample = async (id: string) => {
   }
 
   const { data } = await axios.delete(`${SERVER_URL}/gists/${id}`, { withCredentials: true });
-  console.log('data', data);
   return data;
 };
 
