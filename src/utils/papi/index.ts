@@ -119,7 +119,7 @@ export const subscribeToBestBlocks = ({
       Promise.allSettled(promises).then((results) => {
         results.forEach((blockData) => {
           if (blockData.status === 'fulfilled') {
-            const blockExtrinsics = (blockData?.value.body?.extrinsics?.slice(2) ?? [])
+            const blockExtrinsics = (blockData?.value.body?.extrinsics ?? [])
               .reverse()
               .map((extrinsic) => {
                 const { id, blockNumber, extrinsicData, timestamp, isSuccess } = extrinsic;
