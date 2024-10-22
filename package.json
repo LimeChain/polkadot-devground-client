@@ -11,23 +11,18 @@
     "add-polkadot-asset-hub": "npx papi add dot_asset_hub -n polkadot_asset_hub --skip-codegen",
     "add-polkadot-bridge-hub": "npx papi add dot_bridge_hub -n polkadot_bridge_hub --skip-codegen",
     "add-polkadot-collectives": "npx papi add dot_collectives -n polkadot_collectives --skip-codegen",
-
     "add-kusama": "npx papi add kusama -n ksmcc3 --skip-codegen",
     "add-kusama-people": "npx papi add kusama_people -n ksmcc3_people --skip-codegen",
     "add-kusama-asset-hub": "npx papi add kusama_asset_hub -n ksmcc3_asset_hub --skip-codegen",
     "add-kusama-bridge-hub": "npx papi add kusama_bridge_hub -n ksmcc3_bridge_hub --skip-codegen",
-
     "add-westend": "npx papi add westend -n westend2 --skip-codegen",
     "add-westend-people": "npx papi add westend_people -n westend2_people --skip-codegen",
     "add-westend-asset-hub": "npx papi add westend_asset_hub -n westend2_asset_hub --skip-codegen",
     "add-westend-bridge-hub": "npx papi add westend_bridge_hub -n westend2_bridge_hub --skip-codegen",
     "add-westend-collectives": "npx papi add westend_collectives -n westend2_collectives --skip-codegen",
-
     "add-paseo": "npx papi add paseo -n paseo --skip-codegen",
     "add-paseo-asset-hub": "npx papi add paseo_asset_hub -n paseo_asset_hub --skip-codegen",
-
     "add-descriptors": "npm run add-polkadot && npm run add-polkadot-people && npm run add-polkadot-asset-hub && npm run add-polkadot-bridge-hub && npm run add-polkadot-collectives && npm run add-kusama && npm run add-kusama-people && npm run add-kusama-asset-hub && npm run add-kusama-bridge-hub && npm run add-westend && npm run add-westend-people && npm run add-westend-asset-hub && npm run add-westend-bridge-hub && npm run add-westend-collectives && npm run add-paseo && npm run add-paseo-asset-hub && npx papi generate",
-
     "remove-descriptors": "rm -rf node_modules .papi",
     "lint": "npm run tsc && eslint . --ext .ts,.tsx --no-cache",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
@@ -60,7 +55,6 @@
     "date-fns": "^3.6.0",
     "file-saver": "2.0.5",
     "firebase": "10.14.0",
-    "jszip": "3.10.1",
     "monaco-editor": "0.50.0",
     "nanoid": "5.0.7",
     "pako": "2.1.0",

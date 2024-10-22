@@ -80,9 +80,10 @@ export const EditorActions = () => {
       };
     };
 
-    const downloadFiles = async (files: { name: string; content: string }[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const downloadFiles = async (_files: { name: string; content: string }[]) => {
       try {
-        await downloadZip('example', files);
+        await downloadZip();
       } catch (error) {
         console.error('Failed to download zip file:', error);
       }
