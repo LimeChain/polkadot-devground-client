@@ -10,9 +10,9 @@ import {
 
 import { cn } from '@utils/helpers';
 
-import type { ICallArgs } from '@components/callParam';
-
-interface IPDFileUpload extends ICallArgs {}
+interface IPDFileUpload {
+  onChange: (args: unknown) => void;
+}
 
 export const PDFileUpload = ({ onChange }: IPDFileUpload) => {
   const refInput = useRef<HTMLLabelElement>(null);

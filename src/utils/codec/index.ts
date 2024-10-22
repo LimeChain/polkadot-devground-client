@@ -3,11 +3,7 @@ import {
   metadata,
   ScaleEnum,
 } from '@polkadot-api/substrate-bindings';
-import {
-  Struct,
-  u32,
-  u64,
-} from 'scale-ts';
+import { u32 } from 'scale-ts';
 
 import {
   baseStoreChain,
@@ -31,6 +27,5 @@ export const babeDigestCodec = ScaleEnum({
   three: u32,
 });
 
-export const auraDigestCodec = Struct({ slotNumber: u64 });
 export const blockHeaderCodec = blockHeader;
 export const metadataCodec = metadata;
