@@ -80,14 +80,3 @@ export interface IMappedBlock {
   header: IMappedBlockHeader;
   body: IMappedBlockBody;
 }
-
-export interface IExtrinsicStoreData {
-  id: string;
-  blockNumber: number;
-  timestamp: number;
-  isSuccess: boolean;
-  signer: string | { Id: string };
-  method: IGenericExtrinsicMethod;
-  section: string;
-  args: Record<string, unknown>;
-}

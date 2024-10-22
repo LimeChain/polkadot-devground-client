@@ -57,41 +57,36 @@ export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
             return blockStore;
           }
 
-          try {
-            const block = await getBlockDetailsWithRawClient({
-              blockNumber,
-              dynamicBuilder,
-            });
+          const block = await getBlockDetailsWithRawClient({
+            blockNumber,
+            dynamicBuilder,
+          });
 
-            const mappedExtrinsics: IMappedBlockExtrinsic[] = block.body.extrinsics.map((extrinsic: IMappedBlockExtrinsic) => {
-              const { extrinsicData } = extrinsic;
-
-              return {
-                id: extrinsic.id,
-                blockNumber: extrinsic.blockNumber,
-                timestamp: extrinsic.timestamp,
-                isSuccess: extrinsic.isSuccess,
-                hash: extrinsic.hash,
-                extrinsicData: {
-                  ...extrinsicData,
-                  signer: extrinsicData.signer ? { Id: extrinsicData.signer.Id } : undefined,
-                },
-              };
-            });
+          const mappedExtrinsics: IMappedBlockExtrinsic[] = block.body.extrinsics.map((extrinsic: IMappedBlockExtrinsic) => {
+            const { extrinsicData } = extrinsic;
 
             return {
-              ...blockStore,
-              extrinsics: mappedExtrinsics,
-              header: {
-                ...block.header,
-                timestamp: blockStore.timestamp,
-                identity: chain.isRelayChain ? blockStore.identity : undefined,
+              id: extrinsic.id,
+              blockNumber: extrinsic.blockNumber,
+              timestamp: extrinsic.timestamp,
+              isSuccess: extrinsic.isSuccess,
+              hash: extrinsic.hash,
+              extrinsicData: {
+                ...extrinsicData,
+                signer: extrinsicData.signer ? { Id: extrinsicData.signer.Id } : undefined,
               },
             };
-          } catch (error) {
-            console.error('Error fetching block details:', error);
-            return blockStore;
-          }
+          });
+
+          return {
+            ...blockStore,
+            extrinsics: mappedExtrinsics,
+            header: {
+              ...block.header,
+              timestamp: blockStore.timestamp,
+              identity: chain.isRelayChain ? blockStore.identity : undefined,
+            },
+          };
         }),
       );
 
