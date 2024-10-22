@@ -49,20 +49,20 @@ export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
     const updateBlocks = async () => {
       const blocksArray = Array.from(blocksData.values()).reverse();
 
-      const updatedBlocks = await Promise.all(
-        blocksArray.map(async (blockStore) => {
-          const blockNumber = blockStore?.number;
+      const fetchBlockDetails = async (blockStore: IBlockStoreData) => {
+        const blockNumber = blockStore?.number;
 
-          if (!blockStore || typeof blockNumber !== 'number') {
-            return blockStore;
-          }
+        if (!blockStore || typeof blockNumber !== 'number') {
+          return blockStore;
+        }
 
+        try {
           const block = await getBlockDetailsWithRawClient({
             blockNumber,
             dynamicBuilder,
           });
 
-          const mappedExtrinsics: IMappedBlockExtrinsic[] = block.body.extrinsics.map((extrinsic: IMappedBlockExtrinsic) => {
+          const mappedExtrinsics: IMappedBlockExtrinsic[] = await block.body.extrinsics.map((extrinsic: IMappedBlockExtrinsic) => {
             const { extrinsicData } = extrinsic;
 
             return {
@@ -87,8 +87,13 @@ export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
               identity: chain.isRelayChain ? blockStore.identity : undefined,
             },
           };
-        }),
-      );
+        } catch (error) {
+          console.error(`Error fetching block details for block ${blockNumber}:`, error);
+          return blockStore;
+        }
+      };
+
+      const updatedBlocks = await Promise.all(blocksArray.map(fetchBlockDetails));
 
       setBlocks(updatedBlocks as IBlockStoreData[]);
     };
@@ -154,5 +159,3 @@ export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
     </PDScrollArea>
   );
 });
-
-LatestBlocksList.displayName = 'LatestBlocksList';
