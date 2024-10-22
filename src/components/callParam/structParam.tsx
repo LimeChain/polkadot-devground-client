@@ -20,12 +20,11 @@ export const StructParam = ({ struct, onChange }: IStructParam) => {
     args,
     setArgs,
   ] = useState(() =>
-    Object.fromEntries(
-      Object.keys(struct.value).map((key) => [
-        key,
-        undefined,
-      ] as const),
-    ),
+    Object.keys(struct.value)
+      .reduce((acc: { [key: string]: unknown }, key) => {
+        acc[key] = undefined;
+        return acc;
+      }, {}),
   );
 
   useEffect(() => {

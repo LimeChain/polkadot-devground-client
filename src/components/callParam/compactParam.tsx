@@ -38,16 +38,6 @@ export const CompactParam = ({ compact, onChange }: ICompactParam) => {
       onWheelCapture={onWheelPreventDefault}
       placeholder="Compact"
       type="number"
-      max={
-        compact.isBig
-          ? '170141183460469231731687303715884105727'
-          : 4294967295
-      }
-      min={
-        compact.isBig
-          ? '-57896044618658097711785492504343953926634992332820282019728792003956564819968'
-          : -2147483648
-      }
     />
   );
 };
