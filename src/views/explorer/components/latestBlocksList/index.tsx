@@ -1,5 +1,6 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
 import {
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -45,6 +46,24 @@ export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
   });
   const rowItems = rowVirtualizer.getVirtualItems();
 
+  const mapExtrinsics = useCallback((extrinsics: IMappedBlockExtrinsic[]): IMappedBlockExtrinsic[] => {
+    return extrinsics.map((extrinsic: IMappedBlockExtrinsic) => {
+      const { extrinsicData } = extrinsic;
+
+      return {
+        id: extrinsic.id,
+        blockNumber: extrinsic.blockNumber,
+        timestamp: extrinsic.timestamp,
+        isSuccess: extrinsic.isSuccess,
+        hash: extrinsic.hash,
+        extrinsicData: {
+          ...extrinsicData,
+          signer: extrinsicData.signer ? { Id: extrinsicData.signer.Id } : undefined,
+        },
+      };
+    });
+  }, []);
+
   useEffect(() => {
     const updateBlocks = async () => {
       const blocksArray = Array.from(blocksData.values()).reverse();
@@ -62,21 +81,7 @@ export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
             dynamicBuilder,
           });
 
-          const mappedExtrinsics: IMappedBlockExtrinsic[] = await block.body.extrinsics.map((extrinsic: IMappedBlockExtrinsic) => {
-            const { extrinsicData } = extrinsic;
-
-            return {
-              id: extrinsic.id,
-              blockNumber: extrinsic.blockNumber,
-              timestamp: extrinsic.timestamp,
-              isSuccess: extrinsic.isSuccess,
-              hash: extrinsic.hash,
-              extrinsicData: {
-                ...extrinsicData,
-                signer: extrinsicData.signer ? { Id: extrinsicData.signer.Id } : undefined,
-              },
-            };
-          });
+          const mappedExtrinsics = mapExtrinsics(block.body.extrinsics);
 
           return {
             ...blockStore,
@@ -103,8 +108,70 @@ export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
     blocksData,
     bestBlock,
     dynamicBuilder,
-    chain.isRelayChain,
+    chain,
+    mapExtrinsics,
   ]);
+
+  // useEffect(() => {
+  //   const updateBlocks = async () => {
+  //     const blocksArray = Array.from(blocksData.values()).reverse();
+
+  //     const fetchBlockDetails = async (blockStore: IBlockStoreData) => {
+  //       const blockNumber = blockStore?.number;
+
+  //       if (!blockStore || typeof blockNumber !== 'number') {
+  //         return blockStore;
+  //       }
+
+  //       try {
+  //         const block = await getBlockDetailsWithRawClient({
+  //           blockNumber,
+  //           dynamicBuilder,
+  //         });
+
+  //         const mappedExtrinsics: IMappedBlockExtrinsic[] = await block.body.extrinsics.map((extrinsic: IMappedBlockExtrinsic) => {
+  //           const { extrinsicData } = extrinsic;
+
+  //           return {
+  //             id: extrinsic.id,
+  //             blockNumber: extrinsic.blockNumber,
+  //             timestamp: extrinsic.timestamp,
+  //             isSuccess: extrinsic.isSuccess,
+  //             hash: extrinsic.hash,
+  //             extrinsicData: {
+  //               ...extrinsicData,
+  //               signer: extrinsicData.signer ? { Id: extrinsicData.signer.Id } : undefined,
+  //             },
+  //           };
+  //         });
+
+  //         return {
+  //           ...blockStore,
+  //           extrinsics: mappedExtrinsics,
+  //           header: {
+  //             ...block.header,
+  //             timestamp: blockStore.timestamp,
+  //             identity: chain.isRelayChain ? blockStore.identity : undefined,
+  //           },
+  //         };
+  //       } catch (error) {
+  //         console.error(`Error fetching block details for block ${blockNumber}:`, error);
+  //         return blockStore;
+  //       }
+  //     };
+
+  //     const updatedBlocks = await Promise.all(blocksArray.map(fetchBlockDetails));
+
+  //     setBlocks(updatedBlocks as IBlockStoreData[]);
+  //   };
+
+  //   void updateBlocks();
+  // }, [
+  //   blocksData,
+  //   bestBlock,
+  //   dynamicBuilder,
+  //   chain.isRelayChain,
+  // ]);
 
   return (
     <PDScrollArea
