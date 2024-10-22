@@ -137,5 +137,5 @@ export interface IExtrinsicStoreData {
 
 interface Identity {
   name?: string;
-  address: SS58String;
+  address?: SS58String;
 }
