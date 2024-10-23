@@ -11,7 +11,10 @@ import {
 
 import { ModalSaveExample } from '@components/modals/modalSaveExample';
 import { downloadZip } from '@utils/downloadZip';
-import { cn } from '@utils/helpers';
+import {
+  cn,
+  getSearchParam,
+} from '@utils/helpers';
 import {
   getImportMap,
   mergeImportMap,
@@ -32,10 +35,12 @@ export const EditorActions = () => {
     toggleVisibility,
   ] = useToggleVisibility(ModalSaveExample);
   const selectedExampleId = useStoreCustomExamples.use.selectedExampleId();
+  const isSavingContent = useStoreCustomExamples.use.isSavingContent();
   const { updateCustomExampleContent } = useStoreCustomExamples.use.actions();
   const refCode = useRef<string>('');
   const initCode = useRef<string>('');
   const isInit = useRef(false);
+
   const [
     isEdited,
     setIsEdited,
@@ -129,7 +134,9 @@ export const EditorActions = () => {
   ]);
 
   useEventBus<IEventBusMonacoEditorUpdateCode>('@@-monaco-editor-update-code', ({ data }) => {
-    if (data !== null) {
+    const isCustomExample = !!getSearchParam('c');
+
+    if (data !== null && isCustomExample) {
       refCode.current = data;
 
       if (!isInit.current) {
@@ -160,6 +167,7 @@ export const EditorActions = () => {
           isEdited && (
             <ActionButton
               iconName="icon-save"
+              isLoading={isSavingContent}
               onClick={handleSave}
               toolTip="Revert changes"
             />
@@ -170,7 +178,7 @@ export const EditorActions = () => {
           toolTip="Share"
         />
         <ActionButton
-          iconName="icon-saveAll"
+          iconName="icon-uploadCloud"
           onClick={toggleVisibility}
           toolTip="Save to GitHub"
         />

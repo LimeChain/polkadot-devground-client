@@ -77,18 +77,18 @@ export const SelectExample = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (refContainer.current && !refContainer.current.contains(event.target as Node)) {
-        setIsOpened(false);
-      }
-    };
+  // useEffect(() => {
+  //   const handleClickOutside = (event: MouseEvent) => {
+  //     if (refContainer.current && !refContainer.current.contains(event.target as Node)) {
+  //       setIsOpened(false);
+  //     }
+  //   };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+  //   document.addEventListener('mousedown', handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener('mousedown', handleClickOutside);
+  //   };
+  // }, []);
 
   useEffect(() => {
     const defaultExampleParam = searchParams.get('d');
@@ -99,7 +99,7 @@ export const SelectExample = () => {
     if (defaultExampleParam) {
       exampleName = snippets.find((snippet) => snippet.id === defaultExampleParam)?.name || '';
     } else if (customExampleParam) {
-      exampleName = customExamples.find((example) => example.id === customExampleParam)?.name || '';
+      exampleName = customExamples?.find((example) => example.id === customExampleParam)?.name || '';
     }
 
     setSelectedSnippet(exampleName || '');
