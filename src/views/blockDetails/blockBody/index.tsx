@@ -89,7 +89,7 @@ export const BlockBody = (props: BlockBodyProps) => {
         initialTab={initialTab}
         onChange={setInitialTab}
         refContainer={refContainer}
-        tabClassName="px-2 py-2 mb-5"
+        tabClassName="px-2 py-2 mb-5 sticky left-0 last:left-24 sm:relative sm:last:left-0"
         unmountOnHide={false}
       >
         <div
@@ -173,7 +173,7 @@ export const BlockBody = (props: BlockBodyProps) => {
             bodyData.extrinsics.length > 3 && (
               <div className="flex justify-center">
                 <button
-                  className="mt-4 font-geist font-body2-bold"
+                  className="my-4 font-geist font-body2-bold sm:mb-0"
                   data-type="extrinsic"
                   onClick={handleShowMore}
                 >
@@ -246,7 +246,7 @@ export const BlockBody = (props: BlockBodyProps) => {
           {bodyData.events.length > 3 && (
             <div className="flex justify-center">
               <button
-                className="mt-4 font-geist font-body2-bold"
+                className="my-4 font-geist font-body2-bold sm:mb-0 sm:mt-4"
                 data-type="event"
                 onClick={handleShowMore}
               >
