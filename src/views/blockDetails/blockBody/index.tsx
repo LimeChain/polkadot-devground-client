@@ -246,7 +246,7 @@ export const BlockBody = (props: BlockBodyProps) => {
           {bodyData.events.length > 3 && (
             <div className="flex justify-center">
               <button
-                className="my-4 font-geist font-body2-bold sm:mb-0 sm:mt-4"
+                className="my-4 font-geist font-body2-bold sm:mb-0"
                 data-type="event"
                 onClick={handleShowMore}
               >
