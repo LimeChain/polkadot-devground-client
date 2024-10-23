@@ -105,9 +105,9 @@ const CustomAccountBuilder = ({
   ] = useState(false);
 
   useEffect(() => {
-    const isValidAddress = getSs58AddressInfo(value).isValid;
+    const addressIsValid = getSs58AddressInfo(value).isValid;
 
-    setIsError(!isValidAddress);
+    setIsError(!addressIsValid);
     onChange(value);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
