@@ -15,12 +15,13 @@ import {
 import type { IUploadExampleModalClose } from '@custom-types/eventBus';
 
 interface IModalGithubLogin extends Pick<IModal, 'onClose'> {
-  code: string;
+  code?: string;
+  type: string;
 }
 
 export const ModalSaveExample = (props: IModalGithubLogin) => {
-  const { onClose, code } = props;
-  const { uploadCustomExample } = useStoreCustomExamples.use.actions();
+  const { onClose, code, type } = props;
+  const { uploadCustomExample, updateCustomExampleInfo } = useStoreCustomExamples.use.actions();
   const isUploading = useStoreCustomExamples.use.isUploading();
 
   const [
@@ -37,15 +38,22 @@ export const ModalSaveExample = (props: IModalGithubLogin) => {
       return;
     }
 
-    uploadCustomExample({
+    type === 'upload' && uploadCustomExample({
       code,
       description,
       exampleName,
     });
+
+    type === 'update' && updateCustomExampleInfo(
+      exampleName,
+      description,
+    );
   }, [
     code,
     description,
     exampleName,
+    type,
+    updateCustomExampleInfo,
     uploadCustomExample,
   ]);
 
@@ -71,7 +79,13 @@ export const ModalSaveExample = (props: IModalGithubLogin) => {
         'dark:border-dev-purple-700',
       )}
     >
-      <h5 className="self-start font-h5-bold">Upload Example</h5>
+      <h5 className="self-start font-h5-bold">
+        {
+          type === 'upload'
+            ? 'Upload Example'
+            : 'Edit Example'
+        }
+      </h5>
       <div className="flex flex-col">
         <input
           onChange={handleExampleNameChange}

@@ -1,6 +1,8 @@
+import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import { useCallback } from 'react';
 
 import { Icon } from '@components/icon';
+import { ModalSaveExample } from '@components/modals/modalSaveExample';
 import { PDScrollArea } from '@components/pdScrollArea';
 import { cn } from '@utils/helpers';
 import { useStoreCustomExamples } from 'src/stores/customExamples';
@@ -17,6 +19,10 @@ interface ExamplesListProps {
 export const ExamplesList = (props: ExamplesListProps) => {
   const { examples, selectedExample, type, editable = false, handleChangeExample } = props;
   const { deleteExample } = useStoreCustomExamples.use.actions();
+  const [
+    SaveExampleModal,
+    toggleVisibility,
+  ] = useToggleVisibility(ModalSaveExample);
 
   const handleDeleteExample = useCallback((e: React.MouseEvent<HTMLSpanElement>) => {
     e.stopPropagation();
@@ -66,10 +72,12 @@ export const ExamplesList = (props: ExamplesListProps) => {
                     'text-dev-white-1000 dark:text-dev-black-300',
                   )}
                   >
-                    <Icon
-                      name="icon-pen"
-                      size={[16]}
-                    />
+                    <span onClick={toggleVisibility}>
+                      <Icon
+                        name="icon-pen"
+                        size={[16]}
+                      />
+                    </span>
                     <span
                       data-example-index={example.id}
                       onClick={handleDeleteExample}
@@ -86,6 +94,10 @@ export const ExamplesList = (props: ExamplesListProps) => {
           ))
         }
       </ul>
+      <SaveExampleModal
+        onClose={toggleVisibility}
+        type="update"
+      />
     </PDScrollArea >
   );
 };

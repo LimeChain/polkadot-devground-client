@@ -75,6 +75,58 @@ const getGistContent = async (id: string) => {
   }
 };
 
+const editGistInfo = async (id: string, name: string, description: string) => {
+  const jwtToken = await authService.getJwtToken();
+  if (!jwtToken) {
+    console.log('no jwt token');
+    return;
+  }
+
+  const body = {
+    name,
+    files: {
+      'description.txt': {
+        content: description,
+      },
+    },
+  };
+
+  try {
+    const { data } = await axios.patch(`${SERVER_URL}/gists/edit-info/${id}`, body);
+
+    return data;
+  } catch (error) {
+    console.log('error', error);
+  }
+};
+
+const editGistContent = async (id: string, data: string) => {
+  const jwtToken = await authService.getJwtToken();
+
+  if (!jwtToken) {
+    console.log('no jwt token');
+    return;
+  }
+
+  const files: { [key: string]: GistFile } = {
+    'snippet.tsx': {
+      content: data,
+    },
+  };
+
+  const body = {
+    files,
+  };
+
+  try {
+    const gists = await axios.patch(`${SERVER_URL}/gists/edit-content/${id}`, body);
+    return gists;
+  } catch (error) {
+    console.log('error', error);
+  }
+
+};
+
 const deleteExample = async (id: string) => {
   const jwtToken = await authService.getJwtToken();
   if (!jwtToken) {
@@ -90,5 +142,7 @@ export default {
   uploadCustomExample,
   getUserGists,
   getGistContent,
+  editGistContent,
+  editGistInfo,
   deleteExample,
 };
