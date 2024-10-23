@@ -184,7 +184,6 @@ export const SelectExample = () => {
                   />
                 )
                 : (
-                  console.log('customExamples', customExamples),
                   <ExampleNotFound />
                 )
             }

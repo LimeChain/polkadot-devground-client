@@ -19,10 +19,13 @@ interface StoreInterface {
   examples: ICodeExample[];
   isUploading: boolean;
   exampleDescription: string;
+  selectedExampleId: string;
   actions: {
     resetStore: () => void;
     uploadCustomExample: (data: UploadCustomExampleData) => void;
     loadCustomExampleContent: (id: string, type: string) => Promise<string>;
+    updateCustomExampleInfo: (exampleName: string, description: string) => void;
+    updateCustomExampleContent: (id: string, data: string) => void;
     getCustomExamples: () => void;
     deleteExample: (id: string) => void;
   };
@@ -31,6 +34,7 @@ interface StoreInterface {
 const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   examples: [],
   exampleDescription: '',
+  selectedExampleId: '',
   isUploading: false,
 };
 
@@ -58,6 +62,8 @@ const baseStore = create<StoreInterface>()((set) => ({
     },
 
     loadCustomExampleContent: async (id: string, type: string) => {
+      set({ selectedExampleId: id });
+
       if (type === 'default') {
         const selectedSnippet = snippets.find((f) => f.id === id) || snippets[0];
         set({ exampleDescription: selectedSnippet.description });
@@ -74,6 +80,17 @@ const baseStore = create<StoreInterface>()((set) => ({
           throw error;
         }
       }
+    },
+
+    updateCustomExampleInfo: async (exampleName: string, description: string) => {
+      const { selectedExampleId } = baseStore.getState();
+
+      const gistsArray = await gistService.editGistInfo(selectedExampleId, exampleName, description);
+      set({ examples: gistsArray });
+    },
+
+    updateCustomExampleContent: async (id: string, data: string) => {
+      await gistService.editGistContent(id, data);
     },
 
     deleteExample: async (id: string) => {

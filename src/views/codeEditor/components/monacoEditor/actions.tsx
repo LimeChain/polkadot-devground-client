@@ -17,6 +17,7 @@ import {
   mergeImportMap,
 } from '@utils/iframe';
 import { defaultImportMap } from '@views/codeEditor/constants';
+import { useStoreCustomExamples } from 'src/stores/customExamples';
 
 import { ActionButton } from '../actionButton';
 
@@ -30,8 +31,15 @@ export const EditorActions = () => {
     SaveExampleModal,
     toggleVisibility,
   ] = useToggleVisibility(ModalSaveExample);
-
+  const selectedExampleId = useStoreCustomExamples.use.selectedExampleId();
+  const { updateCustomExampleContent } = useStoreCustomExamples.use.actions();
   const refCode = useRef<string>('');
+  const initCode = useRef<string>('');
+  const isInit = useRef(false);
+  const [
+    isEdited,
+    setIsEdited,
+  ] = useState(false);
 
   const [
     isRunning,
@@ -113,13 +121,29 @@ export const EditorActions = () => {
     await downloadFiles(files);
   }, []);
 
+  const handleSave = useCallback(() => {
+    updateCustomExampleContent(selectedExampleId, refCode.current);
+  }, [
+    selectedExampleId,
+    updateCustomExampleContent,
+  ]);
+
   useEventBus<IEventBusMonacoEditorUpdateCode>('@@-monaco-editor-update-code', ({ data }) => {
     if (data !== null) {
       refCode.current = data;
+
+      if (!isInit.current) {
+        initCode.current = data;
+        isInit.current = true;
+      }
+
+      setIsEdited(initCode.current !== data);
     }
   });
 
   useEventBus<IEventBusMonacoEditorLoadSnippet>('@@-monaco-editor-load-snippet', () => {
+    setIsEdited(false);
+    isInit.current = false;
     handleStop();
   });
 
@@ -132,12 +156,21 @@ export const EditorActions = () => {
       )}
     >
       <div className="flex gap-2 pr-2">
+        {
+          isEdited && (
+            <ActionButton
+              iconName="icon-save"
+              onClick={handleSave}
+              toolTip="Revert changes"
+            />
+          )
+        }
         <ActionButton
           iconName="icon-share"
           toolTip="Share"
         />
         <ActionButton
-          iconName="icon-save"
+          iconName="icon-saveAll"
           onClick={toggleVisibility}
           toolTip="Save to GitHub"
         />
@@ -166,6 +199,7 @@ export const EditorActions = () => {
       <SaveExampleModal
         code={refCode.current}
         onClose={toggleVisibility}
+        type="upload"
       />
     </div>
   );
