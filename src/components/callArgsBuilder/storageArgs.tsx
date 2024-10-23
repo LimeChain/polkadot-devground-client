@@ -1,6 +1,6 @@
 import { useStoreChain } from '@stores';
 
-import { CodecParam } from './codecParam';
+import { CodecParam } from './codecBuilder';
 
 import type { TMetaDataStorageItem } from '@custom-types/papi';
 
@@ -11,14 +11,13 @@ interface IStorageArgs {
 
 export const StorageArgs = ({ storage, onChange }: IStorageArgs) => {
   const lookup = useStoreChain?.use?.lookup?.();
-
   const storageType = storage.type;
 
   if (storageType.tag === 'plain' || !lookup) {
     return null;
   }
 
-  const keyVariable = lookup!(storageType.value.key);
+  const keyVariable = lookup(storageType.value.key);
 
   return (
     <CodecParam

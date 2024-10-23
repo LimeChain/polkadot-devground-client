@@ -3,6 +3,8 @@ import {
   FixedSizeBinary,
 } from 'polkadot-api';
 
+import type { Var } from '@polkadot-api/metadata-builders';
+
 type AssertFunction = (condition: unknown, message: string) => asserts condition;
 export const assert: AssertFunction = (condition, message) => {
   if (!condition) {
@@ -16,8 +18,18 @@ export const checkIfCompatable = (isCompatable: boolean, message: string) => {
   }
 };
 
+export const varIsBinary = (variabel: Var) => {
+  switch (variabel.type) {
+    case 'tuple':
+      return variabel.value.every((lookupEntry) =>
+        lookupEntry.type === 'primitive' && lookupEntry.value === 'u8');
+    default:
+      return;
+  }
+};
+
 export const unwrapApiResult = (data: unknown): unknown => {
-  // instanceof Binary doesn't catch Binaries returned from rpc calls
+  // for rpc calls
   if (data && typeof data === 'object' && 'asHex' in data) {
     return (data as Binary).asHex();
   }

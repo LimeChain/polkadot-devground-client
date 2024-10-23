@@ -1,4 +1,4 @@
-import { PrimitiveParam } from '@components/callParam/primitiveParam';
+import { PrimitiveParam } from '@components/callArgsBuilder/primitiveParam';
 
 import styles from './styles.module.css';
 

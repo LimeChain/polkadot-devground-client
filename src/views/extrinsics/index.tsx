@@ -11,13 +11,13 @@ import {
 import {
   CallParam,
   type ICallParam,
-} from '@components/callParam';
-import { AccountSelectParam } from '@components/callParam/accountSelectParam';
-import { QueryButton } from '@components/callParam/queryButton';
-import { QueryFormContainer } from '@components/callParam/queryFormContainer';
-import { QueryResult } from '@components/callParam/queryResult';
-import { QueryResultContainer } from '@components/callParam/queryResultContainer';
-import { QueryViewContainer } from '@components/callParam/queryViewContainer';
+} from '@components/callArgsBuilder';
+import { AccountSelectParam } from '@components/callArgsBuilder/accountSelectBuilder';
+import { QueryButton } from '@components/callArgsBuilder/queryButton';
+import { QueryFormContainer } from '@components/callArgsBuilder/queryFormContainer';
+import { QueryResult } from '@components/callArgsBuilder/queryResult';
+import { QueryResultContainer } from '@components/callArgsBuilder/queryResultContainer';
+import { QueryViewContainer } from '@components/callArgsBuilder/queryViewContainer';
 import { Loader } from '@components/loader';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';

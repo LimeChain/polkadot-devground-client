@@ -1,4 +1,4 @@
-import { DecoderParam } from '@components/callParam/decoderParam';
+import { DecoderParam } from '@components/callArgsBuilder/decoderParam';
 
 import styles from './styles.module.css';
 

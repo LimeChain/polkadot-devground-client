@@ -7,7 +7,7 @@ import {
 import { useStoreChain } from '@stores';
 import { cn } from '@utils/helpers';
 
-import { CodecParam } from './codecParam';
+import { CodecParam } from './codecBuilder';
 import styles from './styles.module.css';
 
 import type { TMetaDataApiMethod } from '@custom-types/papi';

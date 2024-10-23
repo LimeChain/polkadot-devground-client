@@ -10,7 +10,7 @@ import {
 
 import { cn } from '@utils/helpers';
 
-import type { ICallArgs } from '@components/callParam';
+import type { ICallArgs } from '@components/callArgsBuilder';
 
 interface IPDFileUpload extends ICallArgs {}
 

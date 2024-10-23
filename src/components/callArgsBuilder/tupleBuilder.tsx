@@ -3,48 +3,51 @@ import {
   useState,
 } from 'react';
 
+import { varIsBinary } from '@utils/papi/helpers';
+
 import { BinaryParam } from './binaryParam';
-import { CodecParam } from './codecParam';
+import { CodecBuilder } from './codecBuilder';
 import styles from './styles.module.css';
 
 import type { ICallArgs } from '.';
 import type { TupleVar } from '@polkadot-api/metadata-builders';
-interface ISequence extends ICallArgs {
+
+interface ITupleBuilder extends ICallArgs {
   tuple: TupleVar;
 }
 
-export const TupleParam = ({ tuple, onChange }: ISequence) => {
-  if (
-    tuple.value.every((lookupEntry) =>
-      lookupEntry.type === 'primitive' && lookupEntry.value === 'u8')
-  ) {
+export const TupleBuilder = ({ tuple, onChange }: ITupleBuilder) => {
+  if (varIsBinary(tuple)) {
     return (
       <div className="border-l pl-4 pt-2">
         <BinaryParam
           minLength={0}
           onChange={onChange}
         />
-        ;
       </div>
     );
+  } else {
+    return (
+      <TupleBuilderCore
+        onChange={onChange}
+        tuple={tuple}
+      />
+    );
   }
-
-  return (
-    <_TupleParam
-      onChange={onChange}
-      tuple={tuple}
-    />
-  );
 };
 
-const _TupleParam = ({
+const TupleBuilderCore = ({
   tuple,
   onChange,
-}: ISequence) => {
+}: ITupleBuilder) => {
   const [
     params,
     setParams,
-  ] = useState(Array.from({ length: tuple.value.length }).fill(undefined));
+  ] = useState(
+    Array
+      .from({ length: tuple.value.length })
+      .fill(undefined),
+  );
 
   useEffect(() => {
     onChange(params);
@@ -55,7 +58,7 @@ const _TupleParam = ({
     <div className={styles.codecContainer}>
       {
         tuple.value.map((entry, index) => (
-          <CodecParam
+          <CodecBuilder
             key={`tuple-param-${entry.id}-${index}`}
             variable={entry}
             // eslint-disable-next-line react/jsx-no-bind

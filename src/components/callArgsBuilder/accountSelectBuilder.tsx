@@ -10,11 +10,11 @@ import { PDSelect } from '@components/pdSelect';
 import type { ICallArgs } from '.';
 import type { InjectedPolkadotAccount } from 'polkadot-api/dist/reexports/pjs-signer';
 
-interface IAccountSelectParam extends ICallArgs {
+interface IAccountSelectBuilder extends ICallArgs {
   accounts: InjectedPolkadotAccount[];
 }
 
-export const AccountSelectParam = ({ accounts, onChange }: IAccountSelectParam) => {
+export const AccountSelectBuilder = ({ accounts, onChange }: IAccountSelectBuilder) => {
   const [
     selectedAccount,
     setSelectedAccount,

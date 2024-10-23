@@ -6,7 +6,7 @@ import {
 
 import { PDSwitch } from '@components/pdSwitch';
 
-import { CodecParam } from './codecParam';
+import { CodecParam } from './codecBuilder';
 import styles from './styles.module.css';
 
 import type { ICallArgs } from '.';

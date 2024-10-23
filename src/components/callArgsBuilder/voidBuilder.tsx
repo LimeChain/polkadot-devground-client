@@ -2,11 +2,9 @@ import { useEffect } from 'react';
 
 import type { ICallArgs } from '.';
 
-interface IVoidParam extends ICallArgs {
+interface IVoidBuilder extends ICallArgs {}
 
-}
-
-export const VoidParam = ({ onChange }: IVoidParam) => {
+export const VoidBuilder = ({ onChange }: IVoidBuilder) => {
 
   useEffect(() => {
     onChange(undefined);

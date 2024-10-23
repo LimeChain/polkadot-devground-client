@@ -8,7 +8,7 @@ import { Icon } from '@components/icon';
 import { cn } from '@utils/helpers';
 
 import { BinaryParam } from './binaryParam';
-import { CodecParam } from './codecParam';
+import { CodecParam } from './codecBuilder';
 import styles from './styles.module.css';
 
 import { type ICallArgs } from '.';

@@ -6,13 +6,13 @@ import React, {
   useState,
 } from 'react';
 
-import { CallDocs } from '@components/callParam/callDocs';
-import { QueryButton } from '@components/callParam/queryButton';
-import { QueryFormContainer } from '@components/callParam/queryFormContainer';
-import { QueryResult } from '@components/callParam/queryResult';
-import { QueryResultContainer } from '@components/callParam/queryResultContainer';
-import { QueryViewContainer } from '@components/callParam/queryViewContainer';
-import { RpcParams } from '@components/callParam/rpcParams';
+import { CallDocs } from '@components/callArgsBuilder/callDocs';
+import { QueryButton } from '@components/callArgsBuilder/queryButton';
+import { QueryFormContainer } from '@components/callArgsBuilder/queryFormContainer';
+import { QueryResult } from '@components/callArgsBuilder/queryResult';
+import { QueryResultContainer } from '@components/callArgsBuilder/queryResultContainer';
+import { QueryViewContainer } from '@components/callArgsBuilder/queryViewContainer';
+import { RpcParams } from '@components/callArgsBuilder/rpcParams';
 import { Loader } from '@components/loader';
 import {
   type IPDSelectItem,

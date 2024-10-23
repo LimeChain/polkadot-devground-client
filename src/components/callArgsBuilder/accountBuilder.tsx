@@ -7,11 +7,11 @@ import React, {
   useState,
 } from 'react';
 
+import { AccountSelectBuilder } from '@components/callArgsBuilder/accountSelectBuilder';
 import { PDSwitch } from '@components/pdSwitch';
 import { cn } from '@utils/helpers';
 import { useStoreWallet } from 'src/stores/wallet';
 
-import { AccountSelectParam } from './accountSelectParam';
 import styles from './styles.module.css';
 
 import type { ICallArgs } from './index';
@@ -19,11 +19,11 @@ import type {
   AccountId20,
   AccountId32,
 } from '@polkadot-api/metadata-builders';
-interface IAccountParam extends ICallArgs {
+interface IAccountBuilder extends ICallArgs {
   accountId: AccountId20 | AccountId32;
 }
 
-export const AccountParam = ({ accountId, onChange }: IAccountParam) => {
+export const AccountBuilder = ({ accountId, onChange }: IAccountBuilder) => {
   const accounts = useStoreWallet?.use?.accounts?.();
 
   const [
@@ -70,13 +70,13 @@ export const AccountParam = ({ accountId, onChange }: IAccountParam) => {
         {
           useCustomAccount
             ? (
-              <CustomAccountParam
+              <CustomAccountBuilder
                 accountId={accountId}
                 onChange={onChange}
               />
             )
             : (
-              <AccountSelectParam
+              <AccountSelectBuilder
                 accounts={accounts}
                 onChange={handleAccountSelect}
               />
@@ -91,7 +91,7 @@ interface ICustomAccount extends ICallArgs {
   accountId: AccountId20 | AccountId32;
 }
 
-const CustomAccountParam = ({
+const CustomAccountBuilder = ({
   accountId,
   onChange,
 }: ICustomAccount) => {
