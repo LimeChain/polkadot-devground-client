@@ -5,7 +5,7 @@ import {
   useState,
 } from 'react';
 
-import { DecoderDynamicParams } from '@components/callArgsBuilder/decoderDynamicParam';
+import { DecoderDynamicParams } from '@components/callArgsBuilder/decoderDynamicBuilder';
 import { QueryButton } from '@components/callArgsBuilder/queryButton';
 import { QueryFormContainer } from '@components/callArgsBuilder/queryFormContainer';
 import { QueryResult } from '@components/callArgsBuilder/queryResult';

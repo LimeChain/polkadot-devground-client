@@ -12,7 +12,7 @@ import { QueryFormContainer } from '@components/callArgsBuilder/queryFormContain
 import { QueryResult } from '@components/callArgsBuilder/queryResult';
 import { QueryResultContainer } from '@components/callArgsBuilder/queryResultContainer';
 import { QueryViewContainer } from '@components/callArgsBuilder/queryViewContainer';
-import { RpcParams } from '@components/callArgsBuilder/rpcParams';
+import { RpcArgsBuilder } from '@components/callArgsBuilder/rpcArgsBuilder';
 import { Loader } from '@components/loader';
 import {
   type IPDSelectItem,
@@ -233,7 +233,7 @@ export const RpcCalls = () => {
         {
           rpcCall
           && rpcCall?.params?.length > 0 && (
-            <RpcParams
+            <RpcArgsBuilder
               key={`rpc-param-${palletSelected}-${methodSelected}`}
               onChange={handleRpcParamChange}
               params={rpcCall.params}

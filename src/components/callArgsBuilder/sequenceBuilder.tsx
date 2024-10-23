@@ -6,44 +6,45 @@ import {
 
 import { Icon } from '@components/icon';
 import { cn } from '@utils/helpers';
+import { varIsBinary } from '@utils/papi/helpers';
 
-import { BinaryParam } from './binaryParam';
-import { CodecParam } from './codecBuilder';
+import { BinaryBuilder } from './binaryBuilder';
+import { CodecBuilder } from './codecBuilder';
 import styles from './styles.module.css';
 
 import { type ICallArgs } from '.';
 
 import type { SequenceVar } from '@polkadot-api/metadata-builders';
-interface ISequence extends ICallArgs {
+interface ISequenceBuilder extends ICallArgs {
   sequence: SequenceVar;
   placeholder?: string;
 
 }
 
-export const SequenceParam = ({ sequence, onChange, placeholder }: ISequence) => {
-  if (sequence.value.type === 'primitive' && sequence.value.value === 'u8') {
+export const SequenceBuilder = ({ sequence, onChange, placeholder }: ISequenceBuilder) => {
+  if (varIsBinary(sequence)) {
     return (
       <div className={styles.codecParam}>
-        <BinaryParam
+        <BinaryBuilder
           minLength={0}
           onChange={onChange}
           placeholder={placeholder}
         />
       </div>
     );
+  } else {
+    return (
+      <SequenceBuilderCore
+        key={`sequence-param-${sequence.value.id}`}
+        onChange={onChange}
+        placeholder={placeholder}
+        sequence={sequence}
+      />
+    );
   }
-
-  return (
-    <_SequenceParam
-      key={`sequence-param-${sequence.value.id}`}
-      onChange={onChange}
-      placeholder={placeholder}
-      sequence={sequence}
-    />
-  );
 };
 
-const _SequenceParam = ({ sequence, onChange, placeholder }: ISequence) => {
+const SequenceBuilderCore = ({ sequence, onChange, placeholder }: ISequenceBuilder) => {
   const [
     length,
     setLength,
@@ -151,7 +152,7 @@ const _SequenceParam = ({ sequence, onChange, placeholder }: ISequence) => {
                 :
               </span>
               <div className="flex w-full flex-col gap-6">
-                <CodecParam
+                <CodecBuilder
                   // eslint-disable-next-line react/jsx-no-bind
                   onChange={(args) => handleOnChange(args, param.id)}
                   placeholder={placeholder}

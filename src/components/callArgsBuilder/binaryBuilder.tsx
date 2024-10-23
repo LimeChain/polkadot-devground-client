@@ -1,5 +1,5 @@
 import { Binary } from 'polkadot-api';
-import React, {
+import {
   type ChangeEvent,
   useCallback,
   useEffect,
@@ -14,18 +14,18 @@ import styles from './styles.module.css';
 
 import type { ICallArgs } from './index';
 
-interface IBinaryParam extends ICallArgs {
+interface IBinaryBuilder extends ICallArgs {
   minLength: number;
   placeholder?: string;
   readOnly?: boolean;
 }
 
-export const BinaryParam = ({
+export const BinaryBuilder = ({
   onChange,
   minLength,
   placeholder,
   readOnly,
-}: IBinaryParam) => {
+}: IBinaryBuilder) => {
 
   const [
     useFileUpload,
@@ -50,7 +50,7 @@ export const BinaryParam = ({
         useFileUpload && !readOnly
           ? <PDFileUpload onChange={onChange} />
           : (
-            <TextBinaryParam
+            <TextBinaryBuilder
               minLength={minLength}
               onChange={onChange}
               placeholder={placeholder}
@@ -62,12 +62,12 @@ export const BinaryParam = ({
   );
 };
 
-export const TextBinaryParam = ({
+export const TextBinaryBuilder = ({
   onChange,
   minLength,
   placeholder,
   readOnly,
-}: IBinaryParam) => {
+}: IBinaryBuilder) => {
   const requiredHexLength = minLength * 2;
 
   const requiredBinaryLength = minLength;

@@ -3,36 +3,39 @@ import {
   useState,
 } from 'react';
 
-import { BinaryParam } from './binaryParam';
-import { CodecParam } from './codecBuilder';
+import { varIsBinary } from '@utils/papi/helpers';
+
+import { BinaryBuilder } from './binaryBuilder';
+import { CodecBuilder } from './codecBuilder';
 import styles from './styles.module.css';
 
 import type { ICallArgs } from './index';
 import type { ArrayVar } from '@polkadot-api/metadata-builders';
-interface IArrayParam extends ICallArgs {
+
+interface IArrayBuilder extends ICallArgs {
   array: ArrayVar;
 }
 
-export const ArrayParam = ({ array, onChange }: IArrayParam) => {
-  if (array.value.type === 'primitive' && array.value.value === 'u8') {
+export const ArrayBuilder = ({ array, onChange }: IArrayBuilder) => {
+  if (varIsBinary(array)) {
     return (
-      <BinaryParam
+      <BinaryBuilder
         minLength={array.len}
         onChange={onChange}
       />
     );
+  } else {
+    return (
+      <ArrayBuilderCore
+        key={`array-param-${array.len}-${array.value.id}`}
+        array={array}
+        onChange={onChange}
+      />
+    );
   }
-
-  return (
-    <_ArrayParam
-      key={`array-param-${array.len}-${array.value.id}`}
-      array={array}
-      onChange={onChange}
-    />
-  );
 };
 
-const _ArrayParam = ({ array, onChange }: IArrayParam) => {
+const ArrayBuilderCore = ({ array, onChange }: IArrayBuilder) => {
   const [
     arrayProps,
     setArrayProps,
@@ -53,7 +56,7 @@ const _ArrayParam = ({ array, onChange }: IArrayParam) => {
       {
         arrayProps.map((_, index) => {
           return (
-            <CodecParam
+            <CodecBuilder
               key={`array-param-${index}`}
               // eslint-disable-next-line react/jsx-no-bind
               onChange={(args) => setArrayProps((props) => [...props.with(index, args)])}

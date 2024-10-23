@@ -1,14 +1,14 @@
-import { RpcParam } from './rpcParam';
+import { RpcArgBuilder } from './rpcArgBuilder';
 import styles from './styles.module.css';
 
 import type { IRpcCallParam } from '@constants/rpcCalls/types';
 
-interface IRpcParams {
+interface IRpcArgsBuilder {
   params: IRpcCallParam[];
   onChange: (index: number, args: unknown) => void;
 }
 
-export const RpcParams = ({ params, onChange }: IRpcParams) => {
+export const RpcArgsBuilder = ({ params, onChange }: IRpcArgsBuilder) => {
 
   return (
     <div className="flex flex-col gap-6 empty:hidden">
@@ -20,7 +20,7 @@ export const RpcParams = ({ params, onChange }: IRpcParams) => {
             </span>
             <div className={styles['codecContainer']}>
               <div className={styles['codecGroup']}>
-                <RpcParam
+                <RpcArgBuilder
                   // eslint-disable-next-line react/jsx-no-bind
                   onChange={(args) => onChange(index, args)}
                   param={param}

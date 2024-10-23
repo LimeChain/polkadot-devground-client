@@ -1,21 +1,21 @@
-import { PrimitiveParam } from './primitiveParam';
-import { SequenceParam } from './sequenceParam';
+import { PrimitiveBuilder } from './primitiveBuilder';
+import { SequenceBuilder } from './sequenceBuilder';
 
 import type { ICallArgs } from '.';
-import type { IDecoderParam } from '@constants/decoders/types';
+import type { IDecoderBuilder } from '@constants/decoders/types';
 
-export interface IDecoderParamProps extends ICallArgs {
-  param: IDecoderParam;
+export interface IDecoderBuilderProps extends ICallArgs {
+  param: IDecoderBuilder;
   placeholder?: string;
   readOnly?: boolean;
 }
 
-export const DecoderParam = (props: IDecoderParamProps) => {
+export const DecoderBuilder = (props: IDecoderBuilderProps) => {
   switch (props.param.type) {
     case 'string':
     case 'hex':
       return (
-        <PrimitiveParam
+        <PrimitiveBuilder
           {...props}
           primitive={{ value: 'str', type: 'primitive' }}
         />
@@ -23,7 +23,7 @@ export const DecoderParam = (props: IDecoderParamProps) => {
 
     case 'array':
       return (
-        <SequenceParam
+        <SequenceBuilder
           {...props}
           sequence={{
             type: 'sequence',

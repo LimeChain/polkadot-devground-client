@@ -7,7 +7,7 @@ import {
 import { useStoreChain } from '@stores';
 import { cn } from '@utils/helpers';
 
-import { CodecParam } from './codecBuilder';
+import { CodecBuilder } from './codecBuilder';
 import styles from './styles.module.css';
 
 import type { TMetaDataApiMethod } from '@custom-types/papi';
@@ -66,7 +66,7 @@ export const MethodArgs = ({
                 styles.codecContainer,
               )}
               >
-                <CodecParam
+                <CodecBuilder
                   // eslint-disable-next-line react/jsx-no-bind
                   onChange={(args) => handleOnChange(type.name, args)}
                   variable={apiType}

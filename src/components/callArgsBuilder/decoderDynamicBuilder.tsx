@@ -1,4 +1,4 @@
-import { PrimitiveParam } from '@components/callArgsBuilder/primitiveParam';
+import { PrimitiveBuilder } from '@components/callArgsBuilder/primitiveBuilder';
 
 import styles from './styles.module.css';
 
@@ -15,7 +15,7 @@ export const DecoderDynamicParams = ({ onChange }: IDecoderDynamicParams) => {
         </span>
         <div className={styles['codecContainer']}>
           <div className={styles['codecGroup']}>
-            <PrimitiveParam
+            <PrimitiveBuilder
               onChange={onChange}
               placeholder="hex"
               primitive={{ value: 'str', type: 'primitive' }}

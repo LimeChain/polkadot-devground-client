@@ -1,4 +1,4 @@
-import React, {
+import {
   type ChangeEvent,
   useCallback,
   useEffect,
@@ -11,11 +11,12 @@ import styles from './styles.module.css';
 
 import type { ICallArgs } from '.';
 import type { CompactVar } from '@polkadot-api/metadata-builders';
-interface ICompactParam extends ICallArgs {
+
+interface ICompactBuilder extends ICallArgs {
   compact: CompactVar;
 }
 
-export const CompactParam = ({ compact, onChange }: ICompactParam) => {
+export const CompactBuilder = ({ compact, onChange }: ICompactBuilder) => {
   const [
     value,
     setValue,

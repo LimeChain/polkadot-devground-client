@@ -6,23 +6,23 @@ import {
 
 import { PDSelect } from '@components/pdSelect';
 
-import { PrimitiveParam } from './primitiveParam';
-import { SequenceParam } from './sequenceParam';
+import { PrimitiveBuilder } from './primitiveBuilder';
+import { SequenceBuilder } from './sequenceBuilder';
 
 import type { ICallArgs } from '.';
 import type { IRpcCallParam } from '@constants/rpcCalls/types';
 
-export interface IRpcParam extends ICallArgs {
+export interface IRpcArgBuilder extends ICallArgs {
   param: IRpcCallParam;
   placeholder?: string;
   readOnly?: boolean;
 }
 
-export const RpcParam = (props: IRpcParam) => {
+export const RpcArgBuilder = (props: IRpcArgBuilder) => {
   switch (props.param.type) {
     case 'boolean':
       return (
-        <PrimitiveParam
+        <PrimitiveBuilder
           {...props}
           primitive={{ value: 'bool', type: 'primitive' }}
         />
@@ -30,7 +30,7 @@ export const RpcParam = (props: IRpcParam) => {
 
     case 'number':
       return (
-        <PrimitiveParam
+        <PrimitiveBuilder
           {...props}
           primitive={{ value: props.param.primitiveType || 'u64', type: 'primitive' }}
         />
@@ -39,7 +39,7 @@ export const RpcParam = (props: IRpcParam) => {
     case 'string':
     case 'hex':
       return (
-        <PrimitiveParam
+        <PrimitiveBuilder
           {...props}
           primitive={{ value: 'str', type: 'primitive' }}
         />
@@ -52,7 +52,7 @@ export const RpcParam = (props: IRpcParam) => {
 
     case 'array':
       return (
-        <SequenceParam
+        <SequenceBuilder
           {...props}
           sequence={{
             type: 'sequence',
@@ -74,7 +74,7 @@ export const RpcParam = (props: IRpcParam) => {
   }
 };
 
-const RpcSelect = ({ onChange, param }: IRpcParam) => {
+const RpcSelect = ({ onChange, param }: IRpcArgBuilder) => {
 
   const [
     value,

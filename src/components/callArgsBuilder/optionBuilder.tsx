@@ -6,16 +6,17 @@ import {
 
 import { PDSwitch } from '@components/pdSwitch';
 
-import { CodecParam } from './codecBuilder';
+import { CodecBuilder } from './codecBuilder';
 import styles from './styles.module.css';
 
 import type { ICallArgs } from '.';
 import type { OptionVar } from '@polkadot-api/metadata-builders';
-interface IOptionParam extends ICallArgs {
+
+interface IOptionBuilder extends ICallArgs {
   option: OptionVar;
 }
 
-export const OptionParam = ({ option, onChange }: IOptionParam) => {
+export const OptionBuilder = ({ option, onChange }: IOptionBuilder) => {
   const [
     includeOption,
     setIncludeOption,
@@ -50,7 +51,7 @@ export const OptionParam = ({ option, onChange }: IOptionParam) => {
       />
       {
         includeOption && (
-          <CodecParam
+          <CodecBuilder
             onChange={handleOnChange}
             variable={option.value}
           />

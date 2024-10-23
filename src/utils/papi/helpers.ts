@@ -23,6 +23,9 @@ export const varIsBinary = (variabel: Var) => {
     case 'tuple':
       return variabel.value.every((lookupEntry) =>
         lookupEntry.type === 'primitive' && lookupEntry.value === 'u8');
+    case 'sequence':
+    case 'array':
+      return variabel.value.type === 'primitive' && variabel.value.value === 'u8';
     default:
       return;
   }

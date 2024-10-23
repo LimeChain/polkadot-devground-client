@@ -1,11 +1,11 @@
-import { DecoderParam } from '@components/callArgsBuilder/decoderParam';
+import { DecoderBuilder } from '@components/callArgsBuilder/decoderBuilder';
 
 import styles from './styles.module.css';
 
-import type { IDecoderParam } from '@constants/decoders/types';
+import type { IDecoderBuilder } from '@constants/decoders/types';
 
 interface IDecoderParams {
-  params: IDecoderParam[];
+  params: IDecoderBuilder[];
   onChange: (index: number, args: unknown) => void;
 }
 
@@ -20,7 +20,7 @@ export const DecoderParams = ({ params, onChange }: IDecoderParams) => {
             </span>
             <div className={styles['codecContainer']}>
               <div className={styles['codecGroup']}>
-                <DecoderParam
+                <DecoderBuilder
                   // eslint-disable-next-line react/jsx-no-bind
                   onChange={(args) => onChange(index, args)}
                   param={param}

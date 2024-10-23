@@ -5,7 +5,7 @@ import {
 
 import { varIsBinary } from '@utils/papi/helpers';
 
-import { BinaryParam } from './binaryParam';
+import { BinaryBuilder } from './binaryBuilder';
 import { CodecBuilder } from './codecBuilder';
 import styles from './styles.module.css';
 
@@ -20,7 +20,7 @@ export const TupleBuilder = ({ tuple, onChange }: ITupleBuilder) => {
   if (varIsBinary(tuple)) {
     return (
       <div className="border-l pl-4 pt-2">
-        <BinaryParam
+        <BinaryBuilder
           minLength={0}
           onChange={onChange}
         />

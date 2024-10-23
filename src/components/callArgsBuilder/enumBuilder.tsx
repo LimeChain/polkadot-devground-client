@@ -7,16 +7,17 @@ import {
 
 import { PDSelect } from '@components/pdSelect';
 
-import { CodecParam } from './codecBuilder';
+import { CodecBuilder } from './codecBuilder';
 import styles from './styles.module.css';
 
 import type { ICallArgs } from '.';
 import type { EnumVar } from '@polkadot-api/metadata-builders';
-interface IEnumParam extends ICallArgs {
+
+interface IEnumBuilder extends ICallArgs {
   enum: EnumVar;
 }
 
-export const EnumParam = ({ onChange, ...props }: IEnumParam) => {
+export const EnumBuilder = ({ onChange, ...props }: IEnumBuilder) => {
   const enumVar = props.enum;
   const enumKeys = Object.keys(enumVar.value);
 
@@ -66,7 +67,7 @@ export const EnumParam = ({ onChange, ...props }: IEnumParam) => {
       {
         variable && (
           <div className={styles.codecContainer}>
-            <CodecParam
+            <CodecBuilder
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               key={`${variable.type}-${(variable as any)?.id}`} /* used to fix state on enum change */
               onChange={handleSetValue}

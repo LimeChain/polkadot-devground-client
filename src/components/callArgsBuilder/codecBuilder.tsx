@@ -1,3 +1,4 @@
+import { AccountBuilder } from '@components/callArgsBuilder/accountBuilder';
 import { ArrayBuilder } from '@components/callArgsBuilder/arrayBuilder';
 import { BinaryBuilder } from '@components/callArgsBuilder/binaryBuilder';
 import { CompactBuilder } from '@components/callArgsBuilder/compactBuilder';
@@ -5,8 +6,6 @@ import { EnumBuilder } from '@components/callArgsBuilder/enumBuilder';
 import { OptionBuilder } from '@components/callArgsBuilder/optionBuilder';
 import { PrimitiveBuilder } from '@components/callArgsBuilder/primitiveBuilder';
 import { SequenceBuilder } from '@components/callArgsBuilder/sequenceBuilder';
-
-import { AccountBuilder } from '@components/callArgsBuilder/accountBuilder';
 import { TupleBuilder } from '@components/callArgsBuilder/tupleBuilder';
 import { VoidBuilder } from '@components/callArgsBuilder/voidBuilder';
 
@@ -40,7 +39,11 @@ const NotImplemented = () => {
   );
 };
 
-export const CodecBuilder = ({ variable, onChange, placeholder }: ICodecBuilder) => {
+export const CodecBuilder = ({
+  variable,
+  onChange,
+  placeholder,
+}: ICodecBuilder) => {
 
   const components = {
     struct: <StructBuilder
