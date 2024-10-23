@@ -1,3 +1,6 @@
+This source code is licensed under Apache-2.0 apart from the protobuf library
+which is licensed under BSD-3-Clause, both licenses given below.
+
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -200,74 +203,55 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   ============================================================================
-   LimeChain polkadot-devground-client SUBCOMPONENTS:
+-------------------------------------------------------------------------------
 
-   The LimeChain polkadot-devground-client project contains subcomponents with separate copyright
-   notices and license terms. Your use of the source code for the these
-   subcomponents is subject to the terms and conditions of the following
-   licenses.
+For tslib.
 
-========================================================================
-Third party Apache 2.0 licenses
-========================================================================
+file: [source code root]/packages/firebase
 
-The following components are provided under the Apache 2.0 License.
-See project link for details. The text of each license is also included
-at 3rd-party-licenses/LICENSE-[project].txt.
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
 
-   (ALv2 License) @polkadot/react-identicon v3.9.1 (https://github.com/polkadot-js/ui)
-   (ALv2 License) @polkadot/types v12.2.3 (https://github.com/polkadot-js/api)
-   (ALv2 License) firebase v10.14.0 (https://github.com/firebase/firebase-js-sdk)
-   (ALv2 License) react-helmet-async v2.0.5 (https://github.com/staylor/react-helmet-async)
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
 
-========================================================================
-MIT licenses
-========================================================================
+------------------------------------------------------------------------------
 
-The following components are provided under the MIT License. See project link for details.
-The text of each license is also included at 3rd-party-licenses/LICENSE-[project].txt.
+For Google protobuf source.
 
-   (MIT License) @pivanov/event-bus v1.0.0 (https://github.com/pivanov/event-bus)
-   (MIT License) @pivanov/use-toggle-visibility v0.0.1 (https://github.com/pivanov/use-toggle-visibility)
-   (MIT License) @polkadot-api/descriptors v0.1.0 (https://github.com/polkadot-api/polkadot-api)
-   (MIT License) @polkadot-api/metadata-builders v0.7.0 (https://github.com/polkadot-api/polkadot-api)
-   (MIT License) @polkadot-api/view-builder v0.3.3 (https://github.com/polkadot-api/polkadot-api)
-   (MIT License) @radix-ui/react-scroll-area v1.1.0 (https://github.com/radix-ui/primitives)
-   (MIT License) @radix-ui/react-select v2.1.1 (https://github.com/radix-ui/primitives)
-   (MIT License) @radix-ui/react-switch v1.1.0 (https://github.com/radix-ui/primitives)
-   (MIT License) @radix-ui/react-tooltip v1.1.3 (https://github.com/radix-ui/primitives)
-   (MIT License) @shikijs/monaco v1.10.0 (https://github.com/shikijs/shiki)
-   (MIT License) @stylistic/eslint-plugin v2.8.0 (https://github.com/eslint-stylistic/eslint-stylistic)
-   (MIT License) @stylistic/eslint-plugin-jsx v2.8.0 (https://github.com/eslint-stylistic/eslint-stylistic)
-   (MIT License) @tanstack/react-table v8.20.5 (https://github.com/TanStack/table)
-   (MIT License) @tanstack/react-virtual v3.8.2 (https://github.com/tanstack/virtual)
-   (MIT License) @typescript/ata v0.9.6 (https://github.com/microsoft/TypeScript-Website)
-   (MIT License) @vitejs/plugin-react-swc v3.7.0 (https://github.com/vitejs/vite-plugin-react-swc)
-   (MIT License) axios v1.7.2 (https://github.com/axios/axios)
-   (MIT License) clsx v2.1.1 (https://github.com/lukeed/clsx)
-   (MIT License) date-fns v3.6.0 (https://github.com/date-fns/date-fns)
-   (MIT License) file-saver v2.0.5 (https://github.com/eligrey/FileSaver.js)
-   (MIT License) monaco-editor v0.50.0 (https://github.com/microsoft/monaco-editor)
-   (MIT License) nanoid v5.0.7 (https://github.com/ai/nanoid)
-   (MIT License) pako v2.1.0 (https://github.com/nodeca/pako)
-   (MIT License) polkadot-api v1.4.1 (https://github.com/polkadot-api/polkadot-api)
-   (MIT License) prettier v3.3.2 (https://github.com/prettier/prettier)
-   (MIT License) prism-themes v1.9.0 (https://github.com/PrismJS/prism-themes)
-   (MIT License) prismjs v1.29.0 (https://github.com/PrismJS/prism)
-   (MIT License) react v18.3.1 (https://github.com/facebook/react)
-   (MIT License) react-dom v18.3.1 (https://github.com/facebook/react)
-   (MIT License) react-hot-toast v2.4.1 (https://github.com/timolins/react-hot-toast)
-   (MIT License) react-resizable-panels v2.0.19 (https://github.com/bvaughn/react-resizable-panels)
-   (MIT License) react-router-dom v6.24.0 (https://github.com/remix-run/react-router)
-   (MIT License) react18-json-view v0.2.8 (https://github.com/YYsuni/react18-json-view)
-   (MIT License) scale-ts v1.6.0 (https://github.com/unstoppablejs/unstoppablejs)
-   (MIT License) shiki v1.10.0 (https://github.com/shikijs/shiki)
-   (MIT License) styled-components v6.1.12 (https://github.com/styled-components/styled-components)
-   (MIT License) sucrase v3.35.0 (https://github.com/alangpierce/sucrase)
-   (MIT License) tailwind-merge v2.5.2 (https://github.com/dcastil/tailwind-merge)
-   (MIT License) ts-node v10.9.2 (https://github.com/TypeStrong/ts-node)
-   (MIT License) vite v5.3.1 (https://github.com/vitejs/vite)
-   (MIT License) zustand v4.5.4 (https://github.com/pmndrs/zustand)
+file: [source code root]/packages/firestore/src/protos/google/protobuf/any.proto
 
-========================================================================
+// Protocol Buffers - Google's data interchange format
+// Copyright 2008 Google Inc.  All rights reserved.
+// https://developers.google.com/protocol-buffers/
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are
+// met:
+//
+//     * Redistributions of source code must retain the above copyright
+// notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above
+// copyright notice, this list of conditions and the following disclaimer
+// in the documentation and/or other materials provided with the
+// distribution.
+//     * Neither the name of Google Inc. nor the names of its
+// contributors may be used to endorse or promote products derived from
+// this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

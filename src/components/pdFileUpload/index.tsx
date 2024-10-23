@@ -1,4 +1,3 @@
-import { formatNumber } from '@polkadot/util';
 import { Binary } from 'polkadot-api';
 import {
   type ChangeEvent,
@@ -8,7 +7,10 @@ import {
   useState,
 } from 'react';
 
-import { cn } from '@utils/helpers';
+import {
+  cn,
+  formatNumber,
+} from '@utils/helpers';
 
 interface IPDFileUpload {
   onChange: (args: unknown) => void;
