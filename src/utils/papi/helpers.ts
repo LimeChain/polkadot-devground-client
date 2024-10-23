@@ -27,7 +27,7 @@ export const varIsBinary = (variabel: Var) => {
     case 'array':
       return variabel.value.type === 'primitive' && variabel.value.value === 'u8';
     default:
-      return;
+      return false;
   }
 };
 

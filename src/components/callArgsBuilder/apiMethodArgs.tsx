@@ -27,14 +27,15 @@ export const MethodArgs = ({
   const [
     args,
     setArgs,
-  ] = useState(inputs.reduce((
-    acc: {
-      [key: string]: unknown;
-    }, curr,
-  ) => {
-    acc[curr.name] = undefined;
-    return acc;
-  }, {}));
+  ] = useState(inputs
+    .reduce((
+      acc: {
+        [key: string]: unknown;
+      }, curr,
+    ) => {
+      acc[curr.name] = undefined;
+      return acc;
+    }, {}));
 
   useEffect(() => {
     onChange(args);
