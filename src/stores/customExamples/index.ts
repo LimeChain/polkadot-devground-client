@@ -18,6 +18,7 @@ interface UploadCustomExampleData {
 interface StoreInterface {
   examples: ICodeExample[];
   isUploading: boolean;
+  isSavingContent: boolean;
   exampleDescription: string;
   selectedExampleId: string;
   actions: {
@@ -36,6 +37,7 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   exampleDescription: '',
   selectedExampleId: '',
   isUploading: false,
+  isSavingContent: false,
 };
 
 const baseStore = create<StoreInterface>()((set) => ({
@@ -84,13 +86,22 @@ const baseStore = create<StoreInterface>()((set) => ({
 
     updateCustomExampleInfo: async (exampleName: string, description: string) => {
       const { selectedExampleId } = baseStore.getState();
+      set({ isUploading: true });
 
       const gistsArray = await gistService.editGistInfo(selectedExampleId, exampleName, description);
-      set({ examples: gistsArray });
+
+      set({ examples: gistsArray, isUploading: false });
+      busDispatch<IUploadExampleModalClose>('@@-close-upload-example-modal');
+      toast.success('Example Information Updated!');
     },
 
     updateCustomExampleContent: async (id: string, data: string) => {
+      set({ isSavingContent: true });
+
       await gistService.editGistContent(id, data);
+      set({ isSavingContent: false });
+      busDispatch<IUploadExampleModalClose>('@@-close-upload-example-modal');
+      toast.success('Example Content Updated!');
     },
 
     deleteExample: async (id: string) => {

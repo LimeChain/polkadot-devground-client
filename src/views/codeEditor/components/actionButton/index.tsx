@@ -4,14 +4,15 @@ import { cn } from '@utils/helpers';
 
 interface ActionButtonProps {
   iconName: string;
-  onClick?: () => void;
   classes?: string;
   fill?: string;
   toolTip?: string;
+  isLoading?: boolean;
+  onClick?: () => void;
 }
 
 export const ActionButton = (props: ActionButtonProps) => {
-  const { iconName, onClick, classes, toolTip } = props;
+  const { iconName, classes, toolTip, isLoading = false, onClick } = props;
 
   const button = (
     <button
@@ -23,7 +24,15 @@ export const ActionButton = (props: ActionButtonProps) => {
         classes,
       )}
     >
-      <Icon name={iconName} />
+      {isLoading
+        ? (
+          <Icon
+            className="animate-spin duration-1000"
+            name="icon-loader"
+          />
+        )
+        : <Icon name={iconName} />
+      }
     </button>
   );
 

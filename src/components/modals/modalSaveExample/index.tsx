@@ -4,6 +4,7 @@ import {
   useState,
 } from 'react';
 
+import { Icon } from '@components/icon';
 import { cn } from '@utils/helpers';
 import { useStoreCustomExamples } from 'src/stores/customExamples';
 
@@ -113,6 +114,7 @@ export const ModalSaveExample = (props: IModalGithubLogin) => {
           disabled={!exampleName || !description}
           onClick={handleSubmit}
           className={cn(
+            'flex justify-center',
             'mb-2 mt-6 p-4 transition-colors',
             'font-geist text-white font-body2-bold',
             'bg-dev-pink-500',
@@ -120,7 +122,16 @@ export const ModalSaveExample = (props: IModalGithubLogin) => {
             { 'opacity-50 cursor-not-allowed': !exampleName || !description },
           )}
         >
-          {isUploading ? 'Submitting' : 'Submit'}
+          {
+            isUploading
+              ? (
+                <Icon
+                  className="animate-spin"
+                  name="icon-loader"
+                />
+              )
+              : 'Save'
+          }
         </button>
         <button
           onClick={onClose}
