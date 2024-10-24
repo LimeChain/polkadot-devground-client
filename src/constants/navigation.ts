@@ -11,7 +11,7 @@ export const NAVIGATION_ITEMS: TNavItem[] = [
   {
     linkProps: {
       title: 'Console',
-      to: '/code',
+      to: '/code?d=1',
     },
     type: 'link',
   },

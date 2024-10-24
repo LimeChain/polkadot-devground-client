@@ -22,6 +22,7 @@ import {
   useStoreWallet,
 } from '@stores';
 import { analyticsApp } from 'firebaseConfig';
+import { useStoreCustomExamples } from 'src/stores/examples';
 
 import { routes } from './routes';
 
@@ -54,32 +55,41 @@ export const App = () => {
     resetStore: resetStoreWallet,
   } = useStoreWallet.use.actions();
 
+  const { resetStore: resetStoreGists } = useStoreCustomExamples.use.actions();
+
   useEffect(() => {
-    initStoreAuth();
-    initStoreUI();
-    initStoreChainClient();
-    initStoreWallet();
+    const initializeStores = async () => {
+      await initStoreAuth();
+      initStoreUI();
+      initStoreChainClient();
+      initStoreWallet();
 
-    window.customPackages = {};
-    Object.assign(window.customPackages, {
-      createClient,
-      ...createClient,
-      papiDescriptors,
-      ...papiDescriptors,
-      getPolkadotSigner,
-      connectInjectedExtension,
-      getInjectedExtensions,
+      window.customPackages = {};
+      Object.assign(window.customPackages, {
+        createClient,
+        ...createClient,
+        papiDescriptors,
+        ...papiDescriptors,
+        getPolkadotSigner,
+        connectInjectedExtension,
+        getInjectedExtensions,
+      });
+
+      refTimeout.current = setTimeout(() => {
+        document.body.removeAttribute('style');
+      }, 400);
+    };
+
+    initializeStores().catch((error) => {
+      console.error('Error initializing stores', error);
     });
-
-    refTimeout.current = setTimeout(() => {
-      document.body.removeAttribute('style');
-    }, 400);
 
     return () => {
       resetStoreAuth();
       resetStoreUI();
       void resetStoreChain();
       resetStoreWallet();
+      resetStoreGists();
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

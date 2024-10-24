@@ -2,6 +2,8 @@ import axios from 'axios';
 
 import authService from './authService';
 
+const MAX_RETRIES = 3;
+
 axios.interceptors.request.use(
   async (config) => {
     const token = await authService.getJwtToken();
@@ -22,10 +24,13 @@ axios.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+    if (!originalRequest._retryCount) {
+      originalRequest._retryCount = 0;
+    }
+
+    if (error.response.status === 401 && originalRequest._retryCount < MAX_RETRIES) {
+      originalRequest._retryCount += 1;
       try {
-        await authService.refreshJwtToken();
         const token = await authService.getJwtToken();
         if (token) {
           axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -35,14 +40,16 @@ axios.interceptors.response.use(
         return Promise.reject(e);
       }
     }
+
     if (error.response.status === 403 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        return authService.authoriseGitHubApp();
+        return authService.authorizeGitHubApp();
       } catch (e) {
         return Promise.reject(e);
       }
     }
+
     return Promise.reject(error);
   },
 );

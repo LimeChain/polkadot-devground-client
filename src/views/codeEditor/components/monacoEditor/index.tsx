@@ -14,7 +14,6 @@ import {
 } from 'react';
 import { getSingletonHighlighter } from 'shiki/index.mjs';
 
-import { snippets } from '@constants/snippets';
 import { useStoreUI } from '@stores';
 import {
   cn,
@@ -32,6 +31,7 @@ import {
 } from '@views/codeEditor/helpers';
 import { monacoEditorConfig } from '@views/codeEditor/monaco-editor-config';
 import { Progress } from '@views/codeEditor/progress';
+import { useStoreCustomExamples } from 'src/stores/examples';
 
 import type {
   IEventBusIframeDestroy,
@@ -112,6 +112,13 @@ const checkTheme = async (theme: string) => {
   monaco.editor.setTheme(currentTheme);
 };
 
+// Utility to handle showing/hiding preview based on code content
+const triggerPreview = (code: string) => {
+  busDispatch({
+    type: '@@-monaco-editor-show-preview',
+    data: code.includes('createRoot'),
+  });
+};
 interface IMonacoEditorProps {
   classNames?: string;
 }
@@ -132,6 +139,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
   ] = useState(false);
 
   const theme = useStoreUI.use.theme?.();
+  const { loadExampleContent } = useStoreCustomExamples.use.actions();
 
   const triggerValidation = useCallback(async () => {
     if (refModel.current) {
@@ -194,7 +202,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
       void checkTheme(theme);
       void triggerValidation();
     },
-    () => {},
+    () => { },
     (userFacingMessage, error) => {
       console.error('Custom error handling:', userFacingMessage, error);
     },
@@ -223,57 +231,51 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
     void fetchType(refSnippet.current);
   };
 
-  const loadSnippet = useCallback(async (snippetIndex: number | null) => {
+  const loadExample = useCallback(async (id: string, type: string) => {
     clearTimeout(refTimeout.current);
+    // Reset bus states
+    busDispatch({ type: '@@-problems-message', data: [] });
+    busDispatch({ type: '@@-console-message-reset' });
+    busDispatch({ type: '@@-monaco-editor-types-progress', data: 0 });
 
-    busDispatch({
-      type: '@@-problems-message',
-      data: [],
-    });
+    // Default code snippet
+    if (!id) {
+      const code = 'console.log("Hello, World!");';
+      refSnippetIndex.current = String(id);
+      refSnippet.current = await formatCode(code);
+      createNewModel(refSnippet.current);
+      triggerPreview(refSnippet.current);
 
-    busDispatch({
-      type: '@@-console-message-reset',
-    });
+      // Hide loading after delay
+      refTimeout.current = setTimeout(() => {
+        busDispatch({ type: '@@-monaco-editor-hide-loading' });
+      }, 400);
 
-    busDispatch({
-      type: '@@-monaco-editor-types-progress',
-      data: 0,
-    });
-
-    let code = 'console.log("Hello, World!");';
-    if (!!snippetIndex) {
-      const selectedCodeSnippet = snippets.find((f) => f.id === snippetIndex) || snippets[0];
-      refSnippetIndex.current = String(selectedCodeSnippet.id);
-
-      // const isTempVersionExist = await storageExists(STORAGE_CACHE_NAME, `${STORAGE_PREFIX}-${snippetIndex}`);
-      code = selectedCodeSnippet.code;
-
-      // if (isTempVersionExist) {
-      //   const existingCode = await storageGetItem<string>(STORAGE_CACHE_NAME, `${STORAGE_PREFIX}-${snippetIndex}`);
-      //   code = existingCode || code;
-      // }
-
-      setSearchParam('s', snippetIndex);
+      return;
     }
 
+    const code = await loadExampleContent(id, type);
+
+    if (type === 'default') {
+      setSearchParam('d', id);
+    } else {
+      setSearchParam('c', id);
+    }
+
+    refSnippetIndex.current = String(id);
     refSnippet.current = await formatCode(code);
     createNewModel(refSnippet.current);
+    triggerPreview(refSnippet.current);
 
-    busDispatch({
-      type: '@@-monaco-editor-show-preview',
-      data: refSnippet.current.includes('createRoot'),
-    });
-
-    refTimeout.current = setTimeout(async () => {
-      busDispatch({
-        type: '@@-monaco-editor-hide-loading',
-      });
+    // Hide loading after delay
+    refTimeout.current = setTimeout(() => {
+      busDispatch({ type: '@@-monaco-editor-hide-loading' });
     }, 400);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const updateMonacoCursorPositon = useCallback((currentPosition: monaco.Position) => {
+  const updateMonacoCursorPosition = useCallback((currentPosition: monaco.Position) => {
     if (currentPosition) {
       refMonacoEditor.current?.setPosition(currentPosition);
       refMonacoEditor.current?.revealPositionInCenter(currentPosition);
@@ -282,9 +284,18 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
   }, []);
 
   useEffect(() => {
-    const snippetIndex = getSearchParam('s');
-    void loadSnippet(!!snippetIndex ? Number(snippetIndex) : null);
+    const defaultId = getSearchParam('d');
+    const customId = getSearchParam('c');
 
+    // Load examples if either defaultId or customId is present
+    if (defaultId) {
+      void loadExample(defaultId, 'default');
+    } else if (customId) {
+
+      void loadExample(customId, 'custom');
+    } else {
+      void loadExample('1', 'default');
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -311,7 +322,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
           const code = refMonacoEditor.current.getValue() || '';
           refSnippet.current = await formatCode(code);
 
-          updateMonacoCursorPositon(currentPosition!);
+          updateMonacoCursorPosition(currentPosition!);
 
           await fetchType(refSnippet.current);
 
@@ -362,7 +373,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
   }, []);
 
   useEventBus<IEventBusMonacoEditorUpdateCursorPosition>('@@-monaco-editor-update-cursor-position', ({ data }) => {
-    updateMonacoCursorPositon(data);
+    updateMonacoCursorPosition(data);
   });
 
   useEventBus<IEventBusMonacoEditorExecuteSnippet>('@@-monaco-editor-execute-snippet', () => {
@@ -381,7 +392,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
   });
 
   useEventBus<IEventBusMonacoEditorLoadSnippet>('@@-monaco-editor-load-snippet', ({ data }) => {
-    void loadSnippet(data);
+    void loadExample(data.id, data.type);
   });
 
   return (

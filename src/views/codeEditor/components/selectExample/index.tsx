@@ -11,37 +11,45 @@ import {
 } from 'react-router-dom';
 
 import { Icon } from '@components/icon';
-import { PDScrollArea } from '@components/pdScrollArea';
 import { Tabs } from '@components/tabs';
 import { snippets } from '@constants/snippets';
 import {
   cn,
   sleep,
 } from '@utils/helpers';
+import { ExamplesList } from '@views/codeEditor/components/selectExample/snippetList';
+import { useStoreCustomExamples } from 'src/stores/examples';
 
 import type { IEventBusMonacoEditorLoadSnippet } from '@custom-types/eventBus';
 
 export const SelectExample = () => {
-  const navigate = useNavigate();
+  const refContainer = useRef<HTMLDivElement>(null);
 
   const [
     isOpened,
     setIsOpened,
   ] = useState(false);
 
+  const [
+    selectedSnippet,
+    setSelectedSnippet,
+  ] = useState<string>('');
+
+  const customExamples = useStoreCustomExamples.use.examples();
+  const { getExamples } = useStoreCustomExamples.use.actions();
   const [searchParams] = useSearchParams();
-  const selectedSnippet = searchParams.get('s');
-  const selectedSnippetName = snippets.find((snippet) => snippet.id === Number(selectedSnippet))?.name;
-
-  const refContainer = useRef<HTMLDivElement>(null);
-
+  const navigate = useNavigate();
   const handleSetOpen = useCallback(() => {
     setIsOpened((prev) => !prev);
   }, []);
 
-  const handleChangeExample = useCallback(async (e: React.MouseEvent<HTMLButtonElement>) => {
-    const snippetIndex = Number(e.currentTarget.getAttribute('data-snippet-index'));
-    navigate(`/code?s=${snippetIndex}`);
+  const handleChangeExample = useCallback(async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
+    const id = e.currentTarget.getAttribute('data-example-index') ?? '';
+    const type = e.currentTarget.getAttribute('data-example-type') ?? '';
+
+    const queryParam = type === 'default' ? `d=${id}` : `c=${id}`;
+    navigate(`/code?${queryParam}`);
+
     setIsOpened(false);
 
     busDispatch({
@@ -52,26 +60,51 @@ export const SelectExample = () => {
 
     busDispatch<IEventBusMonacoEditorLoadSnippet>({
       type: '@@-monaco-editor-load-snippet',
-      data: snippetIndex,
+      data: {
+        id,
+        type,
+      },
     });
 
     busDispatch({
       type: '@@-monaco-editor-hide-loading',
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [navigate]);
+
+  // useEffect(() => {
+  //   const handleClickOutside = (event: MouseEvent) => {
+  //     if (refContainer.current && !refContainer.current.contains(event.target as Node)) {
+  //       setIsOpened(false);
+  //     }
+  //   };
+
+  //   document.addEventListener('mousedown', handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener('mousedown', handleClickOutside);
+  //   };
+  // }, []);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (refContainer.current && !refContainer.current.contains(event.target as Node)) {
-        setIsOpened(false);
-      }
-    };
+    const defaultExampleParam = searchParams.get('d');
+    const customExampleParam = searchParams.get('c');
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    let exampleName = '';
+
+    if (defaultExampleParam) {
+      exampleName = snippets.find((snippet) => snippet.id === defaultExampleParam)?.name || '';
+    } else if (customExampleParam) {
+      exampleName = customExamples?.find((example) => example.id === customExampleParam)?.name || '';
+    }
+
+    setSelectedSnippet(exampleName || '');
+  }, [
+    customExamples,
+    searchParams,
+  ]);
+
+  useEffect(() => {
+    getExamples();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -94,7 +127,7 @@ export const SelectExample = () => {
           },
         )}
       >
-        {selectedSnippetName || 'Select Example'}
+        {selectedSnippet || 'Select Example'}
         <Icon
           name="icon-dropdownArrow"
           className={cn(
@@ -120,51 +153,61 @@ export const SelectExample = () => {
         <Tabs
           tabClassName={cn(
             'mb-2 px-10 py-2.5',
-            'text-dev-white-400 hover:text-dev-white-200 dark:text-dev-black-800 dark:hover:text-dev-black-1000',
+            'text-dev-white-400 hover:text-dev-white-200',
+            'dark:text-dev-black-800 dark:hover:text-dev-black-1000',
           )}
 
         >
-          <div data-title="Custom">
-            <li className="font-geist text-dev-white-1000 font-body1-regular dark:text-dev-black-300">
-              No examples found
-            </li>
-          </div>
           <div data-title="Default">
-            <PDScrollArea
-              verticalScrollClassNames="py-4"
-              verticalScrollThumbClassNames="before:bg-dev-purple-700 dark:before:bg-dev-purple-300"
-            >
-              <ul className="max-h-56 ">
-                {
-                  snippets.map((snippet) => (
-                    <li
-                      key={snippet.id}
-                    >
+            <ExamplesList
+              examples={snippets}
+              handleChangeExample={handleChangeExample}
+              selectedExample={selectedSnippet}
+              type="default"
+            />
+          </div>
+          <div data-title="Custom">
+            {
+              customExamples?.length >= 1
+                ? (
+                  <ExamplesList
+                    examples={customExamples}
+                    handleChangeExample={handleChangeExample}
+                    selectedExample={selectedSnippet}
+                    type="custom"
+                    editable
+                  />
+                )
+                : (
+                  <div className="flex flex-col p-3">
+                    <Icon
+                      name="icon-group"
+                      size={[100]}
+                      className={cn(
+                        'mb-8',
+                        'self-center text-dev-white-1000',
+                        'dark:text-dev-purple-50',
+                      )}
+                    />
+                    <div className="flex flex-col items-center justify-center text-white dark:text-dev-black-1000">
+                      <h4 className="mb-4 self-center font-h4-bold">Nothing here</h4>
+                      <p className="max-w-80 text-center font-geist">
+                        Currently, you don't have any custom examples created. Ready to create one?
+                      </p>
                       <button
-                        data-snippet-index={snippet.id}
-                        onClick={handleChangeExample}
                         className={cn(
-                          'flex w-full items-center justify-between',
-                          'px-4 py-3.5',
-                          'transition-[background] duration-300',
-                          'hover:bg-dev-black-900 hover:dark:bg-dev-purple-200',
-                          {
-                            ['bg-dev-black-800 dark:bg-dev-purple-300']: selectedSnippet === snippet.id.toString(),
-                          },
+                          'mb-2 mt-6 w-full p-4 transition-colors',
+                          'font-geist text-white font-body2-bold',
+                          'bg-dev-pink-500',
+                          'hover:bg-dev-pink-400',
                         )}
                       >
-                        <p className="font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000">
-                          {snippet.name}
-                        </p>
-                        <p className="font-geist text-dev-white-1000 font-body3-regular dark:text-dev-black-300">
-                          CUSTOM
-                        </p>
+                        Create Example
                       </button>
-                    </li>
-                  ))
-                }
-              </ul>
-            </PDScrollArea>
+                    </div>
+                  </div>
+                )
+            }
           </div>
         </Tabs>
       </div>

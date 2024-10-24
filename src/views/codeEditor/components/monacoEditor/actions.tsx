@@ -2,19 +2,25 @@ import {
   busDispatch,
   useEventBus,
 } from '@pivanov/event-bus';
+import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import {
   useCallback,
   useRef,
   useState,
 } from 'react';
 
+import { ModalSaveExample } from '@components/modals/modalSaveExample';
 import { downloadZip } from '@utils/downloadZip';
-import { cn } from '@utils/helpers';
+import {
+  cn,
+  getSearchParam,
+} from '@utils/helpers';
 import {
   getImportMap,
   mergeImportMap,
 } from '@utils/iframe';
 import { defaultImportMap } from '@views/codeEditor/constants';
+import { useStoreCustomExamples } from 'src/stores/examples';
 
 import { ActionButton } from '../actionButton';
 
@@ -24,7 +30,24 @@ import type {
 } from '@custom-types/eventBus';
 
 export const EditorActions = () => {
+  const selectedExampleId = useStoreCustomExamples.use.selectedExampleId();
+  const isSavingContent = useStoreCustomExamples.use.isSavingContent();
+  const { updateExampleContent } = useStoreCustomExamples.use.actions();
+
   const refCode = useRef<string>('');
+  const initCode = useRef<string>('');
+  const isInit = useRef(false);
+
+  const [
+    SaveExampleModal,
+    toggleVisibility,
+  ] = useToggleVisibility(ModalSaveExample);
+
+  const [
+    isEdited,
+    setIsEdited,
+  ] = useState(false);
+
   const [
     isRunning,
     setIsRunning,
@@ -105,29 +128,60 @@ export const EditorActions = () => {
     await downloadFiles(files);
   }, []);
 
+  const handleSave = useCallback(() => {
+    updateExampleContent(selectedExampleId, refCode.current);
+  }, [
+    selectedExampleId,
+    updateExampleContent,
+  ]);
+
   useEventBus<IEventBusMonacoEditorUpdateCode>('@@-monaco-editor-update-code', ({ data }) => {
-    refCode.current = data;
+    const isCustomExample = !!getSearchParam('c');
+
+    if (data !== null) {
+      refCode.current = data;
+
+      if (!isInit.current) {
+        initCode.current = data;
+        isInit.current = true;
+      }
+
+      isCustomExample && setIsEdited(initCode.current !== data);
+    }
   });
 
   useEventBus<IEventBusMonacoEditorLoadSnippet>('@@-monaco-editor-load-snippet', () => {
+    setIsEdited(false);
+    isInit.current = false;
     handleStop();
   });
 
   return (
     <div
       className={cn(
-        'absolute right-0 top-0',
+        'absolute right-0 top-4',
         'flex items-center justify-between',
-        'z-20 py-4 pl-14',
+        'z-20',
       )}
     >
       <div className="flex gap-2 pr-2">
+        {
+          isEdited && (
+            <ActionButton
+              iconName="icon-save"
+              isLoading={isSavingContent}
+              onClick={handleSave}
+              toolTip="Revert changes"
+            />
+          )
+        }
         <ActionButton
           iconName="icon-share"
           toolTip="Share"
         />
         <ActionButton
-          iconName="icon-save"
+          iconName="icon-uploadCloud"
+          onClick={toggleVisibility}
           toolTip="Save to GitHub"
         />
         <ActionButton
@@ -152,6 +206,11 @@ export const EditorActions = () => {
             />
           )}
       </div>
+      <SaveExampleModal
+        code={refCode.current}
+        onClose={toggleVisibility}
+        type="upload"
+      />
     </div>
   );
 };
