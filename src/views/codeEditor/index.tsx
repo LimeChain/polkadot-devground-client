@@ -17,7 +17,7 @@ import { useStoreUI } from '@stores';
 import { cn } from '@utils/helpers';
 import { useResizeObserver } from '@utils/hooks/useResizeObserver';
 import { SelectExample } from '@views/codeEditor/components/selectExample';
-import { useStoreCustomExamples } from 'src/stores/customExamples';
+import { useStoreCustomExamples } from 'src/stores/examples';
 
 import { ActionButton } from './components/actionButton';
 import { DebugPanel } from './components/debugPanel';
@@ -93,7 +93,6 @@ const TypeScriptEditor = () => {
             )}
           >
             <SelectExample />
-
             <div
               className={cn(
                 'relative z-10 flex-1',
@@ -102,15 +101,13 @@ const TypeScriptEditor = () => {
                 },
               )}
             >
-              <EditorActions />
-
               <Tabs
                 unmountOnHide={false}
                 tabClassName={cn(
-                  'px-10 py-2.5',
+                  'px-6 py-2.5',
                 )}
                 tabsClassName={cn(
-                  'w-full py-4 pl-16',
+                  'w-full py-4 pl-8',
                   'dark:bg-dev-black-800',
                 )}
               >
@@ -121,12 +118,13 @@ const TypeScriptEditor = () => {
                   <MonacoEditor />
                 </div>
                 <div
-                  className="flex h-full p-4 dark:bg-dev-black-800"
+                  className="flex h-full dark:bg-dev-black-800"
                   data-title="Read me"
                 >
                   {exampleDescription}
                 </div>
               </Tabs>
+              <EditorActions />
             </div>
           </Panel>
           <PanelResizeHandle className="group relative top-20 w-4">

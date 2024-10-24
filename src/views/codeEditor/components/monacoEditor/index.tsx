@@ -31,7 +31,7 @@ import {
 } from '@views/codeEditor/helpers';
 import { monacoEditorConfig } from '@views/codeEditor/monaco-editor-config';
 import { Progress } from '@views/codeEditor/progress';
-import { useStoreCustomExamples } from 'src/stores/customExamples';
+import { useStoreCustomExamples } from 'src/stores/examples';
 
 import type {
   IEventBusIframeDestroy,
@@ -139,7 +139,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
   ] = useState(false);
 
   const theme = useStoreUI.use.theme?.();
-  const { loadCustomExampleContent } = useStoreCustomExamples.use.actions();
+  const { loadExampleContent } = useStoreCustomExamples.use.actions();
 
   const triggerValidation = useCallback(async () => {
     if (refModel.current) {
@@ -254,7 +254,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
       return;
     }
 
-    const code = await loadCustomExampleContent(id, type);
+    const code = await loadExampleContent(id, type);
 
     if (type === 'default') {
       setSearchParam('d', id);
@@ -275,7 +275,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const updateMonacoCursorPositon = useCallback((currentPosition: monaco.Position) => {
+  const updateMonacoCursorPosition = useCallback((currentPosition: monaco.Position) => {
     if (currentPosition) {
       refMonacoEditor.current?.setPosition(currentPosition);
       refMonacoEditor.current?.revealPositionInCenter(currentPosition);
@@ -322,7 +322,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
           const code = refMonacoEditor.current.getValue() || '';
           refSnippet.current = await formatCode(code);
 
-          updateMonacoCursorPositon(currentPosition!);
+          updateMonacoCursorPosition(currentPosition!);
 
           await fetchType(refSnippet.current);
 
@@ -373,7 +373,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
   }, []);
 
   useEventBus<IEventBusMonacoEditorUpdateCursorPosition>('@@-monaco-editor-update-cursor-position', ({ data }) => {
-    updateMonacoCursorPositon(data);
+    updateMonacoCursorPosition(data);
   });
 
   useEventBus<IEventBusMonacoEditorExecuteSnippet>('@@-monaco-editor-execute-snippet', () => {

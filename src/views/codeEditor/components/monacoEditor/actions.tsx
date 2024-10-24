@@ -20,7 +20,7 @@ import {
   mergeImportMap,
 } from '@utils/iframe';
 import { defaultImportMap } from '@views/codeEditor/constants';
-import { useStoreCustomExamples } from 'src/stores/customExamples';
+import { useStoreCustomExamples } from 'src/stores/examples';
 
 import { ActionButton } from '../actionButton';
 
@@ -30,16 +30,18 @@ import type {
 } from '@custom-types/eventBus';
 
 export const EditorActions = () => {
+  const selectedExampleId = useStoreCustomExamples.use.selectedExampleId();
+  const isSavingContent = useStoreCustomExamples.use.isSavingContent();
+  const { updateExampleContent } = useStoreCustomExamples.use.actions();
+
+  const refCode = useRef<string>('');
+  const initCode = useRef<string>('');
+  const isInit = useRef(false);
+
   const [
     SaveExampleModal,
     toggleVisibility,
   ] = useToggleVisibility(ModalSaveExample);
-  const selectedExampleId = useStoreCustomExamples.use.selectedExampleId();
-  const isSavingContent = useStoreCustomExamples.use.isSavingContent();
-  const { updateCustomExampleContent } = useStoreCustomExamples.use.actions();
-  const refCode = useRef<string>('');
-  const initCode = useRef<string>('');
-  const isInit = useRef(false);
 
   const [
     isEdited,
@@ -127,16 +129,16 @@ export const EditorActions = () => {
   }, []);
 
   const handleSave = useCallback(() => {
-    updateCustomExampleContent(selectedExampleId, refCode.current);
+    updateExampleContent(selectedExampleId, refCode.current);
   }, [
     selectedExampleId,
-    updateCustomExampleContent,
+    updateExampleContent,
   ]);
 
   useEventBus<IEventBusMonacoEditorUpdateCode>('@@-monaco-editor-update-code', ({ data }) => {
     const isCustomExample = !!getSearchParam('c');
 
-    if (data !== null && isCustomExample) {
+    if (data !== null) {
       refCode.current = data;
 
       if (!isInit.current) {
@@ -144,7 +146,7 @@ export const EditorActions = () => {
         isInit.current = true;
       }
 
-      setIsEdited(initCode.current !== data);
+      isCustomExample && setIsEdited(initCode.current !== data);
     }
   });
 
@@ -157,9 +159,9 @@ export const EditorActions = () => {
   return (
     <div
       className={cn(
-        'absolute right-0 top-0',
+        'absolute right-0 top-4',
         'flex items-center justify-between',
-        'z-20 py-4 pl-14',
+        'z-20',
       )}
     >
       <div className="flex gap-2 pr-2">

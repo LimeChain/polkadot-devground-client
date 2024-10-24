@@ -10,7 +10,6 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 
-import { ExampleNotFound } from '@components/exampleNotFound';
 import { Icon } from '@components/icon';
 import { Tabs } from '@components/tabs';
 import { snippets } from '@constants/snippets';
@@ -19,7 +18,7 @@ import {
   sleep,
 } from '@utils/helpers';
 import { ExamplesList } from '@views/codeEditor/components/selectExample/snippetList';
-import { useStoreCustomExamples } from 'src/stores/customExamples';
+import { useStoreCustomExamples } from 'src/stores/examples';
 
 import type { IEventBusMonacoEditorLoadSnippet } from '@custom-types/eventBus';
 
@@ -37,23 +36,19 @@ export const SelectExample = () => {
   ] = useState<string>('');
 
   const customExamples = useStoreCustomExamples.use.examples();
-  const { getCustomExamples } = useStoreCustomExamples.use.actions();
+  const { getExamples } = useStoreCustomExamples.use.actions();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-
   const handleSetOpen = useCallback(() => {
     setIsOpened((prev) => !prev);
   }, []);
 
-  const handleChangeExample = useCallback(async (e: React.MouseEvent<HTMLButtonElement>) => {
-    const id = e.currentTarget.getAttribute('data-example-index') || '';
-    const type = e.currentTarget.getAttribute('data-example-type') || '';
+  const handleChangeExample = useCallback(async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
+    const id = e.currentTarget.getAttribute('data-example-index') ?? '';
+    const type = e.currentTarget.getAttribute('data-example-type') ?? '';
 
-    if (type === 'default') {
-      navigate(`/code?d=${id}`);
-    } else {
-      navigate(`/code?c=${id}`);
-    }
+    const queryParam = type === 'default' ? `d=${id}` : `c=${id}`;
+    navigate(`/code?${queryParam}`);
 
     setIsOpened(false);
 
@@ -74,8 +69,7 @@ export const SelectExample = () => {
     busDispatch({
       type: '@@-monaco-editor-hide-loading',
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [navigate]);
 
   // useEffect(() => {
   //   const handleClickOutside = (event: MouseEvent) => {
@@ -109,7 +103,7 @@ export const SelectExample = () => {
   ]);
 
   useEffect(() => {
-    getCustomExamples();
+    getExamples();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -159,7 +153,8 @@ export const SelectExample = () => {
         <Tabs
           tabClassName={cn(
             'mb-2 px-10 py-2.5',
-            'text-dev-white-400 hover:text-dev-white-200 dark:text-dev-black-800 dark:hover:text-dev-black-1000',
+            'text-dev-white-400 hover:text-dev-white-200',
+            'dark:text-dev-black-800 dark:hover:text-dev-black-1000',
           )}
 
         >
@@ -184,7 +179,33 @@ export const SelectExample = () => {
                   />
                 )
                 : (
-                  <ExampleNotFound />
+                  <div className="flex flex-col p-3">
+                    <Icon
+                      name="icon-group"
+                      size={[100]}
+                      className={cn(
+                        'mb-8',
+                        'self-center text-dev-white-1000',
+                        'dark:text-dev-purple-50',
+                      )}
+                    />
+                    <div className="flex flex-col items-center justify-center text-white dark:text-dev-black-1000">
+                      <h4 className="mb-4 self-center font-h4-bold">Nothing here</h4>
+                      <p className="max-w-80 text-center font-geist">
+                        Currently, you don't have any custom examples created. Ready to create one?
+                      </p>
+                      <button
+                        className={cn(
+                          'mb-2 mt-6 w-full p-4 transition-colors',
+                          'font-geist text-white font-body2-bold',
+                          'bg-dev-pink-500',
+                          'hover:bg-dev-pink-400',
+                        )}
+                      >
+                        Create Example
+                      </button>
+                    </div>
+                  </div>
                 )
             }
           </div>

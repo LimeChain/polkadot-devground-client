@@ -14,12 +14,8 @@ interface UploadCustomExampleData {
   exampleName: string;
 }
 
-const uploadCustomExample = async (data: UploadCustomExampleData) => {
+const uploadExample = async (data: UploadCustomExampleData) => {
   const jwtToken = await authService.getJwtToken();
-  if (!jwtToken) {
-    console.log('no jwt token');
-    return;
-  }
 
   const files: { [key: string]: GistFile } = {
     'snippet.tsx': {
@@ -36,33 +32,29 @@ const uploadCustomExample = async (data: UploadCustomExampleData) => {
     publicGist: true,
   };
 
-  const examples = await axios.post(`${SERVER_URL}/gists`, body);
-  return examples;
+  const response = await axios.post(`${SERVER_URL}/gists`, body, {
+    headers: {
+      Authorization: `Bearer ${jwtToken}`,
+    },
+  });
+
+  return response.data;
 };
 
-const getUserGists = async () => {
+const getUserExamples = async () => {
   const jwtToken = await authService.getJwtToken();
 
-  if (!jwtToken) {
-    console.log('no jwt token');
-    return;
-  }
+  const response = await axios.get(`${SERVER_URL}/gists`, {
+    headers: {
+      Authorization: `Bearer ${jwtToken}`,
+    },
+    withCredentials: true,
+  });
 
-  try {
-    const { data } = await axios.get(`${SERVER_URL}/gists`, { withCredentials: true });
-    return data;
-  } catch (error) {
-    console.log('error', error);
-  }
+  return response.data;
 };
 
-const getGistContent = async (id: string) => {
-  const jwtToken = await authService.getJwtToken();
-  if (!jwtToken) {
-    console.log('no jwt token');
-    return;
-  }
-
+const getExampleContent = async (id: string) => {
   try {
     const { data } = await axios.get(`${SERVER_URL}/gists/${id}`, { withCredentials: true });
 
@@ -75,13 +67,7 @@ const getGistContent = async (id: string) => {
   }
 };
 
-const editGistInfo = async (id: string, name: string, description: string) => {
-  const jwtToken = await authService.getJwtToken();
-  if (!jwtToken) {
-    console.log('no jwt token');
-    return;
-  }
-
+const updateExampleInfo = async (id: string, name: string, description: string) => {
   const body = {
     name,
     files: {
@@ -91,23 +77,13 @@ const editGistInfo = async (id: string, name: string, description: string) => {
     },
   };
 
-  try {
-    const { data } = await axios.patch(`${SERVER_URL}/gists/edit-info/${id}`, body);
+  const { data } = await axios.patch(`${SERVER_URL}/gists/edit-info/${id}`, body);
 
-    return data;
-  } catch (error) {
-    console.log('error', error);
-  }
+  return data;
+
 };
 
-const editGistContent = async (id: string, data: string) => {
-  const jwtToken = await authService.getJwtToken();
-
-  if (!jwtToken) {
-    console.log('no jwt token');
-    return;
-  }
-
+const updateExampleContent = async (id: string, data: string) => {
   const files: { [key: string]: GistFile } = {
     'snippet.tsx': {
       content: data,
@@ -128,21 +104,15 @@ const editGistContent = async (id: string, data: string) => {
 };
 
 const deleteExample = async (id: string) => {
-  const jwtToken = await authService.getJwtToken();
-  if (!jwtToken) {
-    console.log('no jwt token');
-    return;
-  }
-
   const { data } = await axios.delete(`${SERVER_URL}/gists/${id}`, { withCredentials: true });
   return data;
 };
 
 export default {
-  uploadCustomExample,
-  getUserGists,
-  getGistContent,
-  editGistContent,
-  editGistInfo,
+  uploadExample,
+  getUserExamples,
+  getExampleContent,
+  updateExampleContent,
+  updateExampleInfo,
   deleteExample,
 };
