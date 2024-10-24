@@ -22,7 +22,7 @@ import {
   useStoreWallet,
 } from '@stores';
 import { analyticsApp } from 'firebaseConfig';
-import { useStoreCustomExamples } from 'src/stores/customExamples';
+import { useStoreCustomExamples } from 'src/stores/examples';
 
 import { routes } from './routes';
 

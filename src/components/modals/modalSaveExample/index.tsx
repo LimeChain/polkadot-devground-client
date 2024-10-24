@@ -6,7 +6,7 @@ import {
 
 import { Icon } from '@components/icon';
 import { cn } from '@utils/helpers';
-import { useStoreCustomExamples } from 'src/stores/customExamples';
+import { useStoreCustomExamples } from 'src/stores/examples';
 
 import {
   type IModal,
@@ -18,11 +18,12 @@ import type { IUploadExampleModalClose } from '@custom-types/eventBus';
 interface IModalGithubLogin extends Pick<IModal, 'onClose'> {
   code?: string;
   type: string;
+  id?: string;
 }
 
 export const ModalSaveExample = (props: IModalGithubLogin) => {
-  const { onClose, code, type } = props;
-  const { uploadCustomExample, updateCustomExampleInfo } = useStoreCustomExamples.use.actions();
+  const { code, onClose, type, id } = props;
+  const { uploadExample, updateExampleInfo } = useStoreCustomExamples.use.actions();
   const isUploading = useStoreCustomExamples.use.isUploading();
 
   const [
@@ -39,13 +40,14 @@ export const ModalSaveExample = (props: IModalGithubLogin) => {
       return;
     }
 
-    type === 'upload' && uploadCustomExample({
+    type === 'upload' && uploadExample({
       code,
       description,
       exampleName,
     });
 
-    type === 'update' && updateCustomExampleInfo(
+    type === 'update' && updateExampleInfo(
+      id,
       exampleName,
       description,
     );
@@ -53,9 +55,10 @@ export const ModalSaveExample = (props: IModalGithubLogin) => {
     code,
     description,
     exampleName,
+    id,
     type,
-    updateCustomExampleInfo,
-    uploadCustomExample,
+    updateExampleInfo,
+    uploadExample,
   ]);
 
   const handleExampleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {

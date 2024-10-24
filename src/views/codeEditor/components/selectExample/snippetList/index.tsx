@@ -1,11 +1,14 @@
 import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
-import { useCallback } from 'react';
+import {
+  useCallback,
+  useState,
+} from 'react';
 
 import { Icon } from '@components/icon';
 import { ModalSaveExample } from '@components/modals/modalSaveExample';
 import { PDScrollArea } from '@components/pdScrollArea';
 import { cn } from '@utils/helpers';
-import { useStoreCustomExamples } from 'src/stores/customExamples';
+import { useStoreCustomExamples } from 'src/stores/examples';
 
 import type { ICodeExample } from 'src/types/codeSnippet';
 interface ExamplesListProps {
@@ -18,17 +21,29 @@ interface ExamplesListProps {
 
 export const ExamplesList = (props: ExamplesListProps) => {
   const { examples, selectedExample, type, editable = false, handleChangeExample } = props;
+
   const { deleteExample } = useStoreCustomExamples.use.actions();
   const [
     SaveExampleModal,
     toggleVisibility,
   ] = useToggleVisibility(ModalSaveExample);
 
+  const [
+    selectedExampleId,
+    setSelectedExampleId,
+  ] = useState<string | null>(null);
+
   const handleDeleteExample = useCallback((e: React.MouseEvent<HTMLSpanElement>) => {
-    e.stopPropagation();
     const id = e.currentTarget.getAttribute('data-example-index');
     deleteExample(id as string);
   }, [deleteExample]);
+
+  const handleEditExample = useCallback((e: React.MouseEvent<HTMLSpanElement>) => {
+    const id = e.currentTarget.getAttribute('data-example-index');
+
+    setSelectedExampleId(id);
+    toggleVisibility();
+  }, [toggleVisibility]);
 
   return (
     <PDScrollArea
@@ -72,10 +87,13 @@ export const ExamplesList = (props: ExamplesListProps) => {
                     'text-dev-white-1000 dark:text-dev-black-300',
                   )}
                   >
-                    <span onClick={toggleVisibility}>
+                    <span
+                      data-example-index={example.id}
+                      onClick={handleEditExample}
+                    >
                       <Icon
                         name="icon-pen"
-                        size={[16]}
+                        size={[17]}
                       />
                     </span>
                     <span
@@ -84,7 +102,7 @@ export const ExamplesList = (props: ExamplesListProps) => {
                     >
                       <Icon
                         name="icon-trash"
-                        size={[16]}
+                        size={[17]}
                       />
                     </span>
                   </div>
@@ -95,6 +113,7 @@ export const ExamplesList = (props: ExamplesListProps) => {
         }
       </ul>
       <SaveExampleModal
+        id={selectedExampleId}
         onClose={toggleVisibility}
         type="update"
       />
