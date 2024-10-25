@@ -5,13 +5,13 @@ import {
   useState,
 } from 'react';
 
-import { CallDocs } from '@components/callArgsBuilder/callDocs';
-import { QueryButton } from '@components/callArgsBuilder/queryButton';
-import { QueryFormContainer } from '@components/callArgsBuilder/queryFormContainer';
-import { QueryResult } from '@components/callArgsBuilder/queryResult';
-import { QueryResultContainer } from '@components/callArgsBuilder/queryResultContainer';
-import { QueryViewContainer } from '@components/callArgsBuilder/queryViewContainer';
-import { StorageArgs } from '@components/callArgsBuilder/storageArgs';
+import { InvocationStorageArgs } from '@components/chainState';
+import { CallDocs } from '@components/callDocs';
+import { QueryButton } from '@components/papiQuery/queryButton';
+import { QueryFormContainer } from '@components/papiQuery/queryFormContainer';
+import { QueryResult } from '@components/papiQuery/queryResult';
+import { QueryResultContainer } from '@components/papiQuery/queryResultContainer';
+import { QueryViewContainer } from '@components/papiQuery/queryViewContainer';
 import { Loader } from '@components/loader';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
@@ -111,17 +111,16 @@ const ChainState = () => {
     if (palletSelected?.name && storageSelected?.name && dynamicBuilder) {
       try {
         const storageCodec = dynamicBuilder.buildStorage(palletSelected.name, storageSelected.name);
+        const filteredCallArgs = [callArgs].filter((arg) => Boolean(arg));
+        const encodedKey = storageCodec.enc(...filteredCallArgs);
 
-        const encodedKey = storageCodec.enc(...([callArgs].filter((arg) => Boolean(arg))));
         setEncodedStorageKey(encodedKey);
-
       } catch (error) {
         setEncodedStorageKey('');
         console.log(error);
 
       }
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     palletSelected,
@@ -149,17 +148,18 @@ const ChainState = () => {
     }
   }, [palletSelected]);
 
-  const handleStorageQuerySubmit = useCallback(() => {
+  const handleQuerySubmit = useCallback(() => {
     if (palletSelected?.name && storageSelected?.name && dynamicBuilder) {
-      setQueries((queries) => ([
-        {
+      setQueries((queries) => {
+        const newQueries = [...queries];
+        newQueries.unshift({
           pallet: palletSelected.name,
           storage: storageSelected.name,
           id: crypto.randomUUID(),
           args: callArgs,
-        },
-        ...queries,
-      ]));
+        });
+        return newQueries;
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -168,14 +168,14 @@ const ChainState = () => {
     callArgs,
   ]);
 
-  const handleStorageSubscribe = useCallback((subscription: ISubscription) => {
+  const handleSubscribe = useCallback((subscription: ISubscription) => {
     setSubscriptions((subs) => ([
       ...subs,
       subscription,
     ]));
   }, []);
 
-  const handleStorageUnsubscribe = useCallback((id: string) => {
+  const handleUnsubscribe = useCallback((id: string) => {
     setQueries((queries) => queries.filter((query) => query.id !== id));
 
     const subscriptionToCancel = subscriptions.find((sub) => sub.id === id);
@@ -219,15 +219,15 @@ const ChainState = () => {
 
         {
           storageSelected && (
-            <StorageArgs
-              key={`storage-param-${storageSelected.name}`}
+            <InvocationStorageArgs
+              key={`incovation-storage-${storageSelected.name}`}
+              args={storageSelected}
               onChange={setCallArgs}
-              storage={storageSelected}
             />
           )
         }
 
-        <QueryButton onClick={handleStorageQuerySubmit}>
+        <QueryButton onClick={handleQuerySubmit}>
           Subscribe to
           {' '}
           {palletSelected?.name}
@@ -254,8 +254,8 @@ const ChainState = () => {
           queries.map((query) => (
             <Query
               key={`query-result-${query.pallet}-${query.storage}-${query.id}`}
-              onSubscribe={handleStorageSubscribe}
-              onUnsubscribe={handleStorageUnsubscribe}
+              onSubscribe={handleSubscribe}
+              onUnsubscribe={handleUnsubscribe}
               querie={query}
             />
           ))

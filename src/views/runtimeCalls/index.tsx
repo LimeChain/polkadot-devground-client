@@ -6,15 +6,15 @@ import {
   useState,
 } from 'react';
 
-import { MethodArgs } from '@components/callArgsBuilder/apiMethodArgs';
-import { CallDocs } from '@components/callArgsBuilder/callDocs';
-import { QueryButton } from '@components/callArgsBuilder/queryButton';
-import { QueryFormContainer } from '@components/callArgsBuilder/queryFormContainer';
-import { QueryResult } from '@components/callArgsBuilder/queryResult';
-import { QueryResultContainer } from '@components/callArgsBuilder/queryResultContainer';
-import { QueryViewContainer } from '@components/callArgsBuilder/queryViewContainer';
+import { CallDocs } from '@components/callDocs';
+import { QueryButton } from '@components/papiQuery/queryButton';
+import { QueryFormContainer } from '@components/papiQuery/queryFormContainer';
+import { QueryResult } from '@components/papiQuery/queryResult';
+import { QueryResultContainer } from '@components/papiQuery/queryResultContainer';
+import { QueryViewContainer } from '@components/papiQuery/queryViewContainer';
 import { Loader } from '@components/loader';
 import { PDSelect } from '@components/pdSelect';
+import { InvocationRuntimeArgs } from '@components/runtimeCalls';
 import { useStoreChain } from '@stores';
 import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
@@ -54,8 +54,8 @@ const RuntimeCalls = () => {
     setEncodedCall,
   ] = useState<Binary>(Binary.fromHex('0x'));
   const [
-    callArgs,
-    setCallArgs,
+    runtimeMethodArgs,
+    setRuntimeMethodArgs,
   ] = useState<unknown>(undefined);
   const [
     queries,
@@ -65,7 +65,7 @@ const RuntimeCalls = () => {
   useEffect(() => {
     setQueries([]);
     setApiSelected(undefined);
-    setCallArgs(undefined);
+    setRuntimeMethodArgs(undefined);
   }, [chain.id]);
 
   useEffect(() => {
@@ -83,7 +83,7 @@ const RuntimeCalls = () => {
       if (selectedMethod) {
         setApiSelected(selectedMethod);
         setMethodSelected(selectedMethod.methods?.sort((a, b) => a.name.localeCompare(b.name)).at(0));
-        setCallArgs(undefined);
+        setRuntimeMethodArgs(undefined);
       }
     }
   }, [apis]);
@@ -92,27 +92,28 @@ const RuntimeCalls = () => {
     if (apiSelected) {
       const selectedStorage = apiSelected.methods.find((item) => item.name === callSelectedName);
       setMethodSelected(selectedStorage);
-      setCallArgs(undefined);
+      setRuntimeMethodArgs(undefined);
     }
   }, [apiSelected]);
 
-  const handleStorageQuerySubmit = useCallback(() => {
+  const handleQuerySubmit = useCallback(() => {
     if (apiSelected?.name && methodSelected?.name) {
-      setQueries((queries) => ([
-        {
+      setQueries((queries) => {
+        const newQueries = [...queries];
+        newQueries.unshift({
           pallet: apiSelected.name,
           storage: methodSelected.name,
           id: crypto.randomUUID(),
-          args: callArgs,
-        },
-        ...queries,
-      ]));
+          args: runtimeMethodArgs,
+        });
+        return newQueries;
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     apiSelected,
     methodSelected,
-    callArgs,
+    runtimeMethodArgs,
   ]);
 
   useEffect(() => {
@@ -121,7 +122,9 @@ const RuntimeCalls = () => {
         const callCodec = dynamicBuilder?.buildRuntimeCall(
           apiSelected.name,
           methodSelected.name,
-        ).args.enc(Object.values(callArgs || {} as object));
+        )
+          .args
+          .enc(Object.values(runtimeMethodArgs || {}));
 
         const _encodedCall = Binary.fromBytes(callCodec);
         setEncodedCall(_encodedCall);
@@ -135,11 +138,11 @@ const RuntimeCalls = () => {
   }, [
     apiSelected,
     methodSelected,
-    callArgs,
+    runtimeMethodArgs,
     dynamicBuilder,
   ]);
 
-  const handleStorageUnsubscribe = useCallback((id: string) => {
+  const handleUnsubscribe = useCallback((id: string) => {
     setQueries((queries) => queries.filter((query) => query.id !== id));
   }, []);
 
@@ -175,17 +178,17 @@ const RuntimeCalls = () => {
 
         {
           methodSelected && (
-            <MethodArgs
-              key={`method-select-${methodSelected?.name}`}
-              method={methodSelected}
-              onChange={setCallArgs}
+            <InvocationRuntimeArgs
+              key={`invocation-runtime-method-${methodSelected?.name}`}
+              onChange={setRuntimeMethodArgs}
+              runtimeMethod={methodSelected}
             />
           )
         }
 
         <CallDocs docs={methodSelected?.docs?.filter((d) => d) || []} />
 
-        <QueryButton onClick={handleStorageQuerySubmit}>
+        <QueryButton onClick={handleQuerySubmit}>
           Call
           {' '}
           {apiSelected?.name}
@@ -211,7 +214,7 @@ const RuntimeCalls = () => {
           queries.map((query) => (
             <Query
               key={`query-result-${query.pallet}-${query.storage}-${query.id}`}
-              onUnsubscribe={handleStorageUnsubscribe}
+              onUnsubscribe={handleUnsubscribe}
               querie={query}
             />
           ))
@@ -248,7 +251,6 @@ const Query = ({
 
     if (api) {
       try {
-        // @TODO: fix types
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (api.apis as any)[querie.pallet][querie.storage](...Object.values(querie.args as object))
           .then((res: unknown) => {

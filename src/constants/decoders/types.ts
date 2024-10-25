@@ -1,13 +1,13 @@
 export interface IDecoders {
   [key: string]: {
-    params: IDecoderBuilder[];
+    params: InvocationDecoderArgs[];
   };
 }
 
 type TDecoderProp = 'string' | 'hex' | 'array';
 type TArrayItem = 'string' | 'hex';
 
-export interface IDecoderBuilder {
+export interface InvocationDecoderArgs {
   name: string;
   type: TDecoderProp;
 

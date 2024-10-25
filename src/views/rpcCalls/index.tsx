@@ -6,18 +6,18 @@ import React, {
   useState,
 } from 'react';
 
-import { CallDocs } from '@components/callArgsBuilder/callDocs';
-import { QueryButton } from '@components/callArgsBuilder/queryButton';
-import { QueryFormContainer } from '@components/callArgsBuilder/queryFormContainer';
-import { QueryResult } from '@components/callArgsBuilder/queryResult';
-import { QueryResultContainer } from '@components/callArgsBuilder/queryResultContainer';
-import { QueryViewContainer } from '@components/callArgsBuilder/queryViewContainer';
-import { RpcArgsBuilder } from '@components/callArgsBuilder/rpcArgsBuilder';
+import { CallDocs } from '@components/callDocs';
+import { QueryButton } from '@components/papiQuery/queryButton';
+import { QueryFormContainer } from '@components/papiQuery/queryFormContainer';
+import { QueryResult } from '@components/papiQuery/queryResult';
+import { QueryResultContainer } from '@components/papiQuery/queryResultContainer';
+import { QueryViewContainer } from '@components/papiQuery/queryViewContainer';
 import { Loader } from '@components/loader';
 import {
   type IPDSelectItem,
   PDSelect,
 } from '@components/pdSelect';
+import { InvocationRpcArgs } from '@components/rpcCalls';
 import {
   newRpcCalls,
   oldRpcCalls,
@@ -46,7 +46,7 @@ interface IQuery {
 }
 
 const newRpcKeys = Object.keys(newRpcCalls);
-export const RpcCalls = () => {
+const RpcCalls = () => {
 
   const chain = useStoreChain?.use?.chain?.();
   const rawClient = useStoreChain?.use?.rawClient?.();
@@ -162,36 +162,34 @@ export const RpcCalls = () => {
     setMethodSelected(selectedMethodName);
   }, []);
 
-  const handleRpcParamChange = useCallback((index: number, args: unknown) => {
+  const handleOnChange = useCallback((index: number, args: unknown) => {
     setCallParams((params) => {
       if (!params || params.length === 0) {
         return [];
+      } else {
+        const newParams = [...params];
+        newParams[index].value = args;
+        return newParams;
       }
-      return params.with(
-        index,
-        {
-          name: params?.[index]?.name,
-          value: args,
-        },
-      );
     });
   }, []);
 
-  const handleStorageUnsubscribe = useCallback((id: string) => {
+  const handleUnsubscribe = useCallback((id: string) => {
     setQueries((queries) => queries.filter((query) => query.id !== id));
   }, []);
 
-  const handleRpcSubmit = useCallback(() => {
+  const handleSubmit = useCallback(() => {
     if (palletSelected && methodSelected) {
-      setQueries((queries) => ([
-        {
+      setQueries((queries) => {
+        const newQueries = [...queries];
+        newQueries.unshift({
           pallet: palletSelected,
           method: methodSelected,
           args: callParams,
           id: crypto.randomUUID(),
-        },
-        ...queries,
-      ]));
+        });
+        return newQueries;
+      });
     }
 
   }, [
@@ -233,15 +231,15 @@ export const RpcCalls = () => {
         {
           rpcCall
           && rpcCall?.params?.length > 0 && (
-            <RpcArgsBuilder
-              key={`rpc-param-${palletSelected}-${methodSelected}`}
-              onChange={handleRpcParamChange}
-              params={rpcCall.params}
+            <InvocationRpcArgs
+              key={`invocation-rpc-${palletSelected}-${methodSelected}`}
+              onChange={handleOnChange}
+              rpcs={rpcCall.params}
             />
           )
         }
 
-        <QueryButton onClick={handleRpcSubmit}>
+        <QueryButton onClick={handleSubmit}>
           Submit Rpc Call
         </QueryButton>
 
@@ -253,7 +251,7 @@ export const RpcCalls = () => {
           queries.map((query) => (
             <Query
               key={`query-result-${query.pallet}-${query.method}-${query.id}`}
-              onUnsubscribe={handleStorageUnsubscribe}
+              onUnsubscribe={handleUnsubscribe}
               querie={query}
               unCleanedSubscriptions={refUncleanedSubscriptions}
             />
@@ -490,3 +488,5 @@ const Query = ({
     />
   );
 };
+
+export default RpcCalls;

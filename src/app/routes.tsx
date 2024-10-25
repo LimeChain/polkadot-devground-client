@@ -2,8 +2,6 @@ import { lazy } from 'react';
 
 import { LayoutBasic } from '@components/layouts/basic';
 import { LayoutCodeEditor } from '@components/layouts/codeEditor';
-import { NotFound } from '@views/notFound';
-import { RpcCalls } from '@views/rpcCalls';
 
 const Home = lazy(() => import('../views/home'));
 const CodeEditor = lazy(() => import('../views/codeEditor'));
@@ -19,8 +17,10 @@ const Constants = lazy(() => import('../views/constants'));
 const RuntimeCalls = lazy(() => import('../views/runtimeCalls'));
 const Onboarding = lazy(() => import('../views/onboarding'));
 const LatestBlocks = lazy(() => import('../views/latestBlocks'));
-const Decoder = lazy(() => import('../views/decode'));
-const DecoderDynamic = lazy(() => import('../views/decodeDynamic'));
+const Decoder = lazy(() => import('../views/decoder'));
+const DecoderDynamic = lazy(() => import('../views/decoderDynamic'));
+const RpcCalls = lazy(() => import('../views/rpcCalls'));
+const NotFound = lazy(() => import('../views/notFound'));
 
 export const routes = () => ([
   {

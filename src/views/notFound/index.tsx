@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 
-export const NotFound = () => {
+const NotFound = () => {
   return (
     <Suspense fallback={<></>}>
       <div className="fixed inset-0 flex w-full items-center justify-center pb-16">
@@ -11,3 +11,4 @@ export const NotFound = () => {
 };
 
 NotFound.displayName = 'NotFound';
+export default NotFound;

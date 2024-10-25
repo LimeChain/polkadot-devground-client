@@ -8,16 +8,13 @@ import {
   useState,
 } from 'react';
 
-import {
-  CallParam,
-  type ICallParam,
-} from '@components/callArgsBuilder';
-import { AccountSelectParam } from '@components/callArgsBuilder/accountSelectBuilder';
-import { QueryButton } from '@components/callArgsBuilder/queryButton';
-import { QueryFormContainer } from '@components/callArgsBuilder/queryFormContainer';
-import { QueryResult } from '@components/callArgsBuilder/queryResult';
-import { QueryResultContainer } from '@components/callArgsBuilder/queryResultContainer';
-import { QueryViewContainer } from '@components/callArgsBuilder/queryViewContainer';
+import { InvocationArgsMapper } from '@components/invocationArgsMapper';
+import { AccountSelectBuilder } from '@components/metadataBuilders/accountBuilder/accountSelectBuilder';
+import { QueryButton } from '@components/papiQuery/queryButton';
+import { QueryFormContainer } from '@components/papiQuery/queryFormContainer';
+import { QueryResult } from '@components/papiQuery/queryResult';
+import { QueryResultContainer } from '@components/papiQuery/queryResultContainer';
+import { QueryViewContainer } from '@components/papiQuery/queryViewContainer';
 import { Loader } from '@components/loader';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
@@ -25,6 +22,7 @@ import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 import { useViewBuilder } from 'src/hooks/useViewBuilder';
 import { useStoreWallet } from 'src/stores/wallet';
 
+import type { InvocationArgsMapper as InvocationArgsMapperProps } from '@components/invocationArgsMapper/types';
 import type { TRelayApi } from '@custom-types/chain';
 import type {
   InjectedPolkadotAccount,
@@ -75,7 +73,7 @@ const Extrinsics = () => {
   const [
     calls,
     setCalls,
-  ] = useState<Pick<ICallParam, 'name' | 'param'>[]>([]);
+  ] = useState<Pick<InvocationArgsMapperProps, 'name' | 'invocationVar'>[]>([]);
   const [
     callSelected,
     setCallSelected,
@@ -95,10 +93,10 @@ const Extrinsics = () => {
         .sort((a, b) => a[0].localeCompare(b[0]))
         .map(([
           name,
-          param,
+          invocationVar,
         ]) => ({
           name,
-          param,
+          invocationVar,
         }));
 
       setCalls(calls);
@@ -124,7 +122,6 @@ const Extrinsics = () => {
     if (viewBuilder && encodedCall) {
       try {
         return viewBuilder.callDecoder(encodedCall.asHex());
-
       } catch {
         return undefined;
       }
@@ -139,15 +136,15 @@ const Extrinsics = () => {
     if (dynamicBuilder && palletSelected?.name && callSelected?.name) {
       try {
         const callCodec = dynamicBuilder.buildCall(palletSelected.name, callSelected.name);
-
-        const _encodedCall = Binary.fromBytes(
+        const locationBytes = new Uint8Array(callCodec.location);
+        const encodedCall = Binary.fromBytes(
           mergeUint8(
-            new Uint8Array(callCodec.location),
+            locationBytes,
             callCodec.codec.enc(callArgs),
           ),
         );
-        setEncodedCall(_encodedCall);
 
+        setEncodedCall(encodedCall);
       } catch (err) {
         setEncodedCall(Binary.fromHex('0x'));
         console.log(err);
@@ -163,15 +160,16 @@ const Extrinsics = () => {
 
   const submitTx = useCallback(async () => {
     if (palletSelected?.name && callSelected?.name) {
-      setQueries((queries) => ([
-        {
+      setQueries((queries) => {
+        const newQueries = [...queries];
+        newQueries.unshift({
           pallet: palletSelected.name,
           storage: callSelected.name,
           id: crypto.randomUUID(),
           args: callArgs,
-        },
-        ...queries,
-      ]));
+        });
+        return newQueries;
+      });
     }
   }, [
     callArgs,
@@ -191,15 +189,14 @@ const Extrinsics = () => {
           .sort((a, b) => a[0].localeCompare(b[0]))
           .map(([
             name,
-            param,
+            invocationVar,
           ]) => ({
             name,
-            param,
+            invocationVar,
           }));
 
         setCalls(calls);
         setCallSelected(calls.at(0));
-
         setCallArgs({});
       }
     }
@@ -215,7 +212,7 @@ const Extrinsics = () => {
     setCallArgs({});
   }, [calls]);
 
-  const handleStorageUnsubscribe = useCallback((id: string) => {
+  const handleUnsubscribe = useCallback((id: string) => {
     setQueries((queries) => queries.filter((query) => query.id !== id));
   }, []);
 
@@ -253,7 +250,7 @@ const Extrinsics = () => {
         </div>
         <div className="flex flex-col gap-2">
           <span className=" font-geist font-body1-regular">Signer</span>
-          <AccountSelectParam
+          <AccountSelectBuilder
             accounts={accounts}
             onChange={handleAccountSelect}
           />
@@ -261,12 +258,12 @@ const Extrinsics = () => {
         {
           (palletSelected && callSelected) && (
             <div className="flex flex-col gap-6 empty:hidden">
-              <CallParam
+              <InvocationArgsMapper
                 key={`call-param-${callSelected.name}`}
+                invocationVar={callSelected.invocationVar}
                 name={callSelected.name}
                 onChange={setCallArgs}
                 pallet={palletSelected}
-                param={callSelected.param}
               />
             </div>
           )
@@ -298,7 +295,7 @@ const Extrinsics = () => {
           signer && queries.map((query) => (
             <Query
               key={`query-result-${query.pallet}-${query.storage}-${query.id}`}
-              onUnsubscribe={handleStorageUnsubscribe}
+              onUnsubscribe={handleUnsubscribe}
               querie={query}
               signer={signer}
             />

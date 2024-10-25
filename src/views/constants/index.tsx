@@ -5,12 +5,12 @@ import {
   useState,
 } from 'react';
 
-import { CallDocs } from '@components/callArgsBuilder/callDocs';
-import { QueryButton } from '@components/callArgsBuilder/queryButton';
-import { QueryFormContainer } from '@components/callArgsBuilder/queryFormContainer';
-import { QueryResult } from '@components/callArgsBuilder/queryResult';
-import { QueryResultContainer } from '@components/callArgsBuilder/queryResultContainer';
-import { QueryViewContainer } from '@components/callArgsBuilder/queryViewContainer';
+import { CallDocs } from '@components/callDocs';
+import { QueryButton } from '@components/papiQuery/queryButton';
+import { QueryFormContainer } from '@components/papiQuery/queryFormContainer';
+import { QueryResult } from '@components/papiQuery/queryResult';
+import { QueryResultContainer } from '@components/papiQuery/queryResultContainer';
+import { QueryViewContainer } from '@components/papiQuery/queryViewContainer';
 import { Loader } from '@components/loader';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
@@ -88,23 +88,24 @@ const Constants = () => {
     }
   }, [palletSelected]);
 
-  const handleStorageQuerySubmit = useCallback(() => {
+  const handleQuerySubmit = useCallback(() => {
     if (palletSelected?.name && constantSelected?.name) {
-      setQueries((queries) => ([
-        {
+      setQueries((queries) => {
+        const newQueries = [...queries];
+        newQueries.unshift({
           pallet: palletSelected.name,
           storage: constantSelected.name,
           id: crypto.randomUUID(),
-        },
-        ...queries,
-      ]));
+        });
+        return newQueries;
+      });
     }
   }, [
     palletSelected,
     constantSelected,
   ]);
 
-  const handleStorageUnsubscribe = useCallback((id: string) => {
+  const handleUnsubscribe = useCallback((id: string) => {
     setQueries((queries) => queries.filter((query) => query.id !== id));
   }, []);
 
@@ -141,7 +142,7 @@ const Constants = () => {
 
         <CallDocs docs={constantSelected?.docs?.filter((d) => d) || []} />
 
-        <QueryButton onClick={handleStorageQuerySubmit}>
+        <QueryButton onClick={handleQuerySubmit}>
           Query
           {' '}
           {palletSelected?.name}
@@ -155,7 +156,7 @@ const Constants = () => {
           queries.map((query) => (
             <Query
               key={`query-result-${query.pallet}-${query.storage}-${query.id}`}
-              onUnsubscribe={handleStorageUnsubscribe}
+              onUnsubscribe={handleUnsubscribe}
               querie={query}
             />
           ))
