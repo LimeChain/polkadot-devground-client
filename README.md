@@ -30,6 +30,12 @@ Install dependencies
   npm install
 ```
 
+Install chain descriptors
+
+```bash
+  npm run add-descriptors
+```
+
 Start the app
 
 ```bash
