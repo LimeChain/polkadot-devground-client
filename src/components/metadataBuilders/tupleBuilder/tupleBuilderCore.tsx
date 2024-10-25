@@ -19,22 +19,21 @@ export const TupleBuilderCore = ({
   onChange,
 }: ITupleBuilder) => {
   const [
-    params,
-    setParams,
+    state,
+    setState,
   ] = useState(buildArrayState(tuple.value.length));
 
   const handleOnChange = useCallback((index: number, value: unknown) => {
-    setParams((tuple) => {
+    setState((tuple) => {
       const newParams = [...tuple];
       newParams[index] = value;
-      onChange(newParams);
       return newParams;
     });
   }, []);
 
   useEffect(() => {
-    onChange(params);
-  }, []);
+    onChange(state);
+  }, [state]);
 
   try {
     if (!tuple) {

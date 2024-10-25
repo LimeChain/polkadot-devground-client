@@ -37,7 +37,7 @@ const AccountBuilder = ({ accountId, onChange }: IAccountBuilder) => {
     accounts,
   ]);
 
-  const handleUseCustomAccount = useCallback(() => {
+  const handleSwitch = useCallback(() => {
     setUseCustomAccount((use) => !use);
   }, []);
 
@@ -51,7 +51,7 @@ const AccountBuilder = ({ accountId, onChange }: IAccountBuilder) => {
     <div className={styles.invocationGroup}>
       <PDSwitch
         checked={useCustomAccount}
-        onChange={handleUseCustomAccount}
+        onChange={handleSwitch}
         title="Use Custom Account"
       />
       <div>

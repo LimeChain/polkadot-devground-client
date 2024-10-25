@@ -14,26 +14,26 @@ import type { IOptionBuilder } from '@components/invocationArgsMapper/types';
 
 const OptionBuilder = ({ option, onChange }: IOptionBuilder) => {
   const [
+    optionState,
+    setOptionState,
+  ] = useState(undefined);
+  const [
     shouldIncludeOption,
     setShouldIncludeOption,
   ] = useState(false);
-  const [
-    value,
-    setValue,
-  ] = useState(undefined);
+
+  const handleOnChange = useCallback((args: unknown) => {
+    setOptionState(args as undefined);
+  }, []);
 
   const handleOnSwitch = useCallback(() => {
     setShouldIncludeOption((shouldInclude) => !shouldInclude);
   }, []);
 
-  const handleOnChange = useCallback((args: unknown) => {
-    setValue(args as undefined);
-  }, []);
-
   useEffect(() => {
-    onChange(shouldIncludeOption ? value : undefined);
+    onChange(shouldIncludeOption ? optionState : undefined);
   }, [
-    value,
+    optionState,
     shouldIncludeOption,
   ]);
 

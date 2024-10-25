@@ -11,6 +11,7 @@ import type {
   AccountId32,
   ArrayVar,
   CompactVar,
+  EnumVar,
   OptionVar,
   PrimitiveVar,
   SequenceVar,
@@ -116,4 +117,8 @@ export interface IPrimitiveBuilder extends InvocationOnChangeProps {
 
 export interface IOptionBuilder extends InvocationOnChangeProps {
   option: OptionVar;
+}
+
+export interface IEnumBuilder extends InvocationOnChangeProps {
+  enum: EnumVar;
 }

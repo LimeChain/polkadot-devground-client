@@ -7,6 +7,7 @@ import {
 } from 'react';
 
 import { onWheelPreventDefault } from '@utils/callbacks';
+import { getCompactValue } from '@utils/invocationMapper';
 
 import styles from '../../invocationArgsMapper/styles.module.css';
 
@@ -18,13 +19,13 @@ const CompactVarBuilder = ({ compact, onChange }: ICompactBuilder) => {
     setValue,
   ] = useState('0');
 
-  useEffect(() => {
-    onChange(compact.isBig ? BigInt(Number(value).toFixed(0)) : Number(value));
-  }, [value]);
-
   const handleOnChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
   }, []);
+
+  useEffect(() => {
+    onChange(getCompactValue(compact.isBig || false, value));
+  }, [value]);
 
   return (
     <input

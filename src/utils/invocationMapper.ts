@@ -16,6 +16,10 @@ export const buildArrayState = (length: number) => {
   return Array.from({ length }).fill(undefined);
 };
 
+export const buildSequenceState = (length: number) => {
+  return Array.from({ length }).map(() => ({ id: crypto.randomUUID(), value: undefined }));
+};
+
 export const buildStructState = (struct: StructVar) => {
   return Object
     .keys(struct.value)
@@ -47,4 +51,8 @@ export const handlePrimitiveInputChange = (v: PrimitiveVar, value: string) => {
     case 'i256':
       return BigInt(Number(value).toFixed(0));
   }
+};
+
+export const getCompactValue = (isBig: boolean, value: string) => {
+  return isBig ? BigInt(Number(value).toFixed(0)) : Number(value);
 };

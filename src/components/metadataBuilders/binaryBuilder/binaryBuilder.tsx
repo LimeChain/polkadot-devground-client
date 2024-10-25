@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Binary } from 'polkadot-api';
 import {
   useCallback,
@@ -26,7 +27,6 @@ const BinaryBuilder = ({
   const handleOnSwitch = useCallback(() => {
     setUseFileUpload((upload): boolean => !upload);
     onChange(Binary.fromText(''));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const shouldUseFileUpload = useFileUpload && !readOnly;

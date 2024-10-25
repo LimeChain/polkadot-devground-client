@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
   type ChangeEvent,
+  useCallback,
   useEffect,
   useState,
 } from 'react';
@@ -24,6 +25,10 @@ const PrimitiveBuilder = ({
     value,
     setValue,
   ] = useState('');
+
+  const handlePDSwitchChange = useCallback(() => {
+    setValue((val) => Boolean(val) ? '' : 'true');
+  }, []);
 
   const commonProps = {
     placeholder: placeholder || primitive.value,
@@ -69,8 +74,7 @@ const PrimitiveBuilder = ({
       return (
         <PDSwitch
           checked={Boolean(value)}
-          // eslint-disable-next-line react/jsx-no-bind
-          onChange={() => setValue((val) => Boolean(val) ? '' : 'true')}
+          onChange={handlePDSwitchChange}
         />
       );
     case 'char':

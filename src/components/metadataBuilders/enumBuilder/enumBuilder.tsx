@@ -11,35 +11,30 @@ import { PDSelect } from '@components/pdSelect';
 import { InvocationMapper } from '../../invocationArgsMapper/invocationMapper';
 import styles from '../../invocationArgsMapper/styles.module.css';
 
-import type { InvocationOnChangeProps } from '@components/invocationArgsMapper/types';
-import type { EnumVar } from '@polkadot-api/metadata-builders';
-
-interface IEnumBuilder extends InvocationOnChangeProps {
-  enum: EnumVar;
-}
+import type { IEnumBuilder } from '@components/invocationArgsMapper/types';
 
 const EnumBuilder = ({ onChange, ...props }: IEnumBuilder) => {
-  const enumVar = props.enum;
-  const enumKeys = Object.keys(enumVar.value);
+  const _enum = props.enum;
+  const options = Object.keys(_enum.value);
 
   const selectItems = useMemo(() => {
-    return enumKeys.map((key, index) => ({
+    return options.map((key, index) => ({
       label: key,
       value: key,
       key: `enum-select-${key}-${index}`,
     }));
-  }, [enumKeys]);
+  }, [options]);
 
   const [
     key,
     setKey,
-  ] = useState(enumKeys.at(0)!);
+  ] = useState(options.at(0)!);
 
   const handleSetValue = useCallback((args: unknown) => {
     onChange({ type: key, value: args });
   }, [key]);
 
-  const enumValue = enumVar.value[key];
+  const enumValue = _enum.value[key];
   const getEnumVariable = () => {
     if (!enumValue) {
       return undefined;
@@ -74,7 +69,7 @@ const EnumBuilder = ({ onChange, ...props }: IEnumBuilder) => {
         _enumVar && (
           <div className={styles.invocationContainer}>
             <InvocationMapper
-              key={`${_enumVar.type}-${(_enumVar as { id: number })?.id}`} /* used to fix state on enum change */
+              key={`${_enumVar.type}-${(_enumVar as { id: number })?.id}`} /* used for correct state on enum change */
               invokationVar={_enumVar}
               onChange={handleSetValue}
             />

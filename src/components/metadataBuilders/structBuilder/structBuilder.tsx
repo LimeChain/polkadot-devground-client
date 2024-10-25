@@ -28,14 +28,13 @@ const StructBuilder = ({ struct, onChange }: IStructBuilder) => {
   const handleOnChange = useCallback((key: StructArgs['key'], value: StructArgs['value']) => {
     setStructState((structState) => {
       const newArgs = { ...structState, [key]: value };
-      onChange(newArgs);
       return newArgs;
     });
   }, []);
 
   useEffect(() => {
     onChange(structState);
-  }, []);
+  }, [structState]);
 
   try {
     if (!entries) {

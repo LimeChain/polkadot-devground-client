@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-bind */
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
   useCallback,
@@ -8,6 +9,7 @@ import {
 import { Icon } from '@components/icon';
 import { InvocationMapper } from '@components/invocationArgsMapper/invocationMapper';
 import { cn } from '@utils/helpers';
+import { buildSequenceState } from '@utils/invocationMapper';
 
 import type { ISequenceBuilder } from '@components/invocationArgsMapper/types';
 
@@ -19,7 +21,7 @@ export const SequenceBuilderCore = ({ sequence, onChange, placeholder }: ISequen
   const [
     params,
     setParams,
-  ] = useState(Array.from({ length }).map(() => ({ id: crypto.randomUUID(), value: undefined })));
+  ] = useState(buildSequenceState(length));
 
   useEffect(() => {
     const res = params.map((p) => p.value);
@@ -29,13 +31,13 @@ export const SequenceBuilderCore = ({ sequence, onChange, placeholder }: ISequen
   const handleOnChange = useCallback((args: unknown, id: string) => {
     setParams((params) => {
       const item = params.find((p) => p.id === id);
-      if (item) {
+      if (!item) {
+        return params;
+      } else {
         const index = params.indexOf(item);
         const newParams = [...params];
         newParams[index].value = args as undefined;
         return newParams;
-      } else {
-        return params;
       }
     });
   }, []);
@@ -118,7 +120,6 @@ export const SequenceBuilderCore = ({ sequence, onChange, placeholder }: ISequen
               <div className="flex w-full flex-col gap-6">
                 <InvocationMapper
                   invokationVar={sequence.value}
-                  // eslint-disable-next-line react/jsx-no-bind
                   onChange={(args) => handleOnChange(args, param.id)}
                   placeholder={placeholder}
                 />

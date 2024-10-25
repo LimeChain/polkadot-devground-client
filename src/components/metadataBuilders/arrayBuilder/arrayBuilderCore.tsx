@@ -25,13 +25,12 @@ export const ArrayVarBuilderCore = ({ array, onChange }: IArrayVarBuilder) => {
 
   useEffect(() => {
     handleUpdateVals(arrayProps);
-  }, []);
+  }, [arrayProps]);
 
   const handleOnChange = useCallback((index: number, args: unknown) => {
     setArrayProps((props) => {
       const newProps = [...props];
       newProps[index] = args;
-      handleUpdateVals(newProps);
       return newProps;
     });
   }, []);
