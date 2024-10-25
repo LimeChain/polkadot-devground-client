@@ -3,14 +3,12 @@ import {
   type StoreInterface,
 } from '@stores';
 import {
-  auraDigestCodec,
   babeDigestCodec,
   decodeExtrinsic,
 } from '@utils/codec';
 import { formatPrettyNumberString } from '@utils/helpers';
 import {
   getIdentity,
-  getInvulnerables,
   getSuperIdentity,
   getSystemDigestData,
   getSystemEvents,
@@ -19,7 +17,6 @@ import {
 import { assert } from '@utils/papi/helpers';
 
 import type { IMappedBlockExtrinsic } from '@custom-types/block';
-import type { TPeopleApi } from '@custom-types/chain';
 import type { BlockDetails } from '@custom-types/rawClientReturnTypes';
 import type { RuntimeVersion } from '@polkadot/types/interfaces';
 import type {
@@ -51,22 +48,16 @@ const getBlockValidator = async ({
 
   if (isRelayChain) {
     authorIndex = babeDigestCodec.dec(digestData).value;
-  } else {
-    authorIndex = Number(auraDigestCodec.dec(digestData).slotNumber);
   }
 
-  let authors = [];
+  let authors: string[] = [];
 
   if (isRelayChain) {
     authors = await getValidators(api, blockHash)
       .catch();
-  } else {
-    authors = await getInvulnerables(api as TPeopleApi, blockHash)
-      .catch();
   }
 
-  // TODO parachain validator index is not correct
-  const address = isRelayChain ? authors[authorIndex] : authors[authorIndex % authors.length];
+  const address = isRelayChain ? authors[authorIndex] : '';
 
   let identity;
 
@@ -98,7 +89,7 @@ const getBlockValidator = async ({
   }
 
   return {
-    name: identity?.toString(),
+    name: identity?.toString?.(),
     address,
   };
 };
@@ -190,7 +181,6 @@ export const getBlockDetailsWithPAPI = async ({
       runtime,
       identity: identity.status === 'fulfilled' ? identity.value : undefined,
       ...(blockHeader.status === 'fulfilled' ? blockHeader.value : {}),
-      // ...blockHeader,
     },
     body: {
       extrinsics,
