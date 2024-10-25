@@ -2,15 +2,21 @@ interface IExpandButtonProps {
   isExpanded: boolean;
   onToggle: () => void;
   itemType: 'extrinsics' | 'events';
+  className: string;
 }
 
 const ExpandButton = (props: IExpandButtonProps) => {
-  const { isExpanded, onToggle, itemType } = props;
+  const {
+    isExpanded,
+    onToggle,
+    itemType,
+    className,
+  } = props;
 
   return (
     <div className="flex justify-center">
       <button
-        className="font-geist font-body2-bold"
+        className={className}
         data-type={itemType}
         onClick={onToggle}
       >

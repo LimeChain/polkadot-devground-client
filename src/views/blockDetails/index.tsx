@@ -160,11 +160,17 @@ const BlockDetails = () => {
         selectedTab={selectedTab}
         showMore={showMore}
       />
-      <ExpandButton
-        isExpanded={showMore}
-        itemType={selectedTab}
-        onToggle={handleExpandButtonClick}
-      />
+      {(selectedTab === 'extrinsics' && blockData.body.extrinsics.length > 3)
+        || (selectedTab === 'events' && blockData.body.events.length > 3)
+        ? (
+          <ExpandButton
+            className="-mt-8 font-geist font-body2-bold"
+            isExpanded={showMore}
+            itemType={selectedTab}
+            onToggle={handleExpandButtonClick}
+          />
+        )
+        : null}
       <div className="flex justify-center gap-6 md:hidden">
         {
           subscanLink

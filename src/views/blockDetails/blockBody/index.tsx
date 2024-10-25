@@ -28,7 +28,15 @@ interface BlockBodyProps {
 }
 
 export const BlockBody = (props: BlockBodyProps) => {
-  const { bodyData, blockNumber, blockTimestamp, showMore, selectedTab, onTabChange } = props;
+  const {
+    bodyData,
+    blockNumber,
+    blockTimestamp,
+    showMore,
+    selectedTab,
+    onTabChange,
+  } = props;
+
   const [
     JSONViewerModal,
     toggleVisibility,
@@ -80,7 +88,7 @@ export const BlockBody = (props: BlockBodyProps) => {
         <div
           data-title="Extrinsics"
         >
-          <table className="mb-4 w-full">
+          <table className="mb-2 w-full">
             <colgroup>
               <col className="min-w-28" />
               <col className="min-w-24" />
@@ -158,7 +166,7 @@ export const BlockBody = (props: BlockBodyProps) => {
         <div
           data-title="Events"
         >
-          <table className="mb-4 w-full">
+          <table className="mb-2 w-full">
             <colgroup>
               <col className="min-w-28" />
               <col className="min-w-36" />
