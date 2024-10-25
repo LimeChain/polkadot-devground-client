@@ -75,14 +75,14 @@ const getBlockValidator = async ({
       .catch();
 
     if (identity) {
-      const _identity = (identity?.[0]?.info?.display?.value as FixedSizeBinary<2>)?.asText?.();
-      const _superIdentity = (superIdentity?.[1]?.value as FixedSizeBinary<2>)?.asText?.();
+      const identityVal = (identity?.[0]?.info?.display?.value as FixedSizeBinary<2>)?.asText?.();
+      const superIdentityVal = (superIdentity?.[1]?.value as FixedSizeBinary<2>)?.asText?.();
 
-      if (_identity) {
-        if (_superIdentity) {
-          identity = `${_identity}/${_superIdentity}`;
+      if (identityVal) {
+        if (superIdentityVal) {
+          identity = `${identityVal}/${superIdentityVal}`;
         } else {
-          identity = _identity;
+          identity = identityVal;
         }
       }
     }
