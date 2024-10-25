@@ -79,9 +79,6 @@ const Extrinsics = () => {
     setCallSelected,
   ] = useState(calls.at(0));
 
-  console.log(callArgs);
-  console.log(callSelected);
-
   useEffect(() => {
     setQueries([]);
     setCallArgs({});
