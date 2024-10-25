@@ -9,13 +9,13 @@ import {
 } from 'react';
 
 import { InvocationArgsMapper } from '@components/invocationArgsMapper';
+import { Loader } from '@components/loader';
 import { AccountSelectBuilder } from '@components/metadataBuilders/accountBuilder/accountSelectBuilder';
 import { QueryButton } from '@components/papiQuery/queryButton';
 import { QueryFormContainer } from '@components/papiQuery/queryFormContainer';
 import { QueryResult } from '@components/papiQuery/queryResult';
 import { QueryResultContainer } from '@components/papiQuery/queryResultContainer';
 import { QueryViewContainer } from '@components/papiQuery/queryViewContainer';
-import { Loader } from '@components/loader';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
 import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';

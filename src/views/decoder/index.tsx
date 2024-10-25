@@ -5,12 +5,12 @@ import {
 } from 'react';
 
 import { InvocationDecoder } from '@components/decoder';
+import { Loader } from '@components/loader';
 import { QueryButton } from '@components/papiQuery/queryButton';
 import { QueryFormContainer } from '@components/papiQuery/queryFormContainer';
 import { QueryResult } from '@components/papiQuery/queryResult';
 import { QueryResultContainer } from '@components/papiQuery/queryResultContainer';
 import { QueryViewContainer } from '@components/papiQuery/queryViewContainer';
-import { Loader } from '@components/loader';
 import { PDSelect } from '@components/pdSelect';
 import { decoders } from '@constants/decoders';
 import { useStoreChain } from '@stores';

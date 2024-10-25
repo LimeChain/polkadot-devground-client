@@ -7,12 +7,12 @@ import {
 } from 'react';
 
 import { CallDocs } from '@components/callDocs';
+import { Loader } from '@components/loader';
 import { QueryButton } from '@components/papiQuery/queryButton';
 import { QueryFormContainer } from '@components/papiQuery/queryFormContainer';
 import { QueryResult } from '@components/papiQuery/queryResult';
 import { QueryResultContainer } from '@components/papiQuery/queryResultContainer';
 import { QueryViewContainer } from '@components/papiQuery/queryViewContainer';
-import { Loader } from '@components/loader';
 import { PDSelect } from '@components/pdSelect';
 import { InvocationRuntimeArgs } from '@components/runtimeCalls';
 import { useStoreChain } from '@stores';

@@ -5,14 +5,14 @@ import {
   useState,
 } from 'react';
 
-import { InvocationStorageArgs } from '@components/chainState';
 import { CallDocs } from '@components/callDocs';
+import { InvocationStorageArgs } from '@components/chainState';
+import { Loader } from '@components/loader';
 import { QueryButton } from '@components/papiQuery/queryButton';
 import { QueryFormContainer } from '@components/papiQuery/queryFormContainer';
 import { QueryResult } from '@components/papiQuery/queryResult';
 import { QueryResultContainer } from '@components/papiQuery/queryResultContainer';
 import { QueryViewContainer } from '@components/papiQuery/queryViewContainer';
-import { Loader } from '@components/loader';
 import { PDSelect } from '@components/pdSelect';
 import { useStoreChain } from '@stores';
 import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
