@@ -22,10 +22,13 @@ interface BlockBodyProps {
   bodyData: IMappedBlockBody;
   blockNumber: number;
   blockTimestamp: number;
+  showMore: boolean;
+  selectedTab: 'extrinsics' | 'events';
+  onTabChange: (tab: 'extrinsics' | 'events') => void;
 }
 
 export const BlockBody = (props: BlockBodyProps) => {
-  const { bodyData, blockNumber, blockTimestamp } = props;
+  const { bodyData, blockNumber, blockTimestamp, showMore, selectedTab, onTabChange } = props;
   const [
     JSONViewerModal,
     toggleVisibility,
@@ -37,21 +40,16 @@ export const BlockBody = (props: BlockBodyProps) => {
     modalData,
     setModalData,
   ] = useState<IMappedBlockEvent | IBlockExtrinsic | null>(null);
-  const [
-    initialTab,
-    setInitialTab,
-  ] = useState(0);
-  const [
-    showMoreExtrinsics,
-    setShowMoreExtrinsics,
-  ] = useState(false);
-  const [
-    showMoreEvents,
-    setShowMoreEvents,
-  ] = useState(false);
 
-  const visibleExtrinsics = showMoreExtrinsics ? bodyData.extrinsics : bodyData.extrinsics.slice(0, 3);
-  const visibleEvents = showMoreEvents ? bodyData.events : bodyData.events.slice(0, 3);
+  const visibleExtrinsics = showMore ? bodyData.extrinsics : bodyData.extrinsics.slice(0, 3);
+  const visibleEvents = showMore ? bodyData.events : bodyData.events.slice(0, 3);
+
+  const tabIndex = selectedTab === 'extrinsics' ? 0 : 1;
+
+  const handleOnTabChange = useCallback(
+    (index: number) => onTabChange(index === 0 ? 'extrinsics' : 'events'),
+    [onTabChange],
+  );
 
   const handleOpenModal = useCallback(async (e: React.MouseEvent<HTMLTableRowElement>) => {
     const type = e.currentTarget.getAttribute('data-type');
@@ -70,24 +68,11 @@ export const BlockBody = (props: BlockBodyProps) => {
     bodyData.events,
   ]);
 
-  const handleShowMore = useCallback((e: React.MouseEvent) => {
-    const type = e.currentTarget.getAttribute('data-type');
-    if (type === 'extrinsic') {
-      setShowMoreExtrinsics(!showMoreExtrinsics);
-    } else if (type === 'event') {
-      setShowMoreEvents(!showMoreEvents);
-    }
-
-  }, [
-    showMoreEvents,
-    showMoreExtrinsics,
-  ]);
-
   return (
     <div className="grid gap-4 overflow-auto">
       <Tabs
-        initialTab={initialTab}
-        onChange={setInitialTab}
+        initialTab={tabIndex}
+        onChange={handleOnTabChange}
         refContainer={refContainer}
         tabClassName="px-2 py-2 mb-5 sticky left-0 last:left-24 sm:relative sm:last:left-0"
         unmountOnHide={false}
@@ -95,7 +80,7 @@ export const BlockBody = (props: BlockBodyProps) => {
         <div
           data-title="Extrinsics"
         >
-          <table className="w-full">
+          <table className="mb-4 w-full">
             <colgroup>
               <col className="min-w-28" />
               <col className="min-w-24" />
@@ -169,24 +154,11 @@ export const BlockBody = (props: BlockBodyProps) => {
               }
             </tbody>
           </table>
-          {
-            bodyData.extrinsics.length > 3 && (
-              <div className="flex justify-center">
-                <button
-                  className="my-4 font-geist font-body2-bold sm:mb-0"
-                  data-type="extrinsic"
-                  onClick={handleShowMore}
-                >
-                  {showMoreExtrinsics ? 'Show Less' : 'Show More'}
-                </button>
-              </div>
-            )
-          }
         </div>
         <div
           data-title="Events"
         >
-          <table className="w-full">
+          <table className="mb-4 w-full">
             <colgroup>
               <col className="min-w-28" />
               <col className="min-w-36" />
@@ -243,17 +215,6 @@ export const BlockBody = (props: BlockBodyProps) => {
               }
             </tbody>
           </table>
-          {bodyData.events.length > 3 && (
-            <div className="flex justify-center">
-              <button
-                className="my-4 font-geist font-body2-bold sm:mb-0"
-                data-type="event"
-                onClick={handleShowMore}
-              >
-                {showMoreEvents ? 'Show Less' : 'Show More'}
-              </button>
-            </div>
-          )}
         </div>
       </Tabs>
       <JSONViewerModal

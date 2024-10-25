@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -12,6 +13,7 @@ import { useStoreChain } from '@stores';
 import { getBlockExplorerLink } from '@utils/explorer';
 import { formatNumber } from '@utils/helpers';
 import { getBlockDetailsWithRawClient } from '@utils/rpc/getBlockDetails';
+import ExpandButton from '@views/blockDetails/components/expandButton';
 import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
 import { BlockBody } from './blockBody';
@@ -51,6 +53,23 @@ const BlockDetails = () => {
     blockData,
     setBlockData,
   ] = useState<IMappedBlock>();
+  const [
+    showMore,
+    setShowMore,
+  ] = useState(false);
+  const [
+    selectedTab,
+    setSelectedTab,
+  ] = useState<'extrinsics' | 'events'>('extrinsics');
+
+  const handleExpandButtonClick = useCallback(() => {
+    setShowMore((prev) => !prev);
+  }, []);
+
+  const handleTabChange = useCallback((tab: 'extrinsics' | 'events') => {
+    setSelectedTab(tab);
+    setShowMore(false);
+  }, []);
 
   useEffect(() => {
     void (async () => {
@@ -137,6 +156,14 @@ const BlockDetails = () => {
         blockNumber={blockData.header.number}
         blockTimestamp={blockData.header.timestamp}
         bodyData={blockData.body}
+        onTabChange={handleTabChange}
+        selectedTab={selectedTab}
+        showMore={showMore}
+      />
+      <ExpandButton
+        isExpanded={showMore}
+        itemType={selectedTab}
+        onToggle={handleExpandButtonClick}
       />
       <div className="flex justify-center gap-6 md:hidden">
         {
