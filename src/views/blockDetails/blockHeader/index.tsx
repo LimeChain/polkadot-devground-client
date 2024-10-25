@@ -2,6 +2,7 @@ import { Identicon } from '@polkadot/react-identicon';
 import { format } from 'date-fns';
 import {
   useCallback,
+  useEffect,
   useState,
 } from 'react';
 import { toast } from 'react-hot-toast';
@@ -24,10 +25,11 @@ interface DetailRowProps {
   label: string;
   value: string | undefined;
   isCopyable?: boolean;
+  iconComponent?: React.ReactNode;
 }
 
-const DetailRow = (props: DetailRowProps) => {
-  const { label, value } = props;
+export const DetailRow = (props: DetailRowProps) => {
+  const { label, value, iconComponent } = props;
 
   const [
     isHovered,
@@ -38,6 +40,20 @@ const DetailRow = (props: DetailRowProps) => {
     isParentHovered,
     setIsParentHovered,
   ] = useState(false);
+
+  const [
+    isMobile,
+    setIsMobile,
+  ] = useState<boolean>(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleMouseEnter = useCallback(() => {
     setIsHovered(true);
@@ -80,6 +96,7 @@ const DetailRow = (props: DetailRowProps) => {
     >
       <p>{label}</p>
       <div className="flex items-center gap-x-1">
+        {iconComponent && <span className="mr-2">{iconComponent}</span>}
         <p
           className="cursor-pointer"
           onClick={copyToClipboard}
@@ -94,7 +111,7 @@ const DetailRow = (props: DetailRowProps) => {
             toastMessage={label}
             className={cn(
               'transition-opacity duration-200 ease-in-out',
-              isHovered || isParentHovered ? 'visible opacity-100' : 'invisible opacity-0',
+              (isHovered || isParentHovered || isMobile) ? 'visible opacity-100' : 'invisible opacity-0',
             )}
           >
             {({ ClipboardIcon }) => (
@@ -181,28 +198,17 @@ export const BlockHeader = (props: BlockHeaderProps) => {
         value={headerData.extrinsicRoot}
       />
       {headerData.identity && (
-        <div className={styles['pd-block-details']}>
-          <p>Validator</p>
-          <div className={styles['validator']}>
+        <DetailRow
+          label="Validator"
+          value={headerData.identity.address}
+          iconComponent={(
             <Identicon
               size={32}
               theme="polkadot"
               value={headerData.identity.address}
             />
-            <span>
-              {headerData.identity.name}
-              <div className="flex items-center gap-x-2">
-                <span>{headerData.identity.address}</span>
-                <CopyToClipboard
-                  text={headerData.identity.address || ''}
-                  toastMessage="Validator Address"
-                >
-                  {({ ClipboardIcon }) => <>{ClipboardIcon}</>}
-                </CopyToClipboard>
-              </div>
-            </span>
-          </div>
-        </div>
+          )}
+        />
       )}
       <DetailRow
         label="Spec Version"
