@@ -18,7 +18,7 @@ import type {
 } from '@components/invocationArgsMapper/types';
 
 const StructBuilder = ({ struct, onChange }: IStructBuilder) => {
-  const entries = Object.entries(struct.value);
+  const structEntries = Object.entries(struct.value);
 
   const [
     structState,
@@ -37,29 +37,30 @@ const StructBuilder = ({ struct, onChange }: IStructBuilder) => {
   }, [structState]);
 
   try {
-    if (!entries) {
+    if (!structEntries) {
       return null;
     } else {
-      return entries
-        .map(([
+      return structEntries.map((strEntry, index) => {
+        const [
           key,
           value,
-        ], index) => {
-          return (
-            <div key={`struct-${key}-${index}-${value.id}`}>
-              <span className="block pb-1 font-geist font-body1-regular">
-                {key}
-              </span>
-              <div className={styles.invocationContainer}>
-                <InvocationMapper
-                  key={`struct-invoker-${value.id}`}
-                  invokationVar={value}
-                  onChange={(args) => handleOnChange(key, args)}
-                />
-              </div>
+        ] = strEntry;
+
+        return (
+          <div key={`struct-${key}-${index}-${value.id}`}>
+            <span className="block pb-1 font-geist font-body1-regular">
+              {key}
+            </span>
+            <div className={styles.invocationContainer}>
+              <InvocationMapper
+                key={`struct-invoker-${value.id}`}
+                invokationVar={value}
+                onChange={(args) => handleOnChange(key, args)}
+              />
             </div>
-          );
-        });
+          </div>
+        );
+      });
     }
   } catch (error) {
     console.error(error);

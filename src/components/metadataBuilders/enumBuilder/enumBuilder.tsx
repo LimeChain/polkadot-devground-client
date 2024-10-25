@@ -15,26 +15,26 @@ import type { IEnumBuilder } from '@components/invocationArgsMapper/types';
 
 const EnumBuilder = ({ onChange, ...props }: IEnumBuilder) => {
   const _enum = props.enum;
-  const options = Object.keys(_enum.value);
+  const enumOptions = Object.keys(_enum.value);
 
   const selectItems = useMemo(() => {
-    return options.map((key, index) => ({
+    return enumOptions.map((key, index) => ({
       label: key,
       value: key,
       key: `enum-select-${key}-${index}`,
     }));
-  }, [options]);
+  }, [enumOptions]);
 
   const [
-    key,
-    setKey,
-  ] = useState(options.at(0)!);
+    option,
+    setOption,
+  ] = useState(enumOptions.at(0)!);
 
   const handleSetValue = useCallback((args: unknown) => {
-    onChange({ type: key, value: args });
-  }, [key]);
+    onChange({ type: option, value: args });
+  }, [option]);
 
-  const enumValue = _enum.value[key];
+  const enumValue = _enum.value[option];
   const getEnumVariable = () => {
     if (!enumValue) {
       return undefined;
@@ -53,7 +53,7 @@ const EnumBuilder = ({ onChange, ...props }: IEnumBuilder) => {
       handleSetValue(undefined);
     }
   }, [
-    key,
+    option,
     _enumVar,
     handleSetValue,
   ]);
@@ -62,8 +62,8 @@ const EnumBuilder = ({ onChange, ...props }: IEnumBuilder) => {
     <div className={styles.invocationGroup}>
       <PDSelect
         items={[selectItems]}
-        onChange={setKey}
-        value={key}
+        onChange={setOption}
+        value={option}
       />
       {
         _enumVar && (

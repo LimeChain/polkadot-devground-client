@@ -43,7 +43,7 @@ const AccountBuilder = ({ accountId, onChange }: IAccountBuilder) => {
 
   const handleAccountSelect = useCallback((account: unknown) => {
     if ((account as InjectedPolkadotAccount)?.address) {
-      onChange((account as InjectedPolkadotAccount)?.address);
+      onChange((account as InjectedPolkadotAccount)?.address || '');
     }
   }, []);
 

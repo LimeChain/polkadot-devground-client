@@ -29,16 +29,16 @@ export const ArrayVarBuilderCore = ({ array, onChange }: IArrayVarBuilder) => {
 
   const handleOnChange = useCallback((index: number, args: unknown) => {
     setArrayProps((props) => {
-      const newProps = [...props];
-      newProps[index] = args;
-      return newProps;
+      const newArrayProps = [...props];
+      newArrayProps[index] = args;
+      return newArrayProps;
     });
   }, []);
 
   return (
     <div className={styles.invocationGroup}>
       {
-        arrayProps.map((_, index) => {
+        arrayProps.map((arrProp, index) => {
           return (
             <InvocationMapper
               key={`array-var-${index}`}

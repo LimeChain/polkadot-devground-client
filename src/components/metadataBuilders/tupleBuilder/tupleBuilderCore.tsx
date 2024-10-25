@@ -21,7 +21,7 @@ export const TupleBuilderCore = ({
   const [
     state,
     setState,
-  ] = useState(buildArrayState(tuple.value.length));
+  ] = useState(buildArrayState(tuple?.value?.length || 0));
 
   const handleOnChange = useCallback((index: number, value: unknown) => {
     setState((tuple) => {

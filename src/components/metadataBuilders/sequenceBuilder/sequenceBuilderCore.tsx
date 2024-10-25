@@ -13,29 +13,31 @@ import { buildSequenceState } from '@utils/invocationMapper';
 
 import type { ISequenceBuilder } from '@components/invocationArgsMapper/types';
 
+const STARTING_SEQUENCE_LENGTH = 1;
+
 export const SequenceBuilderCore = ({ sequence, onChange, placeholder }: ISequenceBuilder) => {
   const [
-    length,
-    setLength,
-  ] = useState<number>(1);
+    sequenceLength,
+    setSequenceLength,
+  ] = useState<number>(STARTING_SEQUENCE_LENGTH);
   const [
-    params,
-    setParams,
-  ] = useState(buildSequenceState(length));
+    sequenceState,
+    setSequenceState,
+  ] = useState(buildSequenceState(sequenceLength));
 
   useEffect(() => {
-    const res = params.map((p) => p.value);
+    const res = sequenceState.map((p) => p.value);
     onChange(res.includes(undefined) ? undefined : res);
-  }, [params]);
+  }, [sequenceState]);
 
   const handleOnChange = useCallback((args: unknown, id: string) => {
-    setParams((params) => {
-      const item = params.find((p) => p.id === id);
+    setSequenceState((state) => {
+      const item = state.find((p) => p.id === id);
       if (!item) {
-        return params;
+        return state;
       } else {
-        const index = params.indexOf(item);
-        const newParams = [...params];
+        const index = state.indexOf(item);
+        const newParams = [...state];
         newParams[index].value = args as undefined;
         return newParams;
       }
@@ -43,16 +45,16 @@ export const SequenceBuilderCore = ({ sequence, onChange, placeholder }: ISequen
   }, []);
 
   const handleAddItem = useCallback(() => {
-    setLength((length) => length + 1);
-    setParams((params) => ([
-      ...params,
+    setSequenceLength((length) => length + 1);
+    setSequenceState((state) => ([
+      ...state,
       { id: crypto.randomUUID(), value: undefined },
     ]));
   }, []);
 
   const handleRemoveItem = useCallback(() => {
-    setLength((length) => length - 1);
-    setParams((params) => params.slice(0, -1));
+    setSequenceLength((length) => length - 1);
+    setSequenceState((params) => params.slice(0, -1));
   }, []);
 
   return (
@@ -80,7 +82,7 @@ export const SequenceBuilderCore = ({ sequence, onChange, placeholder }: ISequen
         </button>
 
         <button
-          disabled={params.length === 0}
+          disabled={sequenceState.length === 0}
           onClick={handleRemoveItem}
           type="button"
           className={cn(
@@ -98,12 +100,12 @@ export const SequenceBuilderCore = ({ sequence, onChange, placeholder }: ISequen
 
       </div>
       {
-        params.map((param, index) => {
+        sequenceState.map((state, index) => {
           const nextType = sequence.value.type;
 
           return (
             <div
-              key={param.id}
+              key={state.id}
               className="grid w-full grid-cols-[16px_1fr] gap-2"
             >
               <span className={cn(
@@ -120,7 +122,7 @@ export const SequenceBuilderCore = ({ sequence, onChange, placeholder }: ISequen
               <div className="flex w-full flex-col gap-6">
                 <InvocationMapper
                   invokationVar={sequence.value}
-                  onChange={(args) => handleOnChange(args, param.id)}
+                  onChange={(args) => handleOnChange(args, state.id)}
                   placeholder={placeholder}
                 />
               </div>

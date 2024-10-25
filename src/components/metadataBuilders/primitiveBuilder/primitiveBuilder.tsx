@@ -22,20 +22,20 @@ const PrimitiveBuilder = ({
   readOnly,
 }: IPrimitiveBuilder) => {
   const [
-    value,
-    setValue,
+    primValue,
+    setPrimValue,
   ] = useState('');
 
   const handlePDSwitchChange = useCallback(() => {
-    setValue((val) => Boolean(val) ? '' : 'true');
+    setPrimValue((val) => Boolean(val) ? '' : 'true');
   }, []);
 
   const commonProps = {
     placeholder: placeholder || primitive.value,
-    value,
+    value: primValue,
     className: styles.invocationInputField,
     onChange: (event: ChangeEvent<HTMLInputElement>) =>
-      setValue(event.target.value),
+      setPrimValue(event.target.value),
     readOnly: !!readOnly,
   };
 
@@ -47,8 +47,8 @@ const PrimitiveBuilder = ({
   } as const;
 
   useEffect(() => {
-    onChange(handlePrimitiveInputChange(primitive, value));
-  }, [value]);
+    onChange(handlePrimitiveInputChange(primitive, primValue));
+  }, [primValue]);
 
   switch (primitive.value) {
     case 'i8':
@@ -73,7 +73,7 @@ const PrimitiveBuilder = ({
     case 'bool':
       return (
         <PDSwitch
-          checked={Boolean(value)}
+          checked={Boolean(primValue)}
           onChange={handlePDSwitchChange}
         />
       );

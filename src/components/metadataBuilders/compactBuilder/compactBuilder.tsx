@@ -15,17 +15,17 @@ import type { ICompactBuilder } from '@components/invocationArgsMapper/types';
 
 const CompactVarBuilder = ({ compact, onChange }: ICompactBuilder) => {
   const [
-    value,
-    setValue,
+    compactValue,
+    setCompactValue,
   ] = useState('0');
 
   const handleOnChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
+    setCompactValue(e.target.value);
   }, []);
 
   useEffect(() => {
-    onChange(getCompactValue(compact.isBig || false, value));
-  }, [value]);
+    onChange(getCompactValue(compact.isBig || false, compactValue));
+  }, [compactValue]);
 
   return (
     <input
