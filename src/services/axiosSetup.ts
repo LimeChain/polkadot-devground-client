@@ -2,8 +2,6 @@ import axios from 'axios';
 
 import authService from './authService';
 
-const MAX_RETRIES = 3;
-
 axios.interceptors.request.use(
   async (config) => {
     const token = await authService.getJwtToken();
@@ -28,10 +26,10 @@ axios.interceptors.response.use(
       originalRequest._retryCount = 0;
     }
 
-    if (error.response.status === 401 && originalRequest._retryCount < MAX_RETRIES) {
-      originalRequest._retryCount += 1;
+    if (error.response.status === 401) {
       try {
-        const token = await authService.getJwtToken();
+        const token = await authService.refreshJwtToken();
+        console.log('Token refreshed');
         if (token) {
           axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           return axios(originalRequest);
@@ -44,7 +42,8 @@ axios.interceptors.response.use(
     if (error.response.status === 403 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        return authService.authorizeGitHubApp();
+        authService.authorizeGitHubApp();
+        return;
       } catch (e) {
         return Promise.reject(e);
       }
