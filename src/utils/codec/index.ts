@@ -21,10 +21,10 @@ export const decodeExtrinsic = (extrinsic: string): IBlockExtrinsic | undefined 
   }
 };
 export const babeDigestCodec = ScaleEnum({
-  authority_index: u32,
   a: u32,
   b: u32,
   c: u32,
+  d: u32,
 });
 
 export const blockHeaderCodec = blockHeader;
