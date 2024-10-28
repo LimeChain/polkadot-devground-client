@@ -6,66 +6,70 @@ import {
   useState,
 } from 'react';
 
-import { AccountSelectBuilder } from '@components/metadataBuilders/accountBuilder/accountSelectBuilder';
-import { CustomAccountBuilder } from '@components/metadataBuilders/accountBuilder/customAccountBuilder';
 import { PDSwitch } from '@components/pdSwitch';
 import { useStoreWallet } from 'src/stores/wallet';
 
 import styles from '../../invocationArgsMapper/styles.module.css';
 
+import { ManualAccountInput } from './manualAccountInput';
+import { WalletAccountSelector } from './walletAccountSelector';
+
 import type { IAccountBuilder } from '@components/invocationArgsMapper/types';
-
-const AccountBuilder = ({ accountId, onChange }: IAccountBuilder) => {
-  const accounts = useStoreWallet?.use?.accounts?.();
-
+export const AccountBuilder = ({ accountId, onChange }: IAccountBuilder) => {
+  const walletAccounts = useStoreWallet?.use?.accounts?.() ?? [];
   const [
-    useCustomAccount,
-    setUseCustomAccount,
+    isManualInput,
+    setIsManualInput,
   ] = useState(false);
 
+  // Reset to wallet selection mode when accounts change
   useEffect(() => {
-    setUseCustomAccount(false);
-    onChange(accounts[0]?.address);
-  }, [accounts]);
+    setIsManualInput(false);
+    if (walletAccounts.length > 0) {
+      onChange(walletAccounts[0].address);
+    }
+  }, [walletAccounts]);
 
+  // Set default wallet account when switching back from manual mode
   useEffect(() => {
-    if (!useCustomAccount && accounts.length) {
-      onChange(accounts[0].address);
+    if (!isManualInput && walletAccounts.length > 0) {
+      onChange(walletAccounts[0].address);
     }
   }, [
-    useCustomAccount,
-    accounts,
+    isManualInput,
+    walletAccounts,
   ]);
 
-  const handleSwitch = useCallback(() => {
-    setUseCustomAccount((use) => !use);
+  const handleAccountSelect = useCallback((account: unknown) => {
+    const selectedAccount = account as InjectedPolkadotAccount;
+    if (selectedAccount?.address) {
+      onChange(selectedAccount.address);
+    }
   }, []);
 
-  const handleAccountSelect = useCallback((account: unknown) => {
-    if ((account as InjectedPolkadotAccount)?.address) {
-      onChange((account as InjectedPolkadotAccount)?.address || '');
-    }
+  const handleManualInputToggle = useCallback(() => {
+    setIsManualInput((prev) => !prev);
   }, []);
 
   return (
     <div className={styles.invocationGroup}>
       <PDSwitch
-        checked={useCustomAccount}
-        onChange={handleSwitch}
-        title="Use Custom Account"
+        checked={isManualInput}
+        onChange={handleManualInputToggle}
+        title="Enter Account Manually"
       />
       <div>
         {
-          useCustomAccount
+          isManualInput
             ? (
-              <CustomAccountBuilder
+              <ManualAccountInput
                 accountId={accountId}
                 onChange={onChange}
               />
             )
             : (
-              <AccountSelectBuilder
-                accounts={accounts}
+              <WalletAccountSelector
+                accounts={walletAccounts}
                 onChange={handleAccountSelect}
               />
             )
@@ -74,5 +78,3 @@ const AccountBuilder = ({ accountId, onChange }: IAccountBuilder) => {
     </div>
   );
 };
-
-export default AccountBuilder;

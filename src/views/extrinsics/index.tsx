@@ -10,7 +10,7 @@ import {
 
 import { InvocationArgsMapper } from '@components/invocationArgsMapper';
 import { Loader } from '@components/loader';
-import { AccountSelectBuilder } from '@components/metadataBuilders/accountBuilder/accountSelectBuilder';
+import { WalletAccountSelector } from '@components/metadataBuilders/accountBuilder/walletAccountSelector';
 import { QueryButton } from '@components/papiQuery/queryButton';
 import { QueryFormContainer } from '@components/papiQuery/queryFormContainer';
 import { QueryResult } from '@components/papiQuery/queryResult';
@@ -250,7 +250,7 @@ const Extrinsics = () => {
         </div>
         <div className="flex flex-col gap-2">
           <span className=" font-geist font-body1-regular">Signer</span>
-          <AccountSelectBuilder
+          <WalletAccountSelector
             accounts={accounts}
             onChange={handleAccountSelect}
           />
