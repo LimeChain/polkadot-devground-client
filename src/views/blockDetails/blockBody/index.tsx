@@ -156,11 +156,10 @@ export const BlockBody = (props: BlockBodyProps) => {
                         {extrinsic.extrinsicData.method.method}
                         )
                       </td>
-                      <td className="flex flex-row gap-2 text-white">
-                        See details
+                      <td>
                         <Icon
-                          className="-rotate-90 text-dev-black-1000 dark:text-dev-purple-50"
-                          name="icon-dropdownArrow"
+                          className="text-dev-black-1000 dark:text-dev-purple-50"
+                          name="icon-expand"
                           size={[18]}
                         />
                       </td>
@@ -235,7 +234,7 @@ export const BlockBody = (props: BlockBodyProps) => {
                     <td>
                       <Icon
                         className="text-dev-black-1000 dark:text-dev-purple-50"
-                        name="icon-dropdownArrow"
+                        name="icon-expand"
                         size={[18]}
                       />
                     </td>

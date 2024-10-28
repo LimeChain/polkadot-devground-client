@@ -5,7 +5,6 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { toast } from 'react-hot-toast';
 
 import { CopyToClipboard } from '@components/copyToClipboard';
 import { Icon } from '@components/icon';
@@ -28,19 +27,18 @@ interface DetailRowProps {
   iconComponent?: React.ReactNode;
 }
 
+// WORKING WITH EXCEPTIONS
 export const DetailRow = (props: DetailRowProps) => {
-  const { label, value, iconComponent } = props;
+  const { label, value = '', iconComponent } = props;
 
   const [
     isHovered,
     setIsHovered,
   ] = useState(false);
-
   const [
     isParentHovered,
     setIsParentHovered,
   ] = useState(false);
-
   const [
     isMobile,
     setIsMobile,
@@ -55,14 +53,6 @@ export const DetailRow = (props: DetailRowProps) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handleMouseEnter = useCallback(() => {
-    setIsHovered(true);
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    setIsHovered(false);
-  }, []);
-
   const handleParentMouseEnter = useCallback(() => {
     setIsParentHovered(true);
   }, []);
@@ -71,22 +61,13 @@ export const DetailRow = (props: DetailRowProps) => {
     setIsParentHovered(false);
   }, []);
 
-  const copyToClipboard = useCallback(async () => {
-    if (!value) return;
+  const handleMouseEnter = useCallback(() => {
+    setIsHovered(true);
+  }, []);
 
-    const toastId = 'copy-to-clipboard';
-    toast.dismiss(toastId);
-
-    try {
-      await navigator.clipboard.writeText(value);
-      toast.success(`Copied ${label} to clipboard`, { id: toastId });
-    } catch (err) {
-      toast.error('Oops. Something went wrong', { id: toastId });
-    }
-  }, [
-    value,
-    label,
-  ]);
+  const handleMouseLeave = useCallback(() => {
+    setIsHovered(false);
+  }, []);
 
   return (
     <div
@@ -97,14 +78,7 @@ export const DetailRow = (props: DetailRowProps) => {
       <p>{label}</p>
       <div className="flex items-center gap-x-1">
         {iconComponent && <span className="mr-2">{iconComponent}</span>}
-        <p
-          className="cursor-pointer"
-          onClick={copyToClipboard}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          {value}
-        </p>
+
         {value && (
           <CopyToClipboard
             text={value}
@@ -114,14 +88,24 @@ export const DetailRow = (props: DetailRowProps) => {
               (isHovered || isParentHovered || isMobile) ? 'visible opacity-100' : 'invisible opacity-0',
             )}
           >
-            {({ ClipboardIcon }) => (
-              <span className={cn(
-                'transition-colors duration-200 ease-in-out',
-                isHovered ? 'text-dev-pink-400' : 'text-white',
-              )}
-              >
-                {ClipboardIcon}
-              </span>
+            {({ ClipboardIcon, onClick }) => (
+              <>
+                <p
+                  className="cursor-pointer"
+                  onClick={onClick}
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  {value}
+                </p>
+                <span className={cn(
+                  'transition-colors duration-200 ease-in-out',
+                  isHovered ? 'text-dev-pink-400' : 'text-white',
+                )}
+                >
+                  {ClipboardIcon}
+                </span>
+              </>
             )}
           </CopyToClipboard>
         )}
