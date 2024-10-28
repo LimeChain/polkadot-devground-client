@@ -101,8 +101,6 @@ const getJwtToken = async (): Promise<string | null> => {
       STORAGE_AUTH_JWT_TOKEN,
     );
 
-    console.log('JWT token', jwtToken);
-
     return jwtToken;
   } catch (error) {
     console.error('Failed to get JWT token', error);

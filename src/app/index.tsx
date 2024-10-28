@@ -55,7 +55,8 @@ export const App = () => {
     resetStore: resetStoreWallet,
   } = useStoreWallet.use.actions();
 
-  const { resetStore: resetStoreGists } = useStoreCustomExamples.use.actions();
+  const initStoreExamples = useStoreCustomExamples.use.init?.();
+  const { resetStore: resetStoreExamples } = useStoreCustomExamples.use.actions();
 
   useEffect(() => {
     const initializeStores = async () => {
@@ -63,6 +64,7 @@ export const App = () => {
       initStoreUI();
       initStoreChainClient();
       initStoreWallet();
+      initStoreExamples();
 
       window.customPackages = {};
       Object.assign(window.customPackages, {
@@ -89,7 +91,7 @@ export const App = () => {
       resetStoreUI();
       void resetStoreChain();
       resetStoreWallet();
-      resetStoreGists();
+      resetStoreExamples();
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

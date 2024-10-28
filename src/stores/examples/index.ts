@@ -29,6 +29,8 @@ interface StoreInterface {
     getExamples: () => void;
     deleteExample: (id: string) => void;
   };
+  init: () => void;
+
 }
 
 const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
@@ -43,13 +45,7 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   isSavingContent: false,
 };
 
-// Utility function for error handling
-const handleError = (error: unknown, message: string) => {
-  console.error(message, error);
-  toast.error(message);
-};
-
-const baseStore = create<StoreInterface>()((set) => ({
+const baseStore = create<StoreInterface>()((set, get) => ({
   ...initialState,
   actions: {
     uploadExample: async (data) => {
@@ -72,10 +68,10 @@ const baseStore = create<StoreInterface>()((set) => ({
         // Load the newly uploaded example
         const newExampleId = newExamples[newExamples.length - 1].id;
         if (newExampleId) {
-          baseStore.getState().actions.loadExampleContent(newExampleId, 'custom');
+          get().actions.loadExampleContent(newExampleId, 'custom');
         }
       } catch (error) {
-        handleError(error, 'Error uploading snippet');
+        console.log('Error uploading snippet', error);
       } finally {
         set({ isUploading: false });
       }
@@ -86,7 +82,7 @@ const baseStore = create<StoreInterface>()((set) => ({
         const data = await gistService.getUserExamples();
         set({ examples: data });
       } catch (error) {
-        handleError(error, 'Error getting snippets');
+        console.log('Error getting examples', error);
       }
     },
 
@@ -108,7 +104,7 @@ const baseStore = create<StoreInterface>()((set) => ({
 
         set({ selectedExample });
       } catch (error) {
-        handleError(error, 'Error loading snippet');
+        console.log('Error loading example content', error);
         throw error;
       } finally {
         busDispatch({ type: '@@-monaco-editor-hide-loading' });
@@ -116,25 +112,25 @@ const baseStore = create<StoreInterface>()((set) => ({
     },
 
     updateExampleInfo: async (id: string, exampleName: string, description: string) => {
-
       if (!id || !exampleName || !description) {
         handleError(null, 'No selected example id');
         return;
       }
+
       set({ isUploading: true });
 
       try {
         const gistsArray = await gistService.updateExampleInfo(id, exampleName, description);
         set({ examples: gistsArray, isUploading: false });
 
-        if (baseStore.getState().selectedExample.id === id) {
+        if (get().selectedExample.id === id) {
           // Update the selected example in the store
-          set({ selectedExample: { ...baseStore.getState().selectedExample, name: exampleName, description } });
+          set({ selectedExample: { ...get().selectedExample, name: exampleName, description } });
         }
         busDispatch<IUploadExampleModalClose>('@@-close-upload-example-modal');
         toast.success('Example Information Updated!');
       } catch (error) {
-        handleError(error, 'Error updating snippet');
+        console.log('Error updating snippet', error);
       } finally {
         set({ isUploading: false });
       }
@@ -144,7 +140,7 @@ const baseStore = create<StoreInterface>()((set) => ({
       set({ isSavingContent: true });
 
       if (!id || !data) {
-        handleError(null, 'No selected example id or data');
+        toast.error('No selected example id or data');
         return;
       }
 
@@ -153,7 +149,7 @@ const baseStore = create<StoreInterface>()((set) => ({
         busDispatch<IUploadExampleModalClose>('@@-close-upload-example-modal');
         toast.success('Example Content Updated!');
       } catch (error) {
-        handleError(error, 'Error updating snippet');
+        console.log('Error updating snippet', error);
       } finally {
         set({ isSavingContent: false });
       }
@@ -161,7 +157,7 @@ const baseStore = create<StoreInterface>()((set) => ({
 
     deleteExample: async (id: string) => {
       if (!id) {
-        handleError(null, 'No selected example id');
+        toast.error('No selected example id');
         return;
       }
 
@@ -170,16 +166,19 @@ const baseStore = create<StoreInterface>()((set) => ({
         set({ examples: newExamples });
         toast.success('Snippet deleted');
       } catch (error) {
-        handleError(error, 'Error deleting snippet');
+        console.log('Error deleting snippet', error);
       }
     },
 
     resetStore: () => (
-      console.log(initialState),
       set({ ...initialState })
     ),
+  },
+  init: async () => {
+    get().actions.getExamples();
   },
 }));
 
 export const baseStoreCustomExamples = baseStore;
 export const useStoreCustomExamples = createSelectors(baseStore);
+

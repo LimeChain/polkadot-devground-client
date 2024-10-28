@@ -76,8 +76,7 @@ const baseStore = create<StoreInterface>()((set) => ({
       const token = await authService.getJwtToken();
       const user = await authService.getUserData();
 
-      set({ user: user ? JSON.parse(user) : { name: '', avatar: '' } });
-      set({ jwtToken: token || '', jwtTokenIsLoading: false });
+      set({ jwtToken: token, user, jwtTokenIsLoading: false });
     } catch (error) {
       console.error('Initialization failed', error);
       set({ jwtTokenIsLoading: false });

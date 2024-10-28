@@ -5,7 +5,6 @@ import authService from './authService';
 axios.interceptors.request.use(
   async (config) => {
     const token = await authService.getJwtToken();
-    console.log('token', token);
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
@@ -30,7 +29,6 @@ axios.interceptors.response.use(
     if (error.response.status === 401) {
       try {
         const token = await authService.refreshJwtToken();
-        console.log('token', token);
         if (token) {
           axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           return axios(originalRequest);

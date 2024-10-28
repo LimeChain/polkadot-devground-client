@@ -15,7 +15,6 @@ export const GithubButton = () => {
 
   const { logout } = useStoreAuth.use.actions();
   const { name, avatar } = useStoreAuth.use.user();
-  const authIsLoading = useStoreAuth.use.jwtTokenIsLoading?.();
   const isAuthenticated = useStoreAuth.use.jwtToken?.();
   const { resetStore } = useStoreCustomExamples.use.actions();
 
@@ -28,47 +27,55 @@ export const GithubButton = () => {
   ]);
   return (
     <div className="mb-4 flex h-16 items-center">
-      <button
-        disabled={authIsLoading}
-        onClick={isAuthenticated ? handleLogout : toggleVisibility}
-        type="button"
-        className={cn(
-          'flex h-12 cursor-pointer items-center gap-1',
-          'ml-auto',
-          'disabled:cursor-not-allowed disabled:opacity-50',
-          'font-geist font-body1-bold',
-          'relative',
-          'after:absolute after:bottom-0 after:left-0 after:content-[""]',
-          'after:h-[2px] after:w-full after:bg-dev-pink-500',
-          'after:opacity-0 after:transition-opacity hover:after:opacity-100',
-        )}
-      >
-        {
-          isAuthenticated
-            ? (
-              <div className="flex h-12 cursor-pointer items-center gap-4">
+      {
+        isAuthenticated
+          ? (
+            <div className={cn(
+              'flex h-12 items-center gap-4',
+              'ml-auto',
+              'font-geist font-body1-bold',
+            )}
+            >
+              <div className="flex items-center gap-2.5">
                 <img
                   alt="avatar"
                   className="size-8 rounded-full"
                   src={avatar}
                 />
-                <div className="flex items-center gap-2">
-                  {name.length > 14 ? `${name.slice(0, 10)}..` : name}
-                  <Icon
-                    name="icon-logout"
-                    size={[22]}
-                  />
-                </div>
+                {name.length > 14 ? `${name.slice(0, 10)}..` : name}
               </div>
-            )
-            : (
-              <div className="flex h-12 cursor-pointer items-center gap-1">
-                <Icon name="logo-github" />
-                Login
-              </div>
-            )
-        }
-      </button>
+              <button
+                className="flex items-center gap-4 duration-200 hover:text-dev-pink-500"
+                onClick={handleLogout}
+              >
+                <Icon
+                  name="icon-logout"
+                  size={[22]}
+                />
+              </button>
+            </div>
+          )
+          : (
+            <button
+              onClick={toggleVisibility}
+              type="button"
+              className={cn(
+                'flex h-12 cursor-pointer items-center gap-1',
+                'ml-auto',
+                'disabled:cursor-not-allowed disabled:opacity-50',
+                'font-geist font-body1-bold',
+                'relative',
+                'after:absolute after:bottom-0 after:left-0 after:content-[""]',
+                'after:h-[2px] after:w-full after:bg-dev-pink-500',
+                'after:opacity-0 after:transition-opacity hover:after:opacity-100',
+              )}
+            >
+              <Icon name="logo-github" />
+              Login
+            </button>
+          )
+      }
+
       <GithubModal onClose={toggleVisibility} />
     </div>
   );
