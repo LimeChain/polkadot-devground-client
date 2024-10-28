@@ -15,6 +15,7 @@ import { ManualAccountInput } from './manualAccountInput';
 import { WalletAccountSelector } from './walletAccountSelector';
 
 import type { IAccountBuilder } from '@components/invocationArgsMapper/types';
+
 export const AccountBuilder = ({ accountId, onChange }: IAccountBuilder) => {
   const walletAccounts = useStoreWallet?.use?.accounts?.() ?? [];
   const [
@@ -51,6 +52,24 @@ export const AccountBuilder = ({ accountId, onChange }: IAccountBuilder) => {
     setIsManualInput((prev) => !prev);
   }, []);
 
+  const renderAccountInput = () => {
+    if (isManualInput) {
+      return (
+        <ManualAccountInput
+          accountId={accountId}
+          onChange={onChange}
+        />
+      );
+    }
+
+    return (
+      <WalletAccountSelector
+        accounts={walletAccounts}
+        onChange={handleAccountSelect}
+      />
+    );
+  };
+
   return (
     <div className={styles.invocationGroup}>
       <PDSwitch
@@ -59,21 +78,7 @@ export const AccountBuilder = ({ accountId, onChange }: IAccountBuilder) => {
         title="Enter Account Manually"
       />
       <div>
-        {
-          isManualInput
-            ? (
-              <ManualAccountInput
-                accountId={accountId}
-                onChange={onChange}
-              />
-            )
-            : (
-              <WalletAccountSelector
-                accounts={walletAccounts}
-                onChange={handleAccountSelect}
-              />
-            )
-        }
+        {renderAccountInput()}
       </div>
     </div>
   );
