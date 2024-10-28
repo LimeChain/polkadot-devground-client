@@ -3,7 +3,6 @@ import { toast } from 'react-hot-toast';
 import { create } from 'zustand';
 
 import { snippets } from '@constants/snippets';
-import authService from '@services/authService';
 import gistService from '@services/examplesService';
 import { createSelectors } from 'src/stores/createSelectors';
 
@@ -20,12 +19,11 @@ interface StoreInterface {
   examples: ICodeExample[];
   isUploading: boolean;
   isSavingContent: boolean;
-  exampleDescription: string;
-  selectedExampleId: string;
+  selectedExample: ICodeExample;
   actions: {
     resetStore: () => void;
     uploadExample: (data: UploadCustomExampleData) => void;
-    loadExampleContent: (id: string, type: string) => Promise<string>;
+    loadExampleContent: (id: string, type: string) => void;
     updateExampleInfo: (id: string, exampleName: string, description: string) => void;
     updateExampleContent: (id: string, data: string) => void;
     getExamples: () => void;
@@ -35,8 +33,12 @@ interface StoreInterface {
 
 const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   examples: [],
-  exampleDescription: '',
-  selectedExampleId: '',
+  selectedExample: {
+    id: '',
+    name: '',
+    description: '',
+    code: '',
+  },
   isUploading: false,
   isSavingContent: false,
 };
@@ -45,16 +47,6 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
 const handleError = (error: unknown, message: string) => {
   console.error(message, error);
   toast.error(message);
-};
-
-// Utility function to get JWT token
-const getJwtToken = async (): Promise<string | null> => {
-  try {
-    return await authService.getJwtToken();
-  } catch (error) {
-    handleError(error, 'Authentication error');
-    return null;
-  }
 };
 
 const baseStore = create<StoreInterface>()((set) => ({
@@ -70,9 +62,6 @@ const baseStore = create<StoreInterface>()((set) => ({
       }
 
       try {
-        const jwtToken = await getJwtToken();
-        if (!jwtToken) return;
-
         const newExamples = await gistService.uploadExample(data);
         set({ examples: newExamples });
         toast.success('Snippet uploaded');
@@ -86,9 +75,6 @@ const baseStore = create<StoreInterface>()((set) => ({
 
     getExamples: async () => {
       try {
-        const jwtToken = await getJwtToken();
-        if (!jwtToken) return;
-
         const data = await gistService.getUserExamples();
         set({ examples: data });
       } catch (error) {
@@ -97,23 +83,28 @@ const baseStore = create<StoreInterface>()((set) => ({
     },
 
     loadExampleContent: async (id: string, type: string) => {
-      set({ selectedExampleId: id });
+      busDispatch({ type: '@@-monaco-editor-show-loading' });
+      busDispatch({ type: '@@-problems-message', data: [] });
+      busDispatch({ type: '@@-console-message-reset' });
+      busDispatch({ type: '@@-monaco-editor-types-progress', data: 0 });
 
-      if (type === 'default') {
-        const selectedSnippet = snippets.find((f) => f.id === id) || snippets[0];
-        set({ exampleDescription: selectedSnippet.description });
-        return selectedSnippet.code;
-      }
+      try {
+        let selectedExample;
 
-      if (type === 'custom') {
-        try {
-          const snippetContent = await gistService.getExampleContent(id);
-          set({ exampleDescription: snippetContent?.description });
-          return snippetContent?.code;
-        } catch (error) {
-          handleError(error, 'Error loading snippet');
-          throw error;
+        if (type === 'default') {
+          selectedExample = snippets.find((snippet) => snippet.id === id) || snippets[0];
+        } else if (type === 'custom') {
+          const { code, description } = await gistService.getExampleContent(id);
+          const name = baseStore.getState().examples.find((example) => example.id === id)?.name || 'Untitled Gist';
+          selectedExample = { id, name, description, code };
         }
+
+        set({ selectedExample });
+      } catch (error) {
+        handleError(error, 'Error loading snippet');
+        throw error;
+      } finally {
+        busDispatch({ type: '@@-monaco-editor-hide-loading' });
       }
     },
 
@@ -126,9 +117,6 @@ const baseStore = create<StoreInterface>()((set) => ({
       set({ isUploading: true });
 
       try {
-        const jwtToken = await getJwtToken();
-        if (!jwtToken) return;
-
         const gistsArray = await gistService.updateExampleInfo(id, exampleName, description);
         set({ examples: gistsArray, isUploading: false });
         busDispatch<IUploadExampleModalClose>('@@-close-upload-example-modal');
@@ -149,9 +137,6 @@ const baseStore = create<StoreInterface>()((set) => ({
       }
 
       try {
-        const jwtToken = await getJwtToken();
-        if (!jwtToken) return;
-
         await gistService.updateExampleContent(id, data);
         busDispatch<IUploadExampleModalClose>('@@-close-upload-example-modal');
         toast.success('Example Content Updated!');
@@ -169,9 +154,6 @@ const baseStore = create<StoreInterface>()((set) => ({
       }
 
       try {
-        const jwtToken = await getJwtToken();
-        if (!jwtToken) return;
-
         const newExamples = await gistService.deleteExample(id);
         set({ examples: newExamples });
         toast.success('Snippet deleted');

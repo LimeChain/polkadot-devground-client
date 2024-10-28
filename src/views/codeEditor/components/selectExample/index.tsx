@@ -1,14 +1,10 @@
-import { busDispatch } from '@pivanov/event-bus';
 import {
   useCallback,
   useEffect,
   useRef,
   useState,
 } from 'react';
-import {
-  useNavigate,
-  useSearchParams,
-} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { Icon } from '@components/icon';
 import { Tabs } from '@components/tabs';
@@ -20,24 +16,18 @@ import {
 import { ExamplesList } from '@views/codeEditor/components/selectExample/snippetList';
 import { useStoreCustomExamples } from 'src/stores/examples';
 
-import type { IEventBusMonacoEditorLoadSnippet } from '@custom-types/eventBus';
-
 export const SelectExample = () => {
   const refContainer = useRef<HTMLDivElement>(null);
+  const { loadExampleContent } = useStoreCustomExamples.use.actions();
 
   const [
     isOpened,
     setIsOpened,
   ] = useState(false);
 
-  const [
-    selectedSnippet,
-    setSelectedSnippet,
-  ] = useState<string>('');
-
   const customExamples = useStoreCustomExamples.use.examples();
   const { getExamples } = useStoreCustomExamples.use.actions();
-  const [searchParams] = useSearchParams();
+  const { name: selectedExample } = useStoreCustomExamples.use.selectedExample();
   const navigate = useNavigate();
   const handleSetOpen = useCallback(() => {
     setIsOpened((prev) => !prev);
@@ -48,28 +38,15 @@ export const SelectExample = () => {
     const type = e.currentTarget.getAttribute('data-example-type') ?? '';
 
     const queryParam = type === 'default' ? `d=${id}` : `c=${id}`;
+    loadExampleContent(id, type);
     navigate(`/code?${queryParam}`);
-
     setIsOpened(false);
 
-    busDispatch({
-      type: '@@-monaco-editor-show-loading',
-    });
-
     await sleep(400);
-
-    busDispatch<IEventBusMonacoEditorLoadSnippet>({
-      type: '@@-monaco-editor-load-snippet',
-      data: {
-        id,
-        type,
-      },
-    });
-
-    busDispatch({
-      type: '@@-monaco-editor-hide-loading',
-    });
-  }, [navigate]);
+  }, [
+    loadExampleContent,
+    navigate,
+  ]);
 
   // useEffect(() => {
   //   const handleClickOutside = (event: MouseEvent) => {
@@ -83,24 +60,6 @@ export const SelectExample = () => {
   //     document.removeEventListener('mousedown', handleClickOutside);
   //   };
   // }, []);
-
-  useEffect(() => {
-    const defaultExampleParam = searchParams.get('d');
-    const customExampleParam = searchParams.get('c');
-
-    let exampleName = '';
-
-    if (defaultExampleParam) {
-      exampleName = snippets.find((snippet) => snippet.id === defaultExampleParam)?.name || '';
-    } else if (customExampleParam) {
-      exampleName = customExamples?.find((example) => example.id === customExampleParam)?.name || '';
-    }
-
-    setSelectedSnippet(exampleName || '');
-  }, [
-    customExamples,
-    searchParams,
-  ]);
 
   useEffect(() => {
     getExamples();
@@ -127,7 +86,7 @@ export const SelectExample = () => {
           },
         )}
       >
-        {selectedSnippet || 'Select Example'}
+        {selectedExample || 'Select Example'}
         <Icon
           name="icon-dropdownArrow"
           className={cn(
@@ -162,7 +121,7 @@ export const SelectExample = () => {
             <ExamplesList
               examples={snippets}
               handleChangeExample={handleChangeExample}
-              selectedExample={selectedSnippet}
+              selectedExample={selectedExample}
               type="default"
             />
           </div>
@@ -173,7 +132,7 @@ export const SelectExample = () => {
                   <ExamplesList
                     examples={customExamples}
                     handleChangeExample={handleChangeExample}
-                    selectedExample={selectedSnippet}
+                    selectedExample={selectedExample}
                     type="custom"
                     editable
                   />

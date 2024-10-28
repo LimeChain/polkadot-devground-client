@@ -29,7 +29,6 @@ axios.interceptors.response.use(
     if (error.response.status === 401) {
       try {
         const token = await authService.refreshJwtToken();
-        console.log('Token refreshed');
         if (token) {
           axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           return axios(originalRequest);

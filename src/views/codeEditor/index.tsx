@@ -32,9 +32,9 @@ const TypeScriptEditor = () => {
   const refTimeout = useRef<NodeJS.Timeout>();
   const refCanPreview = useRef(false);
 
+  const { description: exampleDescription } = useStoreCustomExamples.use.selectedExample();
   const [refContainerDimensions] = useResizeObserver(refContainer);
   const containerWidth = refContainerDimensions?.width;
-  const exampleDescription = useStoreCustomExamples.use.exampleDescription();
 
   const [
     isLoaded,
@@ -64,6 +64,8 @@ const TypeScriptEditor = () => {
   if (!isDesktop) {
     return <MobileNotAllowed />;
   }
+
+  console.log(exampleDescription);
 
   return (
     <div
@@ -118,7 +120,7 @@ const TypeScriptEditor = () => {
                   <MonacoEditor />
                 </div>
                 <div
-                  className="flex h-full dark:bg-dev-black-800"
+                  className="flex h-full p-3 dark:bg-dev-black-800"
                   data-title="Read me"
                 >
                   {exampleDescription}

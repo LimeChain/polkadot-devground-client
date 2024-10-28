@@ -77,6 +77,7 @@ const refreshJwtToken = async (): Promise<IAuthResponse> => {
       response?.data?.jwtToken,
     );
 
+    console.log('Token refreshed');
     return response.data;
   } catch (error) {
     console.error('Token refresh failed', error);

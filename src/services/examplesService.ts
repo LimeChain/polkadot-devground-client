@@ -21,13 +21,11 @@ const uploadExample = async (data: UploadCustomExampleData) => {
     'snippet.tsx': {
       content: data.code,
     },
-    'description.txt': {
-      content: data.description,
-    },
   };
 
   const body = {
     name: data.exampleName,
+    description: data.description,
     files,
     publicGist: true,
   };
@@ -58,10 +56,7 @@ const getExampleContent = async (id: string) => {
   try {
     const { data } = await axios.get(`${SERVER_URL}/gists/${id}`, { withCredentials: true });
 
-    return {
-      code: data['snippet.tsx'].content,
-      description: data['description.txt'].content,
-    };
+    return data;
   } catch (error) {
     console.log('error', error);
   }

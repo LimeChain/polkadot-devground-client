@@ -18,7 +18,6 @@ import { useStoreUI } from '@stores';
 import {
   cn,
   getSearchParam,
-  setSearchParam,
 } from '@utils/helpers';
 import { storageSetItem } from '@utils/storage';
 import {
@@ -36,7 +35,6 @@ import { useStoreCustomExamples } from 'src/stores/examples';
 import type {
   IEventBusIframeDestroy,
   IEventBusMonacoEditorExecuteSnippet,
-  IEventBusMonacoEditorLoadSnippet,
   IEventBusMonacoEditorUpdateCursorPosition,
 } from '@custom-types/eventBus';
 
@@ -125,6 +123,8 @@ interface IMonacoEditorProps {
 
 export const MonacoEditor = (props: IMonacoEditorProps) => {
   const { classNames } = props;
+  const { loadExampleContent } = useStoreCustomExamples.use.actions();
+  const { code } = useStoreCustomExamples.use.selectedExample();
 
   const refTimeout = useRef<NodeJS.Timeout>();
   const refSnippet = useRef<string>('');
@@ -139,7 +139,6 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
   ] = useState(false);
 
   const theme = useStoreUI.use.theme?.();
-  const { loadExampleContent } = useStoreCustomExamples.use.actions();
 
   const triggerValidation = useCallback(async () => {
     if (refModel.current) {
@@ -231,47 +230,18 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
     void fetchType(refSnippet.current);
   };
 
-  const loadExample = useCallback(async (id: string, type: string) => {
+  const loadExample = useCallback(async (code: string) => {
     clearTimeout(refTimeout.current);
-    // Reset bus states
-    busDispatch({ type: '@@-problems-message', data: [] });
-    busDispatch({ type: '@@-console-message-reset' });
-    busDispatch({ type: '@@-monaco-editor-types-progress', data: 0 });
 
-    // Default code snippet
-    if (!id) {
-      const code = 'console.log("Hello, World!");';
-      refSnippetIndex.current = String(id);
-      refSnippet.current = await formatCode(code);
-      createNewModel(refSnippet.current);
-      triggerPreview(refSnippet.current);
-
-      // Hide loading after delay
-      refTimeout.current = setTimeout(() => {
-        busDispatch({ type: '@@-monaco-editor-hide-loading' });
-      }, 400);
-
-      return;
-    }
-
-    const code = await loadExampleContent(id, type);
-
-    if (type === 'default') {
-      setSearchParam('d', id);
-    } else {
-      setSearchParam('c', id);
-    }
-
-    refSnippetIndex.current = String(id);
+    console.log('Loading example:', code);
+    refSnippetIndex.current = String('id');
     refSnippet.current = await formatCode(code);
     createNewModel(refSnippet.current);
     triggerPreview(refSnippet.current);
 
-    // Hide loading after delay
     refTimeout.current = setTimeout(() => {
       busDispatch({ type: '@@-monaco-editor-hide-loading' });
     }, 400);
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -284,17 +254,22 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
   }, []);
 
   useEffect(() => {
+    if (code) {
+      void loadExample(code);
+    }
+  }, [
+    code,
+    loadExample,
+  ]);
+
+  useEffect(() => {
     const defaultId = getSearchParam('d');
     const customId = getSearchParam('c');
 
-    // Load examples if either defaultId or customId is present
     if (defaultId) {
-      void loadExample(defaultId, 'default');
+      void loadExampleContent(defaultId, 'default');
     } else if (customId) {
-
-      void loadExample(customId, 'custom');
-    } else {
-      void loadExample('1', 'default');
+      void loadExampleContent(customId, 'custom');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -389,10 +364,6 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
     });
     setIsReadOnly(false);
     refMonacoEditor.current?.focus();
-  });
-
-  useEventBus<IEventBusMonacoEditorLoadSnippet>('@@-monaco-editor-load-snippet', ({ data }) => {
-    void loadExample(data.id, data.type);
   });
 
   return (

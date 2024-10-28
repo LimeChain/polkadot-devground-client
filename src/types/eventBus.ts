@@ -12,7 +12,7 @@ export interface IEventBusStoreSize {
 export interface IEventBusMonacoEditorLoadSnippet {
   type: '@@-monaco-editor-load-snippet';
   data: {
-    id: string;
+    code: string;
     type: string;
   };
 }

@@ -5,6 +5,7 @@ import {
 import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import {
   useCallback,
+  useEffect,
   useRef,
   useState,
 } from 'react';
@@ -24,15 +25,12 @@ import { useStoreCustomExamples } from 'src/stores/examples';
 
 import { ActionButton } from '../actionButton';
 
-import type {
-  IEventBusMonacoEditorLoadSnippet,
-  IEventBusMonacoEditorUpdateCode,
-} from '@custom-types/eventBus';
+import type { IEventBusMonacoEditorUpdateCode } from '@custom-types/eventBus';
 
 export const EditorActions = () => {
-  const selectedExampleId = useStoreCustomExamples.use.selectedExampleId();
-  const isSavingContent = useStoreCustomExamples.use.isSavingContent();
   const { updateExampleContent } = useStoreCustomExamples.use.actions();
+  const isSavingContent = useStoreCustomExamples.use.isSavingContent();
+  const selectedExample = useStoreCustomExamples.use.selectedExample();
 
   const refCode = useRef<string>('');
   const initCode = useRef<string>('');
@@ -129,9 +127,9 @@ export const EditorActions = () => {
   }, []);
 
   const handleSave = useCallback(() => {
-    updateExampleContent(selectedExampleId, refCode.current);
+    updateExampleContent(selectedExample.id, refCode.current);
   }, [
-    selectedExampleId,
+    selectedExample.id,
     updateExampleContent,
   ]);
 
@@ -150,12 +148,14 @@ export const EditorActions = () => {
     }
   });
 
-  useEventBus<IEventBusMonacoEditorLoadSnippet>('@@-monaco-editor-load-snippet', () => {
+  useEffect(() => {
     setIsEdited(false);
     isInit.current = false;
     handleStop();
-  });
-
+  }, [
+    handleStop,
+    selectedExample,
+  ]);
   return (
     <div
       className={cn(
