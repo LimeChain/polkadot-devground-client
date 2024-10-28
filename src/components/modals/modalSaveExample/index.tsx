@@ -22,7 +22,7 @@ interface IModalGithubLogin extends Pick<IModal, 'onClose'> {
 }
 
 export const ModalSaveExample = (props: IModalGithubLogin) => {
-  const { code, onClose, type, id } = props;
+  const { code, onClose, type, id = '' } = props;
   const { uploadExample, updateExampleInfo } = useStoreCustomExamples.use.actions();
   const isUploading = useStoreCustomExamples.use.isUploading();
 
@@ -36,7 +36,8 @@ export const ModalSaveExample = (props: IModalGithubLogin) => {
   ] = useState('');
 
   const handleSubmit = useCallback(async () => {
-    if (!exampleName || !description || !code || !id) {
+    if (!exampleName || !description || !code) {
+      console.log('Invalid input data: Missing code, description, or exampleName');
       return;
     }
 

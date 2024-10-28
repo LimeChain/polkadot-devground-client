@@ -27,7 +27,8 @@ export const SelectExample = () => {
 
   const customExamples = useStoreCustomExamples.use.examples();
   const { getExamples } = useStoreCustomExamples.use.actions();
-  const { name: selectedExample } = useStoreCustomExamples.use.selectedExample();
+  const data = useStoreCustomExamples.use.selectedExample();
+  const selectedExample = data.name;
   const navigate = useNavigate();
   const handleSetOpen = useCallback(() => {
     setIsOpened((prev) => !prev);
@@ -64,7 +65,9 @@ export const SelectExample = () => {
   useEffect(() => {
     getExamples();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedExample]);
+  }, [data]);
+
+  console.log(customExamples);
 
   return (
     <div

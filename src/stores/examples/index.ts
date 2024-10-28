@@ -174,7 +174,10 @@ const baseStore = create<StoreInterface>()((set) => ({
       }
     },
 
-    resetStore: () => set({ ...initialState }),
+    resetStore: () => (
+      console.log(initialState),
+      set({ ...initialState })
+    ),
   },
 }));
 

@@ -7,8 +7,8 @@ import {
   STORAGE_AUTH_SUCCESSFUL_REDIRECT_TO,
 } from '@constants/auth';
 import {
+  storageClear,
   storageGetItem,
-  storageRemoveItem,
   storageSetItem,
 } from '@utils/storage';
 
@@ -61,15 +61,13 @@ const login = async (code: string): Promise<IAuthResponse> => {
 
 const logout = async (): Promise<void> => {
   try {
-    await storageRemoveItem(
-      STORAGE_AUTH_CACHE_NAME,
-      STORAGE_AUTH_JWT_TOKEN,
+    await axios.post<IAuthResponse>(
+      `${AUTH_URL}/logout`,
+      {},
+      { withCredentials: true },
     );
 
-    await storageRemoveItem(
-      STORAGE_AUTH_CACHE_NAME,
-      'user',
-    );
+    await storageClear(STORAGE_AUTH_CACHE_NAME);
   } catch (error) {
     console.error('Logout failed', error);
     throw error;
@@ -102,6 +100,8 @@ const getJwtToken = async (): Promise<string | null> => {
       STORAGE_AUTH_CACHE_NAME,
       STORAGE_AUTH_JWT_TOKEN,
     );
+
+    console.log('JWT token', jwtToken);
 
     return jwtToken;
   } catch (error) {
