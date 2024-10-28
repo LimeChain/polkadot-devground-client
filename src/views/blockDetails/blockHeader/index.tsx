@@ -27,9 +27,8 @@ interface DetailRowProps {
   iconComponent?: React.ReactNode;
 }
 
-// WORKING WITH EXCEPTIONS
 export const DetailRow = (props: DetailRowProps) => {
-  const { label, value = '', iconComponent } = props;
+  const { label, value, iconComponent } = props;
 
   const [
     isHovered,
@@ -82,30 +81,26 @@ export const DetailRow = (props: DetailRowProps) => {
         {value && (
           <CopyToClipboard
             text={value}
+            textClassName="cursor-pointer"
+            textDisplay={value}
             toastMessage={label}
             className={cn(
               'transition-opacity duration-200 ease-in-out',
               (isHovered || isParentHovered || isMobile) ? 'visible opacity-100' : 'invisible opacity-0',
             )}
+            textDisplayProps={{
+              onMouseEnter: handleMouseEnter,
+              onMouseLeave: handleMouseLeave,
+            }}
           >
-            {({ ClipboardIcon, onClick }) => (
-              <>
-                <p
-                  className="cursor-pointer"
-                  onClick={onClick}
-                  onMouseEnter={handleMouseEnter}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  {value}
-                </p>
-                <span className={cn(
-                  'transition-colors duration-200 ease-in-out',
-                  isHovered ? 'text-dev-pink-400' : 'text-white',
-                )}
-                >
-                  {ClipboardIcon}
-                </span>
-              </>
+            {({ ClipboardIcon }) => (
+              <div className={cn(
+                'transition-colors duration-200 ease-in-out',
+                isHovered ? 'text-dev-pink-400' : 'text-white',
+              )}
+              >
+                {ClipboardIcon}
+              </div>
             )}
           </CopyToClipboard>
         )}

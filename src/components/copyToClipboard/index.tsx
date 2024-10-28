@@ -12,6 +12,7 @@ import { Icon } from '@components/icon';
 import { cn } from '@utils/helpers';
 
 import type {
+  HTMLAttributes,
   ReactElement,
   ReactNode,
 } from 'react';
@@ -25,6 +26,7 @@ interface ICopyToClipboardProps {
   className?: string;
   iconSize?: number;
   textDisplay?: string;
+  textDisplayProps?: HTMLAttributes<HTMLParagraphElement>;
   textClassName?: string;
 }
 
@@ -38,6 +40,7 @@ export const CopyToClipboard = memo((props: ICopyToClipboardProps) => {
     className,
     iconSize = 16,
     textDisplay,
+    textDisplayProps,
     textClassName,
   } = props;
 
@@ -132,6 +135,7 @@ export const CopyToClipboard = memo((props: ICopyToClipboardProps) => {
         <p
           className={textClassName}
           onClick={copyToClipboard}
+          {...textDisplayProps}
         >
           {textDisplay}
         </p>
