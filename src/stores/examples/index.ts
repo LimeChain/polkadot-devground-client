@@ -64,8 +64,16 @@ const baseStore = create<StoreInterface>()((set) => ({
       try {
         const newExamples = await gistService.uploadExample(data);
         set({ examples: newExamples });
+
         toast.success('Snippet uploaded');
+
         busDispatch<IUploadExampleModalClose>('@@-close-upload-example-modal');
+
+        // Load the newly uploaded example
+        const newExampleId = newExamples[newExamples.length - 1].id;
+        if (newExampleId) {
+          baseStore.getState().actions.loadExampleContent(newExampleId, 'custom');
+        }
       } catch (error) {
         handleError(error, 'Error uploading snippet');
       } finally {
@@ -94,9 +102,8 @@ const baseStore = create<StoreInterface>()((set) => ({
         if (type === 'default') {
           selectedExample = snippets.find((snippet) => snippet.id === id) || snippets[0];
         } else if (type === 'custom') {
-          const { code, description } = await gistService.getExampleContent(id);
-          const name = baseStore.getState().examples.find((example) => example.id === id)?.name || 'Untitled Gist';
-          selectedExample = { id, name, description, code };
+          const exampleData = await gistService.getExampleContent(id);
+          selectedExample = { ...exampleData, id };
         }
 
         set({ selectedExample });
@@ -119,6 +126,11 @@ const baseStore = create<StoreInterface>()((set) => ({
       try {
         const gistsArray = await gistService.updateExampleInfo(id, exampleName, description);
         set({ examples: gistsArray, isUploading: false });
+
+        if (baseStore.getState().selectedExample.id === id) {
+          // Update the selected example in the store
+          set({ selectedExample: { ...baseStore.getState().selectedExample, name: exampleName, description } });
+        }
         busDispatch<IUploadExampleModalClose>('@@-close-upload-example-modal');
         toast.success('Example Information Updated!');
       } catch (error) {

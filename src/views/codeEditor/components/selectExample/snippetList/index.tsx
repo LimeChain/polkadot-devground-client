@@ -13,7 +13,7 @@ import { useStoreCustomExamples } from 'src/stores/examples';
 import type { ICodeExample } from 'src/types/codeSnippet';
 interface ExamplesListProps {
   examples: ICodeExample[];
-  selectedExample: string;
+  selectedExample?: string;
   type: string;
   editable?: boolean;
   handleChangeExample: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -113,7 +113,7 @@ export const ExamplesList = (props: ExamplesListProps) => {
         }
       </ul>
       <SaveExampleModal
-        id={selectedExampleId}
+        id={selectedExampleId as string}
         onClose={toggleVisibility}
         type="update"
       />

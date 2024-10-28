@@ -36,7 +36,7 @@ export const ModalSaveExample = (props: IModalGithubLogin) => {
   ] = useState('');
 
   const handleSubmit = useCallback(async () => {
-    if (!exampleName || !description) {
+    if (!exampleName || !description || !code || !id) {
       return;
     }
 

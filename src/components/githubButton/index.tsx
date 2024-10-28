@@ -12,6 +12,7 @@ export const GithubButton = () => {
   ] = useToggleVisibility(ModalGithubLogin);
 
   const { logout } = useStoreAuth.use.actions();
+  const { name, avatar } = useStoreAuth.use.user();
   const authIsLoading = useStoreAuth.use.jwtTokenIsLoading?.();
   const isAuthenticated = useStoreAuth.use.jwtToken?.();
 
@@ -32,11 +33,27 @@ export const GithubButton = () => {
           'after:opacity-0 after:transition-opacity hover:after:opacity-100',
         )}
       >
-        <Icon name="logo-github" />
         {
           isAuthenticated
-            ? 'Logout'
-            : 'Login'
+            ? (
+              <div className="flex h-12 cursor-pointer items-center gap-4">
+                <img
+                  alt="avatar"
+                  className="size-8 rounded-full"
+                  src={avatar}
+                />
+                <div className="flex items-center gap-1">
+                  {name.length > 14 ? `${name.slice(0, 10)}..` : name}
+                  <Icon name="icon-logout" />
+                </div>
+              </div>
+            )
+            : (
+              <div className="flex h-12 cursor-pointer items-center gap-1">
+                <Icon name="logo-github" />
+                Login
+              </div>
+            )
         }
       </button>
       <GithubModal onClose={toggleVisibility} />

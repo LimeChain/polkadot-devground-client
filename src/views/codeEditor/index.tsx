@@ -65,8 +65,6 @@ const TypeScriptEditor = () => {
     return <MobileNotAllowed />;
   }
 
-  console.log(exampleDescription);
-
   return (
     <div
       ref={refContainer}

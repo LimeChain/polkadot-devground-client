@@ -233,7 +233,6 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
   const loadExample = useCallback(async (code: string) => {
     clearTimeout(refTimeout.current);
 
-    console.log('Loading example:', code);
     refSnippetIndex.current = String('id');
     refSnippet.current = await formatCode(code);
     createNewModel(refSnippet.current);

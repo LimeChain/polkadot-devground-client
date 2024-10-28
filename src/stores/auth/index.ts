@@ -63,7 +63,7 @@ const baseStore = create<StoreInterface>()((set) => ({
     logout: async () => {
       try {
         await authService.logout();
-        set({ ...initialState, jwtTokenIsLoading: false });
+        set({ ...initialState, jwtTokenIsLoading: false, user: { name: '', avatar: '' } });
       } catch (error) {
         console.error('Logout failed', error);
         throw error;
@@ -74,6 +74,9 @@ const baseStore = create<StoreInterface>()((set) => ({
   init: async () => {
     try {
       const token = await authService.getJwtToken();
+      const user = await authService.getUserData();
+
+      set({ user: user ? JSON.parse(user) : { name: '', avatar: '' } });
       set({ jwtToken: token || '', jwtTokenIsLoading: false });
     } catch (error) {
       console.error('Initialization failed', error);

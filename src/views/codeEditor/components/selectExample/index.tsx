@@ -64,7 +64,7 @@ export const SelectExample = () => {
   useEffect(() => {
     getExamples();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [selectedExample]);
 
   return (
     <div

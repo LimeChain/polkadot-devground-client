@@ -21,6 +21,7 @@ const authorizeGitHubApp = () => {
   const githubApiUrl = import.meta.env.VITE_GITHUB_API_URL;
 
   const { pathname, search } = location;
+
   window.localStorage.setItem(
     STORAGE_AUTH_SUCCESSFUL_REDIRECT_TO,
     `${pathname}${search}`,
@@ -45,6 +46,12 @@ const login = async (code: string): Promise<IAuthResponse> => {
       response?.data?.jwtToken,
     );
 
+    await storageSetItem(
+      STORAGE_AUTH_CACHE_NAME,
+      'user',
+      JSON.stringify({ name: response?.data?.userName, avatar: response?.data?.userAvatar }),
+    );
+
     return response.data;
   } catch (error) {
     console.error('Login failed', error);
@@ -57,6 +64,11 @@ const logout = async (): Promise<void> => {
     await storageRemoveItem(
       STORAGE_AUTH_CACHE_NAME,
       STORAGE_AUTH_JWT_TOKEN,
+    );
+
+    await storageRemoveItem(
+      STORAGE_AUTH_CACHE_NAME,
+      'user',
     );
   } catch (error) {
     console.error('Logout failed', error);
@@ -77,7 +89,6 @@ const refreshJwtToken = async (): Promise<IAuthResponse> => {
       response?.data?.jwtToken,
     );
 
-    console.log('Token refreshed');
     return response.data;
   } catch (error) {
     console.error('Token refresh failed', error);
@@ -99,10 +110,28 @@ const getJwtToken = async (): Promise<string | null> => {
   }
 };
 
+const getUserData = async (): Promise<string> => {
+  try {
+    const userData: string | null = await storageGetItem(
+      STORAGE_AUTH_CACHE_NAME,
+      'user',
+    );
+
+    if (userData === null) {
+      throw new Error('User data not found');
+    }
+
+    return JSON.parse(userData);
+  } catch (error) {
+    console.error('Failed to get user data', error);
+    throw error;
+  }
+};
 export default {
   login,
   refreshJwtToken,
   authorizeGitHubApp,
   getJwtToken,
+  getUserData,
   logout,
 };
