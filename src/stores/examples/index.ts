@@ -25,7 +25,7 @@ interface StoreInterface {
     uploadExample: (data: UploadCustomExampleData) => void;
     loadExampleContent: (id: string, type: string) => void;
     updateExampleInfo: (id: string, exampleName: string, description: string) => void;
-    updateExampleContent: (id: string, data: string) => void;
+    updateExampleContent: (data: string) => void;
     getExamples: () => void;
     deleteExample: (id: string) => void;
   };
@@ -136,8 +136,9 @@ const baseStore = create<StoreInterface>()((set, get) => ({
       }
     },
 
-    updateExampleContent: async (id: string, data: string) => {
+    updateExampleContent: async (data: string) => {
       set({ isSavingContent: true });
+      const id = get().selectedExample.id;
 
       if (!id || !data) {
         toast.error('No selected example id or data');

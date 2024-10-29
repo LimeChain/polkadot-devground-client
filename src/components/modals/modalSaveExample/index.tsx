@@ -1,11 +1,17 @@
 import { useEventBus } from '@pivanov/event-bus';
 import {
   useCallback,
+  useEffect,
   useState,
 } from 'react';
+import { toast } from 'react-hot-toast';
 
 import { Icon } from '@components/icon';
-import { cn } from '@utils/helpers';
+import { CreateExample } from '@components/modals/modalSaveExample/createExample';
+import {
+  cn,
+  getSearchParam,
+} from '@utils/helpers';
 import { useStoreCustomExamples } from 'src/stores/examples';
 
 import {
@@ -17,57 +23,48 @@ import type { IUploadExampleModalClose } from '@custom-types/eventBus';
 
 interface IModalGithubLogin extends Pick<IModal, 'onClose'> {
   code?: string;
-  type: string;
-  id?: string;
+  onClose: () => void;
 }
 
 export const ModalSaveExample = (props: IModalGithubLogin) => {
-  const { code, onClose, type, id = '' } = props;
-  const { uploadExample, updateExampleInfo } = useStoreCustomExamples.use.actions();
+  const { code, onClose } = props;
+  const { updateExampleContent } = useStoreCustomExamples.use.actions();
   const isUploading = useStoreCustomExamples.use.isUploading();
+  const isSavingContent = useStoreCustomExamples.use.isSavingContent();
 
   const [
-    exampleName,
-    setExampleName,
-  ] = useState('');
-  const [
-    description,
-    setDescription,
-  ] = useState('');
+    createNewExample,
+    setCreateNewExample,
+  ] = useState(false);
 
-  const handleSubmit = useCallback(async () => {
-    if (!exampleName || !description || !code) {
-      console.log('Invalid input data: Missing code, description, or exampleName');
+  const [
+    isDefaultExample,
+    setIsDefaultExample,
+  ] = useState(false);
+
+  const handleUpdateCurrentExample = useCallback(() => {
+
+    if (!code) {
+      toast.error('No code to save');
       return;
     }
 
-    type === 'upload' && uploadExample({
-      code,
-      description,
-      exampleName,
-    });
-
-    type === 'update' && updateExampleInfo(
-      id,
-      exampleName,
-      description,
-    );
+    updateExampleContent(code);
   }, [
     code,
-    description,
-    exampleName,
-    id,
-    type,
-    updateExampleInfo,
-    uploadExample,
+    updateExampleContent,
   ]);
 
-  const handleExampleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setExampleName(e.target.value);
-  }, []);
+  const handleChangeIsUpload = useCallback(() => {
+    setCreateNewExample(!createNewExample);
+  }, [createNewExample]);
 
-  const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setDescription(e.target.value);
+  useEffect(() => {
+    const isDefaultExample = getSearchParam('d');
+    if (isDefaultExample) {
+      setCreateNewExample(true);
+      setIsDefaultExample(true);
+    }
   }, []);
 
   useEventBus<IUploadExampleModalClose>('@@-close-upload-example-modal', () => {
@@ -79,75 +76,73 @@ export const ModalSaveExample = (props: IModalGithubLogin) => {
       onClose={onClose}
       className={cn(
         'w-96',
-        'flex flex-col gap-10 p-6',
         'border border-dev-purple-300',
         'dark:border-dev-purple-700',
       )}
     >
-      <h5 className="self-start font-h5-bold">
-        {
-          type === 'upload'
-            ? 'Upload Example'
-            : 'Edit Example'
-        }
-      </h5>
-      <div className="flex flex-col">
-        <input
-          onChange={handleExampleNameChange}
-          placeholder="Enter Example Name"
-          value={exampleName}
-          className={cn(
-            'mb-6 p-4',
-            'border border-dev-white-900',
-            'placeholder:text-dev-black-1000 placeholder:font-body2-regular',
-            'dark:border-dev-purple-700 dark:bg-transparent dark:placeholder:text-white',
-          )}
-        />
-        <textarea
-          onChange={handleDescriptionChange}
-          placeholder="Enter Description"
-          value={description}
-          className={cn(
-            'mb-6 p-4',
-            'border border-dev-white-900',
-            'placeholder:text-dev-black-1000 placeholder:font-body2-regular',
-            'dark:border-dev-purple-700 dark:bg-transparent dark:placeholder:text-white',
-          )}
-        />
-        <button
-          disabled={!exampleName || !description}
-          onClick={handleSubmit}
-          className={cn(
-            'flex justify-center',
-            'mb-2 mt-6 p-4 transition-colors',
-            'font-geist text-white font-body2-bold',
-            'bg-dev-pink-500',
-            'hover:bg-dev-pink-400',
-            { 'opacity-50 cursor-not-allowed': !exampleName || !description },
-          )}
-        >
-          {
-            isUploading
-              ? (
+      {
+        createNewExample
+          ? (
+            <CreateExample
+              code={code as string}
+              handleClose={isDefaultExample ? onClose : handleChangeIsUpload}
+            />
+          )
+          : (
+            <>
+              <div className="mt-10 flex flex-col items-center justify-center gap-10 p-6">
                 <Icon
-                  className="animate-spin"
-                  name="icon-loader"
+                  name="icon-save"
+                  size={[96]}
                 />
-              )
-              : 'Save'
-          }
-        </button>
-        <button
-          onClick={onClose}
-          className={cn(
-            'p-4 transition-colors',
-            'font-geist font-body2-bold',
-            'hover:text-dev-white-1000',
+                <div className="flex w-full flex-col">
+                  <p className="text-center text-2xl font-semibold">Save Changes</p>
+                  <button
+                    disabled={isDefaultExample}
+                    onClick={handleUpdateCurrentExample}
+                    className={cn(
+                      'flex justify-center',
+                      'mb-2 mt-6 p-4 transition-colors',
+                      'font-geist text-white font-body2-bold',
+                      'bg-dev-pink-500',
+                      'hover:bg-dev-pink-400',
+                    )}
+                  >
+                    {
+                      isSavingContent
+                        ? (
+                          <Icon
+                            className="animate-spin"
+                            name="icon-loader"
+                          />
+                        )
+                        : 'Save to Current Example '
+                    }
+                  </button>
+                  <button
+                    onClick={handleChangeIsUpload}
+                    className={cn(
+                      'p-4 transition-colors',
+                      'font-geist font-body2-bold',
+                      'hover:text-dev-white-1000',
+                    )}
+                  >
+                    {
+                      isUploading
+                        ? (
+                          <Icon
+                            className="animate-spin"
+                            name="icon-loader"
+                          />
+                        )
+                        : 'Save as New Example'
+                    }
+                  </button>
+                </div>
+              </div >
+            </>
           )}
-        >
-          Cancel
-        </button>
-      </div>
-    </Modal>
+
+    </Modal >
   );
 };

@@ -95,10 +95,7 @@ const TypeScriptEditor = () => {
             <SelectExample />
             <div
               className={cn(
-                'relative z-10 flex-1',
-                {
-                  ['border border-dev-purple-300 dark:border-dev-black-800']: theme === 'light',
-                },
+                'relative z-10 flex-1 bg-dev-purple-200 dark:bg-dev-black-800',
               )}
             >
               <Tabs

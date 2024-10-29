@@ -1,12 +1,12 @@
-import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import {
   useCallback,
   useEffect,
+  useState,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Icon } from '@components/icon';
-import { ModalSaveExample } from '@components/modals/modalSaveExample';
+// import { ModalSaveExample } from '@components/modals/modalSaveExample';
 import { PDScrollArea } from '@components/pdScrollArea';
 import {
   cn,
@@ -31,23 +31,27 @@ export const CustomExampleList = (props: DefaultExamplesListProps) => {
   const customExamples = useStoreCustomExamples.use.examples();
   const { name: selectedExample, id } = useStoreCustomExamples.use.selectedExample();
   const { deleteExample, getExamples, loadExampleContent } = useStoreCustomExamples.use.actions();
+  const [
+    editExample,
+    setEditExample,
+  ] = useState(null);
   const navigate = useNavigate();
 
-  const [
-    SaveExampleModal,
-    toggleVisibility,
-  ] = useToggleVisibility(ModalSaveExample);
+  // const [
+  //   SaveExampleModal,
+  //   toggleVisibility,
+  // ] = useToggleVisibility(ModalSaveExample);
 
   const handleDeleteExample = useCallback((e: React.MouseEvent<HTMLSpanElement>) => {
     const id = e.currentTarget.getAttribute('data-example-index');
     deleteExample(id as string);
   }, [deleteExample]);
 
-  const handleEditExample = useCallback((e: React.MouseEvent<HTMLSpanElement>) => {
-    const id = e.currentTarget.getAttribute('data-example-index');
-
-    toggleVisibility();
-  }, [toggleVisibility]);
+  // const handleEditExample = useCallback((e: React.MouseEvent<HTMLSpanElement>) => {
+  //   const id = e.currentTarget.getAttribute('data-example-index');
+  //   setEditExample(id);
+  //   toggleVisibility();
+  // }, [toggleVisibility]);
 
   const handleChangeExample = useCallback(async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
     const id = e.currentTarget.getAttribute('data-example-index') ?? '';
@@ -138,7 +142,7 @@ export const CustomExampleList = (props: DefaultExamplesListProps) => {
               >
                 <span
                   data-example-index={example.id}
-                  onClick={handleEditExample}
+                // onClick={handleEditExample}
                 >
                   <Icon
                     name="icon-pen"
@@ -159,11 +163,11 @@ export const CustomExampleList = (props: DefaultExamplesListProps) => {
           ))
         }
       </ul>
-      <SaveExampleModal
-        id={id as string}
+      {/* <SaveExampleModal
+        id={editExample}
         onClose={toggleVisibility}
         type="update"
-      />
+      /> */}
     </PDScrollArea >
   );
 };

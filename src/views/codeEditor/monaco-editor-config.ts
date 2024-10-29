@@ -1,15 +1,35 @@
-import type { editor } from 'monaco-editor';
+import * as monaco from 'monaco-editor';
 
-export const monacoEditorConfig: editor.IEditorOptions & editor.IGlobalEditorOptions = {
+// Define the custom theme
+monaco.editor.defineTheme('dark-theme', {
+  base: 'vs-dark',
+  inherit: true,
+  rules: [],
+  colors: {
+    'editor.background': '#151515',
+  },
+});
+
+monaco.editor.defineTheme('light-theme', {
+  base: 'vs',
+  inherit: true,
+  rules: [],
+  colors: {
+    'editor.background': '#E6EAF6',
+  },
+});
+
+export const monacoEditorConfig: monaco.editor.IEditorOptions & monaco.editor.IGlobalEditorOptions = {
   automaticLayout: true,
   folding: true,
   inlayHints: {
     enabled: 'on',
   },
-  tabSize: 2,
+  tabSize: 1,
   guides: {
     bracketPairs: true,
     highlightActiveBracketPair: true,
+    indentation: false, // Removes the yellow vertical lines
   },
   hover: {
     delay: 100,

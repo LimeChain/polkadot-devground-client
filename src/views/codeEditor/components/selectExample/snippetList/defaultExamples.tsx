@@ -1,8 +1,7 @@
-import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
+// import { ModalSaveExample } from '@components/modals/modalSaveExample';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { ModalSaveExample } from '@components/modals/modalSaveExample';
 import { PDScrollArea } from '@components/pdScrollArea';
 import { snippets } from '@constants/snippets';
 import {
@@ -17,10 +16,10 @@ interface DefaultExamplesListProps {
 
 export const DefaultExamplesList = (props: DefaultExamplesListProps) => {
   const { handleClose } = props;
-  const [
-    SaveExampleModal,
-    toggleVisibility,
-  ] = useToggleVisibility(ModalSaveExample);
+  // const [
+  //   SaveExampleModal,
+  //   toggleVisibility,
+  // ] = useToggleVisibility(ModalSaveExample);
   const navigate = useNavigate();
   const { loadExampleContent } = useStoreCustomExamples.use.actions();
 
@@ -74,11 +73,11 @@ export const DefaultExamplesList = (props: DefaultExamplesListProps) => {
           ))
         }
       </ul>
-      <SaveExampleModal
+      {/* <SaveExampleModal
         // id={selectedExampleId as string}
         onClose={toggleVisibility}
         type="update"
-      />
+      /> */}
     </PDScrollArea >
   );
 };

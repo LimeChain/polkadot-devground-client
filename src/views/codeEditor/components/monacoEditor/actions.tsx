@@ -1,3 +1,4 @@
+// import { ModalSaveExample } from '@components/modals/modalSaveExample';
 import {
   busDispatch,
   useEventBus,
@@ -126,13 +127,6 @@ export const EditorActions = () => {
     await downloadFiles(files);
   }, []);
 
-  const handleSave = useCallback(() => {
-    updateExampleContent(selectedExample.id, refCode.current);
-  }, [
-    selectedExample.id,
-    updateExampleContent,
-  ]);
-
   useEventBus<IEventBusMonacoEditorUpdateCode>('@@-monaco-editor-update-code', ({ data }) => {
     const isCustomExample = !!getSearchParam('c');
 
@@ -165,22 +159,13 @@ export const EditorActions = () => {
       )}
     >
       <div className="flex gap-2 pr-2">
-        {
-          isEdited && (
-            <ActionButton
-              iconName="icon-save"
-              isLoading={isSavingContent}
-              onClick={handleSave}
-              toolTip="Revert changes"
-            />
-          )
-        }
         <ActionButton
           iconName="icon-share"
+          // onClick={toggleVisibility}
           toolTip="Share"
         />
         <ActionButton
-          iconName="icon-uploadCloud"
+          iconName="icon-save"
           onClick={toggleVisibility}
           toolTip="Save to GitHub"
         />
@@ -206,10 +191,14 @@ export const EditorActions = () => {
             />
           )}
       </div>
-      <SaveExampleModal
+      {/* <SaveExampleModal
         code={refCode.current}
         onClose={toggleVisibility}
         type="upload"
+      /> */}
+      <SaveExampleModal
+        code={refCode.current}
+        onClose={toggleVisibility}
       />
     </div>
   );

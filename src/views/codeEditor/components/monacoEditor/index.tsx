@@ -4,7 +4,6 @@ import {
 } from '@pivanov/event-bus';
 import * as PAPI_SIGNER from '@polkadot-api/signer';
 import * as PAPI_WS_PROVIDER_WEB from '@polkadot-api/ws-provider/web';
-import { shikiToMonaco } from '@shikijs/monaco/index.mjs';
 import * as monaco from 'monaco-editor';
 import {
   useCallback,
@@ -12,7 +11,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import { getSingletonHighlighter } from 'shiki/index.mjs';
 
 import { useStoreUI } from '@stores';
 import {
@@ -93,21 +91,21 @@ const compilerOptions: monaco.languages.typescript.CompilerOptions = {
 monaco.languages.typescript.typescriptDefaults.setCompilerOptions(compilerOptions);
 
 const checkTheme = async (theme: string) => {
-  const currentTheme = theme === 'dark' ? 'github-dark' : 'github-light';
-  const highlighter = await getSingletonHighlighter({
-    themes: [
-      'github-dark',
-      'github-light',
-    ],
-    langs: [
-      'tsx',
-      'typescript',
-      'json',
-    ],
-  });
-
-  shikiToMonaco(highlighter, monaco);
+  const currentTheme = theme === 'dark' ? 'dark-theme' : 'light-theme';
+  console.log('currentTheme', currentTheme);
   monaco.editor.setTheme(currentTheme);
+  //   themes: [
+  //     'github-dark',
+  //     'github-light',
+  //   ],
+  //   langs: [
+  //     'tsx',
+  //     'typescript',
+  //     'json',
+  //   ],
+  // });
+
+  // shikiToMonaco(highlighter, monaco);
 };
 
 // Utility to handle showing/hiding preview based on code content
