@@ -24,13 +24,9 @@ interface TChainStateBlockProps {
 export const ChainStateBlock = ({ type }: TChainStateBlockProps) => {
   const chainData = useStoreChain?.use?.[type]?.();
   const chainSpecs = useStoreChain?.use?.chainSpecs?.();
-  const chain = useStoreChain?.use?.chain?.();
 
   const showData = chainData && chainSpecs;
-  const isParaChain = chain.isParaChain;
-  const chainHasStaking = chain.hasStaking;
 
-  const isStakingBlock = type === 'totalStake';
   const isBlockTimeBlock = type === 'blockTime';
 
   let data;
@@ -54,19 +50,8 @@ export const ChainStateBlock = ({ type }: TChainStateBlockProps) => {
       }
       break;
 
-    case 'totalStake':
-      if (!chainHasStaking) {
-        data = 'No Staking Data';
-        break;
-      }
-
-      if (showData) {
-        data = formatData(chainData);
-      }
-      break;
-
     case 'blockTime':
-      if (chainData) {
+      if (showData) {
         const blockTimeSec = Number(chainData) / 1000;
         data = blockTimeSec;
       }
@@ -102,8 +87,6 @@ export const ChainStateBlock = ({ type }: TChainStateBlockProps) => {
 
           {isBlockTimeBlock && data && ` ${data} sec`}
           {isBlockTimeBlock && !data && ` Loading...`}
-
-          {isStakingBlock && isParaChain && ` at ${chain.relayChainId}`}
         </span>
         <span className="truncate font-geist font-body1-bold">
           {

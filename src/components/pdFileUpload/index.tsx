@@ -1,4 +1,3 @@
-import { formatNumber } from '@polkadot/util';
 import { Binary } from 'polkadot-api';
 import {
   type ChangeEvent,
@@ -8,11 +7,14 @@ import {
   useState,
 } from 'react';
 
-import { cn } from '@utils/helpers';
+import {
+  cn,
+  formatNumber,
+} from '@utils/helpers';
 
-import type { ICallArgs } from '@components/callParam';
-
-interface IPDFileUpload extends ICallArgs {}
+interface IPDFileUpload {
+  onChange: (args: unknown) => void;
+}
 
 export const PDFileUpload = ({ onChange }: IPDFileUpload) => {
   const refInput = useRef<HTMLLabelElement>(null);

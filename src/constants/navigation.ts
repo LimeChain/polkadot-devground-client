@@ -22,37 +22,4 @@ export const NAVIGATION_ITEMS: TNavItem[] = [
     },
     type: 'link',
   },
-  {
-    linkProps: {
-      title: 'Developer',
-      items: [
-        {
-          title: 'Chain State',
-          to: '/chain-state',
-          icon: 'icon-chain',
-        },
-        {
-          title: 'Constants',
-          to: '/constants',
-          icon: 'logo-github',
-        },
-        {
-          title: 'RPC Calls',
-          to: '/rpc-calls',
-          icon: 'icon-rpcCalls',
-        },
-        {
-          title: 'Runtime Calls',
-          to: '/runtime-calls',
-          icon: 'icon-runtimeCalls',
-        },
-        {
-          title: 'Extrinsics',
-          to: '/extrinsics',
-          icon: 'logo-github',
-        },
-      ],
-    },
-    type: 'dropdown',
-  },
 ];

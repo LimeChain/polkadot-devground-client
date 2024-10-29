@@ -1,13 +1,22 @@
+import { createClient as createSubstrateClient } from '@polkadot-api/substrate-client';
 import {
   type Binary,
   CompatibilityLevel,
+  createClient,
   type FixedSizeBinary,
+  type PolkadotClient,
   type SS58String,
   type TypedApi,
 } from 'polkadot-api';
-import { type Client } from 'polkadot-api/smoldot';
+import { getSmProvider } from 'polkadot-api/sm-provider';
+import { getWsProvider } from 'polkadot-api/ws-provider/web';
 
-import { CHAIN_SPECS } from '@constants/chain';
+import {
+  CHAIN_SPECS,
+  CHAIN_WEBSOCKET_URLS,
+} from '@constants/chain';
+import { baseStoreChain } from '@stores';
+import { getBlockDetailsWithPAPI } from '@utils/rpc/getBlockDetails';
 
 import {
   assert,
@@ -21,97 +30,190 @@ import type {
   TParaChainDecsriptor,
   TPeopleApi,
   TRelayChainDecsriptor,
-  TSmoldotChain,
-  TStakingApi,
+  TSupportedChain,
 } from '@custom-types/chain';
+import type { SmoldotChainProps } from '@custom-types/papi';
+import type { ZustandSet } from 'src/stores/sizeMiddleware';
 
-export const initSmoldotChains = async ({
+export const initSmoldotChain = async ({
   smoldot,
   chain,
+  potentialRelayChain,
+}: SmoldotChainProps) => {
+  const relayChain = potentialRelayChain
+    ? await initSmoldotChain({
+      smoldot,
+      chain: potentialRelayChain,
+    })
+    : undefined;
+  const smoldotChain = await smoldot.addChain({
+    chainSpec: await CHAIN_SPECS[chain](),
+    potentialRelayChains: relayChain ? [relayChain] : [],
+  });
+
+  return smoldotChain;
+};
+
+export const getSmoldotChainClient = async ({
+  smoldot,
+  chain,
+  potentialRelayChain,
+}: SmoldotChainProps) => {
+  return createClient(
+    getSmProvider(
+      await initSmoldotChain({
+        smoldot,
+        chain,
+        potentialRelayChain,
+      }),
+    ),
+  );
+};
+
+export const getWsChainClient = async ({
+  chain,
 }: {
-  smoldot: Client;
-  chain: TChain;
+  chain: TSupportedChain;
 }) => {
-  const isParachain = chain.isParaChain;
-  let newChain: TSmoldotChain, peopleChain: TSmoldotChain;
-  let stakingChain: TSmoldotChain = null as unknown as TSmoldotChain;
+  return createClient(
+    getWsProvider(
+      CHAIN_WEBSOCKET_URLS[chain],
+    ),
+  );
+};
 
-  if (isParachain) {
-    const relayChain = await smoldot.addChain({
-      chainSpec: CHAIN_SPECS[chain.relayChainId],
-    })
-      .catch(console.error);
+export const subscribeToBestBlocks = ({
+  client,
+  set,
+}: {
+  client: PolkadotClient;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  set: ZustandSet<any>;
+}) => {
+  const blocksData = baseStoreChain.getState()?.blocksData;
 
-    assert(relayChain, `RelayChain is not defined for ${chain.name}`);
+  const subscription = client.bestBlocks$.subscribe({
+    // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
+    next(bestBlocks) {
+      const bestBlock = bestBlocks.at(0);
+      const finalizedBlock = bestBlocks.at(-1);
 
-    newChain = await smoldot.addChain({
-      chainSpec: CHAIN_SPECS[chain.id],
-      potentialRelayChains: [relayChain],
-    })
-      .catch(console.error);
+      const promises = [];
+      // get block data starting from finalized to best block
+      for (let i = bestBlocks.length - 1; i >= 0; i--) {
+        const block = bestBlocks[i];
 
-    assert(newChain, `newChain is not defined for ${chain.name}`);
+        // skip allready fetched blocks
+        const blockHashHasBeenFetched = blocksData.get(block.number)?.hash === block.hash;
+        if (blockHashHasBeenFetched) {
+          continue;
+        }
 
-    peopleChain = await smoldot.addChain({
-      chainSpec: CHAIN_SPECS[chain.peopleChainId],
-      potentialRelayChains: [relayChain],
-    })
-      .catch(console.error);
+        promises.push(getBlockDetailsWithPAPI({
+          blockHash: block.hash,
+          blockNumber: block.number,
+        }));
 
-    assert(peopleChain, `peopleChain is not defined for ${chain.name}`);
+      }
 
-    if (chain.hasStaking) {
-      stakingChain = await smoldot.addChain({
-        chainSpec: CHAIN_SPECS[chain.stakingChainId],
-        potentialRelayChains: [relayChain],
+      Promise.allSettled(promises).then((results) => {
+        results.forEach((blockData) => {
+          if (blockData.status === 'fulfilled') {
+            const blockExtrinsics = (blockData?.value.body?.extrinsics ?? [])
+              .reverse()
+              .map((extrinsic) => {
+                const { id, blockNumber, extrinsicData, timestamp, isSuccess } = extrinsic;
+                const { method, signer } = extrinsicData;
+                return {
+                  id,
+                  blockNumber,
+                  timestamp,
+                  isSuccess: isSuccess || false,
+                  signer: signer?.Id ?? '',
+                  method: method.method,
+                  section: method.section,
+                };
+              });
+
+            const newBlockData = {
+              number: blockData.value.header.number,
+              hash: blockData.value.header.hash,
+              timestamp: blockData.value.header.timestamp,
+              eventsLength: blockData.value.body.events.length,
+              validator: blockData.value.header.identity?.address?.toString?.(),
+              extrinsics: blockExtrinsics,
+              identity: blockData.value.header.identity,
+            };
+
+            if (typeof newBlockData.number == 'number') {
+              blocksData.set(newBlockData.number, newBlockData);
+            }
+          } else {
+            console.log(blockData);
+          }
+        });
+        // UPDATE STORE AFTER GETTING THE DATA
+        set({
+          bestBlock: bestBlock?.number,
+          finalizedBlock: finalizedBlock?.number,
+        });
       })
-        .catch(console.error);
+        // prevent state crash on random smoldot error
+        .catch((err) => {
+          console.error(err);
+        });
+    },
+    // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
+    error(err) {
+      console.log('Unexpected best blocks subscription error!', err.message);
+      subscription.unsubscribe();
+      // RETRY SUBSCRIBING TO CHAIN HEAD
+      subscribeToBestBlocks({ client, set });
+    },
+  });
+};
 
-      assert(stakingChain, `stakingChain is not defined for ${chain.name}`);
-    }
-
-  } else {
-    newChain = await smoldot.addChain({
-      chainSpec: CHAIN_SPECS[chain.id],
-    })
-      .catch(console.error);
-
-    assert(newChain, `newChain is not defined for ${chain.name}`);
-
-    peopleChain = await smoldot.addChain({
-      chainSpec: CHAIN_SPECS[chain.peopleChainId],
-      potentialRelayChains: [newChain],
-    })
-      .catch(console.error);
-
-    assert(peopleChain, `peopleChain is not defined for ${chain.name}`);
-
-    if (chain.hasStaking) {
-      stakingChain = await smoldot?.addChain({
-        chainSpec: CHAIN_SPECS[chain.stakingChainId],
-        potentialRelayChains: [newChain],
-      })
-        .catch(console.error);
-
-      assert(stakingChain, `stakingChain is not defined for ${chain.name}`);
-    }
-
+export const createSubstrateWsClient = ({
+  chain,
+  set,
+}: {
+  chain: TSupportedChain;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  set: ZustandSet<any>;
+}) => {
+  const wsUrl = CHAIN_WEBSOCKET_URLS[chain];
+  if (!wsUrl) {
+    return;
   }
 
-  return {
-    newChain,
-    peopleChain,
-    stakingChain,
-  };
+  const rawClient = createSubstrateClient(getWsProvider(wsUrl));
+  set({ rawClient });
+
+  const rawClientSubscription = rawClient.chainHead(
+    true,
+    () => {},
+    async (error) => {
+      console.log('Unexpected Raw client subscription error', error);
+      rawClientSubscription.unfollow();
+      rawClient.destroy();
+
+      // RETRY TO CONNECT
+      createSubstrateWsClient({
+        set,
+        chain,
+      });
+    },
+  );
+
+  set({ rawClientSubscription });
 };
 
 export const getMetadata = async (api: TApi) => {
   assert(api, 'Api prop is not defined');
 
-  const v14 = await api.apis.Metadata.metadata_at_version(14);
   const v15 = await api.apis.Metadata.metadata_at_version(15);
 
-  return v15 || v14;
+  return v15;
 };
 
 export const getRuntime = async (api: TApi) => {
@@ -166,7 +268,7 @@ export const getSystemDigestData = async (api: TApi, at: string) => {
   return digestData;
 };
 
-export const getInvulnerables = async (api: TypedApi<TParaChainDecsriptor>, at: string) => {
+export const getInvulnerables = async (api: TPeopleApi, at: string) => {
   assert(api, 'Api prop is not defined');
   assert(at, 'At prop is not defined');
   checkIfCompatable(
@@ -222,30 +324,30 @@ export const subscribeToTotalIssuance = async (api: TApi, callback: (issuance: b
   });
 };
 
-export const subscribeToStakedTokens = async (api: TStakingApi, callback: (totalStake: bigint) => void) => {
-  assert(api, 'Api prop is not defined');
-  checkIfCompatable(
-    await api?.query?.Staking?.ActiveEra?.isCompatible(CompatibilityLevel.Partial),
-    'api.query.Staking.ActiveEra is not compatable',
-  );
-  checkIfCompatable(
-    await api?.query?.NominationPools?.TotalValueLocked?.isCompatible(CompatibilityLevel.Partial),
-    'api.query.NominationPools.TotalValueLocked is not compatable',
-  );
-  checkIfCompatable(
-    await api?.query?.Staking?.ErasTotalStake?.isCompatible(CompatibilityLevel.Partial),
-    'api.query.Staking.ErasTotalStake is not compatable',
-  );
+// export const subscribeToStakedTokens = async (api: TStakingApi, callback: (totalStake: bigint) => void) => {
+//   assert(api, 'Api prop is not defined');
+//   checkIfCompatable(
+//     await api?.query?.Staking?.ActiveEra?.isCompatible(CompatibilityLevel.Partial),
+//     'api.query.Staking.ActiveEra is not compatable',
+//   );
+//   checkIfCompatable(
+//     await api?.query?.NominationPools?.TotalValueLocked?.isCompatible(CompatibilityLevel.Partial),
+//     'api.query.NominationPools.TotalValueLocked is not compatable',
+//   );
+//   checkIfCompatable(
+//     await api?.query?.Staking?.ErasTotalStake?.isCompatible(CompatibilityLevel.Partial),
+//     'api.query.Staking.ErasTotalStake is not compatable',
+//   );
 
-  api.query.Staking.ActiveEra.watchValue('best').subscribe(async (era) => {
-    const totalValueLocked = await api.query.NominationPools.TotalValueLocked.getValue();
-    if (typeof era?.index === 'number') {
-      api.query.Staking.ErasTotalStake.watchValue(era?.index).subscribe((totalStake) => {
-        callback(totalValueLocked + totalStake);
-      });
-    }
-  });
-};
+//   api.query.Staking.ActiveEra.watchValue('best').subscribe(async (era) => {
+//     const totalValueLocked = await api.query.NominationPools.TotalValueLocked.getValue();
+//     if (typeof era?.index === 'number') {
+//       api.query.Staking.ErasTotalStake.watchValue(era?.index).subscribe((totalStake) => {
+//         callback(totalValueLocked + totalStake);
+//       });
+//     }
+//   });
+// };
 
 export const getExpectedBlockTime = async (_api: TApi, chain: TChain, callback: (duration: bigint) => void) => {
   assert(_api, 'Api prop is not defined');

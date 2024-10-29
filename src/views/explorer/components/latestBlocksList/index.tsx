@@ -5,6 +5,7 @@ import {
   useState,
 } from 'react';
 
+import { Loader } from '@components/loader';
 import { PDScrollArea } from '@components/pdScrollArea';
 import { useStoreChain } from '@stores';
 import { polymorphicComponent } from '@utils/components';
@@ -28,12 +29,16 @@ export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
 
   const blocksData = useStoreChain?.use?.blocksData?.();
   const bestBlock = useStoreChain?.use?.bestBlock?.();
+
+  const isConnectingToChain = !!!bestBlock;
+
   const rowVirtualizer = useVirtualizer({
     count: blocks.length,
     getScrollElement: () => refScrollArea?.current,
     estimateSize: () => 64,
     overscan: 5,
   });
+  const rowItems = rowVirtualizer.getVirtualItems();
 
   useEffect(() => {
     const blocksArray = Array.from(blocksData.values()).reverse();
@@ -48,40 +53,50 @@ export const LatestBlocksList = polymorphicComponent<'div'>((_props, ref) => {
     <PDScrollArea
       ref={refs}
       className="h-80 lg:h-full"
-      viewportClassNames="pr-3"
+      viewportClassNames="pr-3 [&>*:first-child]:h-full"
     >
       <div
-        className="relative"
+        className={cn(
+          'relative',
+          {
+            ['flex justify-center items-center']: !!!rowItems.length,
+          },
+        )}
         style={{
-          height: `${rowVirtualizer.getTotalSize()}px`,
+          height: isConnectingToChain || !!!rowItems.length ? '100%' : `${rowVirtualizer.getTotalSize()}px`,
         }}
       >
         {
-          (!!blocks.length)
-            ? (
-              rowVirtualizer.getVirtualItems().map((virtualRow, virtualIndex) => {
-                const block = blocks[virtualRow.index];
-                return (
-                  <Row
-                    key={virtualIndex}
-                    blockNumber={block.number}
-                    eventsLength={block.eventsLength}
-                    extrinsicsLength={block.extrinsics.length}
-                    timestamp={block.timestamp}
-                    className={cn(
-                      styles['pd-explorer-list'],
-                      {
-                        ['opacity-0 animate-fade-in animation-duration-500']: virtualRow.index === 0,
-                      },
-                    )}
-                    style={{
-                      transform: `translateY(${virtualRow.start}px)`,
-                    }}
-                  />
-                );
-              })
+          isConnectingToChain
+            ? <Loader classNames="!top-2/4" />
+            : (
+              <>
+                {
+                  !!rowItems.length
+                    ? rowItems.map((virtualRow, virtualIndex) => {
+                      const block = blocks[virtualRow.index];
+                      return (
+                        <Row
+                          key={virtualIndex}
+                          blockNumber={block.number!}
+                          eventsLength={block.eventsLength}
+                          extrinsicsLength={block.extrinsics.length}
+                          timestamp={block.timestamp}
+                          className={cn(
+                            styles['pd-explorer-list'],
+                            {
+                              ['opacity-0 animate-fade-in animation-duration-500']: virtualRow.index === 0,
+                            },
+                          )}
+                          style={{
+                            transform: `translateY(${virtualRow.start}px)`,
+                          }}
+                        />
+                      );
+                    })
+                    : 'No blocks to display'}
+              </>
             )
-            : 'Loading...'
         }
       </div>
     </PDScrollArea>

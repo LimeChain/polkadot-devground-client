@@ -1,0 +1,75 @@
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { createRoot } from 'react-dom/client';
+import { chainSpec } from 'polkadot-api/chains/westend';
+import { getSmProvider } from 'polkadot-api/sm-provider';
+import { createClient, type PolkadotClient } from "polkadot-api";
+import { start } from 'polkadot-api/smoldot';
+import { connectInjectedExtension, getInjectedExtensions } from "polkadot-api/pjs-signer"
+
+interface AppProps {
+  client: PolkadotClient;
+}
+
+const App = (props: AppProps) => {
+  const { client } = props;
+  const [subscripton,setSubscription] = useState(null)
+
+  const handleOnClick = useCallback(() => {
+    setSubscription(client.finalizedBlock$.subscribe({
+      // HANDLE SUBSCRIPTION DATA
+      next(finalizedBlock) {
+        console.log(finalizedBlock);
+      },
+      // HANDLE ERROR
+      error(err) {
+        console.log("Unexpected error", err.message);
+      }
+    }));
+  }, []);
+
+  const handleStop = useCallback(() => {
+    // UNSUBSCRIBE FROM FINALIZED BLOCKS
+    subscripton?.unsubscribe?.()
+    console.log('Unsubscribed');
+
+    setSubscription(null)
+  }, [subscripton]);
+
+  return (
+    <div className="bg-blue-100 size-full flex flex-col items-center justify-center gap-2">
+      <button
+        onClick={handleOnClick}
+        disabled={Boolean(subscripton)}
+        className="disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        Subscribe to finalizedBlocks
+      </button>
+      <button
+        onClick={handleStop}
+        disabled={!Boolean(subscripton)}
+        className="disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        Unsubscribe
+      </button>
+    </div>
+  );
+};
+
+(async () => {
+  // START SMOLDOT AND CREATE A CHAIN CLIENT
+  const smoldot = start();
+  const chain = await smoldot.addChain({ chainSpec });
+  const provider = getSmProvider(chain);
+  const client = createClient(provider);
+
+  createRoot(document.getElementById('root')!).render(
+    <App
+      client={client}
+    />
+  );
+})();

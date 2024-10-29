@@ -38,7 +38,7 @@ const LatestBlocks = () => {
       {
         header: 'Status',
         cell: ({ row }) => {
-          const isFinalized = latestFinalizedBlock && latestFinalizedBlock >= row.original.number;
+          const isFinalized = latestFinalizedBlock && latestFinalizedBlock >= row.original.number!;
 
           return (
             <Icon
@@ -77,7 +77,8 @@ const LatestBlocks = () => {
       {
         header: 'Validator',
         cell: ({ row }) => {
-          return truncateAddress(row.original.identity.address.toString() || '', 6);
+          // IF THE BLOCK IS NOT PINNED (ITS A WRONG FORK) THE IDENTITY WOULD BE "UNDEFINED"
+          return truncateAddress(row.original.identity?.address?.toString?.() || '', 6);
         },
       },
       {

@@ -18,8 +18,8 @@ import './services/axiosSetup';
 createRoot(document.getElementById('pd-root')!).render(
   <HelmetProvider>
     <Helmet
-      defaultTitle="Polkadot Devground"
-      titleTemplate="%s - Polkadot Devground"
+      defaultTitle="Polkadot devGround"
+      titleTemplate="%s - Polkadot devGround"
     />
     <App />
     <StoreSizeViewer />

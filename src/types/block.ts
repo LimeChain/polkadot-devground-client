@@ -58,16 +58,16 @@ export interface IMappedBlockHeader {
   hash: string;
   timestamp: number;
   runtime?: {
-    spec_name: string;
+    spec_name?: string;
     spec_version: number;
   } | null;
-  identity: {
+  identity?: {
     name?: string;
-    address: string;
+    address?: string;
   };
-  parentHash: string;
-  stateRoot: string;
-  extrinsicRoot: string;
+  parentHash?: string;
+  stateRoot?: string;
+  extrinsicRoot?: string;
   isFinalized?: boolean;
 }
 

@@ -1,33 +1,33 @@
 /* eslint-disable */
-import Snippet1Code from './snippet1.txt?raw';
-import Snippet2Code from './snippet2.txt?raw';
-import Snippet3Code from './snippet3.txt?raw';
-import Snippet4Code from './snippet4.txt?raw';
+import TestAccountTransferSnippet from './testAccountTransfer.txt?raw';
+import InjectedAccountTransferSnippet from './injectedAccountTransfer.txt?raw';
+import ChainSubscriptionSnippet from './chainSubscription.txt?raw';
+import GetChainSpecificDataSnippet from './getChainSpecificData.txt?raw';
 /* eslint-enable */
 
 import type { ICodeSnippet } from '@custom-types/codeSnippet';
 const snippet1: ICodeSnippet = {
   id: 1,
-  name: 'Example 1',
-  code: Snippet1Code,
+  name: 'Balance transfer from a test account',
+  code: TestAccountTransferSnippet,
 };
 
 const snippet2: ICodeSnippet = {
   id: 2,
-  name: 'Example 2',
-  code: Snippet2Code,
+  name: 'Balance transfer from an injected account',
+  code: InjectedAccountTransferSnippet,
 };
 
 const snippet3: ICodeSnippet = {
   id: 3,
-  name: 'Example 3',
-  code: Snippet3Code,
+  name: 'Subscribe to chain data',
+  code: ChainSubscriptionSnippet,
 };
 
 const snippet4: ICodeSnippet = {
   id: 4,
-  name: 'Example 4',
-  code: Snippet4Code,
+  name: 'Get chain specific data',
+  code: GetChainSpecificDataSnippet,
 };
 
 export const snippets = [

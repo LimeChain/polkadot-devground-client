@@ -7,6 +7,7 @@ import {
   useState,
 } from 'react';
 
+import { Loader } from '@components/loader';
 import { ModalJSONViewer } from '@components/modals/modalJSONViewer';
 import { PDScrollArea } from '@components/pdScrollArea';
 import { useStoreChain } from '@stores';
@@ -31,6 +32,7 @@ export const ExtrinsicsList = polymorphicComponent<'div'>((_props, ref) => {
 
   const blocksData = useStoreChain?.use?.blocksData?.();
   const latestBlock = useStoreChain?.use?.bestBlock?.();
+  const isConnectingToChain = !!!latestBlock;
   const dynamicBuilder = useDynamicBuilder();
 
   const [
@@ -64,7 +66,7 @@ export const ExtrinsicsList = polymorphicComponent<'div'>((_props, ref) => {
 
   useEffect(() => {
     const extrinsics = Array.from(blocksData.values())
-      .flatMap((block) => block?.extrinsics ?? [])
+      .flatMap((block) => (block?.extrinsics?.slice(0, -2) ?? []))
       .reverse();
 
     setSignedExtrinsics(extrinsics);
@@ -79,47 +81,58 @@ export const ExtrinsicsList = polymorphicComponent<'div'>((_props, ref) => {
     estimateSize: () => 64,
     overscan: 5,
   });
+  const rowItems = rowVirtualizer.getVirtualItems();
 
   return (
     <>
       <PDScrollArea
         ref={refs}
         className="h-80 lg:h-full"
-        viewportClassNames="pr-3"
+        viewportClassNames="pr-3 [&>*:first-child]:h-full"
       >
         <div
-          className="relative"
+          className={cn(
+            'relative',
+            {
+              ['flex justify-center items-center']: !!!rowItems.length,
+            },
+          )}
           style={{
-            height: `${rowVirtualizer.getTotalSize()}px`,
+            height: isConnectingToChain || !!!rowItems.length ? '100%' : `${rowVirtualizer.getTotalSize()}px`,
           }}
         >
           {
-            (!!signedExtrinsics.length)
-              ? (
-                rowVirtualizer.getVirtualItems().map((virtualRow, virtualIndex) => {
-                  const extrinsic = signedExtrinsics[virtualRow.index];
-                  return (
-                    <Row
-                      key={virtualIndex}
-                      action={`${extrinsic.section}.${extrinsic.method}`}
-                      extrinsicId={extrinsic.id}
-                      handleOpenModal={handleOpenModal}
-                      isSuccess={extrinsic.isSuccess}
-                      timestamp={extrinsic.timestamp}
-                      className={cn(
-                        styles['pd-explorer-list'],
-                        {
-                          ['opacity-0 animate-fade-in animation-duration-500']: virtualRow.index === 0,
-                        },
-                      )}
-                      style={{
-                        transform: `translateY(${virtualRow.start}px)`,
-                      }}
-                    />
-                  );
-                })
+            isConnectingToChain
+              ? <Loader classNames="!top-2/4" />
+              : (
+                <>
+                  {
+                    !!rowItems.length
+                      ? rowItems.map((virtualRow, virtualIndex) => {
+                        const extrinsic = signedExtrinsics[virtualRow.index];
+                        return (
+                          <Row
+                            key={virtualIndex}
+                            action={`${extrinsic.section}.${extrinsic.method}`}
+                            extrinsicId={extrinsic.id}
+                            handleOpenModal={handleOpenModal}
+                            isSuccess={extrinsic.isSuccess}
+                            timestamp={extrinsic.timestamp}
+                            className={cn(
+                              styles['pd-explorer-list'],
+                              {
+                                ['opacity-0 animate-fade-in animation-duration-500']: virtualRow.index === 0,
+                              },
+                            )}
+                            style={{
+                              transform: `translateY(${virtualRow.start}px)`,
+                            }}
+                          />
+                        );
+                      })
+                      : 'No extrinsics to display'}
+                </>
               )
-              : 'Loading...'
           }
         </div>
       </PDScrollArea>
@@ -135,4 +148,3 @@ export const ExtrinsicsList = polymorphicComponent<'div'>((_props, ref) => {
     </>
   );
 });
-
