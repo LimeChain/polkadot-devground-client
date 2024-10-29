@@ -5,6 +5,7 @@ import {
   useState,
 } from 'react';
 import { toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 import { Icon } from '@components/icon';
 import { CreateExample } from '@components/modals/modalSaveExample/createExample';
@@ -28,9 +29,9 @@ interface IModalGithubLogin extends Pick<IModal, 'onClose'> {
 
 export const ModalSaveExample = (props: IModalGithubLogin) => {
   const { code, onClose } = props;
-  const { updateExampleContent } = useStoreCustomExamples.use.actions();
-  const isUploading = useStoreCustomExamples.use.isUploading();
-  const isSavingContent = useStoreCustomExamples.use.isSavingContent();
+  const { updateExampleContent, loadExampleContent } = useStoreCustomExamples.use.actions();
+  const { isSavingContent, isUploading } = useStoreCustomExamples.use.loading();
+  const navigate = useNavigate();
 
   const [
     createNewExample,
@@ -67,7 +68,9 @@ export const ModalSaveExample = (props: IModalGithubLogin) => {
     }
   }, []);
 
-  useEventBus<IUploadExampleModalClose>('@@-close-upload-example-modal', () => {
+  useEventBus<IUploadExampleModalClose>('@@-close-upload-example-modal', ({ data: id }) => {
+    navigate(`/code?c=${id}`);
+    loadExampleContent(id, 'custom');
     onClose();
   });
 
@@ -142,7 +145,6 @@ export const ModalSaveExample = (props: IModalGithubLogin) => {
               </div >
             </>
           )}
-
     </Modal >
   );
 };

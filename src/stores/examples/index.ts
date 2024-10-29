@@ -7,7 +7,11 @@ import gistService from '@services/examplesService';
 import { createSelectors } from 'src/stores/createSelectors';
 
 import type { ICodeExample } from '@custom-types/codeSnippet';
-import type { IUploadExampleModalClose } from '@custom-types/eventBus';
+import type {
+  IDeleteExampleModalClose,
+  IEditExampleInfoModalClose,
+  IUploadExampleModalClose,
+} from '@custom-types/eventBus';
 
 interface UploadCustomExampleData {
   code: string;
@@ -17,9 +21,13 @@ interface UploadCustomExampleData {
 
 interface StoreInterface {
   examples: ICodeExample[];
-  isUploading: boolean;
-  isSavingContent: boolean;
   selectedExample: ICodeExample;
+  loading: {
+    isUploading: boolean;
+    isSavingInfo: boolean;
+    isSavingContent: boolean;
+    isDeleting: boolean;
+  };
   actions: {
     resetStore: () => void;
     uploadExample: (data: UploadCustomExampleData) => void;
@@ -41,19 +49,23 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
     description: '',
     code: '',
   },
-  isUploading: false,
-  isSavingContent: false,
+  loading: {
+    isUploading: false,
+    isSavingInfo: false,
+    isSavingContent: false,
+    isDeleting: false,
+  },
 };
 
 const baseStore = create<StoreInterface>()((set, get) => ({
   ...initialState,
   actions: {
     uploadExample: async (data) => {
-      set({ isUploading: true });
+      set({ loading: { ...get().loading, isUploading: true } });
 
       if (!data.code || !data.description || !data.exampleName) {
-        handleError(null, 'Invalid input data: Missing code, description, or exampleName');
-        set({ isUploading: false });
+        console.log(null, 'Invalid input data: Missing code, description, or exampleName');
+        set({ loading: { ...get().loading, isUploading: false } });
         return;
       }
 
@@ -63,17 +75,18 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
         toast.success('Snippet uploaded');
 
-        busDispatch<IUploadExampleModalClose>('@@-close-upload-example-modal');
-
         // Load the newly uploaded example
         const newExampleId = newExamples[newExamples.length - 1].id;
         if (newExampleId) {
-          get().actions.loadExampleContent(newExampleId, 'custom');
+          busDispatch<IUploadExampleModalClose>({
+            type: '@@-close-upload-example-modal',
+            data: newExampleId,
+          });
         }
       } catch (error) {
         console.log('Error uploading snippet', error);
       } finally {
-        set({ isUploading: false });
+        set({ loading: { ...get().loading, isUploading: false } });
       }
     },
 
@@ -99,6 +112,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
           selectedExample = snippets.find((snippet) => snippet.id === id) || snippets[0];
         } else if (type === 'custom') {
           const exampleData = await gistService.getExampleContent(id);
+          console.log('Example data', exampleData);
           selectedExample = { ...exampleData, id };
         }
 
@@ -113,31 +127,31 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
     updateExampleInfo: async (id: string, exampleName: string, description: string) => {
       if (!id || !exampleName || !description) {
-        handleError(null, 'No selected example id');
+        console.log(null, 'No selected example id');
         return;
       }
 
-      set({ isUploading: true });
+      set({ loading: { ...get().loading, isSavingInfo: true } });
 
       try {
         const gistsArray = await gistService.updateExampleInfo(id, exampleName, description);
-        set({ examples: gistsArray, isUploading: false });
+        set({ examples: gistsArray, loading: { ...get().loading, isSavingInfo: false } });
 
         if (get().selectedExample.id === id) {
           // Update the selected example in the store
           set({ selectedExample: { ...get().selectedExample, name: exampleName, description } });
         }
-        busDispatch<IUploadExampleModalClose>('@@-close-upload-example-modal');
+        busDispatch<IEditExampleInfoModalClose>('@@-close-edit-example-modal');
         toast.success('Example Information Updated!');
       } catch (error) {
         console.log('Error updating snippet', error);
       } finally {
-        set({ isUploading: false });
+        set({ loading: { ...get().loading, isSavingInfo: false } });
       }
     },
 
     updateExampleContent: async (data: string) => {
-      set({ isSavingContent: true });
+      set({ loading: { ...get().loading, isSavingContent: true } });
       const id = get().selectedExample.id;
 
       if (!id || !data) {
@@ -152,7 +166,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
       } catch (error) {
         console.log('Error updating snippet', error);
       } finally {
-        set({ isSavingContent: false });
+        set({ loading: { ...get().loading, isSavingContent: false } });
       }
     },
 
@@ -163,11 +177,18 @@ const baseStore = create<StoreInterface>()((set, get) => ({
       }
 
       try {
+        set({ loading: { ...get().loading, isDeleting: true } });
+
         const newExamples = await gistService.deleteExample(id);
-        set({ examples: newExamples });
         toast.success('Snippet deleted');
+        set({ examples: newExamples });
+        busDispatch<IDeleteExampleModalClose>({
+          type: '@@-close-delete-example-modal',
+        });
       } catch (error) {
         console.log('Error deleting snippet', error);
+      } finally {
+        set({ loading: { ...get().loading, isDeleting: false } });
       }
     },
 

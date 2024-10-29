@@ -2,6 +2,7 @@ import {
   busDispatch,
   useEventBus,
 } from '@pivanov/event-bus';
+import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import * as PAPI_SIGNER from '@polkadot-api/signer';
 import * as PAPI_WS_PROVIDER_WEB from '@polkadot-api/ws-provider/web';
 import * as monaco from 'monaco-editor';
@@ -12,7 +13,11 @@ import {
   useState,
 } from 'react';
 
-import { useStoreUI } from '@stores';
+import { ModalGithubLogin } from '@components/modals/modalGithubLogin';
+import {
+  useStoreAuth,
+  useStoreUI,
+} from '@stores';
 import {
   cn,
   getSearchParam,
@@ -123,6 +128,12 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
   const { classNames } = props;
   const { loadExampleContent } = useStoreCustomExamples.use.actions();
   const { code } = useStoreCustomExamples.use.selectedExample();
+  const isAuthenticated = useStoreAuth.use.jwtToken?.();
+
+  const [
+    GithubModal,
+    toggleVisibility,
+  ] = useToggleVisibility(ModalGithubLogin);
 
   const refTimeout = useRef<NodeJS.Timeout>();
   const refSnippet = useRef<string>('');
@@ -266,6 +277,10 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
     if (defaultId) {
       void loadExampleContent(defaultId, 'default');
     } else if (customId) {
+      if (!isAuthenticated) {
+        console.log('isAuthenticated', isAuthenticated);
+        toggleVisibility();
+      }
       void loadExampleContent(customId, 'custom');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -382,6 +397,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
         classNames="absolute top-2 right-6 z-100"
         size={18}
       />
+      <GithubModal onClose={toggleVisibility} />
     </div>
   );
 };

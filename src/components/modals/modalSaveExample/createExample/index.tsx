@@ -15,10 +15,10 @@ interface CreateExampleProps {
 export const CreateExample = (props: CreateExampleProps) => {
   const { code, handleClose } = props;
   const { uploadExample } = useStoreCustomExamples.use.actions();
-  const isUploading = useStoreCustomExamples.use.isUploading();
+  const { isUploading } = useStoreCustomExamples.use.loading();
 
-  const exampleNameRef = useRef<HTMLInputElement>(null);
-  const descriptionRef = useRef<HTMLTextAreaElement>(null);
+  const exampleNameRef = useRef<HTMLInputElement>(null as any);
+  const descriptionRef = useRef<HTMLTextAreaElement>(null as any);
 
   const handleSubmit = useCallback(() => {
     const exampleName = exampleNameRef.current.value;
@@ -63,16 +63,18 @@ export const CreateExample = (props: CreateExampleProps) => {
           'bg-dev-pink-500 hover:bg-dev-pink-400',
         )}
       >
-        {isUploading
-          ? (
-            <Icon
-              className="animate-spin"
-              name="icon-loader"
-            />
-          )
-          : (
-            'Create'
-          )}
+        {
+          isUploading
+            ? (
+              <Icon
+                className="animate-spin"
+                name="icon-loader"
+              />
+            )
+            : (
+              'Create'
+            )
+        }
       </button>
       <button
         onClick={handleClose}

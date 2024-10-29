@@ -84,4 +84,12 @@ export interface IEventBusNavLinkClick {
 
 export interface IUploadExampleModalClose {
   type: '@@-close-upload-example-modal';
+  data: string;
+}
+
+export interface IEditExampleInfoModalClose {
+  type: '@@-close-edit-example-modal';
+}
+export interface IDeleteExampleModalClose {
+  type: '@@-close-delete-example-modal';
 }

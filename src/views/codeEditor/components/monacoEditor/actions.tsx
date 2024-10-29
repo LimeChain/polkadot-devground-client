@@ -6,17 +6,13 @@ import {
 import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import {
   useCallback,
-  useEffect,
   useRef,
   useState,
 } from 'react';
 
 import { ModalSaveExample } from '@components/modals/modalSaveExample';
 import { downloadZip } from '@utils/downloadZip';
-import {
-  cn,
-  getSearchParam,
-} from '@utils/helpers';
+import { cn } from '@utils/helpers';
 import {
   getImportMap,
   mergeImportMap,
@@ -29,23 +25,14 @@ import { ActionButton } from '../actionButton';
 import type { IEventBusMonacoEditorUpdateCode } from '@custom-types/eventBus';
 
 export const EditorActions = () => {
-  const { updateExampleContent } = useStoreCustomExamples.use.actions();
-  const isSavingContent = useStoreCustomExamples.use.isSavingContent();
-  const selectedExample = useStoreCustomExamples.use.selectedExample();
-
-  const refCode = useRef<string>('');
-  const initCode = useRef<string>('');
-  const isInit = useRef(false);
+  const { code } = useStoreCustomExamples.use.selectedExample();
 
   const [
     SaveExampleModal,
     toggleVisibility,
   ] = useToggleVisibility(ModalSaveExample);
 
-  const [
-    isEdited,
-    setIsEdited,
-  ] = useState(false);
+  const refCode = useRef(code);
 
   const [
     isRunning,
@@ -128,28 +115,11 @@ export const EditorActions = () => {
   }, []);
 
   useEventBus<IEventBusMonacoEditorUpdateCode>('@@-monaco-editor-update-code', ({ data }) => {
-    const isCustomExample = !!getSearchParam('c');
-
     if (data !== null) {
       refCode.current = data;
-
-      if (!isInit.current) {
-        initCode.current = data;
-        isInit.current = true;
-      }
-
-      isCustomExample && setIsEdited(initCode.current !== data);
     }
   });
 
-  useEffect(() => {
-    setIsEdited(false);
-    isInit.current = false;
-    handleStop();
-  }, [
-    handleStop,
-    selectedExample,
-  ]);
   return (
     <div
       className={cn(
@@ -191,11 +161,6 @@ export const EditorActions = () => {
             />
           )}
       </div>
-      {/* <SaveExampleModal
-        code={refCode.current}
-        onClose={toggleVisibility}
-        type="upload"
-      /> */}
       <SaveExampleModal
         code={refCode.current}
         onClose={toggleVisibility}
