@@ -1,15 +1,10 @@
-name: Deploy to Firebase Hosting on PR
-'on':
-  pull_request:
+name: Deploy to Firebase Hosting on merge
+"on":
+  push:
     branches:
-      - dev
-permissions:
-  checks: write
-  contents: read
-  pull-requests: write
+      - dev-deploy
 jobs:
-  build_and_preview:
-    if: '${{ github.event.pull_request.head.repo.full_name == github.repository }}'
+  build_and_deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,6 +29,7 @@ jobs:
           VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_POLKADOT_JS_DEV }}'
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_POLKADOT_JS_DEV }}"
+          channelId: live
           projectId: polkadot-js-dev
