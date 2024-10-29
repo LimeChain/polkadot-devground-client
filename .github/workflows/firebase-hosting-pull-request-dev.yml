@@ -35,5 +35,5 @@ jobs:
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_POLKADOT_JS_DEV }}'
-          projectId: polkadot-js-dev
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_POLKADOT_DEV_ENV }}'
+          projectId: devground-dev
