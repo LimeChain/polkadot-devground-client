@@ -7,6 +7,7 @@ import { snippets } from '@constants/snippets';
 import {
   cn,
   sleep,
+  truncateString,
 } from '@utils/helpers';
 import { useStoreCustomExamples } from 'src/stores/examples';
 
@@ -63,7 +64,7 @@ export const DefaultExamplesList = (props: DefaultExamplesListProps) => {
                 )}
               >
                 <p className="font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000">
-                  {example.name}
+                  {truncateString(example.name, 60)}
                 </p>
               </button>
 

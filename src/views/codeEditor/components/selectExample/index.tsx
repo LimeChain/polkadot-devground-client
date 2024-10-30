@@ -7,7 +7,10 @@ import {
 
 import { Icon } from '@components/icon';
 import { Tabs } from '@components/tabs';
-import { cn } from '@utils/helpers';
+import {
+  cn,
+  truncateString,
+} from '@utils/helpers';
 import { CustomExampleList } from '@views/codeEditor/components/selectExample/snippetList/customExamples';
 import { DefaultExamplesList } from '@views/codeEditor/components/selectExample/snippetList/defaultExamples';
 import { useStoreCustomExamples } from 'src/stores/examples';
@@ -74,7 +77,7 @@ export const SelectExample = () => {
           },
         )}
       >
-        {selectedExample || 'Select Example'}
+        {truncateString(selectedExample, 60) || 'Select Example'}
         <Icon
           name="icon-dropdownArrow"
           className={cn(

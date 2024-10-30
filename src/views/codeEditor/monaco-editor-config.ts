@@ -25,11 +25,10 @@ export const monacoEditorConfig: monaco.editor.IEditorOptions & monaco.editor.IG
   inlayHints: {
     enabled: 'on',
   },
-  tabSize: 1,
+  tabSize: 2,
   guides: {
     bracketPairs: true,
     highlightActiveBracketPair: true,
-    indentation: false, // Removes the yellow vertical lines
   },
   hover: {
     delay: 100,

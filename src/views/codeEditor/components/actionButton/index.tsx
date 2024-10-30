@@ -24,14 +24,15 @@ export const ActionButton = (props: ActionButtonProps) => {
         classes,
       )}
     >
-      {isLoading
-        ? (
-          <Icon
-            className="animate-spin duration-1000"
-            name="icon-loader"
-          />
-        )
-        : <Icon name={iconName} />
+      {
+        isLoading
+          ? (
+            <Icon
+              className="animate-spin duration-1000"
+              name="icon-loader"
+            />
+          )
+          : <Icon name={iconName} />
       }
     </button>
   );

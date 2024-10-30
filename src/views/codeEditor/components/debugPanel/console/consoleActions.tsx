@@ -9,6 +9,7 @@ import {
 
 import { CopyToClipboard } from '@components/copyToClipboard';
 import { Icon } from '@components/icon';
+import { ToolTip } from '@components/tooltTip';
 import { cn } from '@utils/helpers';
 
 import type {
@@ -55,19 +56,21 @@ export const ConsoleActions = () => {
         },
       )}
     >
-      <button
-        onClick={handleClear}
-        type="button"
-        className={cn(
-          'size-4',
-        )}
-      >
-        <Icon
-          className="text-dev-black-1000 dark:text-white"
-          name="icon-circle-slash"
-          size={[16]}
-        />
-      </button>
+      <ToolTip text="Clear console">
+        <button
+          onClick={handleClear}
+          type="button"
+          className={cn(
+            'text-dev-black-1000 hover:text-dev-pink-400',
+            'dark:text-white dark:hover:text-dev-pink-400',
+          )}
+        >
+          <Icon
+            name="icon-circle-slash"
+            size={[16]}
+          />
+        </button>
+      </ToolTip>
       <CopyToClipboard
         text={messages.map(({ message }) => message).join('\n')}
         toastMessage="console output"
