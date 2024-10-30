@@ -46,7 +46,7 @@ export const ConsoleActions = () => {
   return (
     <div
       className={cn(
-        'absolute right-6 top-2 flex gap-x-2',
+        'absolute right-6 top-3 flex gap-x-2',
         'opacity-0',
         'pointer-events-none',
         'transition-opacity duration-300',

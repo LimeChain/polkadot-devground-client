@@ -9,10 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { Icon } from '@components/icon';
 import { CreateExample } from '@components/modals/modalSaveExample/createExample';
-import {
-  cn,
-  getSearchParam,
-} from '@utils/helpers';
+import { cn } from '@utils/helpers';
 import { useStoreCustomExamples } from 'src/stores/examples';
 
 import {
@@ -29,6 +26,10 @@ interface IModalGithubLogin extends Pick<IModal, 'onClose'> {
 
 export const ModalSaveExample = (props: IModalGithubLogin) => {
   const { code, onClose } = props;
+
+  const selectedExample = useStoreCustomExamples.use.selectedExample();
+  const examples = useStoreCustomExamples.use.examples();
+
   const { updateExampleContent, loadExampleContent } = useStoreCustomExamples.use.actions();
   const { isSavingContent, isUploading } = useStoreCustomExamples.use.loading();
   const navigate = useNavigate();
@@ -61,12 +62,17 @@ export const ModalSaveExample = (props: IModalGithubLogin) => {
   }, [createNewExample]);
 
   useEffect(() => {
-    const isDefaultExample = getSearchParam('d');
-    if (isDefaultExample) {
+    //Check who is author in order to other users to be able to save as new example directly
+    const isAuthor = examples.some((example) => example.id === selectedExample.id);
+
+    if (!isAuthor) {
       setCreateNewExample(true);
       setIsDefaultExample(true);
     }
-  }, []);
+  }, [
+    examples,
+    selectedExample.id,
+  ]);
 
   useEventBus<IUploadExampleModalClose>('@@-close-upload-example-modal', ({ data: id }) => {
     navigate(`/code?c=${id}`);

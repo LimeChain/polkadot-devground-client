@@ -42,7 +42,7 @@ export const GithubButton = () => {
                   className="size-8 rounded-full"
                   src={avatar}
                 />
-                {name.length > 14 ? `${name.slice(0, 10)}..` : name}
+                {name.length > 20 ? `${name.slice(0, 20)}..` : name}
               </div>
               <button
                 className="flex items-center gap-4 duration-200 hover:text-dev-pink-500"

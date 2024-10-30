@@ -23,6 +23,7 @@ interface StoreInterface {
   examples: ICodeExample[];
   selectedExample: ICodeExample;
   loading: {
+    isGettingExamples: boolean;
     isUploading: boolean;
     isSavingInfo: boolean;
     isSavingContent: boolean;
@@ -50,6 +51,7 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
     code: '',
   },
   loading: {
+    isGettingExamples: false,
     isUploading: false,
     isSavingInfo: false,
     isSavingContent: false,
@@ -92,10 +94,13 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
     getExamples: async () => {
       try {
+        set({ loading: { ...get().loading, isGettingExamples: true } });
         const data = await gistService.getUserExamples();
         set({ examples: data });
       } catch (error) {
         console.log('Error getting examples', error);
+      } finally {
+        set({ loading: { ...get().loading, isGettingExamples: false } });
       }
     },
 
@@ -107,12 +112,12 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
       try {
         let selectedExample;
-
         if (type === 'default') {
           selectedExample = snippets.find((snippet) => snippet.id === id) || snippets[0];
         } else if (type === 'custom') {
           const exampleData = await gistService.getExampleContent(id);
-          console.log('Example data', exampleData);
+
+          console.log('exampleData', exampleData);
           selectedExample = { ...exampleData, id };
         }
 
@@ -161,7 +166,10 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
       try {
         await gistService.updateExampleContent(id, data);
-        busDispatch<IUploadExampleModalClose>('@@-close-upload-example-modal');
+        busDispatch<IUploadExampleModalClose>({
+          type: '@@-close-upload-example-modal',
+          data: id,
+        });
         toast.success('Example Content Updated!');
       } catch (error) {
         console.log('Error updating snippet', error);

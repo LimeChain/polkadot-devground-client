@@ -16,12 +16,10 @@ interface DefaultExamplesListProps {
 
 export const DefaultExamplesList = (props: DefaultExamplesListProps) => {
   const { handleClose } = props;
-  // const [
-  //   SaveExampleModal,
-  //   toggleVisibility,
-  // ] = useToggleVisibility(ModalSaveExample);
-  const navigate = useNavigate();
+
   const { loadExampleContent } = useStoreCustomExamples.use.actions();
+  const { name: selectedExample } = useStoreCustomExamples.use.selectedExample();
+  const navigate = useNavigate();
 
   const handleChangeExample = useCallback(async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
     const id = e.currentTarget.getAttribute('data-example-index') ?? '';
@@ -52,7 +50,7 @@ export const DefaultExamplesList = (props: DefaultExamplesListProps) => {
                 'cursor-pointer',
                 'hover:bg-dev-black-900 hover:dark:bg-dev-purple-200',
                 {
-                  // ['bg-dev-black-800 dark:bg-dev-purple-300']: selectedExample === example.name,
+                  ['bg-dev-black-800 dark:bg-dev-purple-300']: selectedExample === example.name,
                 },
               )}
             >
@@ -73,11 +71,6 @@ export const DefaultExamplesList = (props: DefaultExamplesListProps) => {
           ))
         }
       </ul>
-      {/* <SaveExampleModal
-        // id={selectedExampleId as string}
-        onClose={toggleVisibility}
-        type="update"
-      /> */}
     </PDScrollArea >
   );
 };

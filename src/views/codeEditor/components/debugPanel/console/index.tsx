@@ -111,9 +111,8 @@ export const Console = () => {
   return (
     <PDScrollArea
       ref={refScrollArea}
-      className="flex-1"
+      className="relative flex-1"
       onScroll={handleOnScroll}
-      viewportClassNames="mask-vertical"
     >
       <div
         ref={refContainer}

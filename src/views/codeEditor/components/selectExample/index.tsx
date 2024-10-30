@@ -14,6 +14,7 @@ import { useStoreCustomExamples } from 'src/stores/examples';
 
 export const SelectExample = () => {
   const { name: selectedExample } = useStoreCustomExamples.use.selectedExample();
+  const { getExamples } = useStoreCustomExamples.use.actions();
 
   const refContainer = useRef<HTMLDivElement>(null);
 
@@ -46,6 +47,11 @@ export const SelectExample = () => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
+  }, []);
+
+  useEffect(() => {
+    getExamples();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -114,3 +120,7 @@ export const SelectExample = () => {
     </div>
   );
 };
+function getExamples() {
+  throw new Error('Function not implemented.');
+}
+

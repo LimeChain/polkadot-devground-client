@@ -19,7 +19,6 @@ import { useResizeObserver } from '@utils/hooks/useResizeObserver';
 import { SelectExample } from '@views/codeEditor/components/selectExample';
 import { useStoreCustomExamples } from 'src/stores/examples';
 
-import { ActionButton } from './components/actionButton';
 import { DebugPanel } from './components/debugPanel';
 import { Iframe } from './components/iframe';
 import { MonacoEditor } from './components/monacoEditor';
@@ -150,21 +149,8 @@ const TypeScriptEditor = () => {
               {
                 refCanPreview.current && (
                   <>
-                    <div className={cn(
-                      'flex w-full items-center justify-end gap-2 bg-dev-purple-200 p-4  dark:bg-dev-black-800',
-                      'border border-b-0 border-dev-purple-300 dark:border-dev-black-800',
-                    )}
-                    >
-                      <ActionButton
-                        iconName="icon-export"
-                      />
-                      <ActionButton
-                        iconName="icon-clipboard"
-                        toolTip="Share"
-                      />
-                    </div>
                     <Panel
-                      className="flex border border-t-0 border-dev-purple-300 dark:border-dev-black-800"
+                      className="relative flex border border-t-0 border-dev-purple-300 dark:border-dev-black-800"
                       defaultSize={50}
                       id="right-top"
                       minSize={30}

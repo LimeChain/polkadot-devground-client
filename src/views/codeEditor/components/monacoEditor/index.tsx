@@ -97,20 +97,7 @@ monaco.languages.typescript.typescriptDefaults.setCompilerOptions(compilerOption
 
 const checkTheme = async (theme: string) => {
   const currentTheme = theme === 'dark' ? 'dark-theme' : 'light-theme';
-  console.log('currentTheme', currentTheme);
   monaco.editor.setTheme(currentTheme);
-  //   themes: [
-  //     'github-dark',
-  //     'github-light',
-  //   ],
-  //   langs: [
-  //     'tsx',
-  //     'typescript',
-  //     'json',
-  //   ],
-  // });
-
-  // shikiToMonaco(highlighter, monaco);
 };
 
 // Utility to handle showing/hiding preview based on code content
@@ -278,7 +265,6 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
       void loadExampleContent(defaultId, 'default');
     } else if (customId) {
       if (!isAuthenticated) {
-        console.log('isAuthenticated', isAuthenticated);
         toggleVisibility();
       }
       void loadExampleContent(customId, 'custom');

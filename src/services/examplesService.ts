@@ -21,6 +21,9 @@ const uploadExample = async (data: UploadCustomExampleData) => {
     'snippet.tsx': {
       content: data.code,
     },
+    'name.txt': {
+      content: data.exampleName,
+    },
   };
 
   const body = {

@@ -41,7 +41,8 @@ export const CreateExample = (props: CreateExampleProps) => {
         ref={exampleNameRef}
         placeholder="Enter Example Name"
         className={cn(
-          'mb-6 border border-dev-white-900 p-4 caret-dev-pink-500 focus-visible:outline-none',
+          'mb-6 border border-dev-white-900 bg-transparent p-4',
+          'caret-dev-pink-500 focus-visible:outline-none',
           'placeholder:text-dev-black-1000 placeholder:font-body2-regular',
           'dark:border-dev-purple-700 dark:bg-transparent dark:placeholder:text-white',
         )}
@@ -51,7 +52,8 @@ export const CreateExample = (props: CreateExampleProps) => {
         placeholder="Enter Description"
         rows={5}
         className={cn(
-          'mb-6 border border-dev-white-900 p-4 caret-dev-pink-500 focus-visible:outline-none',
+          'mb-6 border border-dev-white-900 bg-transparent p-4',
+          'caret-dev-pink-500 focus-visible:outline-none',
           'placeholder:text-dev-black-1000 placeholder:font-body2-regular',
           'dark:border-dev-purple-700 dark:bg-transparent dark:placeholder:text-white',
         )}

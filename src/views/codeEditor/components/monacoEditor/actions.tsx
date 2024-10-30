@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { toast } from 'react-hot-toast';
 
 import { ModalSaveExample } from '@components/modals/modalSaveExample';
 import { downloadZip } from '@utils/downloadZip';
@@ -25,7 +26,11 @@ import { ActionButton } from '../actionButton';
 import type { IEventBusMonacoEditorUpdateCode } from '@custom-types/eventBus';
 
 export const EditorActions = () => {
-  const { code } = useStoreCustomExamples.use.selectedExample();
+  const { name, code } = useStoreCustomExamples.use.selectedExample();
+  const [
+    isDownloading,
+    setIsDownloading,
+  ] = useState(false);
 
   const [
     SaveExampleModal,
@@ -57,6 +62,7 @@ export const EditorActions = () => {
   const handleDownload = useCallback(async () => {
     const getPackageVersion = async (packageName: string) => {
       try {
+        setIsDownloading(true);
         const response = await fetch(packageName);
         if (response.ok) {
           const html = await response.text();
@@ -67,6 +73,8 @@ export const EditorActions = () => {
         }
       } catch (error) {
         console.error(`Failed to fetch version for package ${packageName}:`, error);
+      } finally {
+        setIsDownloading(false);
       }
       return 'latest';
     };
@@ -112,12 +120,24 @@ export const EditorActions = () => {
     ];
 
     await downloadFiles(files);
+  }, [name]);
+
+  const handleShare = useCallback(() => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      toast.success('URL copied to clipboard');
+    }).catch((err) => {
+      console.error('Failed to copy URL to clipboard:', err);
+      toast.error('Failed to copy URL to clipboard');
+    });
   }, []);
 
   useEventBus<IEventBusMonacoEditorUpdateCode>('@@-monaco-editor-update-code', ({ data }) => {
     if (data !== null) {
       refCode.current = data;
     }
+
+    handleStop();
   });
 
   return (
@@ -131,7 +151,7 @@ export const EditorActions = () => {
       <div className="flex gap-2 pr-2">
         <ActionButton
           iconName="icon-share"
-          // onClick={toggleVisibility}
+          onClick={handleShare}
           toolTip="Share"
         />
         <ActionButton
@@ -141,6 +161,7 @@ export const EditorActions = () => {
         />
         <ActionButton
           iconName="icon-download"
+          isLoading={isDownloading}
           onClick={handleDownload}
           toolTip="Download"
         />

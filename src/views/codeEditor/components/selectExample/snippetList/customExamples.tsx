@@ -1,13 +1,13 @@
 import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import {
   useCallback,
-  useEffect,
   useRef,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Icon } from '@components/icon';
 // import { ModalSaveExample } from '@components/modals/modalSaveExample';
+import { Loader } from '@components/loader';
 import { ModalDeleteExamples } from '@components/modals/modalDeleteExample';
 import { ModalEditExampleInfo } from '@components/modals/modalEditExampleInfo';
 import { PDScrollArea } from '@components/pdScrollArea';
@@ -23,8 +23,9 @@ interface ExamplesListProps {
 export const CustomExampleList = (props: ExamplesListProps) => {
   const { handleClose } = props;
   const customExamples = useStoreCustomExamples.use.examples();
+  const { isGettingExamples } = useStoreCustomExamples.use.loading();
   const { name: selectedExample } = useStoreCustomExamples.use.selectedExample();
-  const { getExamples, loadExampleContent } = useStoreCustomExamples.use.actions();
+  const { loadExampleContent } = useStoreCustomExamples.use.actions();
   const navigate = useNavigate();
 
   const exampleId = useRef('');
@@ -66,9 +67,23 @@ export const CustomExampleList = (props: ExamplesListProps) => {
     navigate,
   ]);
 
-  useEffect(() => {
-    getExamples();
-  }, [getExamples]);
+  const handleNavigateToCreateExample = useCallback(() => {
+    navigate('/code?d=1');
+    loadExampleContent('1', 'default');
+    handleClose();
+  }, [
+    handleClose,
+    loadExampleContent,
+    navigate,
+  ]);
+
+  if (isGettingExamples) {
+    return (
+      <div className="flex h-full min-h-56 items-center justify-center">
+        <Loader />
+      </div>
+    );
+  }
 
   if (!customExamples.length) {
     return (
@@ -88,6 +103,7 @@ export const CustomExampleList = (props: ExamplesListProps) => {
             Currently, you don't have any custom examples created. Ready to create one?
           </p>
           <button
+            onClick={handleNavigateToCreateExample}
             className={cn(
               'mb-2 mt-6 w-full p-4 transition-colors',
               'font-geist text-white font-body2-bold',
@@ -164,11 +180,6 @@ export const CustomExampleList = (props: ExamplesListProps) => {
             ))
           }
         </ul>
-        {/* <SaveExampleModal
-        id={editExample}
-        onClose={toggleVisibility}
-        type="update"
-      /> */}
       </PDScrollArea >
       <DeleteExampleModal
         id={exampleId.current}
