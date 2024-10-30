@@ -108,7 +108,7 @@ const getJwtToken = async (): Promise<string | null> => {
   }
 };
 
-const getUserData = async (): Promise<string> => {
+const getUserData = async () => {
   try {
     const userData: string | null = await storageGetItem(
       STORAGE_AUTH_CACHE_NAME,

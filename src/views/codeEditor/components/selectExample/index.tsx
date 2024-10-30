@@ -123,7 +123,4 @@ export const SelectExample = () => {
     </div>
   );
 };
-function getExamples() {
-  throw new Error('Function not implemented.');
-}
 

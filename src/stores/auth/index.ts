@@ -9,7 +9,7 @@ interface StoreInterface {
     name: string;
     avatar: string;
   };
-  jwtToken: string;
+  jwtToken: string | null;
   jwtTokenIsLoading: boolean;
   actions: {
     resetStore: () => void;

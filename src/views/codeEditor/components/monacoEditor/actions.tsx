@@ -26,7 +26,7 @@ import { ActionButton } from '../actionButton';
 import type { IEventBusMonacoEditorUpdateCode } from '@custom-types/eventBus';
 
 export const EditorActions = () => {
-  const { name, code } = useStoreCustomExamples.use.selectedExample();
+  const { code } = useStoreCustomExamples.use.selectedExample();
   const [
     isDownloading,
     setIsDownloading,
@@ -80,7 +80,7 @@ export const EditorActions = () => {
     };
 
     const generatePackageJson = async () => {
-      const importMap = mergeImportMap(defaultImportMap, getImportMap(refCode.current));
+      const importMap = mergeImportMap(defaultImportMap, getImportMap(refCode.current || ''));
       const dependencies: { [key: string]: string } = {};
 
       for (const url of Object.values(importMap.imports || {})) {
@@ -111,7 +111,7 @@ export const EditorActions = () => {
     const files = [
       {
         name: 'index.tsx',
-        content: refCode.current,
+        content: refCode.current || '',
       },
       {
         name: 'package.json',
@@ -120,7 +120,7 @@ export const EditorActions = () => {
     ];
 
     await downloadFiles(files);
-  }, [name]);
+  }, []);
 
   const handleShare = useCallback(() => {
     const url = window.location.href;

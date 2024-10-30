@@ -42,8 +42,6 @@ const TypeScriptEditor = () => {
 
   const isDesktop = useStoreUI?.use?.isDesktop?.();
 
-  const theme = useStoreUI?.use?.theme?.();
-
   useEventBus<IEventBusMonacoEditorShowPreview>('@@-monaco-editor-show-preview', ({ data }) => {
     refCanPreview.current = data;
   });

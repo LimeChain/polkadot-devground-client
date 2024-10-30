@@ -3,6 +3,7 @@ import {
   useCallback,
   useRef,
 } from 'react';
+import { toast } from 'react-hot-toast';
 
 import { Icon } from '@components/icon';
 import { cn } from '@utils/helpers';
@@ -25,12 +26,17 @@ export const ModalEditExampleInfo = (props: IModalDeleteExample) => {
   const { updateExampleInfo } = useStoreCustomExamples.use.actions();
   const { isSavingInfo } = useStoreCustomExamples.use.loading();
 
-  const exampleNameRef = useRef<HTMLInputElement>(null as any);
-  const descriptionRef = useRef<HTMLTextAreaElement>(null as any);
+  const exampleNameRef = useRef<HTMLInputElement>(null);
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSubmit = useCallback(() => {
-    const exampleName = exampleNameRef.current.value;
-    const description = descriptionRef.current.value;
+    const exampleName = exampleNameRef.current?.value;
+    const description = descriptionRef.current?.value;
+
+    if (!exampleName || !description) {
+      toast.error('Please fill all fields');
+      return;
+    }
 
     updateExampleInfo(
       id,

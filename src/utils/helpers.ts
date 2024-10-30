@@ -123,7 +123,8 @@ export const truncateAddress = (address: string = '', chars: number = 3) => {
 };
 
 export const truncateString = (str: string, length: number) => {
-  return str.length > length ? `${str.slice(0, length)}...` : str;
+
+  return str?.length > length ? `${str.slice(0, length)}...` : str;
 };
 
 export const formatTokenValue = (
