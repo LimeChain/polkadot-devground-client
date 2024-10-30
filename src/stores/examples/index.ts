@@ -116,8 +116,6 @@ const baseStore = create<StoreInterface>()((set, get) => ({
           selectedExample = snippets.find((snippet) => snippet.id === id) || snippets[0];
         } else if (type === 'custom') {
           const exampleData = await gistService.getExampleContent(id);
-
-          console.log('exampleData', exampleData);
           selectedExample = { ...exampleData, id };
         }
 

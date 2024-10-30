@@ -5,6 +5,7 @@ import {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { ExampleNotFound } from '@components/exampleNotFound';
 import { Icon } from '@components/icon';
 // import { ModalSaveExample } from '@components/modals/modalSaveExample';
 import { Loader } from '@components/loader';
@@ -88,34 +89,16 @@ export const CustomExampleList = (props: ExamplesListProps) => {
 
   if (!customExamples.length) {
     return (
-      <div className="flex flex-col p-3">
-        <Icon
-          name="icon-group"
-          size={[100]}
-          className={cn(
-            'mb-8',
-            'self-center text-dev-white-1000',
-            'dark:text-dev-purple-50',
-          )}
-        />
-        <div className="flex flex-col items-center justify-center text-white dark:text-dev-black-1000">
-          <h4 className="mb-4 self-center font-h4-bold">Nothing here</h4>
-          <p className="max-w-80 text-center font-geist">
-            Currently, you don't have any custom examples created. Ready to create one?
-          </p>
-          <button
-            onClick={handleNavigateToCreateExample}
-            className={cn(
-              'mb-2 mt-6 w-full p-4 transition-colors',
-              'font-geist text-white font-body2-bold',
-              'bg-dev-pink-500',
-              'hover:bg-dev-pink-400',
-            )}
-          >
-            Create Example
-          </button>
-        </div>
-      </div>
+      <ExampleNotFound
+        classes="p-2"
+        iconClasses="dark:text-dev-black-1000"
+        onClick={handleNavigateToCreateExample}
+        textClasses={cn(
+          'self-center',
+          'text-dev-purple-50',
+          'dark:text-dev-black-1000',
+        )}
+      />
     );
   }
 
