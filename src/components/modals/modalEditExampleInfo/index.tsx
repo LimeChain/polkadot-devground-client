@@ -16,11 +16,11 @@ import {
 
 import type { IEditExampleInfoModalClose } from '@custom-types/eventBus';
 
-interface IModalDeleteExample extends Pick<IModal, 'onClose'> {
+interface IModalEditExample extends Pick<IModal, 'onClose'> {
   id: string;
   onClose: () => void;
 }
-export const ModalEditExampleInfo = (props: IModalDeleteExample) => {
+export const ModalEditExampleInfo = (props: IModalEditExample) => {
   const { id, onClose } = props;
 
   const { updateExampleInfo } = useStoreCustomExamples.use.actions();
@@ -84,10 +84,12 @@ export const ModalEditExampleInfo = (props: IModalDeleteExample) => {
           )}
         />
         <button
+          disabled={isSavingInfo}
           onClick={handleSubmit}
           className={cn(
             'mb-2 mt-6 flex justify-center p-4 font-geist text-white transition-colors font-body2-bold',
             'bg-dev-pink-500 hover:bg-dev-pink-400',
+            'disabled:cursor-not-allowed disabled:opacity-50',
           )}
         >
           {

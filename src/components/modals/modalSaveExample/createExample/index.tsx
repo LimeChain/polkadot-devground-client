@@ -15,8 +15,8 @@ interface CreateExampleProps {
 
 export const CreateExample = (props: CreateExampleProps) => {
   const { code, handleClose } = props;
-  const { uploadExample } = useStoreCustomExamples.use.actions();
-  const { isUploading } = useStoreCustomExamples.use.loading();
+  const { createExample } = useStoreCustomExamples.use.actions();
+  const { isCreatingExample } = useStoreCustomExamples.use.loading();
 
   const exampleNameRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
@@ -30,14 +30,14 @@ export const CreateExample = (props: CreateExampleProps) => {
       return;
     }
 
-    uploadExample({
+    createExample({
       exampleName,
       description,
       code,
     });
   }, [
     code,
-    uploadExample,
+    createExample,
   ]);
 
   return (
@@ -65,14 +65,16 @@ export const CreateExample = (props: CreateExampleProps) => {
         )}
       />
       <button
+        disabled={isCreatingExample}
         onClick={handleSubmit}
         className={cn(
           'mb-2 mt-6 flex justify-center p-4 font-geist text-white transition-colors font-body2-bold',
           'bg-dev-pink-500 hover:bg-dev-pink-400',
+          'disabled:cursor-not-allowed disabled:opacity-50',
         )}
       >
         {
-          isUploading
+          isCreatingExample
             ? (
               <Icon
                 className="animate-spin"

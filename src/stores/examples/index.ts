@@ -24,14 +24,14 @@ interface StoreInterface {
   selectedExample: ICodeExample;
   loading: {
     isGettingExamples: boolean;
-    isUploading: boolean;
+    isCreatingExample: boolean;
     isSavingInfo: boolean;
     isSavingContent: boolean;
     isDeleting: boolean;
   };
   actions: {
     resetStore: () => void;
-    uploadExample: (data: UploadCustomExampleData) => void;
+    createExample: (data: UploadCustomExampleData) => void;
     loadExampleContent: (id: string, type: string) => void;
     updateExampleInfo: (id: string, exampleName: string, description: string) => void;
     updateExampleContent: (data: string) => void;
@@ -52,7 +52,7 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   },
   loading: {
     isGettingExamples: false,
-    isUploading: false,
+    isCreatingExample: false,
     isSavingInfo: false,
     isSavingContent: false,
     isDeleting: false,
@@ -62,17 +62,17 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
 const baseStore = create<StoreInterface>()((set, get) => ({
   ...initialState,
   actions: {
-    uploadExample: async (data) => {
-      set({ loading: { ...get().loading, isUploading: true } });
+    createExample: async (data) => {
+      set({ loading: { ...get().loading, isCreatingExample: true } });
 
       if (!data.code || !data.description || !data.exampleName) {
         console.log(null, 'Invalid input data: Missing code, description, or exampleName');
-        set({ loading: { ...get().loading, isUploading: false } });
+        set({ loading: { ...get().loading, isCreatingExample: false } });
         return;
       }
 
       try {
-        const newExamples = await gistService.uploadExample(data);
+        const newExamples = await gistService.createExample(data);
         set({ examples: newExamples });
 
         toast.success('Snippet uploaded');
@@ -88,7 +88,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
       } catch (error) {
         console.log('Error uploading snippet', error);
       } finally {
-        set({ loading: { ...get().loading, isUploading: false } });
+        set({ loading: { ...get().loading, isCreatingExample: false } });
       }
     },
 

@@ -14,7 +14,7 @@ interface UploadCustomExampleData {
   exampleName: string;
 }
 
-const uploadExample = async (data: UploadCustomExampleData) => {
+const createExample = async (data: UploadCustomExampleData) => {
   const jwtToken = await authService.getJwtToken();
 
   const files: { [key: string]: GistFile } = {
@@ -107,7 +107,7 @@ const deleteExample = async (id: string) => {
 };
 
 export default {
-  uploadExample,
+  createExample,
   getUserExamples,
   getExampleContent,
   updateExampleContent,

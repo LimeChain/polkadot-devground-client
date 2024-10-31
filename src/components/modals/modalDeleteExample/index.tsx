@@ -17,7 +17,7 @@ interface IModalDeleteExample extends Pick<IModal, 'onClose'> {
   onClose: () => void;
 }
 
-export const ModalDeleteExamples = (props: IModalDeleteExample) => {
+export const ModalDeleteExample = (props: IModalDeleteExample) => {
   const { id, onClose } = props;
   const { deleteExample } = useStoreCustomExamples.use.actions();
   const { isDeleting } = useStoreCustomExamples.use.loading();
@@ -50,6 +50,7 @@ export const ModalDeleteExamples = (props: IModalDeleteExample) => {
         <div className="flex w-full flex-col">
           <p className="text-center text-2xl font-semibold">Delete Example</p>
           <button
+            disabled={isDeleting}
             onClick={handleDelete}
             className={cn(
               'flex justify-center',
@@ -57,6 +58,7 @@ export const ModalDeleteExamples = (props: IModalDeleteExample) => {
               'font-geist text-white font-body2-bold',
               'bg-dev-pink-500',
               'hover:bg-dev-pink-400',
+              'disabled:cursor-not-allowed disabled:opacity-50',
             )}
           >
             {

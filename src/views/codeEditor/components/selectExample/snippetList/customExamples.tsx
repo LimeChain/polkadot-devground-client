@@ -9,7 +9,7 @@ import { ExampleNotFound } from '@components/exampleNotFound';
 import { Icon } from '@components/icon';
 // import { ModalSaveExample } from '@components/modals/modalSaveExample';
 import { Loader } from '@components/loader';
-import { ModalDeleteExamples } from '@components/modals/modalDeleteExample';
+import { ModalDeleteExample } from '@components/modals/modalDeleteExample';
 import { ModalEditExampleInfo } from '@components/modals/modalEditExampleInfo';
 import { PDScrollArea } from '@components/pdScrollArea';
 import {
@@ -40,7 +40,7 @@ export const CustomExampleList = (props: ExamplesListProps) => {
   const [
     DeleteExampleModal,
     toggleDeleteModal,
-  ] = useToggleVisibility(ModalDeleteExamples);
+  ] = useToggleVisibility(ModalDeleteExample);
 
   const handleDeleteExample = useCallback((e: React.MouseEvent<HTMLSpanElement>) => {
     const id = e.currentTarget.getAttribute('data-example-index');

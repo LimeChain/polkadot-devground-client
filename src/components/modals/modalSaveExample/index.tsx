@@ -31,7 +31,7 @@ export const ModalSaveExample = (props: IModalGithubLogin) => {
   const examples = useStoreCustomExamples.use.examples();
 
   const { updateExampleContent, loadExampleContent } = useStoreCustomExamples.use.actions();
-  const { isSavingContent, isUploading } = useStoreCustomExamples.use.loading();
+  const { isSavingContent, isCreatingExample } = useStoreCustomExamples.use.loading();
   const navigate = useNavigate();
 
   const [
@@ -107,7 +107,7 @@ export const ModalSaveExample = (props: IModalGithubLogin) => {
                 <div className="flex w-full flex-col">
                   <p className="text-center text-2xl font-semibold">Save Changes</p>
                   <button
-                    disabled={isDefaultExample}
+                    disabled={isSavingContent}
                     onClick={handleUpdateCurrentExample}
                     className={cn(
                       'flex justify-center',
@@ -115,6 +115,7 @@ export const ModalSaveExample = (props: IModalGithubLogin) => {
                       'font-geist text-white font-body2-bold',
                       'bg-dev-pink-500',
                       'hover:bg-dev-pink-400',
+                      'disabled:cursor-not-allowed disabled:opacity-50',
                     )}
                   >
                     {
@@ -137,7 +138,7 @@ export const ModalSaveExample = (props: IModalGithubLogin) => {
                     )}
                   >
                     {
-                      isUploading
+                      isCreatingExample
                         ? (
                           <Icon
                             className="animate-spin"
