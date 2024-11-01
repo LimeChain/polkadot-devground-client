@@ -26,7 +26,7 @@ export const TupleBuilderCore = ({
   const handleOnChange = useCallback((index: number, value: unknown) => {
     setState((tuple) => {
       const newParams = [...tuple];
-      newParams[index] = value;
+      newParams[index] = value as typeof newParams[number];
       return newParams;
     });
   }, []);

@@ -12,8 +12,14 @@ export const initRuntimeParams = (inputs: TMetaDataApiMethod['inputs']) => {
   }, {});
 };
 
-export const buildArrayState = (length: number) => {
-  return Array.from({ length }).fill(undefined);
+export const buildArrayState = <T = undefined>(
+  length: number,
+  initialValue?: T,
+): T[] => {
+  if (length < 0) return [];
+  if (length === 0) return [];
+
+  return Array.from({ length }, () => initialValue as T);
 };
 
 export const buildSequenceState = (length: number) => {

@@ -30,7 +30,7 @@ export const ArrayVarBuilderCore = ({ data, onChange }: IArrayVarBuilder) => {
   const handleOnChange = useCallback((index: number, args: unknown) => {
     setArrayProps((props) => {
       const newArrayProps = [...props];
-      newArrayProps[index] = args;
+      newArrayProps[index] = args as typeof arrayProps[number];
       return newArrayProps;
     });
   }, []);
