@@ -1,6 +1,6 @@
 import { NotImplemented } from '@components/invocationArgsMapper/notImplemented';
 import { ArrayVarBuilderCore } from '@components/metadataBuilders/arrayBuilder/arrayBuilderCore';
-import { BinaryBuilder } from '@components/metadataBuilders/binaryBuilder';
+import { BitstreamBuilder } from '@components/metadataBuilders/bitstreamBuilder';
 import { varIsBinary } from '@utils/papi/helpers';
 
 import type { IArrayVarBuilder } from '@components/invocationArgsMapper/types';
@@ -17,7 +17,7 @@ const ArrayVarBuilder = ({ data, onChange }: IArrayVarBuilder) => {
       );
     } else {
       return (
-        <BinaryBuilder
+        <BitstreamBuilder
           minLength={data.len}
           onChange={onChange}
         />

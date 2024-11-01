@@ -5,31 +5,31 @@ import {
   useState,
 } from 'react';
 
-import { BinaryInput } from '@components/metadataBuilders/binaryBuilder/binaryInput';
+import { BitstreamInput } from '@components/metadataBuilders/bitstreamBuilder/bitstreamInput';
 import { PDFileUpload } from '@components/pdFileUpload';
 import { PDSwitch } from '@components/pdSwitch';
 
 import styles from '../../invocationArgsMapper/styles.module.css';
 
-import type { IBinaryBuilder } from '@components/invocationArgsMapper/types';
+import type { IBitstreamBuilder } from '@components/invocationArgsMapper/types';
 const emptyBin = Binary.fromText('');
-const BinaryBuilder = ({
+const BitstreamBuilder = ({
   onChange,
   minLength,
   placeholder,
   readOnly,
-}: IBinaryBuilder) => {
+}: IBitstreamBuilder) => {
   const [
     isFile,
     setIsFile,
   ] = useState(false);
 
   const handleOnSwitch = useCallback(() => {
-    setIsFile(!isFile);
+    setIsFile((prev) => !prev);
     onChange(emptyBin);
   }, []);
 
-  const shouldUseFileUpload = isFile && !readOnly;
+  const shouldUploadFile = isFile && !readOnly;
 
   return (
     <div className={styles.invocationGroup}>
@@ -39,10 +39,10 @@ const BinaryBuilder = ({
         title="File Upload"
       />
       {
-        shouldUseFileUpload
+        shouldUploadFile
           ? <PDFileUpload onChange={onChange} />
           : (
-            <BinaryInput
+            <BitstreamInput
               minLength={minLength}
               onChange={onChange}
               placeholder={placeholder}
@@ -54,4 +54,4 @@ const BinaryBuilder = ({
   );
 };
 
-export default BinaryBuilder;
+export default BitstreamBuilder;

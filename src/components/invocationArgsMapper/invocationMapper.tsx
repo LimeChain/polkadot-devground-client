@@ -1,7 +1,7 @@
 import { NotImplemented } from '@components/invocationArgsMapper/notImplemented';
 import { AccountBuilder } from '@components/metadataBuilders/accountBuilder';
 import ArrayVarBuilder from '@components/metadataBuilders/arrayBuilder/arrayBuilder';
-import { BinaryBuilder } from '@components/metadataBuilders/binaryBuilder';
+import { BitstreamBuilder } from '@components/metadataBuilders/bitstreamBuilder';
 import CompactVarBuilder from '@components/metadataBuilders/compactBuilder/compactBuilder';
 import { EnumBuilder } from '@components/metadataBuilders/enumBuilder';
 import { OptionBuilder } from '@components/metadataBuilders/optionBuilder';
@@ -28,7 +28,7 @@ import type {
 const mapperCore: Record<string, (props: InvocationMapperProps) => JSX.Element> = {
   result: () => <NotImplemented />,
   bitSequence: ({ onChange, placeholder }) => (
-    <BinaryBuilder
+    <BitstreamBuilder
       minLength={0}
       onChange={onChange}
       placeholder={placeholder}

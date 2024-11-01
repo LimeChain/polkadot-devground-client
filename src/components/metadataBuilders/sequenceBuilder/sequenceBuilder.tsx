@@ -1,4 +1,4 @@
-import { BinaryBuilder } from '@components/metadataBuilders/binaryBuilder';
+import { BitstreamBuilder } from '@components/metadataBuilders/bitstreamBuilder';
 import { SequenceBuilderCore } from '@components/metadataBuilders/sequenceBuilder/sequenceBuilderCore';
 import { varIsBinary } from '@utils/papi/helpers';
 
@@ -19,7 +19,7 @@ const SequenceBuilder = ({ sequence, onChange, placeholder }: ISequenceBuilder) 
   } else {
     return (
       <div className={styles.codecParam}>
-        <BinaryBuilder
+        <BitstreamBuilder
           minLength={0}
           onChange={onChange}
           placeholder={placeholder}

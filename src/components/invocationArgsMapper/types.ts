@@ -69,7 +69,7 @@ export interface IDecoderBuilderProps extends InvocationOnChangeProps {
 
 export interface InvocationDecoderDynamic extends InvocationOnChangeProps { }
 
-export interface IBinaryBuilder extends InvocationOnChangeProps {
+export interface IBitstreamBuilder extends InvocationOnChangeProps {
   minLength: number;
   placeholder?: string;
   readOnly?: boolean;

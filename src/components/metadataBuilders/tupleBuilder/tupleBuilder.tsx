@@ -1,4 +1,4 @@
-import { BinaryBuilder } from '@components/metadataBuilders/binaryBuilder';
+import { BitstreamBuilder } from '@components/metadataBuilders/bitstreamBuilder';
 import { TupleBuilderCore } from '@components/metadataBuilders/tupleBuilder/tupleBuilderCore';
 import { varIsBinary } from '@utils/papi/helpers';
 
@@ -15,7 +15,7 @@ const TupleBuilder = ({ tuple, onChange }: ITupleBuilder) => {
   } else {
     return (
       <div className="border-l pl-4 pt-2">
-        <BinaryBuilder
+        <BitstreamBuilder
           minLength={0}
           onChange={onChange}
         />

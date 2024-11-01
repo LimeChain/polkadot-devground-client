@@ -10,14 +10,14 @@ import { cn } from '@utils/helpers';
 
 import styles from '../../invocationArgsMapper/styles.module.css';
 
-import type { IBinaryBuilder } from '@components/invocationArgsMapper/types';
+import type { IBitstreamBuilder } from '@components/invocationArgsMapper/types';
 
-export const BinaryInput = ({
+export const BitstreamInput = ({
   onChange,
   minLength,
   placeholder,
   readOnly,
-}: IBinaryBuilder) => {
+}: IBitstreamBuilder) => {
   const requiredHexLength = minLength * 2;
 
   const requiredBinaryLength = minLength;
