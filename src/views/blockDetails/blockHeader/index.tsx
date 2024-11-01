@@ -2,7 +2,6 @@ import { Identicon } from '@polkadot/react-identicon';
 import { format } from 'date-fns';
 import {
   useCallback,
-  useEffect,
   useState,
 } from 'react';
 
@@ -34,70 +33,32 @@ export const DetailRow = (props: DetailRowProps) => {
     isHovered,
     setIsHovered,
   ] = useState(false);
-  const [
-    isParentHovered,
-    setIsParentHovered,
-  ] = useState(false);
-  const [
-    isMobile,
-    setIsMobile,
-  ] = useState<boolean>(window.innerWidth < 768);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const handleParentMouseEnter = useCallback(() => {
-    setIsParentHovered(true);
-  }, []);
-
-  const handleParentMouseLeave = useCallback(() => {
-    setIsParentHovered(false);
-  }, []);
-
-  const handleMouseEnter = useCallback(() => {
-    setIsHovered(true);
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    setIsHovered(false);
-  }, []);
 
   return (
-    <div
-      className={styles['pd-block-details']}
-      onMouseEnter={handleParentMouseEnter}
-      onMouseLeave={handleParentMouseLeave}
-    >
+    <div className={cn(styles['pd-block-details'], 'group')}>
       <p>{label}</p>
       <div className="flex items-center gap-x-1">
         {iconComponent && <span className="mr-2">{iconComponent}</span>}
 
         {value && (
           <CopyToClipboard
+            className="relative flex items-center"
             text={value}
             textClassName="cursor-pointer"
             textDisplay={value}
             toastMessage={label}
-            className={cn(
-              'transition-opacity duration-200 ease-in-out',
-              (isHovered || isParentHovered || isMobile) ? 'visible opacity-100' : 'invisible opacity-0',
-            )}
             textDisplayProps={{
-              onMouseEnter: handleMouseEnter,
-              onMouseLeave: handleMouseLeave,
+              onMouseEnter: () => setIsHovered(true),
+              onMouseLeave: () => setIsHovered(false),
             }}
           >
             {({ ClipboardIcon }) => (
-              <div className={cn(
-                'transition-colors duration-200 ease-in-out',
-                isHovered ? 'text-dev-pink-400' : 'text-white',
-              )}
+              <div
+                className={cn(
+                  'transition-opacity duration-200 ease-in-out',
+                  'opacity-100 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100',
+                  isHovered ? 'text-dev-pink-400' : 'text-white',
+                )}
               >
                 {ClipboardIcon}
               </div>
