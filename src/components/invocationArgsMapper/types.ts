@@ -67,7 +67,7 @@ export interface IDecoderBuilderProps extends InvocationOnChangeProps {
   readOnly?: boolean;
 }
 
-export interface InvocationDecoderDynamic extends InvocationOnChangeProps {}
+export interface InvocationDecoderDynamic extends InvocationOnChangeProps { }
 
 export interface IBinaryBuilder extends InvocationOnChangeProps {
   minLength: number;
@@ -75,7 +75,7 @@ export interface IBinaryBuilder extends InvocationOnChangeProps {
   readOnly?: boolean;
 }
 export interface IArrayVarBuilder extends InvocationOnChangeProps {
-  array: ArrayVar;
+  data: ArrayVar;
 }
 export interface ICompactBuilder extends InvocationOnChangeProps {
   compact: CompactVar;

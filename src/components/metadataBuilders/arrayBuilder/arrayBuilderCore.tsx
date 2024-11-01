@@ -13,11 +13,11 @@ import styles from '../../invocationArgsMapper/styles.module.css';
 
 import type { IArrayVarBuilder } from '@components/invocationArgsMapper/types';
 
-export const ArrayVarBuilderCore = ({ array, onChange }: IArrayVarBuilder) => {
+export const ArrayVarBuilderCore = ({ data, onChange }: IArrayVarBuilder) => {
   const [
     arrayProps,
     setArrayProps,
-  ] = useState(buildArrayState(array.len || 0));
+  ] = useState(buildArrayState(data.len || 0));
 
   const handleUpdateVals = useCallback((vals: unknown[]) => {
     onChange(vals.some((val) => !Boolean(val)) ? undefined : vals);
@@ -41,8 +41,8 @@ export const ArrayVarBuilderCore = ({ array, onChange }: IArrayVarBuilder) => {
         arrayProps.map((arrProp, index) => {
           return (
             <InvocationMapper
-              key={`array-var-${index}`}
-              invokationVar={array.value}
+              key={`data-var-${index}`}
+              invokationVar={data.value}
               onChange={(args) => handleOnChange(index, args)}
             />
           );

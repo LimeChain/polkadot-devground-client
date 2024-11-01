@@ -5,20 +5,20 @@ import { varIsBinary } from '@utils/papi/helpers';
 
 import type { IArrayVarBuilder } from '@components/invocationArgsMapper/types';
 
-const ArrayVarBuilder = ({ array, onChange }: IArrayVarBuilder) => {
+const ArrayVarBuilder = ({ data, onChange }: IArrayVarBuilder) => {
   try {
-    if (!varIsBinary(array)) {
+    if (!varIsBinary(data)) {
       return (
         <ArrayVarBuilderCore
-          key={`array-var-${array.len}-${array.value.id}`}
-          array={array}
+          key={`data-var-${data.len}-${data.value.id}`}
+          data={data}
           onChange={onChange}
         />
       );
     } else {
       return (
         <BinaryBuilder
-          minLength={array.len}
+          minLength={data.len}
           onChange={onChange}
         />
       );

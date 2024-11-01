@@ -42,7 +42,7 @@ const mapperCore: Record<string, (props: InvocationMapperProps) => JSX.Element> 
   ),
   array: ({ onChange, invokationVar }) => (
     <ArrayVarBuilder
-      array={invokationVar as ArrayVar}
+      data={invokationVar as ArrayVar}
       onChange={onChange}
     />
   ),
