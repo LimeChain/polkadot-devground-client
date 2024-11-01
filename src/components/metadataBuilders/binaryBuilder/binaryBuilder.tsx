@@ -12,7 +12,7 @@ import { PDSwitch } from '@components/pdSwitch';
 import styles from '../../invocationArgsMapper/styles.module.css';
 
 import type { IBinaryBuilder } from '@components/invocationArgsMapper/types';
-
+const emptyBin = Binary.fromText('');
 const BinaryBuilder = ({
   onChange,
   minLength,
@@ -20,21 +20,21 @@ const BinaryBuilder = ({
   readOnly,
 }: IBinaryBuilder) => {
   const [
-    useFileUpload,
-    setUseFileUpload,
+    isFile,
+    setIsFile,
   ] = useState(false);
 
   const handleOnSwitch = useCallback(() => {
-    setUseFileUpload((upload): boolean => !upload);
-    onChange(Binary.fromText(''));
+    setIsFile(!isFile);
+    onChange(emptyBin);
   }, []);
 
-  const shouldUseFileUpload = useFileUpload && !readOnly;
+  const shouldUseFileUpload = isFile && !readOnly;
 
   return (
     <div className={styles.invocationGroup}>
       <PDSwitch
-        checked={useFileUpload}
+        checked={isFile}
         onChange={handleOnSwitch}
         title="File Upload"
       />
