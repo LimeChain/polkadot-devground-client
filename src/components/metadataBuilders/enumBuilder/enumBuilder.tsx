@@ -14,8 +14,8 @@ import styles from '../../invocationArgsMapper/styles.module.css';
 import type { IEnumBuilder } from '@components/invocationArgsMapper/types';
 
 const EnumBuilder = ({ onChange, ...props }: IEnumBuilder) => {
-  const _enum = props.enum;
-  const enumOptions = Object.keys(_enum.value);
+  const enumPropsValue = props.enum;
+  const enumOptions = Object.keys(enumPropsValue.value);
 
   const selectItems = useMemo(() => {
     return enumOptions.map((key, index) => ({
@@ -34,7 +34,7 @@ const EnumBuilder = ({ onChange, ...props }: IEnumBuilder) => {
     onChange({ type: option, value: args });
   }, [option]);
 
-  const enumValue = _enum.value[option];
+  const enumValue = enumPropsValue.value[option];
   const getEnumVariable = () => {
     if (!enumValue) {
       return undefined;
@@ -46,15 +46,15 @@ const EnumBuilder = ({ onChange, ...props }: IEnumBuilder) => {
       }
     }
   };
-  const _enumVar = getEnumVariable();
+  const enumVariable = getEnumVariable();
 
   useEffect(() => {
-    if (_enumVar?.type === 'void') {
+    if (enumVariable?.type === 'void') {
       handleSetValue(undefined);
     }
   }, [
     option,
-    _enumVar,
+    enumVariable,
     handleSetValue,
   ]);
 
@@ -66,15 +66,17 @@ const EnumBuilder = ({ onChange, ...props }: IEnumBuilder) => {
         value={option}
       />
       {
-        _enumVar && (
-          <div className={styles.invocationContainer}>
-            <InvocationMapper
-              key={`${_enumVar.type}-${(_enumVar as { id: number })?.id}`} /* used for correct state on enum change */
-              invokationVar={_enumVar}
-              onChange={handleSetValue}
-            />
-          </div>
-        )
+        enumVariable
+          ? (
+            <div className={styles.invocationContainer}>
+              <InvocationMapper
+                key={`${enumVariable.type}-${(enumVariable as { id: number })?.id}`}
+                invokationVar={enumVariable}
+                onChange={handleSetValue}
+              />
+            </div>
+          )
+          : null
       }
     </div>
   );
