@@ -11,8 +11,8 @@ import {
   cn,
   truncateString,
 } from '@utils/helpers';
-import { CustomExampleList } from '@views/codeEditor/components/selectExample/snippetList/customExamples';
-import { DefaultExamplesList } from '@views/codeEditor/components/selectExample/snippetList/defaultExamples';
+import { CustomExampleList } from '@views/codeEditor/components/selectExample/examplesList/customExamples';
+import { DefaultExamplesList } from '@views/codeEditor/components/selectExample/examplesList/defaultExamples';
 import { useStoreCustomExamples } from 'src/stores/examples';
 
 export const SelectExample = () => {

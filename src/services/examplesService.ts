@@ -2,8 +2,6 @@ import axios from 'axios';
 
 import { SERVER_URL } from '@constants/auth';
 
-import authService from './authService';
-
 interface GistFile {
   content: string;
 }
@@ -15,8 +13,6 @@ interface UploadCustomExampleData {
 }
 
 const createExample = async (data: UploadCustomExampleData) => {
-  const jwtToken = await authService.getJwtToken();
-
   const files: { [key: string]: GistFile } = {
     'snippet.tsx': {
       content: data.code,
@@ -33,24 +29,13 @@ const createExample = async (data: UploadCustomExampleData) => {
     publicGist: true,
   };
 
-  const response = await axios.post(`${SERVER_URL}/gists`, body, {
-    headers: {
-      Authorization: `Bearer ${jwtToken}`,
-    },
-  });
+  const response = await axios.post(`${SERVER_URL}/gists`, body);
 
   return response.data;
 };
 
 const getUserExamples = async () => {
-  const jwtToken = await authService.getJwtToken();
-
-  const response = await axios.get(`${SERVER_URL}/gists`, {
-    headers: {
-      Authorization: `Bearer ${jwtToken}`,
-    },
-    withCredentials: true,
-  });
+  const response = await axios.get(`${SERVER_URL}/gists`);
 
   return response.data;
 };

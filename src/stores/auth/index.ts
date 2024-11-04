@@ -27,7 +27,7 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
     avatar: '',
   },
   jwtToken: '',
-  jwtTokenIsLoading: true,
+  jwtTokenIsLoading: false,
 };
 
 const baseStore = create<StoreInterface>()((set) => ({
@@ -63,7 +63,7 @@ const baseStore = create<StoreInterface>()((set) => ({
     logout: async () => {
       try {
         await authService.logout();
-        set({ ...initialState, jwtTokenIsLoading: false, user: { name: '', avatar: '' } });
+        set({ ...initialState });
       } catch (error) {
         console.error('Logout failed', error);
         throw error;

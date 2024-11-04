@@ -16,11 +16,11 @@ import {
 
 import type { IEditExampleInfoModalClose } from '@custom-types/eventBus';
 
-interface IModalEditExample extends Pick<IModal, 'onClose'> {
+interface IModalEditExampleInfo extends Pick<IModal, 'onClose'> {
   id: string;
   onClose: () => void;
 }
-export const ModalEditExampleInfo = (props: IModalEditExample) => {
+export const ModalEditExampleInfo = (props: IModalEditExampleInfo) => {
   const { id, onClose } = props;
 
   const { updateExampleInfo } = useStoreCustomExamples.use.actions();
@@ -51,6 +51,7 @@ export const ModalEditExampleInfo = (props: IModalEditExample) => {
   useEventBus<IEditExampleInfoModalClose>('@@-close-edit-example-modal', () => {
     onClose();
   });
+
   return (
     <Modal
       onClose={onClose}

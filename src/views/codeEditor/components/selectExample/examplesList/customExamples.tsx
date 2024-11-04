@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 
 import { ExampleNotFound } from '@components/exampleNotFound';
 import { Icon } from '@components/icon';
-// import { ModalSaveExample } from '@components/modals/modalSaveExample';
 import { Loader } from '@components/loader';
 import { ModalDeleteExample } from '@components/modals/modalDeleteExample';
 import { ModalEditExampleInfo } from '@components/modals/modalEditExampleInfo';

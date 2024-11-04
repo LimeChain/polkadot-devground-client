@@ -25,6 +25,7 @@ export const GithubButton = () => {
     logout,
     resetStore,
   ]);
+
   return (
     <div className="mb-4 flex h-16 items-center">
       {

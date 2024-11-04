@@ -1,6 +1,6 @@
 export interface ICodeExample {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   code?: string;
 }

@@ -5,14 +5,9 @@ import {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import {
-  STORAGE_AUTH_CACHE_NAME,
-  STORAGE_AUTH_JWT_TOKEN,
-  STORAGE_AUTH_SUCCESSFUL_REDIRECT_TO,
-} from '@constants/auth';
+import { STORAGE_AUTH_SUCCESSFUL_REDIRECT_TO } from '@constants/auth';
 import { useStoreAuth } from '@stores';
 import { getSearchParam } from '@utils/helpers';
-import { storageRemoveItem } from '@utils/storage';
 
 const Callback = () => {
   const navigate = useNavigate();
@@ -29,12 +24,6 @@ const Callback = () => {
       const code = getSearchParam('code');
       const error = getSearchParam('error');
 
-      // Remove the JWT token from the cache
-      await storageRemoveItem(
-        STORAGE_AUTH_CACHE_NAME,
-        STORAGE_AUTH_JWT_TOKEN,
-      );
-
       if (error) {
         setError(error);
         return;
@@ -43,6 +32,7 @@ const Callback = () => {
       if (codeUsed.current || !code) {
         return;
       }
+
       codeUsed.current = true;
       const token = await login(code);
       const successRedirectTo = window.localStorage.getItem(STORAGE_AUTH_SUCCESSFUL_REDIRECT_TO);
