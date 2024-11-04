@@ -1,7 +1,7 @@
 import { InvocationRpcSelect } from '@components/invocationArgsMapper/invocationRpcSelect';
 import { NotImplemented } from '@components/invocationArgsMapper/notImplemented';
+import { OrderBuilder } from '@components/metadataBuilders/orderBuilder';
 import { PrimitiveBuilder } from '@components/metadataBuilders/primitiveBuilder';
-import { SequenceBuilder } from '@components/metadataBuilders/sequenceBuilder';
 
 import type { InvocationRpcArg as Type } from '@components/invocationArgsMapper/types';
 import type { TRpcCall } from '@constants/rpcCalls/types';
@@ -27,7 +27,7 @@ const mapperCore: Record<TRpcCall, (props: Type) => JSX.Element> = {
     />
   ),
   array: (props) => (
-    <SequenceBuilder
+    <OrderBuilder
       {...props}
       sequence={{
         type: 'sequence',

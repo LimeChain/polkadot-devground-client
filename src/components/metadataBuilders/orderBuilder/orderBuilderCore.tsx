@@ -15,7 +15,7 @@ import type { ISequenceBuilder } from '@components/invocationArgsMapper/types';
 
 const STARTING_SEQUENCE_LENGTH = 1;
 
-export const SequenceBuilderCore = ({ sequence, onChange, placeholder }: ISequenceBuilder) => {
+export const OrderBuilderCore = ({ sequence, onChange, placeholder }: ISequenceBuilder) => {
   const [
     sequenceLength,
     setSequenceLength,

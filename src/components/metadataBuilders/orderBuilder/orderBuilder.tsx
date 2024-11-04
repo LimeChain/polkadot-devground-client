@@ -1,15 +1,15 @@
 import { BitstreamBuilder } from '@components/metadataBuilders/bitstreamBuilder';
-import { SequenceBuilderCore } from '@components/metadataBuilders/sequenceBuilder/sequenceBuilderCore';
+import { OrderBuilderCore } from '@components/metadataBuilders/orderBuilder/orderBuilderCore';
 import { varIsBinary } from '@utils/papi/helpers';
 
 import styles from '../../invocationArgsMapper/styles.module.css';
 
 import type { ISequenceBuilder } from '@components/invocationArgsMapper/types';
 
-const SequenceBuilder = ({ sequence, onChange, placeholder }: ISequenceBuilder) => {
+const OrderBuilder = ({ sequence, onChange, placeholder }: ISequenceBuilder) => {
   if (!varIsBinary(sequence)) {
     return (
-      <SequenceBuilderCore
+      <OrderBuilderCore
         key={`sequence-${sequence.value.id}`}
         onChange={onChange}
         placeholder={placeholder}
@@ -29,4 +29,4 @@ const SequenceBuilder = ({ sequence, onChange, placeholder }: ISequenceBuilder) 
   }
 };
 
-export default SequenceBuilder;
+export default OrderBuilder;

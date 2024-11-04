@@ -5,8 +5,8 @@ import { BitstreamBuilder } from '@components/metadataBuilders/bitstreamBuilder'
 import CompactVarBuilder from '@components/metadataBuilders/compactBuilder/compactBuilder';
 import { EnumBuilder } from '@components/metadataBuilders/enumBuilder';
 import { OptionBuilder } from '@components/metadataBuilders/optionBuilder';
+import { OrderBuilder } from '@components/metadataBuilders/orderBuilder';
 import { PrimitiveBuilder } from '@components/metadataBuilders/primitiveBuilder';
-import { SequenceBuilder } from '@components/metadataBuilders/sequenceBuilder';
 import { StructBuilder } from '@components/metadataBuilders/structBuilder';
 import { TupleBuilder } from '@components/metadataBuilders/tupleBuilder';
 import { VoidBuilder } from '@components/metadataBuilders/voidBuilder';
@@ -77,7 +77,7 @@ const mapperCore: Record<string, (props: InvocationMapperProps) => JSX.Element> 
     />
   ),
   sequence: ({ onChange, invokationVar, placeholder }) => (
-    <SequenceBuilder
+    <OrderBuilder
       onChange={onChange}
       placeholder={placeholder}
       sequence={invokationVar as SequenceVar}

@@ -1,13 +1,13 @@
 import { NotImplemented } from '@components/invocationArgsMapper/notImplemented';
+import { OrderBuilder } from '@components/metadataBuilders/orderBuilder';
 import { PrimitiveBuilder } from '@components/metadataBuilders/primitiveBuilder';
-import { SequenceBuilder } from '@components/metadataBuilders/sequenceBuilder';
 
 import type { IDecoderBuilderProps } from '@components/invocationArgsMapper/types';
 import type { InvocationDecoderArgs as Type } from '@constants/decoders/types';
 
 const mapperCore: Record<Type['type'], (props: IDecoderBuilderProps) => JSX.Element> = {
   array: (props) => (
-    <SequenceBuilder
+    <OrderBuilder
       {...props}
       sequence={{
         type: 'sequence',
