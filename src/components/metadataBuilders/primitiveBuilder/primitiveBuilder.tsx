@@ -30,40 +30,78 @@ const PrimitiveBuilder = ({
     setPrimValue((val) => Boolean(val) ? '' : 'true');
   }, []);
 
-  const commonProps = {
-    placeholder: placeholder || primitive.value,
-    value: primValue,
-    className: styles.invocationInputField,
-    onChange: (event: ChangeEvent<HTMLInputElement>) =>
-      setPrimValue(event.target.value),
-    readOnly: !!readOnly,
-  };
+  const getNumericProps = () => (
+    {
+      type: 'number',
+      inputMode: 'numeric' as const,
+      onWheelCapture: onWheelPreventDefault,
+    }
+  );
 
-  const commonNumberInputProps = {
-    ...commonProps,
-    type: 'number',
-    inputMode: 'numeric',
-    onWheelCapture: onWheelPreventDefault,
-  } as const;
+  const getPrimitiveProps = () => (
+    {
+      placeholder: placeholder || primitive.value,
+      value: primValue,
+      className: styles.invocationInputField,
+      onChange: (event: ChangeEvent<HTMLInputElement>) => setPrimValue(event.target.value),
+      readOnly: !!readOnly,
+    }
+  );
 
   useEffect(() => {
     onChange(handlePrimitiveInputChange(primitive, primValue));
   }, [primValue]);
 
   const primitiveRenderers: Record<string, JSX.Element> = {
-    i8: <input {...commonNumberInputProps} />,
-    u8: <input {...commonNumberInputProps} />,
-    i16: <input {...commonNumberInputProps} />,
-    u16: <input {...commonNumberInputProps} />,
-    i32: <input {...commonNumberInputProps} />,
-    u32: <input {...commonNumberInputProps} />,
-    i64: <input {...commonNumberInputProps} />,
-    u64: <input {...commonNumberInputProps} />,
-    i128: <input {...commonNumberInputProps} />,
-    u128: <input {...commonNumberInputProps} />,
-    i256: <input {...commonNumberInputProps} />,
-    u256: <input {...commonNumberInputProps} />,
-    str: <input {...commonProps} />,
+    i8: <input
+      {...getPrimitiveProps()}
+      {...getNumericProps()}
+    />,
+    u8: <input
+      {...getPrimitiveProps()}
+      {...getNumericProps()}
+    />,
+    i16: <input
+      {...getPrimitiveProps()}
+      {...getNumericProps()}
+    />,
+    u16: <input
+      {...getPrimitiveProps()}
+      {...getNumericProps()}
+    />,
+    i32: <input
+      {...getPrimitiveProps()}
+      {...getNumericProps()}
+    />,
+    u32: <input
+      {...getPrimitiveProps()}
+      {...getNumericProps()}
+    />,
+    i64: <input
+      {...getPrimitiveProps()}
+      {...getNumericProps()}
+    />,
+    u64: <input
+      {...getPrimitiveProps()}
+      {...getNumericProps()}
+    />,
+    i128: <input
+      {...getPrimitiveProps()}
+      {...getNumericProps()}
+    />,
+    u128: <input
+      {...getPrimitiveProps()}
+      {...getNumericProps()}
+    />,
+    i256: <input
+      {...getPrimitiveProps()}
+      {...getNumericProps()}
+    />,
+    u256: <input
+      {...getPrimitiveProps()}
+      {...getNumericProps()}
+    />,
+    str: <input {...getPrimitiveProps()} />,
     bool: (
       <PDSwitch
         checked={Boolean(primValue)}
@@ -72,7 +110,7 @@ const PrimitiveBuilder = ({
     ),
     char: (
       <input
-        {...commonProps}
+        {...getPrimitiveProps()}
         maxLength={1}
       />
     ),
