@@ -42,11 +42,11 @@ export const TupleBuilderCore = ({
       return (
         <div className={styles.invocationContainer}>
           {
-            tuple?.value?.map((entry, index) => (
+            tuple?.value?.map((tupleVal, i) => (
               <InvocationMapper
-                key={`tuple-invocation-${entry.id}-${index}`}
-                invokationVar={entry}
-                onChange={(value) => handleOnChange(index, value)}
+                key={`tuple-invocation-${tupleVal.id}-${i}`}
+                invokationVar={tupleVal}
+                onChange={(value) => handleOnChange(i, value)}
               />
             ))
           }
