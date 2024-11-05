@@ -36,27 +36,26 @@ export const buildStructState = (struct: StructVar) => {
 };
 
 export const handlePrimitiveInputChange = (v: PrimitiveVar, value: string) => {
-  switch (v.value) {
-    case 'bool':
-      return Boolean(value);
-    case 'char':
-    case 'str':
-      return value;
-    case 'u8':
-    case 'i8':
-    case 'u16':
-    case 'i16':
-    case 'u32':
-    case 'i32':
-      return Number(value);
-    case 'u64':
-    case 'i64':
-    case 'u128':
-    case 'i128':
-    case 'u256':
-    case 'i256':
-      return BigInt(Number(value).toFixed(0));
-  }
+  const primitiveHandlers: Record<string, (value: string) => boolean | string | number | bigint | undefined> = {
+    bool: (value) => Boolean(value),
+    char: (value) => value,
+    str: (value) => value,
+    u8: (value) => Number(value),
+    i8: (value) => Number(value),
+    u16: (value) => Number(value),
+    i16: (value) => Number(value),
+    u32: (value) => Number(value),
+    i32: (value) => Number(value),
+    u64: (value) => BigInt(Number(value).toFixed(0)),
+    i64: (value) => BigInt(Number(value).toFixed(0)),
+    u128: (value) => BigInt(Number(value).toFixed(0)),
+    i128: (value) => BigInt(Number(value).toFixed(0)),
+    u256: (value) => BigInt(Number(value).toFixed(0)),
+    i256: (value) => BigInt(Number(value).toFixed(0)),
+  };
+
+  const handler = primitiveHandlers[v.value];
+  return handler ? handler(value) : undefined;
 };
 
 export const getCompactValue = (isBig: boolean, value: string) => {

@@ -50,43 +50,34 @@ const PrimitiveBuilder = ({
     onChange(handlePrimitiveInputChange(primitive, primValue));
   }, [primValue]);
 
-  switch (primitive.value) {
-    case 'i8':
-    case 'u8':
-    case 'i16':
-    case 'u16':
-    case 'i32':
-    case 'u32':
-    case 'i64':
-    case 'u64':
-    case 'i128':
-    case 'u128':
-    case 'i256':
-    case 'u256':
-      return (
-        <input
-          {...commonNumberInputProps}
-        />
-      );
-    case 'str':
-      return <input {...commonProps} />;
-    case 'bool':
-      return (
-        <PDSwitch
-          checked={Boolean(primValue)}
-          onChange={handlePDSwitchChange}
-        />
-      );
-    case 'char':
-      return (
-        <input
-          {...commonProps}
-          maxLength={1}
-        />
-      );
-    default:
-      return <NotImplemented />;
-  }
+  const primitiveRenderers: Record<string, JSX.Element> = {
+    i8: <input {...commonNumberInputProps} />,
+    u8: <input {...commonNumberInputProps} />,
+    i16: <input {...commonNumberInputProps} />,
+    u16: <input {...commonNumberInputProps} />,
+    i32: <input {...commonNumberInputProps} />,
+    u32: <input {...commonNumberInputProps} />,
+    i64: <input {...commonNumberInputProps} />,
+    u64: <input {...commonNumberInputProps} />,
+    i128: <input {...commonNumberInputProps} />,
+    u128: <input {...commonNumberInputProps} />,
+    i256: <input {...commonNumberInputProps} />,
+    u256: <input {...commonNumberInputProps} />,
+    str: <input {...commonProps} />,
+    bool: (
+      <PDSwitch
+        checked={Boolean(primValue)}
+        onChange={handlePDSwitchChange}
+      />
+    ),
+    char: (
+      <input
+        {...commonProps}
+        maxLength={1}
+      />
+    ),
+  };
+  return primitiveRenderers[primitive.value] || <NotImplemented />;
 };
 
 export default PrimitiveBuilder;
