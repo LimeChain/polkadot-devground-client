@@ -20,11 +20,15 @@ interface IModalEditExampleInfo extends Pick<IModal, 'onClose'> {
   id: string;
   onClose: () => void;
 }
+
 export const ModalEditExampleInfo = (props: IModalEditExampleInfo) => {
   const { id, onClose } = props;
 
+  const examples = useStoreCustomExamples.use.examples();
   const { updateExampleInfo } = useStoreCustomExamples.use.actions();
   const { isSavingInfo } = useStoreCustomExamples.use.loading();
+
+  const example = examples.find((example) => example.id === id);
 
   const exampleNameRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
@@ -38,11 +42,7 @@ export const ModalEditExampleInfo = (props: IModalEditExampleInfo) => {
       return;
     }
 
-    updateExampleInfo(
-      id,
-      exampleName,
-      description,
-    );
+    updateExampleInfo(id, exampleName, description);
   }, [
     id,
     updateExampleInfo,
@@ -65,21 +65,23 @@ export const ModalEditExampleInfo = (props: IModalEditExampleInfo) => {
         <h2 className="mb-10 font-body1-bold">Edit Example</h2>
         <input
           ref={exampleNameRef}
+          defaultValue={example?.name ?? ''}
           placeholder="Enter Example Name"
           className={cn(
             'mb-6 border border-dev-white-900 bg-transparent p-4',
-            ' caret-dev-pink-500 focus-visible:outline-none',
+            'caret-dev-pink-500 focus-visible:outline-none',
             'placeholder:text-dev-black-1000 placeholder:font-body2-regular',
             'dark:border-dev-purple-700 dark:bg-transparent dark:placeholder:text-white',
           )}
         />
         <textarea
           ref={descriptionRef}
+          defaultValue={example?.description ?? ''}
           placeholder="Enter Description"
           rows={5}
           className={cn(
             'mb-6 border border-dev-white-900 bg-transparent p-4',
-            ' caret-dev-pink-500 focus-visible:outline-none',
+            'caret-dev-pink-500 focus-visible:outline-none',
             'placeholder:text-dev-black-1000 placeholder:font-body2-regular',
             'dark:border-dev-purple-700 dark:bg-transparent dark:placeholder:text-white',
           )}
@@ -102,7 +104,7 @@ export const ModalEditExampleInfo = (props: IModalEditExampleInfo) => {
                 />
               )
               : (
-                'Update Example'
+                'Submit'
               )
           }
         </button>
@@ -115,6 +117,6 @@ export const ModalEditExampleInfo = (props: IModalEditExampleInfo) => {
           Cancel
         </button>
       </div>
-    </Modal >
+    </Modal>
   );
 };

@@ -14,11 +14,8 @@ interface UploadCustomExampleData {
 
 const createExample = async (data: UploadCustomExampleData) => {
   const files: { [key: string]: GistFile } = {
-    'snippet.tsx': {
+    [data.exampleName]: {
       content: data.code,
-    },
-    'name.txt': {
-      content: data.exampleName,
     },
   };
 
@@ -53,11 +50,7 @@ const getExampleContent = async (id: string) => {
 const updateExampleInfo = async (id: string, name: string, description: string) => {
   const body = {
     name,
-    files: {
-      'description.txt': {
-        content: description,
-      },
-    },
+    description,
   };
 
   const { data } = await axios.patch(`${SERVER_URL}/gists/edit-info/${id}`, body);
@@ -66,9 +59,9 @@ const updateExampleInfo = async (id: string, name: string, description: string) 
 
 };
 
-const updateExampleContent = async (id: string, data: string) => {
+const updateExampleContent = async (id: string, name: string, data: string) => {
   const files: { [key: string]: GistFile } = {
-    'snippet.tsx': {
+    [name]: {
       content: data,
     },
   };

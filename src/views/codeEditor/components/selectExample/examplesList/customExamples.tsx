@@ -141,6 +141,7 @@ export const CustomExampleList = (props: ExamplesListProps) => {
                 )}
                 >
                   <span
+                    className="duration-200 hover:text-dev-pink-500"
                     data-example-index={example.id}
                     onClick={handleEditExample}
                   >
@@ -150,6 +151,7 @@ export const CustomExampleList = (props: ExamplesListProps) => {
                     />
                   </span>
                   <span
+                    className="duration-200 hover:text-dev-pink-500"
                     data-example-index={example.id}
                     onClick={handleDeleteExample}
                   >

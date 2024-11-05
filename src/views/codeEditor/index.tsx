@@ -31,7 +31,8 @@ const TypeScriptEditor = () => {
   const refTimeout = useRef<NodeJS.Timeout>();
   const refCanPreview = useRef(false);
 
-  const { description: exampleDescription } = useStoreCustomExamples.use.selectedExample();
+  const selectedExample = useStoreCustomExamples?.use?.selectedExample() || {};
+  const exampleDescription = selectedExample?.description;
   const [refContainerDimensions] = useResizeObserver(refContainer);
   const containerWidth = refContainerDimensions?.width;
 
@@ -112,10 +113,10 @@ const TypeScriptEditor = () => {
                   <MonacoEditor />
                 </div>
                 <div
-                  className="flex h-full p-3 dark:bg-dev-black-800"
+                  className="flex h-full px-9 py-4 dark:bg-dev-black-800"
                   data-title="Read me"
                 >
-                  {exampleDescription}
+                  {exampleDescription || 'No description'}
                 </div>
               </Tabs>
               <EditorActions />

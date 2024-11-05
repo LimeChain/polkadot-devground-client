@@ -6,11 +6,12 @@ import GetChainSpecificDataSnippet from './getChainSpecificData.txt?raw';
 /* eslint-enable */
 
 import type { ICodeExample } from '@custom-types/codeSnippet';
+
 const snippet1: ICodeExample = {
   id: '1',
-  name: 'Balance transfer from a test account',
-  description: 'This snippet demonstrates how to transfer balance from a test account',
-  code: TestAccountTransferSnippet,
+  name: 'Get chain specific data',
+  description: 'This snippet demonstrates how to get chain specific data',
+  code: GetChainSpecificDataSnippet,
 };
 
 const snippet2: ICodeExample = {
@@ -29,9 +30,9 @@ const snippet3: ICodeExample = {
 
 const snippet4: ICodeExample = {
   id: '4',
-  name: 'Get chain specific data',
-  description: 'This snippet demonstrates how to get chain specific data',
-  code: GetChainSpecificDataSnippet,
+  name: 'Balance transfer from a test account',
+  description: 'This snippet demonstrates how to transfer balance from a test account',
+  code: TestAccountTransferSnippet,
 };
 
 export const snippets = [

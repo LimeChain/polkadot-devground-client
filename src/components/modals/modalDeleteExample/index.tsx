@@ -1,8 +1,12 @@
 import { useEventBus } from '@pivanov/event-bus';
 import { useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { Icon } from '@components/icon';
-import { cn } from '@utils/helpers';
+import {
+  cn,
+  sleep,
+} from '@utils/helpers';
 import { useStoreCustomExamples } from 'src/stores/examples';
 
 import {
@@ -19,18 +23,25 @@ interface IModalDeleteExample extends Pick<IModal, 'onClose'> {
 
 export const ModalDeleteExample = (props: IModalDeleteExample) => {
   const { id, onClose } = props;
-  const { deleteExample } = useStoreCustomExamples.use.actions();
+  const { deleteExample, loadExampleContent } = useStoreCustomExamples.use.actions();
+  const selectedExample = useStoreCustomExamples.use.selectedExample();
   const { isDeleting } = useStoreCustomExamples.use.loading();
+  const navigate = useNavigate();
 
   const handleDelete = useCallback(async () => {
     deleteExample(id);
-
   }, [
     deleteExample,
     id,
   ]);
 
   useEventBus<IDeleteExampleModalClose>('@@-close-delete-example-modal', () => {
+    if (id === selectedExample?.id) {
+      loadExampleContent('1', 'default');
+      navigate(`/code?d=1`);
+      void sleep(400);
+    }
+
     onClose();
   });
   return (

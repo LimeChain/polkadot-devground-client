@@ -115,14 +115,20 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
       try {
         let selectedExample;
+
         if (type === 'default') {
-          selectedExample = snippets.find((snippet) => snippet.id === id) || snippets[0];
+          selectedExample = snippets.find((snippet) => snippet.id === id);
         } else if (type === 'custom') {
           const exampleData = await gistService.getExampleContent(id);
-          selectedExample = { ...exampleData, id };
+          if (exampleData) {
+            selectedExample = { ...exampleData, id };
+          }
         }
 
-        set({ selectedExample });
+        set({
+          selectedExample: selectedExample || { id: '', name: 'Example Not Found', description: '' },
+        });
+
       } catch (error) {
         console.log('Error loading example content', error);
         throw error;
@@ -142,6 +148,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
       try {
         const editedGist = await gistService.updateExampleInfo(id, exampleName, description);
 
+        console.log('editedGist', editedGist);
         const updatedExamples = get().examples.map((example) =>
           example.id === id ? { ...example, ...editedGist } : example,
         );
@@ -149,7 +156,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         set({ examples: updatedExamples });
 
         if (get().selectedExample.id === id) {
-          set({ selectedExample: { ...get().selectedExample, ...editedGist } });
+          set({ selectedExample: editedGist });
         }
 
         busDispatch<IEditExampleInfoModalClose>('@@-close-edit-example-modal');
@@ -164,15 +171,15 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
     updateExampleContent: async (data: string) => {
       set({ loading: { ...get().loading, isSavingContent: true } });
-      const id = get().selectedExample.id;
+      const { name, id } = get().selectedExample;
 
-      if (!id || !data) {
+      if (!id || !data || !name) {
         toast.error('No selected example id or data');
         return;
       }
 
       try {
-        await gistService.updateExampleContent(id, data);
+        await gistService.updateExampleContent(id, name, data);
         busDispatch<IUploadExampleModalClose>({
           type: '@@-close-upload-example-modal',
           data: id,
@@ -193,7 +200,6 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
       try {
         set({ loading: { ...get().loading, isDeleting: true } });
-        await gistService.deleteExample(id);
 
         const updatedExampleList = get().examples.filter((example) => example.id !== id);
         set({ examples: updatedExampleList });
@@ -202,6 +208,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
           type: '@@-close-delete-example-modal',
         });
 
+        await gistService.deleteExample(id);
         toast.success('Snippet deleted');
       } catch (error) {
         console.log('Error deleting snippet', error);
