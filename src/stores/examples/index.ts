@@ -63,22 +63,28 @@ const baseStore = create<StoreInterface>()((set, get) => ({
   ...initialState,
   actions: {
     createExample: async (data) => {
-      set({ loading: { ...get().loading, isCreatingExample: true } });
+      set((state) => ({ loading: { ...state.loading, isCreatingExample: true } }));
 
       if (!data.code || !data.description || !data.exampleName) {
-        console.log(null, 'Invalid input data: Missing code, description, or exampleName');
-        set({ loading: { ...get().loading, isCreatingExample: false } });
+        console.error('Invalid input data: Missing code, description, or exampleName');
+        set((state) => ({ loading: { ...state.loading, isCreatingExample: false } }));
+        return;
+      }
+
+      if (get().examples.some((example) => example.name === data.exampleName)) {
+        toast.error('Example with this name already exists');
+        set((state) => ({ loading: { ...state.loading, isCreatingExample: false } }));
         return;
       }
 
       try {
-        const { name, id } = await gistService.createExample(data);
-        set({
+        const { name, id, description } = await gistService.createExample(data);
+        set((state) => ({
           examples: [
-            ...get().examples,
-            { name, id },
+            ...state.examples,
+            { name, id, description },
           ],
-        });
+        }));
 
         if (id) {
           busDispatch<IUploadExampleModalClose>({
@@ -89,21 +95,21 @@ const baseStore = create<StoreInterface>()((set, get) => ({
 
         toast.success('Snippet uploaded');
       } catch (error) {
-        console.log('Error uploading snippet', error);
+        console.error('Error uploading snippet', error);
       } finally {
-        set({ loading: { ...get().loading, isCreatingExample: false } });
+        set((state) => ({ loading: { ...state.loading, isCreatingExample: false } }));
       }
     },
 
     getExamples: async () => {
+      set((state) => ({ loading: { ...state.loading, isGettingExamples: true } }));
       try {
-        set({ loading: { ...get().loading, isGettingExamples: true } });
         const data = await gistService.getUserExamples();
         set({ examples: data });
       } catch (error) {
-        console.log('Error getting examples', error);
+        console.error('Error getting examples', error);
       } finally {
-        set({ loading: { ...get().loading, isGettingExamples: false } });
+        set((state) => ({ loading: { ...state.loading, isGettingExamples: false } }));
       }
     },
 
@@ -130,7 +136,7 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         });
 
       } catch (error) {
-        console.log('Error loading example content', error);
+        console.error('Error loading example content', error);
         throw error;
       } finally {
         busDispatch({ type: '@@-monaco-editor-hide-loading' });
@@ -143,34 +149,32 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         return;
       }
 
-      set({ loading: { ...get().loading, isSavingInfo: true } });
+      set((state) => ({ loading: { ...state.loading, isSavingInfo: true } }));
 
       try {
         const editedGist = await gistService.updateExampleInfo(id, exampleName, description);
 
-        console.log('editedGist', editedGist);
         const updatedExamples = get().examples.map((example) =>
           example.id === id ? { ...example, ...editedGist } : example,
         );
-
-        set({ examples: updatedExamples });
 
         if (get().selectedExample.id === id) {
           set({ selectedExample: editedGist });
         }
 
+        set({ examples: updatedExamples });
         busDispatch<IEditExampleInfoModalClose>('@@-close-edit-example-modal');
         toast.success('Example Information Updated!');
       } catch (error) {
-        console.log('Error updating snippet', error);
+        console.error('Error updating snippet', error);
         toast.error('Failed to update example information');
       } finally {
-        set({ loading: { ...get().loading, isSavingInfo: false } });
+        set((state) => ({ loading: { ...state.loading, isSavingInfo: false } }));
       }
     },
 
     updateExampleContent: async (data: string) => {
-      set({ loading: { ...get().loading, isSavingContent: true } });
+      set((state) => ({ loading: { ...state.loading, isSavingContent: true } }));
       const { name, id } = get().selectedExample;
 
       if (!id || !data || !name) {
@@ -186,9 +190,9 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         });
         toast.success('Example Content Updated!');
       } catch (error) {
-        console.log('Error updating snippet', error);
+        console.error('Error updating snippet', error);
       } finally {
-        set({ loading: { ...get().loading, isSavingContent: false } });
+        set((state) => ({ loading: { ...state.loading, isSavingContent: false } }));
       }
     },
 
@@ -198,9 +202,9 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         return;
       }
 
-      try {
-        set({ loading: { ...get().loading, isDeleting: true } });
+      set((state) => ({ loading: { ...state.loading, isDeleting: true } }));
 
+      try {
         const updatedExampleList = get().examples.filter((example) => example.id !== id);
         set({ examples: updatedExampleList });
 
@@ -211,15 +215,13 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         await gistService.deleteExample(id);
         toast.success('Snippet deleted');
       } catch (error) {
-        console.log('Error deleting snippet', error);
+        console.error('Error deleting snippet', error);
       } finally {
-        set({ loading: { ...get().loading, isDeleting: false } });
+        set((state) => ({ loading: { ...state.loading, isDeleting: false } }));
       }
     },
 
-    resetStore: () => (
-      set({ ...initialState })
-    ),
+    resetStore: () => set({ ...initialState }),
   },
   init: async () => {
     get().actions.getExamples();

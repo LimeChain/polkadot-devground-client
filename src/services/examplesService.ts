@@ -3,6 +3,7 @@ import axios from 'axios';
 import { SERVER_URL } from '@constants/auth';
 
 interface GistFile {
+  filename?: string;
   content: string;
 }
 
@@ -14,7 +15,8 @@ interface UploadCustomExampleData {
 
 const createExample = async (data: UploadCustomExampleData) => {
   const files: { [key: string]: GistFile } = {
-    [data.exampleName]: {
+    'example': {
+      filename: data.exampleName,
       content: data.code,
     },
   };
@@ -56,7 +58,6 @@ const updateExampleInfo = async (id: string, name: string, description: string) 
   const { data } = await axios.patch(`${SERVER_URL}/gists/edit-info/${id}`, body);
 
   return data;
-
 };
 
 const updateExampleContent = async (id: string, name: string, data: string) => {

@@ -110,9 +110,7 @@ export const SelectExample = () => {
           )}
 
         >
-          <div
-            data-title="Default"
-          >
+          <div data-title="Default">
             <DefaultExamplesList handleClose={handleClose} />
           </div>
           <div data-title="Custom">
