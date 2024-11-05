@@ -115,8 +115,8 @@ export interface IPrimitiveBuilder extends InvocationOnChangeProps {
   readOnly?: boolean;
 }
 
-export interface IOptionBuilder extends InvocationOnChangeProps {
-  option: OptionVar;
+export interface IConditionalBuilder extends InvocationOnChangeProps {
+  condition: OptionVar;
 }
 
 export interface IEnumBuilder extends InvocationOnChangeProps {

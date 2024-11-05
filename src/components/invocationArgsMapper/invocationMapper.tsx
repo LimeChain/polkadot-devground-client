@@ -4,7 +4,7 @@ import ArrayVarBuilder from '@components/metadataBuilders/arrayBuilder/arrayBuil
 import { BitstreamBuilder } from '@components/metadataBuilders/bitstreamBuilder';
 import CompactVarBuilder from '@components/metadataBuilders/compactBuilder/compactBuilder';
 import { EnumBuilder } from '@components/metadataBuilders/enumBuilder';
-import { OptionBuilder } from '@components/metadataBuilders/optionBuilder';
+import { ConditionalParamBuilder } from '@components/metadataBuilders/optionBuilder';
 import { OrderBuilder } from '@components/metadataBuilders/orderBuilder';
 import { PrimitiveBuilder } from '@components/metadataBuilders/primitiveBuilder';
 import { StructBuilder } from '@components/metadataBuilders/structBuilder';
@@ -91,12 +91,15 @@ const mapperCore: Record<string, (props: InvocationMapperProps) => JSX.Element> 
       primitive={invokationVar as PrimitiveVar}
     />
   ),
-  option: ({ onChange, invokationVar }) => (
-    <OptionBuilder
-      onChange={onChange}
-      option={invokationVar as OptionVar}
-    />
-  ),
+  option: ({ onChange, invokationVar }) => {
+
+    return (
+      <ConditionalParamBuilder
+        condition={invokationVar as OptionVar}
+        onChange={onChange}
+      />
+    );
+  },
 };
 
 export const InvocationMapper = (props: InvocationMapperProps) => {

@@ -10,50 +10,56 @@ import { PDSwitch } from '@components/pdSwitch';
 import { InvocationMapper } from '../../invocationArgsMapper/invocationMapper';
 import styles from '../../invocationArgsMapper/styles.module.css';
 
-import type { IOptionBuilder } from '@components/invocationArgsMapper/types';
+import type { IConditionalBuilder } from '@components/invocationArgsMapper/types';
 
-const OptionBuilder = ({ option, onChange }: IOptionBuilder) => {
+const ConditionalParamBuilder = ({ condition, onChange }: IConditionalBuilder) => {
   const [
-    optionState,
-    setOptionState,
+    paramValue,
+    setParamValue,
   ] = useState(undefined);
   const [
-    shouldIncludeOption,
-    setShouldIncludeOption,
+    showParam,
+    setShowParam,
   ] = useState(false);
 
   const handleOnChange = useCallback((args: unknown) => {
-    setOptionState(args as undefined);
+    setParamValue(args as undefined);
   }, []);
 
   const handleOnSwitch = useCallback(() => {
-    setShouldIncludeOption((shouldInclude) => !shouldInclude);
+    setShowParam((show) => !show);
   }, []);
 
   useEffect(() => {
-    onChange(shouldIncludeOption ? optionState : undefined);
+    let value = undefined;
+    if (showParam) {
+      value = paramValue;
+    }
+    onChange(value);
   }, [
-    optionState,
-    shouldIncludeOption,
+    paramValue,
+    showParam,
   ]);
 
   return (
     <div className={styles.invocationGroup}>
       <PDSwitch
-        checked={shouldIncludeOption}
+        checked={showParam}
         onChange={handleOnSwitch}
         title="Include Option"
       />
       {
-        shouldIncludeOption && (
-          <InvocationMapper
-            invokationVar={option.value}
-            onChange={handleOnChange}
-          />
-        )
+        showParam
+          ? (
+            <InvocationMapper
+              invokationVar={condition.value}
+              onChange={handleOnChange}
+            />
+          )
+          : null
       }
     </div>
   );
 };
 
-export default OptionBuilder;
+export default ConditionalParamBuilder;
