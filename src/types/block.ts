@@ -63,7 +63,7 @@ export interface IMappedBlockHeader {
   } | null;
   identity?: {
     name?: string;
-    address: string;
+    address?: string;
   };
   parentHash?: string;
   stateRoot?: string;

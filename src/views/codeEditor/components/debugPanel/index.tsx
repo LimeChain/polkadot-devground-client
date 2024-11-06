@@ -95,7 +95,6 @@ export const DebugPanel = (props: IframeProps) => {
 
   return (
     <Tabs
-      contentClassName="relative"
       initialTab={initialTab}
       onChange={setInitialTab}
       refContainer={refContainer}

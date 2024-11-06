@@ -34,7 +34,7 @@ const Home = () => {
             description={'With devGround’s custom IDE, safely execute selected JavaScript snippets within the ecosystem.'}
             iconName="icon-brackets"
             title="Developer Console"
-            to={hasVisited ? '/code' : '/onboarding'}
+            to={hasVisited ? '/code?d=1' : '/onboarding'}
           />
           {HOME_LINKS.map((card) => (
             <CardLink

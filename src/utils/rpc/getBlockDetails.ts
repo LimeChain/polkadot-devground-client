@@ -91,6 +91,7 @@ const getBlockValidator = async ({
   return {
     name: identity?.toString?.(),
     address,
+    identity: '',
   };
 };
 

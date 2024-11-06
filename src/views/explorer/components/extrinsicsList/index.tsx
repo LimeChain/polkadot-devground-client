@@ -66,7 +66,7 @@ export const ExtrinsicsList = polymorphicComponent<'div'>((_props, ref) => {
 
   useEffect(() => {
     const extrinsics = Array.from(blocksData.values())
-      .flatMap((block) => block?.extrinsics ?? [])
+      .flatMap((block) => (block?.extrinsics?.slice(0, -2) ?? []))
       .reverse();
 
     setSignedExtrinsics(extrinsics);

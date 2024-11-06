@@ -122,6 +122,11 @@ export const truncateAddress = (address: string = '', chars: number = 3) => {
   return `${address.slice(0, chars)}...${address.slice(-chars)}`;
 };
 
+export const truncateString = (str: string, length: number) => {
+
+  return str?.length > length ? `${str.slice(0, length)}...` : str;
+};
+
 export const formatTokenValue = (
   { value = 0,
     tokenDecimals = 10,

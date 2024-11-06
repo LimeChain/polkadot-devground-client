@@ -1,64 +1,42 @@
-import { busDispatch } from '@pivanov/event-bus';
 import {
   useCallback,
   useEffect,
   useRef,
   useState,
 } from 'react';
-import {
-  useNavigate,
-  useSearchParams,
-} from 'react-router-dom';
 
 import { Icon } from '@components/icon';
-import { PDScrollArea } from '@components/pdScrollArea';
 import { Tabs } from '@components/tabs';
-import { snippets } from '@constants/snippets';
 import {
   cn,
-  sleep,
+  truncateString,
 } from '@utils/helpers';
-
-import type { IEventBusMonacoEditorLoadSnippet } from '@custom-types/eventBus';
+import { CustomExampleList } from '@views/codeEditor/components/selectExample/examplesList/customExamples';
+import { DefaultExamplesList } from '@views/codeEditor/components/selectExample/examplesList/defaultExamples';
+import { useStoreCustomExamples } from 'src/stores/examples';
 
 export const SelectExample = () => {
-  const navigate = useNavigate();
+  const { name: selectedExample } = useStoreCustomExamples.use.selectedExample();
+  const { getExamples } = useStoreCustomExamples.use.actions();
+
+  const refContainer = useRef<HTMLDivElement>(null);
 
   const [
     isOpened,
     setIsOpened,
   ] = useState(false);
 
-  const [searchParams] = useSearchParams();
-  const selectedSnippet = searchParams.get('s');
-  const selectedSnippetName = snippets.find((snippet) => snippet.id === Number(selectedSnippet))?.name;
-
-  const refContainer = useRef<HTMLDivElement>(null);
+  const [
+    initialTab,
+    setInitialTab,
+  ] = useState(0);
 
   const handleSetOpen = useCallback(() => {
     setIsOpened((prev) => !prev);
   }, []);
 
-  const handleChangeExample = useCallback(async (e: React.MouseEvent<HTMLButtonElement>) => {
-    const snippetIndex = Number(e.currentTarget.getAttribute('data-snippet-index'));
-    navigate(`/code?s=${snippetIndex}`);
+  const handleClose = useCallback(() => {
     setIsOpened(false);
-
-    busDispatch({
-      type: '@@-monaco-editor-show-loading',
-    });
-
-    await sleep(400);
-
-    busDispatch<IEventBusMonacoEditorLoadSnippet>({
-      type: '@@-monaco-editor-load-snippet',
-      data: snippetIndex,
-    });
-
-    busDispatch({
-      type: '@@-monaco-editor-hide-loading',
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -72,6 +50,11 @@ export const SelectExample = () => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
+  }, []);
+
+  useEffect(() => {
+    getExamples();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -94,7 +77,7 @@ export const SelectExample = () => {
           },
         )}
       >
-        {selectedSnippetName || 'Select Example'}
+        {truncateString(selectedExample, 60) || 'Select Example'}
         <Icon
           name="icon-dropdownArrow"
           className={cn(
@@ -118,56 +101,24 @@ export const SelectExample = () => {
       )}
       >
         <Tabs
+          initialTab={initialTab}
+          onChange={setInitialTab}
           tabClassName={cn(
             'mb-2 px-10 py-2.5',
-            'text-dev-white-400 hover:text-dev-white-200 dark:text-dev-black-800 dark:hover:text-dev-black-1000',
+            'text-dev-white-400 hover:text-dev-white-200',
+            'dark:text-dev-black-800 dark:hover:text-dev-black-1000',
           )}
 
         >
-          <div data-title="Custom">
-            <li className="font-geist text-dev-white-1000 font-body1-regular dark:text-dev-black-300">
-              No examples found
-            </li>
-          </div>
           <div data-title="Default">
-            <PDScrollArea
-              verticalScrollClassNames="py-4"
-              verticalScrollThumbClassNames="before:bg-dev-purple-700 dark:before:bg-dev-purple-300"
-            >
-              <ul className="max-h-56 ">
-                {
-                  snippets.map((snippet) => (
-                    <li
-                      key={snippet.id}
-                    >
-                      <button
-                        data-snippet-index={snippet.id}
-                        onClick={handleChangeExample}
-                        className={cn(
-                          'flex w-full items-center justify-between',
-                          'px-4 py-3.5',
-                          'transition-[background] duration-300',
-                          'hover:bg-dev-black-900 hover:dark:bg-dev-purple-200',
-                          {
-                            ['bg-dev-black-800 dark:bg-dev-purple-300']: selectedSnippet === snippet.id.toString(),
-                          },
-                        )}
-                      >
-                        <p className="font-geist text-dev-white-200 font-body2-regular dark:text-dev-black-1000">
-                          {snippet.name}
-                        </p>
-                        <p className="font-geist text-dev-white-1000 font-body3-regular dark:text-dev-black-300">
-                          CUSTOM
-                        </p>
-                      </button>
-                    </li>
-                  ))
-                }
-              </ul>
-            </PDScrollArea>
+            <DefaultExamplesList handleClose={handleClose} />
+          </div>
+          <div data-title="Custom">
+            <CustomExampleList handleClose={handleClose} />
           </div>
         </Tabs>
       </div>
     </div>
   );
 };
+

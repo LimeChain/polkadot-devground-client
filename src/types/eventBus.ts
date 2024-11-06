@@ -11,7 +11,10 @@ export interface IEventBusStoreSize {
 
 export interface IEventBusMonacoEditorLoadSnippet {
   type: '@@-monaco-editor-load-snippet';
-  data: number;
+  data: {
+    code: string;
+    type: string;
+  };
 }
 
 export interface IEventBusMonacoEditorShowPreview {
@@ -21,7 +24,7 @@ export interface IEventBusMonacoEditorShowPreview {
 
 export interface IEventBusMonacoEditorUpdateCode {
   type: '@@-monaco-editor-update-code';
-  data: string;
+  data: string | null;
 }
 
 export interface IEventBusMonacoEditorUpdateCursorPosition {
@@ -77,4 +80,16 @@ export interface IEventBusForksReceiveUpdate {
 
 export interface IEventBusNavLinkClick {
   type: '@@-navlink-click';
+}
+
+export interface IUploadExampleModalClose {
+  type: '@@-close-upload-example-modal';
+  data: string;
+}
+
+export interface IEditExampleInfoModalClose {
+  type: '@@-close-edit-example-modal';
+}
+export interface IDeleteExampleModalClose {
+  type: '@@-close-delete-example-modal';
 }

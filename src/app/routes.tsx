@@ -68,11 +68,11 @@ export const routes = () => ([
           },
           {
             path: 'decoder',
-            element: <Decoder/>,
+            element: <Decoder />,
           },
           {
             path: 'decoder-dynamic',
-            element: <DecoderDynamic/>,
+            element: <DecoderDynamic />,
           },
         ],
       },

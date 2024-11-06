@@ -1,5 +1,6 @@
-export interface ICodeSnippet {
-  id: number;
+export interface ICodeExample {
+  id: string;
   name: string;
-  code: string;
+  description?: string;
+  code?: string;
 }

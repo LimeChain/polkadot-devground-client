@@ -33,7 +33,6 @@ const Forks = () => {
     if (!client) {
       return;
     }
-
     resetState();
 
     refSubscription.current = client.bestBlocks$.subscribe((bestBlocks) => {

@@ -2,9 +2,9 @@ import {
   busDispatch,
   useEventBus,
 } from '@pivanov/event-bus';
+import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import * as PAPI_SIGNER from '@polkadot-api/signer';
 import * as PAPI_WS_PROVIDER_WEB from '@polkadot-api/ws-provider/web';
-import { shikiToMonaco } from '@shikijs/monaco/index.mjs';
 import * as monaco from 'monaco-editor';
 import {
   useCallback,
@@ -12,14 +12,15 @@ import {
   useRef,
   useState,
 } from 'react';
-import { getSingletonHighlighter } from 'shiki/index.mjs';
 
-import { snippets } from '@constants/snippets';
-import { useStoreUI } from '@stores';
+import { ModalGithubLogin } from '@components/modals/modalGithubLogin';
+import {
+  useStoreAuth,
+  useStoreUI,
+} from '@stores';
 import {
   cn,
   getSearchParam,
-  setSearchParam,
 } from '@utils/helpers';
 import { storageSetItem } from '@utils/storage';
 import {
@@ -32,11 +33,11 @@ import {
 } from '@views/codeEditor/helpers';
 import { monacoEditorConfig } from '@views/codeEditor/monaco-editor-config';
 import { Progress } from '@views/codeEditor/progress';
+import { useStoreCustomExamples } from 'src/stores/examples';
 
 import type {
   IEventBusIframeDestroy,
   IEventBusMonacoEditorExecuteSnippet,
-  IEventBusMonacoEditorLoadSnippet,
   IEventBusMonacoEditorUpdateCursorPosition,
 } from '@custom-types/eventBus';
 
@@ -95,29 +96,31 @@ const compilerOptions: monaco.languages.typescript.CompilerOptions = {
 monaco.languages.typescript.typescriptDefaults.setCompilerOptions(compilerOptions);
 
 const checkTheme = async (theme: string) => {
-  const currentTheme = theme === 'dark' ? 'github-dark' : 'github-light';
-  const highlighter = await getSingletonHighlighter({
-    themes: [
-      'github-dark',
-      'github-light',
-    ],
-    langs: [
-      'tsx',
-      'typescript',
-      'json',
-    ],
-  });
-
-  shikiToMonaco(highlighter, monaco);
+  const currentTheme = theme === 'dark' ? 'dark-theme' : 'light-theme';
   monaco.editor.setTheme(currentTheme);
 };
 
+// Utility to handle showing/hiding preview based on code content
+const triggerPreview = (code: string) => {
+  busDispatch({
+    type: '@@-monaco-editor-show-preview',
+    data: code.includes('createRoot'),
+  });
+};
 interface IMonacoEditorProps {
   classNames?: string;
 }
 
 export const MonacoEditor = (props: IMonacoEditorProps) => {
   const { classNames } = props;
+  const { loadExampleContent } = useStoreCustomExamples.use.actions();
+  const { code } = useStoreCustomExamples.use.selectedExample();
+  const isAuthenticated = useStoreAuth.use.jwtToken?.();
+
+  const [
+    GithubModal,
+    toggleVisibility,
+  ] = useToggleVisibility(ModalGithubLogin);
 
   const refTimeout = useRef<NodeJS.Timeout>();
   const refSnippet = useRef<string>('');
@@ -194,7 +197,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
       void checkTheme(theme);
       void triggerValidation();
     },
-    () => {},
+    () => { },
     (userFacingMessage, error) => {
       console.error('Custom error handling:', userFacingMessage, error);
     },
@@ -223,57 +226,21 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
     void fetchType(refSnippet.current);
   };
 
-  const loadSnippet = useCallback(async (snippetIndex: number | null) => {
+  const loadExample = useCallback(async (code: string) => {
     clearTimeout(refTimeout.current);
 
-    busDispatch({
-      type: '@@-problems-message',
-      data: [],
-    });
-
-    busDispatch({
-      type: '@@-console-message-reset',
-    });
-
-    busDispatch({
-      type: '@@-monaco-editor-types-progress',
-      data: 0,
-    });
-
-    let code = 'console.log("Hello, World!");';
-    if (!!snippetIndex) {
-      const selectedCodeSnippet = snippets.find((f) => f.id === snippetIndex) || snippets[0];
-      refSnippetIndex.current = String(selectedCodeSnippet.id);
-
-      // const isTempVersionExist = await storageExists(STORAGE_CACHE_NAME, `${STORAGE_PREFIX}-${snippetIndex}`);
-      code = selectedCodeSnippet.code;
-
-      // if (isTempVersionExist) {
-      //   const existingCode = await storageGetItem<string>(STORAGE_CACHE_NAME, `${STORAGE_PREFIX}-${snippetIndex}`);
-      //   code = existingCode || code;
-      // }
-
-      setSearchParam('s', snippetIndex);
-    }
-
+    refSnippetIndex.current = String('id');
     refSnippet.current = await formatCode(code);
     createNewModel(refSnippet.current);
+    triggerPreview(refSnippet.current);
 
-    busDispatch({
-      type: '@@-monaco-editor-show-preview',
-      data: refSnippet.current.includes('createRoot'),
-    });
-
-    refTimeout.current = setTimeout(async () => {
-      busDispatch({
-        type: '@@-monaco-editor-hide-loading',
-      });
+    refTimeout.current = setTimeout(() => {
+      busDispatch({ type: '@@-monaco-editor-hide-loading' });
     }, 400);
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const updateMonacoCursorPositon = useCallback((currentPosition: monaco.Position) => {
+  const updateMonacoCursorPosition = useCallback((currentPosition: monaco.Position) => {
     if (currentPosition) {
       refMonacoEditor.current?.setPosition(currentPosition);
       refMonacoEditor.current?.revealPositionInCenter(currentPosition);
@@ -282,9 +249,26 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
   }, []);
 
   useEffect(() => {
-    const snippetIndex = getSearchParam('s');
-    void loadSnippet(!!snippetIndex ? Number(snippetIndex) : null);
+    if (code) {
+      void loadExample(code);
+    }
+  }, [
+    code,
+    loadExample,
+  ]);
 
+  useEffect(() => {
+    const defaultId = getSearchParam('d');
+    const customId = getSearchParam('c');
+
+    if (defaultId) {
+      void loadExampleContent(defaultId, 'default');
+    } else if (customId) {
+      if (!isAuthenticated) {
+        toggleVisibility();
+      }
+      void loadExampleContent(customId, 'custom');
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -311,7 +295,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
           const code = refMonacoEditor.current.getValue() || '';
           refSnippet.current = await formatCode(code);
 
-          updateMonacoCursorPositon(currentPosition!);
+          updateMonacoCursorPosition(currentPosition!);
 
           await fetchType(refSnippet.current);
 
@@ -362,7 +346,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
   }, []);
 
   useEventBus<IEventBusMonacoEditorUpdateCursorPosition>('@@-monaco-editor-update-cursor-position', ({ data }) => {
-    updateMonacoCursorPositon(data);
+    updateMonacoCursorPosition(data);
   });
 
   useEventBus<IEventBusMonacoEditorExecuteSnippet>('@@-monaco-editor-execute-snippet', () => {
@@ -378,10 +362,6 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
     });
     setIsReadOnly(false);
     refMonacoEditor.current?.focus();
-  });
-
-  useEventBus<IEventBusMonacoEditorLoadSnippet>('@@-monaco-editor-load-snippet', ({ data }) => {
-    void loadSnippet(data);
   });
 
   return (
@@ -403,6 +383,7 @@ export const MonacoEditor = (props: IMonacoEditorProps) => {
         classNames="absolute top-2 right-6 z-100"
         size={18}
       />
+      <GithubModal onClose={toggleVisibility} />
     </div>
   );
 };
