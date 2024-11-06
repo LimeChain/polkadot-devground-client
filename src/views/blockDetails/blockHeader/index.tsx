@@ -26,13 +26,8 @@ interface DetailRowProps {
   iconComponent?: React.ReactNode;
 }
 
-export const DetailRow = (props: DetailRowProps) => {
+const DetailRow = (props: DetailRowProps) => {
   const { label, value, iconComponent } = props;
-
-  const [
-    isHovered,
-    setIsHovered,
-  ] = useState(false);
 
   return (
     <div className={cn(styles['pd-block-details'], 'group')}>
@@ -44,20 +39,15 @@ export const DetailRow = (props: DetailRowProps) => {
           <CopyToClipboard
             className="relative flex items-center"
             text={value}
-            textClassName="cursor-pointer"
-            textDisplay={value}
+            textClassName="cursor-pointer peer"
             toastMessage={label}
-            textDisplayProps={{
-              onMouseEnter: () => setIsHovered(true),
-              onMouseLeave: () => setIsHovered(false),
-            }}
           >
             {({ ClipboardIcon }) => (
               <div
                 className={cn(
                   'transition-opacity duration-200 ease-in-out',
-                  'opacity-100 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100',
-                  isHovered ? 'text-dev-pink-400' : 'text-white',
+                  'opacity-100 md:opacity-0',
+                  'group-hover:opacity-100 peer-hover:text-dev-pink-400 md:group-hover:opacity-100',
                 )}
               >
                 {ClipboardIcon}

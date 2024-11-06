@@ -12,7 +12,6 @@ import { Icon } from '@components/icon';
 import { cn } from '@utils/helpers';
 
 import type {
-  HTMLAttributes,
   ReactElement,
   ReactNode,
 } from 'react';
@@ -25,8 +24,6 @@ interface ICopyToClipboardProps {
   showToast?: boolean;
   className?: string;
   iconSize?: number;
-  textDisplay?: string;
-  textDisplayProps?: HTMLAttributes<HTMLParagraphElement>;
   textClassName?: string;
 }
 
@@ -39,8 +36,6 @@ export const CopyToClipboard = memo((props: ICopyToClipboardProps) => {
     onCopy,
     className,
     iconSize = 16,
-    textDisplay,
-    textDisplayProps,
     textClassName,
   } = props;
 
@@ -131,13 +126,12 @@ export const CopyToClipboard = memo((props: ICopyToClipboardProps) => {
 
   return (
     <div className="flex w-full items-center gap-x-2">
-      {textDisplay && (
+      {text && (
         <p
           className={textClassName}
           onClick={copyToClipboard}
-          {...textDisplayProps}
         >
-          {textDisplay}
+          {text}
         </p>
       )}
       {children({

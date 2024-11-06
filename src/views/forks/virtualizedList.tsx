@@ -218,7 +218,6 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
                               className="hover:text-dev-dev-purple-50"
                               text={item.blockHash}
                               textClassName="truncate cursor-pointer"
-                              textDisplay={item.blockHash}
                               toastMessage="Block Hash"
                             >
                               {
