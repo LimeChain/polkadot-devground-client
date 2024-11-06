@@ -74,6 +74,12 @@ const baseStore = create<StoreInterface>()((set) => ({
   init: async () => {
     try {
       const token = await authService.getJwtToken();
+
+      if (!token) {
+        set({ jwtTokenIsLoading: false });
+        return;
+      }
+
       const user = await authService.getUserData();
 
       set({ jwtToken: token, user, jwtTokenIsLoading: false });

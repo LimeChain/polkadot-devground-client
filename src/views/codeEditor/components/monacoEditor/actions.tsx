@@ -12,6 +12,7 @@ import {
 import { toast } from 'react-hot-toast';
 
 import { ModalSaveExample } from '@components/modals/modalSaveExample';
+import { useStoreAuth } from '@stores';
 import { downloadZip } from '@utils/downloadZip';
 import { cn } from '@utils/helpers';
 import {
@@ -27,6 +28,8 @@ import type { IEventBusMonacoEditorUpdateCode } from '@custom-types/eventBus';
 
 export const EditorActions = () => {
   const { code } = useStoreCustomExamples.use.selectedExample();
+  const isAuthenticated = useStoreAuth.use.jwtToken?.();
+
   const [
     isDownloading,
     setIsDownloading,
@@ -155,9 +158,17 @@ export const EditorActions = () => {
           toolTip="Share"
         />
         <ActionButton
+          disabled={!isAuthenticated}
           iconName="icon-save"
           onClick={toggleVisibility}
-          toolTip="Save to GitHub"
+          toolTip={isAuthenticated ? 'Save' : 'Login to save'}
+          classes={cn(
+            'cursor-pointer',
+            'disabled:cursor-not-allowed disabled:opacity-50',
+            {
+              'opacity-50': !isAuthenticated,
+            },
+          )}
         />
         <ActionButton
           iconName="icon-download"
@@ -165,22 +176,24 @@ export const EditorActions = () => {
           onClick={handleDownload}
           toolTip="Download"
         />
-        {isRunning
-          ? (
-            <ActionButton
-              iconName="icon-pause"
-              onClick={handleStop}
-              toolTip="Stop execution"
-            />
-          )
-          : (
-            <ActionButton
-              fill="red"
-              iconName="icon-play"
-              onClick={handleRun}
-              toolTip="Run"
-            />
-          )}
+        {
+          isRunning
+            ? (
+              <ActionButton
+                iconName="icon-pause"
+                onClick={handleStop}
+                toolTip="Stop execution"
+              />
+            )
+            : (
+              <ActionButton
+                fill="red"
+                iconName="icon-play"
+                onClick={handleRun}
+                toolTip="Run"
+              />
+            )
+        }
       </div>
       <SaveExampleModal
         code={refCode.current}

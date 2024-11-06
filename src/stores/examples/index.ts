@@ -3,6 +3,7 @@ import { toast } from 'react-hot-toast';
 import { create } from 'zustand';
 
 import { snippets } from '@constants/snippets';
+import authService from '@services/authService';
 import gistService from '@services/examplesService';
 import { createSelectors } from 'src/stores/createSelectors';
 
@@ -39,7 +40,6 @@ interface StoreInterface {
     deleteExample: (id: string) => void;
   };
   init: () => void;
-
 }
 
 const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
@@ -59,21 +59,28 @@ const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
   },
 };
 
+const handleLoading = (set: (fn: (state: StoreInterface) => StoreInterface) => void, key: keyof StoreInterface['loading'], value: boolean) => {
+  set((state: StoreInterface) => ({ ...state, loading: { ...state.loading, [key]: value } }));
+};
+
 const baseStore = create<StoreInterface>()((set, get) => ({
   ...initialState,
   actions: {
-    createExample: async (data) => {
-      set((state) => ({ loading: { ...state.loading, isCreatingExample: true } }));
+    createExample: async (data: UploadCustomExampleData) => {
+      const token = await authService.getJwtToken();
+      if (!token) return;
+
+      handleLoading(set, 'isCreatingExample', true);
 
       if (!data.code || !data.description || !data.exampleName) {
         console.error('Invalid input data: Missing code, description, or exampleName');
-        set((state) => ({ loading: { ...state.loading, isCreatingExample: false } }));
+        handleLoading(set, 'isCreatingExample', false);
         return;
       }
 
       if (get().examples.some((example) => example.name === data.exampleName)) {
         toast.error('Example with this name already exists');
-        set((state) => ({ loading: { ...state.loading, isCreatingExample: false } }));
+        handleLoading(set, 'isCreatingExample', false);
         return;
       }
 
@@ -97,19 +104,23 @@ const baseStore = create<StoreInterface>()((set, get) => ({
       } catch (error) {
         console.error('Error uploading snippet', error);
       } finally {
-        set((state) => ({ loading: { ...state.loading, isCreatingExample: false } }));
+        handleLoading(set, 'isCreatingExample', false);
       }
     },
 
     getExamples: async () => {
-      set((state) => ({ loading: { ...state.loading, isGettingExamples: true } }));
+      const token = await authService.getJwtToken();
+      if (!token) return;
+
+      handleLoading(set, 'isGettingExamples', true);
+
       try {
         const data = await gistService.getUserExamples();
         set({ examples: data });
       } catch (error) {
         console.error('Error getting examples', error);
       } finally {
-        set((state) => ({ loading: { ...state.loading, isGettingExamples: false } }));
+        handleLoading(set, 'isGettingExamples', false);
       }
     },
 
@@ -134,7 +145,6 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         set({
           selectedExample: selectedExample || { id: '', name: 'Example Not Found', description: '' },
         });
-
       } catch (error) {
         console.error('Error loading example content', error);
         throw error;
@@ -144,12 +154,15 @@ const baseStore = create<StoreInterface>()((set, get) => ({
     },
 
     updateExampleInfo: async (id: string, exampleName: string, description: string) => {
+      const token = await authService.getJwtToken();
+      if (!token) return;
+
       if (!id || !exampleName || !description) {
         toast.error('Invalid input data: Missing id, exampleName, or description');
         return;
       }
 
-      set((state) => ({ loading: { ...state.loading, isSavingInfo: true } }));
+      handleLoading(set, 'isSavingInfo', true);
 
       try {
         const editedGist = await gistService.updateExampleInfo(id, exampleName, description);
@@ -169,12 +182,15 @@ const baseStore = create<StoreInterface>()((set, get) => ({
         console.error('Error updating snippet', error);
         toast.error('Failed to update example information');
       } finally {
-        set((state) => ({ loading: { ...state.loading, isSavingInfo: false } }));
+        handleLoading(set, 'isSavingInfo', false);
       }
     },
 
     updateExampleContent: async (data: string) => {
-      set((state) => ({ loading: { ...state.loading, isSavingContent: true } }));
+      const token = await authService.getJwtToken();
+      if (!token) return;
+
+      handleLoading(set, 'isSavingContent', true);
       const { name, id } = get().selectedExample;
 
       if (!id || !data || !name) {
@@ -192,17 +208,20 @@ const baseStore = create<StoreInterface>()((set, get) => ({
       } catch (error) {
         console.error('Error updating snippet', error);
       } finally {
-        set((state) => ({ loading: { ...state.loading, isSavingContent: false } }));
+        handleLoading(set, 'isSavingContent', false);
       }
     },
 
     deleteExample: async (id: string) => {
+      const token = await authService.getJwtToken();
+      if (!token) return;
+
       if (!id) {
         toast.error('No selected example id');
         return;
       }
 
-      set((state) => ({ loading: { ...state.loading, isDeleting: true } }));
+      handleLoading(set, 'isDeleting', true);
 
       try {
         const updatedExampleList = get().examples.filter((example) => example.id !== id);
@@ -217,17 +236,20 @@ const baseStore = create<StoreInterface>()((set, get) => ({
       } catch (error) {
         console.error('Error deleting snippet', error);
       } finally {
-        set((state) => ({ loading: { ...state.loading, isDeleting: false } }));
+        handleLoading(set, 'isDeleting', false);
       }
     },
 
     resetStore: () => set({ ...initialState }),
   },
+
   init: async () => {
+    const token = await authService.getJwtToken();
+    if (!token) return;
+
     get().actions.getExamples();
   },
 }));
 
 export const baseStoreCustomExamples = baseStore;
 export const useStoreCustomExamples = createSelectors(baseStore);
-

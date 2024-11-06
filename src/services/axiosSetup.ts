@@ -32,29 +32,26 @@ axios.interceptors.response.use(
       originalRequest._retryCount = 0;
     }
 
-    if (error.response.status === 401 && originalRequest._retryCount < MAX_RETRY_COUNT) {
-      originalRequest._retryCount += 1;
+    if (originalRequest._retryCount < MAX_RETRY_COUNT && error.response.status === 401) {
+      const jwtToken = await authService.getJwtToken();
+      if (!jwtToken) {
+        return Promise.reject(error);
+      }
+
+      originalRequest._retryCount++;
       try {
-        const token = await authService.refreshJwtToken();
-        if (token) {
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          return axios(originalRequest);
-        }
-      } catch (e) {
-        console.error('Error refreshing JWT token', e);
-        return Promise.reject(e);
+        await authService.refreshJwtToken();
+        console.log('Token refreshed');
+        return axios(originalRequest);
+      } catch (error) {
+        console.log('Error refreshing token', error);
+        return Promise.reject(error);
       }
     }
 
-    if (error.response.status === 403 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      try {
-        await authService.logout();
-        return;
-      } catch (e) {
-        console.error('Error during logout', e);
-        return Promise.reject(e);
-      }
+    if (error.response.status === 403) {
+      await authService.logout();
+      authService.authorizeGitHubApp();
     }
 
     return Promise.reject(error);

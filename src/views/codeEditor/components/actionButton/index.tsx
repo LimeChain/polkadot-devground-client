@@ -8,14 +8,16 @@ interface ActionButtonProps {
   fill?: string;
   toolTip?: string;
   isLoading?: boolean;
+  disabled?: boolean;
   onClick?: () => void;
 }
 
 export const ActionButton = (props: ActionButtonProps) => {
-  const { iconName, classes, toolTip, isLoading = false, onClick } = props;
+  const { iconName, classes, toolTip, isLoading = false, disabled, onClick } = props;
 
   const button = (
     <button
+      disabled={disabled}
       onClick={onClick}
       className={cn(
         `p-2 transition-all`,
