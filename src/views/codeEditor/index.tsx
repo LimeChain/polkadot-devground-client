@@ -1,10 +1,8 @@
 import { useEventBus } from '@pivanov/event-bus';
 import {
-  useCallback,
   useRef,
   useState,
 } from 'react';
-import { toast } from 'react-hot-toast';
 import {
   Panel,
   PanelGroup,
@@ -18,26 +16,23 @@ import { Tabs } from '@components/tabs';
 import { useStoreUI } from '@stores';
 import { cn } from '@utils/helpers';
 import { useResizeObserver } from '@utils/hooks/useResizeObserver';
-import { encodeCodeToBase64 } from '@utils/iframe';
 import { SelectExample } from '@views/codeEditor/components/selectExample';
+import { useStoreCustomExamples } from 'src/stores/examples';
 
-import { ActionButton } from './components/actionButton';
 import { DebugPanel } from './components/debugPanel';
 import { Iframe } from './components/iframe';
 import { MonacoEditor } from './components/monacoEditor';
 import { EditorActions } from './components/monacoEditor/actions';
 
-import type {
-  IEventBusMonacoEditorShowPreview,
-  IEventBusMonacoEditorUpdateCode,
-} from '@custom-types/eventBus';
+import type { IEventBusMonacoEditorShowPreview } from '@custom-types/eventBus';
 
 const TypeScriptEditor = () => {
   const refContainer = useRef<HTMLDivElement>(null);
-  const refCode = useRef<string>('');
   const refTimeout = useRef<NodeJS.Timeout>();
   const refCanPreview = useRef(false);
 
+  const selectedExample = useStoreCustomExamples?.use?.selectedExample() || {};
+  const exampleDescription = selectedExample?.description;
   const [refContainerDimensions] = useResizeObserver(refContainer);
   const containerWidth = refContainerDimensions?.width;
 
@@ -47,8 +42,6 @@ const TypeScriptEditor = () => {
   ] = useState(false);
 
   const isDesktop = useStoreUI?.use?.isDesktop?.();
-
-  const theme = useStoreUI?.use?.theme?.();
 
   useEventBus<IEventBusMonacoEditorShowPreview>('@@-monaco-editor-show-preview', ({ data }) => {
     refCanPreview.current = data;
@@ -65,33 +58,6 @@ const TypeScriptEditor = () => {
     clearTimeout(refTimeout.current);
     setIsLoaded(false);
   });
-
-  useEventBus<IEventBusMonacoEditorUpdateCode>('@@-monaco-editor-update-code', ({ data }) => {
-    refCode.current = data;
-  });
-
-  const shareCode = useCallback(async () => {
-    const toastId = 'copy-to-clipboard';
-    toast.dismiss(toastId);
-
-    const encodedCode = encodeCodeToBase64(refCode.current);
-    const sharedUrl = `${window.location.origin}${window.location.pathname}/${encodedCode}`;
-
-    try {
-      await navigator.clipboard.writeText(sharedUrl);
-      toast.success((
-        <span>
-          Copied
-          {' '}
-          <strong>URL</strong>
-          {' '}
-          to clipboard
-        </span>
-      ), { id: toastId });
-    } catch (err) {
-      toast.error('Oops. Something went wrong', { id: toastId });
-    }
-  }, []);
 
   if (!isDesktop) {
     return <MobileNotAllowed />;
@@ -125,24 +91,18 @@ const TypeScriptEditor = () => {
             )}
           >
             <SelectExample />
-
             <div
               className={cn(
-                'relative z-10 flex-1',
-                {
-                  ['border border-dev-purple-300 dark:border-dev-black-800']: theme === 'light',
-                },
+                'relative z-10 flex-1 bg-dev-purple-200 dark:bg-dev-black-800',
               )}
             >
-              <EditorActions />
-
               <Tabs
                 unmountOnHide={false}
                 tabClassName={cn(
-                  'px-10 py-2.5',
+                  'px-6 py-2.5',
                 )}
                 tabsClassName={cn(
-                  'w-full py-4 pl-16',
+                  'w-full py-4 pl-8',
                   'dark:bg-dev-black-800',
                 )}
               >
@@ -153,12 +113,13 @@ const TypeScriptEditor = () => {
                   <MonacoEditor />
                 </div>
                 <div
-                  className="flex h-full p-4 dark:bg-dev-black-800"
+                  className="flex h-full px-9 py-4 dark:bg-dev-black-800"
                   data-title="Read me"
                 >
-                  Readme.md
+                  {exampleDescription || 'No description'}
                 </div>
               </Tabs>
+              <EditorActions />
             </div>
           </Panel>
           <PanelResizeHandle className="group relative top-20 w-4">
@@ -187,22 +148,8 @@ const TypeScriptEditor = () => {
               {
                 refCanPreview.current && (
                   <>
-                    <div className={cn(
-                      'flex w-full items-center justify-end gap-2 bg-dev-purple-200 p-4  dark:bg-dev-black-800',
-                      'border border-b-0 border-dev-purple-300 dark:border-dev-black-800',
-                    )}
-                    >
-                      <ActionButton
-                        iconName="icon-export"
-                      />
-                      <ActionButton
-                        iconName="icon-clipboard"
-                        onClick={shareCode}
-                        toolTip="Share"
-                      />
-                    </div>
                     <Panel
-                      className="flex border border-t-0 border-dev-purple-300 dark:border-dev-black-800"
+                      className="relative flex border border-t-0 border-dev-purple-300 dark:border-dev-black-800"
                       defaultSize={50}
                       id="right-top"
                       minSize={30}

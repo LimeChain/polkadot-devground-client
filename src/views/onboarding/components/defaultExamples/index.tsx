@@ -39,7 +39,7 @@ export const DefaultExamples = (props: DefaultExamplesProps) => {
           {filteredSnippets.map((snippet, index) => (
             <li key={index}>
               <PDLink
-                to={`/code?s=${snippet.id}`}
+                to={`/code?d=${snippet.id}`}
                 className={cn(
                   'flex w-full items-center justify-between',
                   'mt-1 px-3 py-4',

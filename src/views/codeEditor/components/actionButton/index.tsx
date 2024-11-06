@@ -4,17 +4,20 @@ import { cn } from '@utils/helpers';
 
 interface ActionButtonProps {
   iconName: string;
-  onClick?: () => void;
   classes?: string;
   fill?: string;
   toolTip?: string;
+  isLoading?: boolean;
+  disabled?: boolean;
+  onClick?: () => void;
 }
 
 export const ActionButton = (props: ActionButtonProps) => {
-  const { iconName, onClick, classes, toolTip } = props;
+  const { iconName, classes, toolTip, isLoading = false, disabled, onClick } = props;
 
   const button = (
     <button
+      disabled={disabled}
       onClick={onClick}
       className={cn(
         `p-2 transition-all`,
@@ -23,7 +26,16 @@ export const ActionButton = (props: ActionButtonProps) => {
         classes,
       )}
     >
-      <Icon name={iconName} />
+      {
+        isLoading
+          ? (
+            <Icon
+              className="animate-spin duration-1000"
+              name="icon-loader"
+            />
+          )
+          : <Icon name={iconName} />
+      }
     </button>
   );
 

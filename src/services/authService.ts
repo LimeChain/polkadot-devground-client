@@ -16,11 +16,12 @@ import type { IAuthResponse } from '@custom-types/auth';
 
 const AUTH_URL = `${SERVER_URL}/auth`;
 
-const authoriseGitHubApp = () => {
+const authorizeGitHubApp = () => {
   const githubClientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
   const githubApiUrl = import.meta.env.VITE_GITHUB_API_URL;
 
   const { pathname, search } = location;
+
   window.localStorage.setItem(
     STORAGE_AUTH_SUCCESSFUL_REDIRECT_TO,
     `${pathname}${search}`,
@@ -32,56 +33,112 @@ const authoriseGitHubApp = () => {
 };
 
 const login = async (code: string): Promise<IAuthResponse> => {
-  const response = await axios.post<IAuthResponse>(
-    `${AUTH_URL}/login`,
-    { code },
-    { withCredentials: true },
-  );
+  try {
+    const response = await axios.post<IAuthResponse>(
+      `${AUTH_URL}/login`,
+      { code },
+      { withCredentials: true },
+    );
 
-  await storageSetItem(
-    STORAGE_AUTH_CACHE_NAME,
-    STORAGE_AUTH_JWT_TOKEN,
-    response?.data?.jwtToken,
-  );
+    await storageSetItem(
+      STORAGE_AUTH_CACHE_NAME,
+      STORAGE_AUTH_JWT_TOKEN,
+      response?.data?.jwtToken,
+    );
 
-  return response.data;
+    await storageSetItem(
+      STORAGE_AUTH_CACHE_NAME,
+      'user',
+      JSON.stringify({ name: response?.data?.userName, avatar: response?.data?.userAvatar }),
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Login failed', error);
+    throw error;
+  }
 };
 
 const logout = async (): Promise<void> => {
-  await storageRemoveItem(
-    STORAGE_AUTH_CACHE_NAME,
-    STORAGE_AUTH_JWT_TOKEN,
-  );
+  try {
+    await storageRemoveItem(
+      STORAGE_AUTH_CACHE_NAME,
+      STORAGE_AUTH_JWT_TOKEN,
+    );
+
+    await storageRemoveItem(
+      STORAGE_AUTH_CACHE_NAME,
+      'user',
+    );
+
+    await axios.post<IAuthResponse>(
+      `${AUTH_URL}/logout`,
+      {},
+      { withCredentials: true },
+    );
+
+  } catch (error) {
+    console.error('Logout failed', error);
+    throw error;
+  }
 };
 
 const refreshJwtToken = async (): Promise<IAuthResponse> => {
-  const response = await axios.post<IAuthResponse>(
-    `${AUTH_URL}/refresh`,
-    {},
-    { withCredentials: true });
+  try {
+    const response = await axios.post<IAuthResponse>(
+      `${AUTH_URL}/refresh`,
+      {},
+      { withCredentials: true });
 
-  await storageSetItem(
-    STORAGE_AUTH_CACHE_NAME,
-    STORAGE_AUTH_JWT_TOKEN,
-    response?.data?.jwtToken,
-  );
+    await storageSetItem(
+      STORAGE_AUTH_CACHE_NAME,
+      STORAGE_AUTH_JWT_TOKEN,
+      response?.data?.jwtToken,
+    );
 
-  return response.data;
+    return response.data;
+  } catch (error) {
+    console.error('Token refresh failed', error);
+    throw error;
+  }
 };
 
 const getJwtToken = async (): Promise<string | null> => {
-  const jwtToken: string | null = await storageGetItem(
-    STORAGE_AUTH_CACHE_NAME,
-    STORAGE_AUTH_JWT_TOKEN,
-  );
+  try {
+    const jwtToken: string | null = await storageGetItem(
+      STORAGE_AUTH_CACHE_NAME,
+      STORAGE_AUTH_JWT_TOKEN,
+    );
 
-  return jwtToken;
+    return jwtToken;
+  } catch (error) {
+    return null;
+  }
+};
+
+const getUserData = async () => {
+  try {
+    const userData: string | null = await storageGetItem(
+      STORAGE_AUTH_CACHE_NAME,
+      'user',
+    );
+
+    if (userData === null) {
+      throw new Error('User data not found');
+    }
+
+    return JSON.parse(userData);
+  } catch (error) {
+    console.error('Failed to get user data', error);
+    throw error;
+  }
 };
 
 export default {
   login,
   refreshJwtToken,
-  authoriseGitHubApp,
+  authorizeGitHubApp,
   getJwtToken,
+  getUserData,
   logout,
 };

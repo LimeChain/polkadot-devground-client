@@ -4,55 +4,89 @@ import authService from '@services/authService';
 
 import { createSelectors } from '../createSelectors';
 
-import type { IAuthResponse } from '@custom-types/auth';
-
 interface StoreInterface {
-  jwtToken: IAuthResponse['jwtToken'];
+  user: {
+    name: string;
+    avatar: string;
+  };
+  jwtToken: string | null;
   jwtTokenIsLoading: boolean;
   actions: {
     resetStore: () => void;
     login: (gitHubCode: string) => Promise<string>;
     authorize: () => void;
-    refreshJwtToken: () => void;
-    logout: () => void;
+    refreshJwtToken: () => Promise<void>;
+    logout: () => Promise<void>;
   };
-  init: () => void;
+  init: () => Promise<void>;
 }
 
-const initialState = {
+const initialState: Omit<StoreInterface, 'actions' | 'init'> = {
+  user: {
+    name: '',
+    avatar: '',
+  },
   jwtToken: '',
-  jwtTokenIsLoading: true,
+  jwtTokenIsLoading: false,
 };
 
 const baseStore = create<StoreInterface>()((set) => ({
   ...initialState,
   actions: {
-    resetStore: () => {
-      set(initialState);
-    },
-    login: async (gitHubCode: string) => {
-      const { jwtToken } = await authService.login(gitHubCode);
-      set({ jwtToken });
+    resetStore: () => set({ ...initialState }),
 
-      return jwtToken;
+    login: async (gitHubCode: string) => {
+      try {
+        const { userName, userAvatar, jwtToken } = await authService.login(gitHubCode);
+        set({ user: { name: userName, avatar: userAvatar }, jwtToken });
+        return jwtToken;
+      } catch (error) {
+        console.error('Login failed', error);
+        throw error;
+      }
     },
+
     authorize: () => {
-      authService.authoriseGitHubApp();
+      authService.authorizeGitHubApp();
     },
 
     refreshJwtToken: async () => {
-      const { jwtToken } = await authService.refreshJwtToken();
-      set({ jwtToken });
+      try {
+        const { jwtToken } = await authService.refreshJwtToken();
+        set((state) => (state.jwtToken !== jwtToken ? { jwtToken } : state));
+      } catch (error) {
+        console.error('Token refresh failed', error);
+        throw error;
+      }
     },
 
     logout: async () => {
-      await authService.logout();
-      set({ jwtToken: '' });
+      try {
+        await authService.logout();
+        set({ ...initialState });
+      } catch (error) {
+        console.error('Logout failed', error);
+        throw error;
+      }
     },
   },
+
   init: async () => {
-    const token = await authService.getJwtToken();
-    set({ jwtToken: token || '', jwtTokenIsLoading: false });
+    try {
+      const token = await authService.getJwtToken();
+
+      if (!token) {
+        set({ jwtTokenIsLoading: false });
+        return;
+      }
+
+      const user = await authService.getUserData();
+
+      set({ jwtToken: token, user, jwtTokenIsLoading: false });
+    } catch (error) {
+      console.error('Initialization failed', error);
+      set({ jwtTokenIsLoading: false });
+    }
   },
 }));
 
