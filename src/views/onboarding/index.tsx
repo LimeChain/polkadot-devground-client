@@ -29,7 +29,7 @@ const Onboarding = () => {
   }, []);
 
   return (
-    <div className="disable-vertical-scroll grid h-screen grid-rows-[auto_1fr] justify-center">
+    <div className="disable-vertical-scroll m-auto grid w-1/2 grid-rows-[auto_1fr]">
       <h1
         className={cn(
           'pb-4',
@@ -58,16 +58,10 @@ const Onboarding = () => {
         tabsClassName="mb-10 p-1"
         unmountOnHide={false}
       >
-        <div
-          className="flex flex-col"
-          data-title="Default"
-        >
+        <div data-title="Default">
           <DefaultExamples toggleVisibility={toggleVisibility} />
         </div>
-        <div
-          className="px-16"
-          data-title="Custom"
-        >
+        <div data-title="Custom">
           <GithubExamples />
         </div>
       </Tabs>

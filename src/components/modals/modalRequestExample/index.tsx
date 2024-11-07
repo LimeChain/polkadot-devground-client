@@ -1,3 +1,13 @@
+import { sendForm } from '@emailjs/browser';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import ReCAPTCHA from 'react-google-recaptcha';
+import { toast } from 'react-hot-toast';
+
 import { cn } from '@utils/helpers';
 
 import {
@@ -5,9 +15,72 @@ import {
   Modal,
 } from '../modal';
 
-interface IModalGithubLogin extends Pick<IModal, 'onClose'> {}
+interface IModalGithubLogin extends Pick<IModal, 'onClose'> { }
+
+const publicKey = import.meta.env.VITE_EMAIL_PUBLIC_KEY;
+const serviceId = import.meta.env.VITE_EMAIL_SERVICE_ID;
+const templateId = import.meta.env.VITE_EMAIL_TEMPLATE_ID;
+const recaptchaKey = import.meta.env.VITE_RECAPTCHA_KEY;
+
+const MIN_INTERVAL = 60000; // 1 minute in milliseconds
 
 export const ModalRequestExample = ({ onClose }: IModalGithubLogin) => {
+  const formRef = useRef<HTMLFormElement>(null);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
+  const [
+    isSending,
+    setIsSending,
+  ] = useState(false);
+  const [
+    captchaVerified,
+    setCaptchaVerified,
+  ] = useState(false);
+  const [
+    lastSentTime,
+    setLastSentTime,
+  ] = useState<number | null>(null);
+
+  useEffect(() => {
+    const storedLastSentTime = localStorage.getItem('lastSentTime');
+    if (storedLastSentTime) {
+      setLastSentTime(Number(storedLastSentTime));
+    }
+  }, []);
+
+  const sendEmail = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSending(true);
+
+    if (!recaptchaRef.current?.getValue()) {
+      toast.error('Please complete the reCAPTCHA');
+      setIsSending(false);
+      return;
+    }
+
+    const now = Date.now();
+    if (lastSentTime && now - lastSentTime < MIN_INTERVAL) {
+      toast.error('You are sending emails too quickly. Please wait a moment.');
+      setIsSending(false);
+      return;
+    }
+
+    try {
+      await sendForm(serviceId, templateId, formRef.current!, publicKey);
+      toast.success('Email sent successfully');
+      setLastSentTime(now);
+      localStorage.setItem('lastSentTime', now.toString());
+      onClose();
+    } catch {
+      toast.error('Failed to send email');
+    } finally {
+      setIsSending(false);
+      recaptchaRef.current?.reset();
+      setCaptchaVerified(false);
+    }
+  }, [
+    lastSentTime,
+    onClose,
+  ]);
 
   return (
     <Modal
@@ -20,8 +93,13 @@ export const ModalRequestExample = ({ onClose }: IModalGithubLogin) => {
       )}
     >
       <h5 className="self-start font-h5-bold">Request Example</h5>
-      <div className="flex flex-col">
+      <form
+        ref={formRef}
+        className="flex flex-col"
+        onSubmit={sendEmail}
+      >
         <input
+          name="heading"
           placeholder="Enter Example Name"
           className={cn(
             'mb-6 p-4',
@@ -31,6 +109,7 @@ export const ModalRequestExample = ({ onClose }: IModalGithubLogin) => {
           )}
         />
         <textarea
+          name="message"
           placeholder="Enter Description"
           className={cn(
             'mb-6 p-4',
@@ -39,27 +118,32 @@ export const ModalRequestExample = ({ onClose }: IModalGithubLogin) => {
             'dark:border-dev-purple-700 dark:bg-transparent dark:placeholder:text-white',
           )}
         />
+        <ReCAPTCHA
+          ref={recaptchaRef}
+          className="m-auto"
+          onChange={(value) => setCaptchaVerified(!!value)}
+          sitekey={recaptchaKey}
+        />
         <button
+          disabled={isSending || !captchaVerified}
+          type="submit"
           className={cn(
             'mb-2 mt-6 p-4 transition-colors',
             'font-geist text-white font-body2-bold',
             'bg-dev-pink-500',
             'hover:bg-dev-pink-400',
+            'disabled:cursor-not-allowed disabled:opacity-50',
           )}
         >
-          Submit
+          {isSending ? 'Sending...' : 'Submit'}
         </button>
         <button
+          className={cn('p-4 font-geist transition-colors font-body2-bold hover:text-dev-white-1000')}
           onClick={onClose}
-          className={cn(
-            'p-4 transition-colors',
-            'font-geist font-body2-bold',
-            'hover:text-dev-white-1000',
-          )}
         >
           Cancel
         </button>
-      </div>
+      </form>
     </Modal>
   );
 };

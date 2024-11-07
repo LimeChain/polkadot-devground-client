@@ -31,6 +31,7 @@
     "tsc": "tsc --noEmit"
   },
   "dependencies": {
+    "@emailjs/browser": "4.4.1",
     "@pivanov/event-bus": "1.0.0",
     "@pivanov/use-toggle-visibility": "0.0.1",
     "@polkadot-api/descriptors": "file:.papi/descriptors",
@@ -63,6 +64,7 @@
     "prismjs": "1.29.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
+    "react-google-recaptcha": "3.1.0",
     "react-helmet-async": "2.0.5",
     "react-hot-toast": "2.4.1",
     "react-resizable-panels": "2.0.19",
@@ -84,6 +86,7 @@
     "@types/prismjs": "1.26.4",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
+    "@types/react-google-recaptcha": "2.1.9",
     "@types/react-router-dom": "5.3.3",
     "@typescript-eslint/eslint-plugin": "7.14.1",
     "@typescript-eslint/parser": "7.13.1",
