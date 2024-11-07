@@ -6,6 +6,7 @@ import {
 import { useParams } from 'react-router-dom';
 
 import { Icon } from '@components/icon';
+import { Loader } from '@components/loader';
 import { PageHeader } from '@components/pageHeader';
 import { PDLink } from '@components/pdLink';
 import { useStoreChain } from '@stores';
@@ -85,7 +86,7 @@ const BlockDetails = () => {
   ]);
 
   if (!blockData) {
-    return 'Loading...';
+    return <Loader />;
   }
 
   return (
