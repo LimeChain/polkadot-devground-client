@@ -5,7 +5,7 @@ import {
   useState,
 } from 'react';
 
-import { ModalRequestExample } from '@components/modals/modalRequestExample';
+import { ModalSendMail } from '@components/modals/modalSendMail';
 import { PDLink } from '@components/pdLink';
 import { Tabs } from '@components/tabs';
 import { cn } from '@utils/helpers';
@@ -14,9 +14,9 @@ import { GithubExamples } from '@views/onboarding/components/githubExamples';
 
 const Onboarding = () => {
   const [
-    RequestExampleModal,
+    SendMailModal,
     toggleVisibility,
-  ] = useToggleVisibility(ModalRequestExample);
+  ] = useToggleVisibility(ModalSendMail);
 
   const refContainer = useRef<HTMLDivElement | null>(null);
   const [
@@ -43,9 +43,11 @@ const Onboarding = () => {
       <PDLink
         to="/code"
         className={cn(
+          'cursor-pointer',
           'absolute right-20 top-0',
           'mt-1 px-3 py-4',
           'font-geist font-body1-bold',
+          'duration-200 hover:text-dev-pink-500',
         )}
       >
         Skip
@@ -65,7 +67,10 @@ const Onboarding = () => {
           <GithubExamples />
         </div>
       </Tabs>
-      <RequestExampleModal onClose={toggleVisibility} />
+      <SendMailModal
+        onClose={toggleVisibility}
+        title="Request Example"
+      />
     </div>
   );
 };

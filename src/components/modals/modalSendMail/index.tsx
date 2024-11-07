@@ -5,9 +5,11 @@ import {
   useRef,
   useState,
 } from 'react';
+// eslint-disable-next-line import/no-named-as-default
 import ReCAPTCHA from 'react-google-recaptcha';
 import { toast } from 'react-hot-toast';
 
+import { Icon } from '@components/icon';
 import { cn } from '@utils/helpers';
 
 import {
@@ -15,7 +17,9 @@ import {
   Modal,
 } from '../modal';
 
-interface IModalGithubLogin extends Pick<IModal, 'onClose'> { }
+interface IModalGithubLogin extends Pick<IModal, 'onClose'> {
+  title: string;
+}
 
 const publicKey = import.meta.env.VITE_EMAIL_PUBLIC_KEY;
 const serviceId = import.meta.env.VITE_EMAIL_SERVICE_ID;
@@ -24,7 +28,7 @@ const recaptchaKey = import.meta.env.VITE_RECAPTCHA_KEY;
 
 const MIN_INTERVAL = 60000; // 1 minute in milliseconds
 
-export const ModalRequestExample = ({ onClose }: IModalGithubLogin) => {
+export const ModalSendMail = ({ title, onClose }: IModalGithubLogin) => {
   const formRef = useRef<HTMLFormElement>(null);
   const recaptchaRef = useRef<ReCAPTCHA>(null);
   const [
@@ -82,6 +86,10 @@ export const ModalRequestExample = ({ onClose }: IModalGithubLogin) => {
     onClose,
   ]);
 
+  const onCaptchaChange = useCallback((value: string | null) => {
+    setCaptchaVerified(!!value);
+  }, []);
+
   return (
     <Modal
       onClose={onClose}
@@ -92,7 +100,7 @@ export const ModalRequestExample = ({ onClose }: IModalGithubLogin) => {
         'dark:border-dev-purple-700',
       )}
     >
-      <h5 className="self-start font-h5-bold">Request Example</h5>
+      <h5 className="self-start font-h5-bold">{title}</h5>
       <form
         ref={formRef}
         className="flex flex-col"
@@ -100,7 +108,7 @@ export const ModalRequestExample = ({ onClose }: IModalGithubLogin) => {
       >
         <input
           name="heading"
-          placeholder="Enter Example Name"
+          placeholder="Title"
           className={cn(
             'mb-6 p-4',
             'border border-dev-white-900',
@@ -110,7 +118,7 @@ export const ModalRequestExample = ({ onClose }: IModalGithubLogin) => {
         />
         <textarea
           name="message"
-          placeholder="Enter Description"
+          placeholder="Content"
           className={cn(
             'mb-6 p-4',
             'border border-dev-white-900',
@@ -121,13 +129,14 @@ export const ModalRequestExample = ({ onClose }: IModalGithubLogin) => {
         <ReCAPTCHA
           ref={recaptchaRef}
           className="m-auto"
-          onChange={(value) => setCaptchaVerified(!!value)}
+          onChange={onCaptchaChange}
           sitekey={recaptchaKey}
         />
         <button
           disabled={isSending || !captchaVerified}
           type="submit"
           className={cn(
+            'flex justify-center',
             'mb-2 mt-6 p-4 transition-colors',
             'font-geist text-white font-body2-bold',
             'bg-dev-pink-500',
@@ -135,7 +144,16 @@ export const ModalRequestExample = ({ onClose }: IModalGithubLogin) => {
             'disabled:cursor-not-allowed disabled:opacity-50',
           )}
         >
-          {isSending ? 'Sending...' : 'Submit'}
+          {
+            isSending
+              ? (
+                <Icon
+                  className="animate-spin"
+                  name="icon-loader"
+                />
+              )
+              : 'Submit'
+          }
         </button>
         <button
           className={cn('p-4 font-geist transition-colors font-body2-bold hover:text-dev-white-1000')}
