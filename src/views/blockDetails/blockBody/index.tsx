@@ -9,6 +9,7 @@ import {
 import { Icon } from '@components/icon';
 import { ModalJSONViewer } from '@components/modals/modalJSONViewer';
 import { Tabs } from '@components/tabs';
+import { ToolTip } from '@components/tooltTip';
 import { cn } from '@utils/helpers';
 
 import type {
@@ -157,11 +158,15 @@ export const BlockBody = (props: BlockBodyProps) => {
                         )
                       </td>
                       <td>
-                        <Icon
-                          className="text-dev-black-1000 dark:text-dev-purple-50"
-                          name="icon-dropdownArrow"
-                          size={[18]}
-                        />
+                        <ToolTip text="Expand the view">
+                          <span className="inline-flex">
+                            <Icon
+                              className="text-dev-black-1000 dark:text-dev-purple-50"
+                              name="icon-expand"
+                              size={[18]}
+                            />
+                          </span>
+                        </ToolTip>
                       </td>
                     </tr>
                   );
@@ -232,11 +237,15 @@ export const BlockBody = (props: BlockBodyProps) => {
                     </td>
                     <td>{event.phase.type}</td>
                     <td>
-                      <Icon
-                        className="text-dev-black-1000 dark:text-dev-purple-50"
-                        name="icon-dropdownArrow"
-                        size={[18]}
-                      />
+                      <ToolTip text="Expand the view">
+                        <span className="inline-flex">
+                          <Icon
+                            className="text-dev-black-1000 dark:text-dev-purple-50"
+                            name="icon-expand"
+                            size={[18]}
+                          />
+                        </span>
+                      </ToolTip>
                     </td>
                   </tr>
                 ))

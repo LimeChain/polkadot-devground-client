@@ -214,13 +214,10 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
                                 />
                               )
                             }
-                            <div className="truncate">
-                              {item.blockHash}
-                            </div>
-
                             <CopyToClipboard
                               className="hover:text-dev-dev-purple-50"
                               text={item.blockHash}
+                              textClassName="truncate cursor-pointer"
                               toastMessage="Block Hash"
                             >
                               {

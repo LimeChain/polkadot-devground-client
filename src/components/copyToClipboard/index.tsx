@@ -24,6 +24,7 @@ interface ICopyToClipboardProps {
   showToast?: boolean;
   className?: string;
   iconSize?: number;
+  textClassName?: string;
 }
 
 export const CopyToClipboard = memo((props: ICopyToClipboardProps) => {
@@ -35,6 +36,7 @@ export const CopyToClipboard = memo((props: ICopyToClipboardProps) => {
     onCopy,
     className,
     iconSize = 16,
+    textClassName,
   } = props;
 
   const refTimeout = useRef<NodeJS.Timeout>();
@@ -122,8 +124,20 @@ export const CopyToClipboard = memo((props: ICopyToClipboardProps) => {
     isCopied,
   ]);
 
-  return children({
-    ClipboardIcon,
-    onClick: copyToClipboard,
-  });
+  return (
+    <div className="flex w-full items-center gap-x-2">
+      {text && (
+        <p
+          className={textClassName}
+          onClick={copyToClipboard}
+        >
+          {text}
+        </p>
+      )}
+      {children({
+        ClipboardIcon,
+        onClick: copyToClipboard,
+      })}
+    </div>
+  );
 });
