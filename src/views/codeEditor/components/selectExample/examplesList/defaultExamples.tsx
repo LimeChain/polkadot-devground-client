@@ -42,7 +42,7 @@ export const DefaultExamplesList = (props: DefaultExamplesListProps) => {
     >
       <ul className="max-h-56 ">
         {
-          snippets?.map((example) => (
+          snippets?.slice(1).map((example) => (
             <li
               key={example.id}
               className={cn(

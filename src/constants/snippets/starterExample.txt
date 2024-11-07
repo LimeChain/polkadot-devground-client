@@ -1,0 +1,70 @@
+import { createRoot } from "react-dom/client";
+import { chainSpec } from "polkadot-api/chains/westend2";
+import { westend } from "@polkadot-api/descriptors";
+import { getSmProvider } from "polkadot-api/sm-provider";
+import { createClient } from "polkadot-api";
+import { start } from "polkadot-api/smoldot";
+import { useState } from "react";
+
+const App = () => {
+  // State variables to hold metadata, error messages, and loading state
+  const [metadata, setMetadata] = useState<string | null>(null); // Holds fetched metadata
+  const [error, setError] = useState<string | null>(null); // Holds error messages
+  const [loading, setLoading] = useState<boolean>(false); // Holds the loading state
+
+  // Function to handle fetching metadata
+  const handleFetchMetadata = async () => {
+    setError(null); // Reset error state before new fetch
+    setLoading(true); // Set loading state to true when starting the fetch
+
+    try {
+      const smoldot = start(); // Start a Smoldot instance
+      const chain = await smoldot.addChain({ chainSpec }); // Add the Westend chain
+      const provider = getSmProvider(chain); // Get the provider for the chain
+      const client = createClient(provider); // Create a client for the blockchain
+      const api = client.getTypedApi(westend); // Get the typed API for the Westend network
+
+      const metadataResult = await api.apis.Metadata.metadata(); // Fetch metadata from the blockchain
+      setMetadata(metadataResult.asHex().slice(0, 32) + "..."); // Update state with the first 32 characters of metadata
+    } catch (error) {
+      setError(error.message); // Update error state if an error occurs during fetching
+    } finally {
+      setLoading(false); // Set loading state to false once the fetching is done
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+      <h1 className="text-2xl font-bold mb-4">Fetch Polkadot Metadata</h1>
+      <button
+        onClick={handleFetchMetadata}
+        className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600"
+      >
+        Fetch Metadata
+      </button>
+
+      {/* Show loading spinner when fetching data */}
+      {loading && (
+        <div className="mt-4 text-lg font-semibold text-blue-600">Loading...</div>
+      )}
+
+      {/* Show metadata if it exists */}
+      {metadata && !loading && (
+        <div className="mt-4 p-4 bg-green-100 rounded shadow">
+          <h2 className="font-semibold">Metadata:</h2>
+          <p className="break-all">{metadata}</p>
+        </div>
+      )}
+
+      {/* Show error message if an error occurred */}
+      {error && !loading && (
+        <div className="mt-4 p-4 bg-red-100 rounded shadow">
+          <h2 className="font-semibold text-red-700">Error:</h2>
+          <p>{error}</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+createRoot(document.getElementById("root")!).render(<App />);
