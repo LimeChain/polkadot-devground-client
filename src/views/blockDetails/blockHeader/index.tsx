@@ -39,18 +39,25 @@ const DetailRow = (props: DetailRowProps) => {
           <CopyToClipboard
             className="relative flex items-center"
             text={value}
-            textClassName="cursor-pointer peer"
             toastMessage={label}
           >
-            {({ ClipboardIcon }) => (
-              <div
-                className={cn(
-                  'transition-opacity duration-200 ease-in-out',
-                  'opacity-100 md:opacity-0',
-                  'group-hover:opacity-100 peer-hover:text-dev-pink-400 md:group-hover:opacity-100',
-                )}
-              >
-                {ClipboardIcon}
+            {({ ClipboardIcon, text, onClick }) => (
+              <div className="flex items-center gap-x-2">
+                <p
+                  className="peer cursor-pointer"
+                  onClick={onClick}
+                >
+                  {text}
+                </p>
+                <div
+                  className={cn(
+                    'transition-opacity duration-200 ease-in-out',
+                    'opacity-100 md:opacity-0',
+                    'group-hover:opacity-100 peer-hover:text-dev-pink-400 md:group-hover:opacity-100',
+                  )}
+                >
+                  {ClipboardIcon}
+                </div>
               </div>
             )}
           </CopyToClipboard>

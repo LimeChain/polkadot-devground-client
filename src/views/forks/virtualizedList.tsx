@@ -217,11 +217,16 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
                             <CopyToClipboard
                               className="hover:text-dev-dev-purple-50"
                               text={item.blockHash}
-                              textClassName="truncate cursor-pointer"
                               toastMessage="Block Hash"
                             >
-                              {
-                                ({ ClipboardIcon }) => (
+                              {({ ClipboardIcon, text, onClick }) => (
+                                <div className="flex items-center gap-x-2 overflow-hidden">
+                                  <p
+                                    className="cursor-pointer truncate"
+                                    onClick={onClick}
+                                  >
+                                    {text}
+                                  </p>
                                   <div
                                     className={cn(
                                       'ml-auto flex items-center justify-center rounded-full dark:bg-dev-green-600/30',
@@ -229,8 +234,8 @@ export const VirtualizedList = (props: IVirtualizedListProps) => {
                                   >
                                     {ClipboardIcon}
                                   </div>
-                                )
-                              }
+                                </div>
+                              )}
                             </CopyToClipboard>
                           </div>
                         </Fragment>
