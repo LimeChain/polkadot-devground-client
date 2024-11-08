@@ -207,7 +207,7 @@ export const getBlockDetailsWithRawClient = async ({
   try {
     events = storageCodec.dec(storageValue) as Awaited<ReturnType<typeof getSystemEvents>>;
   } catch (error) {
-    console.log('Could not decode storage value');
+    console.log('Could not decode storage value!');
   }
 
   // Initialize timestamp variable
