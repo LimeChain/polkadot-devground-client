@@ -1,0 +1,50 @@
+// `dot` is the name we gave to `npx papi add`
+import {
+  dot,
+  kusama,
+  XcmVersionedMultiLocation,
+  XcmVersionedXcm,
+  XcmV2Instruction,
+  XcmV2MultilocationJunctions,
+} from "@polkadot-api/descriptors";
+import {
+  connectInjectedExtension,
+  getInjectedExtensions,
+  type PolkadotSigner,
+} from "polkadot-api/pjs-signer";
+import { createClient } from "polkadot-api";
+import { getSmProvider } from "polkadot-api/sm-provider";
+import { chainSpec } from "polkadot-api/chains/polkadot";
+import { chainSpec as kusamaspec } from "polkadot-api/chains/ksmcc3";
+import { startFromWorker } from "polkadot-api/smoldot/from-worker";
+import { start } from "polkadot-api/smoldot";
+
+// START SMOLDOT AND CREATE A CHAIN CLIENT
+const smoldot = start();
+const polkadotChain = await smoldot.addChain({ chainSpec });
+const polkadotProvider = getSmProvider(polkadotChain);
+const polkadotClient = createClient(polkadotProvider);
+const polkadotApi = polkadotClient.getTypedApi(dot);
+
+const kusamaChain = await smoldot.addChain({ chainSpec: kusamaspec });
+const kusamaProvider = getSmProvider(kusamaChain);
+const kusamaClient = createClient(kusamaProvider);
+const kusamaApi = kusamaClient.getTypedApi(kusama);
+
+// GET A SIGNER FROM AN INJECTED EXTENSION
+const extensions = getInjectedExtensions() || [];
+const selectedExtension = await connectInjectedExtension(extensions[0]);
+const accounts = selectedExtension.getAccounts();
+const signer = accounts[0].polkadotSigner;
+
+const xcmSendTx = polkadotApi.tx.XcmPallet.send({
+  dest: XcmVersionedLocation.V2({
+    parents: 0,
+    interior: XcmV2MultilocationJunctions.Here(),
+  }),
+  message: XcmVersionedXcm.V2([XcmV2Instruction.ClearOrigin()]),
+});
+
+const encodedData = await xcmSendTx.getEncodedData();
+
+const finalizedCall = await xcmSendTx.signAndSubmit(signer);

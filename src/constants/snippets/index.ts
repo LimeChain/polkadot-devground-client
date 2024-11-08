@@ -4,6 +4,7 @@ import InjectedAccountTransferSnippet from './injectedAccountTransfer.txt?raw';
 import ChainSubscriptionSnippet from './chainSubscription.txt?raw';
 import GetChainSpecificDataSnippet from './getChainSpecificData.txt?raw';
 import StarterExample from './starterExample.txt?raw';
+import XcmTransfer from './xcmTransfer.txt?raw';
 /* eslint-enable */
 
 import type { ICodeExample } from '@custom-types/codeSnippet';
@@ -43,10 +44,18 @@ const snippet5: ICodeExample = {
   code: TestAccountTransferSnippet,
 };
 
+const snippet6: ICodeExample = {
+  id: '6',
+  name: 'XCM transfer',
+  description: 'This snippet demonstrates how to XCM token transfer ',
+  code: XcmTransfer,
+};
+
 export const snippets = [
   snippet1,
   snippet2,
   snippet3,
   snippet4,
   snippet5,
+  snippet6,
 ];
