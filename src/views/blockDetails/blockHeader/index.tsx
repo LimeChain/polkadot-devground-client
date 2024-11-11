@@ -9,6 +9,7 @@ import { CopyToClipboard } from '@components/copyToClipboard';
 import { Icon } from '@components/icon';
 import { ToggleButton } from '@components/toggleButton';
 import { useStoreChain } from '@stores';
+import { cn } from '@utils/helpers';
 
 import styles from '../styles.module.css';
 
@@ -22,22 +23,43 @@ interface DetailRowProps {
   label: string;
   value: string | undefined;
   isCopyable?: boolean;
+  iconComponent?: React.ReactNode;
 }
 
 const DetailRow = (props: DetailRowProps) => {
-  const { label, value } = props;
+  const { label, value, iconComponent } = props;
 
   return (
-    <div className={styles['pd-block-details']}>
+    <div className={cn(styles['pd-block-details'], 'group')}>
       <p>{label}</p>
       <div className="flex items-center gap-x-1">
-        <p>{value}</p>
+        {iconComponent && <span className="mr-2">{iconComponent}</span>}
+
         {value && (
           <CopyToClipboard
+            className="relative flex items-center"
             text={value}
             toastMessage={label}
           >
-            {({ ClipboardIcon }) => <>{ClipboardIcon}</>}
+            {({ ClipboardIcon, text, onClick }) => (
+              <div className="flex items-center gap-x-2">
+                <p
+                  className="peer cursor-pointer"
+                  onClick={onClick}
+                >
+                  {text}
+                </p>
+                <div
+                  className={cn(
+                    'transition-opacity duration-200 ease-in-out',
+                    'opacity-100 md:opacity-0',
+                    'group-hover:opacity-100 peer-hover:text-dev-pink-400 md:group-hover:opacity-100',
+                  )}
+                >
+                  {ClipboardIcon}
+                </div>
+              </div>
+            )}
           </CopyToClipboard>
         )}
       </div>
@@ -67,12 +89,22 @@ export const BlockHeader = (props: BlockHeaderProps) => {
       <div className={styles['pd-block-details']}>
         <p>Time stamp</p>
         <div className="flex items-center gap-x-2">
-          <span>{formattedTimestamp}</span>
+          <button
+            className="cursor-pointer"
+            onClick={handleSetCheck}
+          >
+            {formattedTimestamp}
+          </button>
           <ToggleButton
             handleSetCheck={handleSetCheck}
             isChecked={isUTC}
           />
-          <span>UTC</span>
+          <button
+            className="cursor-pointer"
+            onClick={handleSetCheck}
+          >
+            UTC
+          </button>
         </div>
       </div>
       <div className={styles['pd-block-details']}>
@@ -103,28 +135,17 @@ export const BlockHeader = (props: BlockHeaderProps) => {
         value={headerData.extrinsicRoot}
       />
       {headerData.identity && (
-        <div className={styles['pd-block-details']}>
-          <p>Validator</p>
-          <div className={styles['validator']}>
+        <DetailRow
+          label="Validator"
+          value={headerData.identity.address}
+          iconComponent={(
             <Identicon
               size={32}
               theme="polkadot"
               value={headerData.identity.address}
             />
-            <span>
-              {headerData.identity.name}
-              <div className="flex items-center gap-x-2">
-                <span>{headerData.identity.address}</span>
-                <CopyToClipboard
-                  text={headerData.identity.address || ''}
-                  toastMessage="Validator Address"
-                >
-                  {({ ClipboardIcon }) => <>{ClipboardIcon}</>}
-                </CopyToClipboard>
-              </div>
-            </span>
-          </div>
-        </div>
+          )}
+        />
       )}
       <DetailRow
         label="Spec Version"

@@ -19,7 +19,7 @@ import type {
 interface ICopyToClipboardProps {
   text: string;
   toastMessage?: string;
-  children: (props: { ClipboardIcon: ReactNode; onClick: (e: React.MouseEvent) => void }) => ReactElement;
+  children: (props: { ClipboardIcon: ReactNode; onClick: (e: React.MouseEvent) => void; text: string }) => ReactElement;
   onCopy?: (success: boolean, text: string) => void;
   showToast?: boolean;
   className?: string;
@@ -122,8 +122,13 @@ export const CopyToClipboard = memo((props: ICopyToClipboardProps) => {
     isCopied,
   ]);
 
-  return children({
-    ClipboardIcon,
-    onClick: copyToClipboard,
-  });
+  return (
+    <>
+      {children({
+        ClipboardIcon,
+        onClick: copyToClipboard,
+        text,
+      })}
+    </>
+  );
 });
