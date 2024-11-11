@@ -10,12 +10,7 @@ import { snippets } from '@constants/snippets';
 import { cn } from '@utils/helpers';
 import { Search } from '@views/onboarding/components/search';
 
-interface DefaultExamplesProps {
-  toggleVisibility: () => void;
-}
-
-export const DefaultExamples = (props: DefaultExamplesProps) => {
-  const { toggleVisibility } = props;
+export const DefaultExamples = () => {
   const [
     filteredSnippets,
     setFilteredSnippets,
@@ -57,12 +52,6 @@ export const DefaultExamples = (props: DefaultExamplesProps) => {
           ))}
         </ul>
       </PDScrollArea>
-      <button
-        className={cn('mt-10 w-full text-center font-body1-regular')}
-        onClick={toggleVisibility}
-      >
-        Have any ideas about Example? Request example here.
-      </button>
     </>
   );
 };

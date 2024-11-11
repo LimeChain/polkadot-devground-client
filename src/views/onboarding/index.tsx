@@ -1,11 +1,9 @@
-import { useToggleVisibility } from '@pivanov/use-toggle-visibility';
 import {
   useEffect,
   useRef,
   useState,
 } from 'react';
 
-import { ModalSendMail } from '@components/modals/modalSendMail';
 import { PDLink } from '@components/pdLink';
 import { Tabs } from '@components/tabs';
 import { cn } from '@utils/helpers';
@@ -13,11 +11,6 @@ import { DefaultExamples } from '@views/onboarding/components/defaultExamples';
 import { GithubExamples } from '@views/onboarding/components/githubExamples';
 
 const Onboarding = () => {
-  const [
-    SendMailModal,
-    toggleVisibility,
-  ] = useToggleVisibility(ModalSendMail);
-
   const refContainer = useRef<HTMLDivElement | null>(null);
   const [
     initialTab,
@@ -61,16 +54,12 @@ const Onboarding = () => {
         unmountOnHide={false}
       >
         <div data-title="Default">
-          <DefaultExamples toggleVisibility={toggleVisibility} />
+          <DefaultExamples />
         </div>
         <div data-title="Custom">
           <GithubExamples />
         </div>
       </Tabs>
-      <SendMailModal
-        onClose={toggleVisibility}
-        title="Request Example"
-      />
     </div>
   );
 };
