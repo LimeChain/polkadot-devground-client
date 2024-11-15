@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script async src="https://unpkg.com/es-module-shims/dist/es-module-shims.wasm.js"></script>
+    <script>
+      window.injectedWeb3 = window.parent.injectedWeb3;
+
+      const customPackages = window.parent.customPackages;
+      for (const key in customPackages) {
+        if (customPackages.hasOwnProperty(key)) {
+          Object.defineProperty(globalThis, key, {
+            value: customPackages[key],
+            writable: false,
+            configurable: false,
+            enumerable: true,
+          });
+        }
+      }
+
+    </script>
+    <script>
+      class CustomLogger {
+        constructor() {
+          this.webSockets = new Set();
+          this.fetchControllers = new Set();
+        }
+
+        log(...args) {
+          this._logMessage('log', ...args);
+        }
+
+        info(...args) {
+          this._logMessage('info', ...args);
+        }
+
+        warn(...args) {
+          this._logMessage('warn', ...args);
+        }
+
+        error(...args) {
+          this._logMessage('error', ...args);
+        }
+
+        _logMessage(type, ...args) {
+          const serializedArgs = args.map(arg => {
+            if (typeof arg === "bigint") {
+              return arg.toString();
+            }
+            if (typeof arg === 'object') {
+              try {
+                return JSON.stringify(arg, (key, value) => {
+                  return typeof value === 'bigint' ? value.toString() : value;
+                });
+              } catch (e) {
+                return '[Object]';
+              }
+            }
+            return arg;
+          });
+          window.parent.postMessage({ type: 'customLog', args: serializedArgs }, '*');
+        }
+      }
+
+      const logger = new CustomLogger();
+      console.log = (...args) => {
+        logger.log(...args);
+      };
+
+      console.info = (...args) => {
+        logger.info(...args);
+      };
+
+      console.warn = (...args) => {
+        const filteredArgs = args.filter(arg => typeof arg !== 'string' || !arg.includes('tailwind'));
+        if (filteredArgs.length > 0) {
+          logger.warn(...filteredArgs);
+        }
+      };
+
+      console.error = (...args) => {
+        logger.error(...args);
+      };
+    </script>
+    <script type="importmap">
+      <!-- IMPORT_MAP -->
+    </script>
+    <script>
+      window.onerror = function (msg, url, lineNo, columnNo, error) {
+        var title = 'Error ocurred.'
+        var content = `<div class="p-3"><h3 class="text-red-500 text-sm">${title}</h3><pre class="text-sm">${error.toString()}</pre></div>`
+        document.getElementById('root').innerHTML = content;
+        console.log(error.toString());
+        return true;
+      }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      html, body {
+        margin: 0;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" class="size-full"></div>
+    <script type="module">
+      <!-- SCRIPT -->
+    </script>
+    <script>
+      if (!window.injectedWeb3) {
+        throw new Error('Injected Web3 not found');
+      }
+    </script>
+  </body>
+</html>

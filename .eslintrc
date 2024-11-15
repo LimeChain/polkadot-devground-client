@@ -1,0 +1,339 @@
+{
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "plugin:tailwindcss/recommended"
+  ],
+  "ignorePatterns": [
+    "setupTests.ts",
+    "serviceWorker.ts",
+    "node_modules/**",
+    "coverage/**",
+    "dist",
+    "**/*.js",
+    "**/*.json",
+    "src/constants/snippets/*.tsx"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "sourceType": "module",
+    "project": "./tsconfig.json",
+    "ecmaVersion": 2020,
+    "ecmaFeatures": {
+      "modules": true,
+      "jsx": true
+    }
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "@stylistic",
+    "@stylistic/jsx",
+    "eslint-plugin-react",
+    "eslint-plugin-prefer-arrow",
+    "filenames",
+    "import",
+    "import-newlines",
+    "unused-imports",
+    "react",
+    "react-hooks"
+  ],
+  "rules": {
+    "@stylistic/array-bracket-newline": [
+      "error",
+      {
+        "multiline": true
+      }
+    ],
+    "@stylistic/array-element-newline": "error",
+    "@stylistic/arrow-parens": [
+      "error",
+      "always"
+    ],
+    "@stylistic/no-mixed-operators": "error",
+    "@stylistic/jsx/jsx-one-expression-per-line": [
+      "error",
+      {
+        "allow": "single-child"
+      }
+    ],
+    "@stylistic/jsx/jsx-child-element-spacing": "error",
+    "@stylistic/jsx/jsx-sort-props": [
+      "error",
+      {
+        "callbacksLast": false,
+        "shorthandLast": true,
+        "multiline": "last",
+        "ignoreCase": true,
+        "noSortAlphabetically": false,
+        "reservedFirst": true
+      }
+    ],
+    "@stylistic/multiline-ternary": [
+      "error",
+      "always-multiline"
+    ],
+    "@stylistic/jsx/jsx-closing-bracket-location": [
+      1,
+      "line-aligned"
+    ],
+    "@stylistic/jsx/jsx-closing-tag-location": "error",
+    "@stylistic/jsx/jsx-first-prop-new-line": [
+      "error",
+      "multiline-multiprop"
+    ],
+    "@stylistic/jsx/jsx-max-props-per-line": [
+      "error",
+      {
+        "maximum": 1,
+        "when": "always"
+      }
+    ],
+    "@stylistic/jsx/jsx-wrap-multilines": [
+      "error",
+      {
+        "declaration": "parens-new-line",
+        "assignment": "parens-new-line",
+        "return": "parens-new-line",
+        "arrow": "parens-new-line",
+        "condition": "parens-new-line",
+        "logical": "parens-new-line",
+        "prop": "parens-new-line"
+      }
+    ],
+    "@stylistic/indent": [
+      "error",
+      2,
+      {
+        "SwitchCase": 1
+      }
+    ],
+    "@stylistic/array-bracket-spacing": [
+      "error",
+      "never"
+    ],
+    "@stylistic/arrow-spacing": "error",
+    "@stylistic/brace-style": [
+      "error",
+      "1tbs",
+      {
+        "allowSingleLine": false
+      }
+    ],
+    "@stylistic/comma-dangle": [
+      "error",
+      "always-multiline"
+    ],
+    "@stylistic/comma-spacing": "error",
+    "@stylistic/comma-style": "error",
+    "@stylistic/dot-location": [
+      "error",
+      "property"
+    ],
+    "@stylistic/member-delimiter-style": "error",
+    "@stylistic/semi": "error",
+    "@stylistic/key-spacing": [
+      "error",
+      {
+        "afterColon": true,
+        "beforeColon": false,
+        "mode": "strict"
+      }
+    ],
+    "@stylistic/keyword-spacing": "error",
+    "@stylistic/semi-spacing": "error",
+    "@stylistic/space-in-parens": [
+      "error",
+      "never"
+    ],
+    "@stylistic/space-infix-ops": "error",
+    "@stylistic/no-multiple-empty-lines": [
+      "error",
+      {
+        "max": 1,
+        "maxBOF": 0,
+        "maxEOF": 1
+      }
+    ],
+    "@stylistic/no-whitespace-before-property": "error",
+    "@stylistic/object-curly-spacing": [
+      "error",
+      "always"
+    ],
+    "@stylistic/operator-linebreak": [
+      "error",
+      "before",
+      {
+        "overrides": {
+          "+=": "ignore",
+          "+": "ignore",
+          "=": "ignore"
+        }
+      }
+    ],
+    "filenames/match-regex": [
+      "error",
+      "^[a-z][a-zA-Z0-9_.-]*$",
+      {
+        "ignoreExtensions": true,
+        "caseSensitive": true
+      }
+    ],
+    "jsx-quotes": [
+      "error",
+      "prefer-double"
+    ],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "error",
+    "react/jsx-boolean-value": "error",
+    "react/jsx-key": "error",
+    "react/jsx-no-bind": "error",
+    "react/jsx-no-duplicate-props": "error",
+    "react/self-closing-comp": "error",
+    "react/no-danger-with-children": "error",
+    "@typescript-eslint/consistent-type-imports": "error",
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/no-empty-object-type": "off",
+    "@typescript-eslint/no-empty-interface": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-unused-vars": "error",
+    "import-newlines/enforce": [
+      "error",
+      {
+        "items": 1,
+        "semi": false
+      }
+    ],
+    "unused-imports/no-unused-imports": "error",
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          "unknown",
+          "parent",
+          "sibling",
+          "index",
+          "object",
+          "type"
+        ],
+        "pathGroups": [
+          {
+            "pattern": "@/**",
+            "group": "internal",
+            "position": "after"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": [
+          "builtin"
+        ],
+        "newlines-between": "always",
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        }
+      }
+    ],
+    "import/no-unresolved": [
+      "error",
+      {
+        "ignore": [
+          "^virtual:"
+        ]
+      }
+    ],
+    "no-unneeded-ternary": "error",
+    "no-extra-boolean-cast": "off",
+    "no-prototype-builtins": "off",
+    "no-unused-vars": [
+      "error",
+      {
+        "ignoreRestSiblings": true,
+        "argsIgnorePattern": "^_",
+        "destructuredArrayIgnorePattern": "[A-Z]",
+        "caughtErrors": "none"
+      }
+    ],
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "react",
+            "importNames": [
+              "MouseEvent"
+            ],
+            "message": "Please do not import MouseEvent from react. Use React.MouseEvent instead."
+          }
+        ]
+      }
+    ],
+    "no-duplicate-case": "error",
+    "no-param-reassign": "error",
+    "no-unreachable-loop": "error",
+    "object-shorthand": "error",
+    "prefer-arrow/prefer-arrow-functions": [
+      "warn",
+      {
+        "disallowPrototype": true,
+        "singleReturnOnly": false,
+        "classPropertiesAllowed": false
+      }
+    ],
+    "semi": "off",
+    "sort-imports": [
+      "error",
+      {
+        "ignoreCase": true,
+        "ignoreDeclarationSort": true
+      }
+    ],
+    "tailwindcss/no-custom-classname": "off",
+    "tailwindcss/classnames-order": [
+      "warn",
+      {
+        "callees": [
+          "cn"
+        ],
+        "officialSorting": true,
+        "removeDuplicates": true,
+        "configPath": "tailwind.config"
+      }
+    ],
+    "quotes": [
+      "error",
+      "single",
+      {
+        "allowTemplateLiterals": true
+      }
+    ]
+  },
+  "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [
+        ".js",
+        ".jsx",
+        ".ts",
+        ".tsx",
+        ".txt"
+      ]
+    },
+    "import/resolver": {
+      "typescript": {
+        "project": [
+          "./tsconfig.json"
+        ]
+      }
+    }
+  }
+}

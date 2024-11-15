@@ -1,0 +1,27 @@
+.pd-block-details {
+  @apply md:grid-cols-[theme(width.56)_1fr] font-geist grid;
+  @apply border-b border-dev-white-600 dark:border-dev-black-900;
+  @apply hover:bg-dev-purple-100 dark:hover:bg-dev-purple-900;
+  @apply transition-[background] duration-300;
+  @apply pb-2 sm:pb-0;
+
+  > p {
+    @apply font-body2-bold py-2;
+  }
+
+  > div {
+    @apply gap-2 font-body2-bold font-geist pb-2;
+  }
+
+  > p,
+  > div {
+    @apply flex items-center;
+    @apply px-4 break-all sm:pl-6 sm:py-4;
+  }
+}
+
+.pd-link-btn {
+  @apply flex font-body2-bold items-center gap-1 font-geist;
+  @apply font-body2-bold font-geist;
+  @apply hover:text-dev-black-500 hover:dark:text-dev-purple-200 ease-out duration-300;
+}

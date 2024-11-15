@@ -1,0 +1,190 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+
+  @apply bg-dev-purple-50 dark:bg-dev-black-1000 transition-colors;
+  @apply text-dev-black-1000 dark:text-dev-purple-50;
+  @apply font-popins;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  /* Prevent history navigation on horizontall scroll */
+  &.block-scroll-back {
+    overflow: auto;
+    overscroll-behavior-x: contain;
+  }
+}
+
+body {
+  @apply transition-opacity duration-1000;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #000000;
+  }
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  @apply bg-white dark:bg-black;
+}
+
+#svg-sprite {
+  display: none;
+}
+
+svg {
+  pointer-events: none;
+}
+
+pre {
+  white-space: pre-wrap;
+}
+
+.page-background {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#pd-root {
+  &:before {
+    content: '';
+    position: absolute;
+    top: -1440px;
+    left: 0;
+    width: 1440px;
+    height: 1440px;
+    @apply bg-transparent dark:bg-dev-purple-400 transition-colors pointer-events-none;
+    opacity: .4;
+    filter: blur(500px);
+  }
+}
+
+.disable-vertical-scroll {
+  @apply overflow-hidden;
+  max-height: var(--initial-scroll-arrea-height, 100vh);
+}
+
+.disable-horizontal-scroll {
+  @apply overflow-hidden;
+  max-width: var(--initial-scroll-arrea-width, 100vh);
+}
+
+@keyframes bounce {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(-300%);
+  }
+}
+
+.ball {
+  @apply absolute;
+  @apply left-1/2;
+  @apply top-1/2;
+  @apply size-4;
+  @apply bg-dev-pink-500;
+  transform: translate(-50%, -50%);
+  border-radius: 100%;
+  animation: 400ms bounce infinite alternate;
+  animation-timing-function: cubic-bezier(0.38, 0.17, 0.11, 1);
+}
+
+.navSpacer {
+  @apply relative;
+  @apply before:absolute;
+  @apply before:size-full before:w-[1px] before:-left-5 before:top-0;
+  @apply before:transition-colors before:content-[""];
+  @apply before:bg-dev-purple-300 before:dark:bg-dev-purple-700;
+}
+
+.pd-toast {
+  @apply text-sm;
+  @apply rounded-none;
+  @apply bg-white dark:bg-gray-700;
+  @apply text-gray-900 dark:text-white;
+}
+
+.mask-horizontal {
+  mask-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 48px, rgba(0, 0, 0, 1) calc(100% - 48px), rgba(0, 0, 0, 0));
+}
+
+.mask-vertical {
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 48px, rgba(0, 0, 0, 1) calc(100% - 48px), rgba(0, 0, 0, 0));
+}
+
+.mask-horizontal-and-vertical {
+  mask-composite: intersect;
+  mask-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 48px, rgba(0, 0, 0, 1) calc(100% - 48px), rgba(0, 0, 0, 0)),
+              linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 48px, rgba(0, 0, 0, 1) calc(100% - 48px), rgba(0, 0, 0, 0));
+}
+
+/* SVG Icons */
+html[data-color-scheme="dark"] #icon-checked {
+  --svg-icon-fill: black;
+}
+
+html[data-color-scheme="light"] #icon-checked {
+  --svg-icon-fill: white;
+}
+
+/* Explorer tables */
+  .pd-table-head {
+    @apply bg-dev-purple-100 text-left;
+    @apply dark:bg-dev-black-900;
+    @apply sticky top-0 z-10;
+
+    >th {
+      @apply py-2 pl-1 font-body3-regular font-geist;
+    }
+  }
+
+  .pd-table-row {
+      @apply border-b border-dev-purple-100 cursor-pointer;
+      @apply dark:border-dev-purple-700;
+      @apply hover:bg-dev-purple-100 dark:hover:bg-dev-purple-900;
+
+      >td {
+        @apply pb-2 pt-4 pl-1 font-body2-regular font-geist break-words;
+      }
+
+  }
+
+.json-view--copy {
+  pointer-events: visible;
+}
+
+.json-view--string {
+  word-break: break-all;
+}
