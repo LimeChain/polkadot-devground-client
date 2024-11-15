@@ -3,18 +3,14 @@ import {
   useState,
 } from 'react';
 
+import { Icon } from '@components/icon';
 import { PDLink } from '@components/pdLink';
 import { PDScrollArea } from '@components/pdScrollArea';
 import { snippets } from '@constants/snippets';
 import { cn } from '@utils/helpers';
 import { Search } from '@views/onboarding/components/search';
 
-interface DefaultExamplesProps {
-  toggleVisibility: () => void;
-}
-
-export const DefaultExamples = (props: DefaultExamplesProps) => {
-  const { toggleVisibility } = props;
+export const DefaultExamples = () => {
   const [
     filteredSnippets,
     setFilteredSnippets,
@@ -29,19 +25,16 @@ export const DefaultExamples = (props: DefaultExamplesProps) => {
   }, []);
 
   return (
-    <div
-      className="flex flex-col"
-      data-title="Default"
-    >
+    <>
       <Search onChange={handleSearch} />
-      <PDScrollArea className="h-[calc(100vh-550px)] grow overflow-y-auto">
+      <PDScrollArea className="h-[calc(100vh-550px)] overflow-y-auto">
         <ul>
           {filteredSnippets.map((snippet, index) => (
             <li key={index}>
               <PDLink
                 to={`/code?d=${snippet.id}`}
                 className={cn(
-                  'flex w-full items-center justify-between',
+                  'flex items-center justify-between',
                   'mt-1 px-3 py-4',
                   'font-geist font-body2-regular',
                   'duration-300 ease-in-out',
@@ -50,17 +43,15 @@ export const DefaultExamples = (props: DefaultExamplesProps) => {
                 )}
               >
                 {snippet.name}
+                <Icon
+                  className="rotate-180"
+                  name="icon-arrowLeft"
+                />
               </PDLink>
             </li>
           ))}
         </ul>
       </PDScrollArea>
-      <button
-        className={cn('mt-10 p-4 text-center font-body1-regular')}
-        onClick={toggleVisibility}
-      >
-        Have any ideas about Example? Request example here.
-      </button>
-    </div>
+    </>
   );
 };
