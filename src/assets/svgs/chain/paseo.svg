@@ -1,0 +1,36 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 248 248">
+  <defs>
+    <style>
+      .cls-1_paseo {
+        stroke-width: 9px;
+      }
+
+      .cls-1_paseo, .cls-2_paseo {
+        fill: none;
+        stroke: #56f298;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-2_paseo {
+        stroke-width: 8px;
+      }
+
+      .cls-3_paseo {
+        fill: #56f298;
+      }
+
+      .cls-4_paseo {
+        fill: #38393d;
+      }
+    </style>
+  </defs>
+  <circle class="cls-4_paseo" cx="124" cy="124" r="124"/>
+  <g>
+    <circle class="cls-1_paseo" cx="124" cy="124" r="77"/>
+    <ellipse class="cls-2_paseo" cx="123.83" cy="122.64" rx="31.62" ry="74.73" transform="translate(-27.14 209.71) rotate(-74.7)"/>
+    <circle class="cls-3_paseo" cx="150" cy="98" r="14.5"/>
+    <circle class="cls-3_paseo" cx="92" cy="144" r="14.5"/>
+  </g>
+</svg>
