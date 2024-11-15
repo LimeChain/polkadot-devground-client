@@ -7,7 +7,7 @@ import type {
 } from '@polkadot-api/metadata-builders';
 import type { V15 } from '@polkadot-api/substrate-bindings';
 
-export type TMetaDataCallParam = {
+export type TMetaDataCallBuilder = {
   type: 'lookupEntry';
   value: LookupEntry;
 } | Var;

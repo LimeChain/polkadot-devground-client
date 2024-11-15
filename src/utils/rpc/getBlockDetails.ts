@@ -8,6 +8,8 @@ import {
 } from '@utils/codec';
 import { formatPrettyNumberString } from '@utils/helpers';
 import {
+  getIdentity,
+  getSuperIdentity,
   getSystemDigestData,
   getSystemEvents,
   getValidators,
@@ -18,8 +20,8 @@ import type { IMappedBlockExtrinsic } from '@custom-types/block';
 import type { BlockDetails } from '@custom-types/rawClientReturnTypes';
 import type { RuntimeVersion } from '@polkadot/types/interfaces';
 import type {
+  FixedSizeBinary,
   HexString,
-  SS58String,
 } from 'polkadot-api';
 import type { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
@@ -48,16 +50,46 @@ const getBlockValidator = async ({
     authorIndex = babeDigestCodec.dec(digestData).value;
   }
 
-  let authors: SS58String[] = [];
+  let authors: string[] = [];
 
   if (isRelayChain) {
     authors = await getValidators(api, blockHash)
       .catch();
   }
 
-  const address = isRelayChain && authors[authorIndex];
+  const address = isRelayChain ? authors[authorIndex] : '';
+
+  let identity;
+
+  identity = await getIdentity(peopleApi, address)
+    .catch();
+  if (identity) {
+    identity = (identity?.[0]?.info?.display?.value as FixedSizeBinary<2>)?.asText?.();
+  }
+
+  const superIdentity = await getSuperIdentity(peopleApi, address)
+    .catch();
+
+  if (superIdentity?.[0] && !identity) {
+    identity = await getIdentity(peopleApi, superIdentity[0])
+      .catch();
+
+    if (identity) {
+      const identityVal = (identity?.[0]?.info?.display?.value as FixedSizeBinary<2>)?.asText?.();
+      const superIdentityVal = (superIdentity?.[1]?.value as FixedSizeBinary<2>)?.asText?.();
+
+      if (identityVal) {
+        if (superIdentityVal) {
+          identity = `${identityVal}/${superIdentityVal}`;
+        } else {
+          identity = identityVal;
+        }
+      }
+    }
+  }
 
   return {
+    name: identity?.toString?.(),
     address,
     identity: '',
   };
@@ -150,7 +182,6 @@ export const getBlockDetailsWithPAPI = async ({
       runtime,
       identity: identity.status === 'fulfilled' ? identity.value : undefined,
       ...(blockHeader.status === 'fulfilled' ? blockHeader.value : {}),
-      // ...blockHeader,
     },
     body: {
       extrinsics,

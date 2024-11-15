@@ -12,9 +12,9 @@ import {
   formatNumber,
 } from '@utils/helpers';
 
-interface IPDFileUpload {
-  onChange: (args: unknown) => void;
-}
+import type { InvocationOnChangeProps } from '@components/invocationArgsMapper/types';
+
+interface IPDFileUpload extends InvocationOnChangeProps {}
 
 export const PDFileUpload = ({ onChange }: IPDFileUpload) => {
   const refInput = useRef<HTMLLabelElement>(null);
@@ -33,12 +33,11 @@ export const PDFileUpload = ({ onChange }: IPDFileUpload) => {
       const val = Binary.fromBytes(new Uint8Array(buffer));
       onChange(val);
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    const handleDrop = async (e: DragEvent) => {
+    const handleFileDrop = async (e: DragEvent) => {
       e.preventDefault();
       const file = e.dataTransfer?.files.item(0);
 
@@ -51,20 +50,20 @@ export const PDFileUpload = ({ onChange }: IPDFileUpload) => {
       }
     };
 
-    const handleDragOver = (e: DragEvent) => {
+    const handleFileDragOver = (e: DragEvent) => {
       e.preventDefault();
     };
 
     const element = refInput?.current;
 
     if (refInput) {
-      element?.addEventListener('drop', handleDrop);
-      element?.addEventListener('dragover', handleDragOver);
+      element?.addEventListener('drop', handleFileDrop);
+      element?.addEventListener('dragover', handleFileDragOver);
     }
 
     return () => {
-      element?.removeEventListener('drop', handleDrop);
-      element?.removeEventListener('dragover', handleDragOver);
+      element?.removeEventListener('drop', handleFileDrop);
+      element?.removeEventListener('dragover', handleFileDragOver);
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

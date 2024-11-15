@@ -2,7 +2,7 @@ import type { MetadataPrimitives } from '@polkadot-api/metadata-builders';
 
 export interface IRpcCalls {
   [key: string]: {
-    params: IRpcCallParam[];
+    params: IRpcArg[];
     docs?: string[];
     link?: string;
   };
@@ -11,7 +11,7 @@ export interface IRpcCalls {
 export type TRpcCall = 'boolean' | 'string' | 'hex' | 'select' | 'array' | 'number';
 export type TArrayItem = 'string';
 
-export interface IRpcCallParam {
+export interface IRpcArg {
   name: string;
   type: TRpcCall;
 

@@ -18,4 +18,22 @@ export const HOME_LINKS = [
     title: 'Forks',
     description: 'Keep tabs on finalized blocks and forks as they happen, ensuring you stay informed about network developments!',
   },
+  {
+    to: '/chain-state',
+    iconName: 'icon-chain',
+    title: 'Chain State',
+    description: 'Access Chain constants and storage values directly from the live nodes of Polkadot, Kusama, and their system chains.',
+  },
+  {
+    to: '/rpc-calls',
+    iconName: 'icon-rpcCalls',
+    title: 'RPC Calls',
+    description: 'Initiate RPC Calls on selected endpoints to interact seamlessly with the blockchain network.',
+  },
+  {
+    to: '/runtime-calls',
+    iconName: 'icon-runtimeCalls',
+    title: 'Runtime Calls',
+    description: 'Effortlessly retrieve information from existing APIs and their methods, including account nonce, epoch, and more within the ecosystem.',
+  },
 ];
