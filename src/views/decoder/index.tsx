@@ -1,3 +1,4 @@
+import { useEventBus } from '@pivanov/event-bus';
 import {
   useCallback,
   useEffect,
@@ -5,7 +6,10 @@ import {
 } from 'react';
 
 import { InvocationDecoder } from '@components/decoder';
+import { RecentQueriesDrawer } from '@components/drawers/recentQueries';
+import { Icon } from '@components/icon';
 import { Loader } from '@components/loader';
+import { PageHeader } from '@components/pageHeader';
 import { QueryButton } from '@components/papiQuery/queryButton';
 import { QueryFormContainer } from '@components/papiQuery/queryFormContainer';
 import { QueryResult } from '@components/papiQuery/queryResult';
@@ -13,23 +17,29 @@ import { QueryResultContainer } from '@components/papiQuery/queryResultContainer
 import { QueryViewContainer } from '@components/papiQuery/queryViewContainer';
 import { PDSelect } from '@components/pdSelect';
 import { decoders } from '@constants/decoders';
+import { QUERY_CATEGORIES } from '@constants/recentQueries';
 import { useStoreChain } from '@stores';
 import {
   blockHeaderCodec,
   decodeExtrinsic,
   metadataCodec,
 } from '@utils/codec';
+import { cn } from '@utils/helpers';
+import { addRecentQuerieToStorage } from '@utils/recentQueries';
+import { useDrawer } from 'src/hooks/useDrawer';
+
+import type { IEventBusRunRecentQuery } from '@custom-types/eventBus';
+import type {
+  IDecoderQuery,
+  IQueryParam,
+  TDecoderQueryProps,
+} from '@custom-types/recentQueries';
 
 const decoderSelectItems = Object.keys(decoders).map((decoder) => ({
   key: `decoder-${decoder}`,
   label: decoder,
   value: decoder,
 }));
-
-interface IDecoderField {
-  key: string;
-  value: unknown;
-}
 
 const Decoder = () => {
   const chain = useStoreChain?.use?.chain?.();
@@ -42,11 +52,14 @@ const Decoder = () => {
   const [
     queries,
     setQueries,
-  ] = useState<IQuery[]>([]);
+  ] = useState<IDecoderQuery[]>([]);
+
   const [
     decoderFields,
     setDecoderFields,
-  ] = useState<IDecoderField[]>([]);
+  ] = useState<IQueryParam[]>([]);
+
+  const { isOpen, open, close } = useDrawer();
 
   useEffect(() => {
     if (decoder) {
@@ -81,6 +94,18 @@ const Decoder = () => {
     });
   }, []);
 
+  useEventBus<IEventBusRunRecentQuery>('@@-recent-query', ({ data }) => {
+    setQueries((queries) => ([
+      {
+        decoder: data.decoder as string,
+        id: crypto.randomUUID(),
+        args: data.args as IQueryParam[] || [],
+        isCachedQuery: true,
+      },
+      ...queries,
+    ]));
+  });
+
   const handleDecode = useCallback(() => {
     setQueries((queries) => {
       const newQueries = [...queries];
@@ -106,77 +131,103 @@ const Decoder = () => {
   }
 
   return (
-    <QueryViewContainer>
-      <QueryFormContainer>
-        <div className="grid w-full grid-cols-1 gap-4">
-          <PDSelect
-            emptyPlaceHolder="No decoders available"
-            items={[decoderSelectItems]}
-            label="Select Decoder"
-            onChange={handleOnDecoderChange}
-            placeholder="Please select a decoder"
-            value={decoder}
+    <>
+      <PageHeader
+        className="mb-10"
+        title="Decoder"
+      >
+        <div
+          onClick={open}
+          className={cn(
+            'cursor-pointer duration-300 ease-out',
+            'bg-dev-purple-700 p-2 dark:bg-dev-purple-50',
+            'hover:bg-dev-purple-900 hover:dark:bg-dev-purple-200',
+          )}
+        >
+          <Icon
+            className="text-dev-white-200 dark:text-dev-purple-700"
+            name="icon-history"
           />
         </div>
-
-        {
-          decoder
-          && decoders?.[decoder]?.params?.length > 0 && (
-            <InvocationDecoder
-              key={`decoder-${decoder}`}
-              fields={decoders[decoder].params}
-              onChange={handleOnChange}
+      </PageHeader>
+      <QueryViewContainer>
+        <RecentQueriesDrawer
+          category={QUERY_CATEGORIES.DECODER}
+          handleClose={close}
+          isOpen={isOpen}
+        />
+        <QueryFormContainer>
+          <div className="grid w-full grid-cols-1 gap-4">
+            <PDSelect
+              emptyPlaceHolder="No decoders available"
+              items={[decoderSelectItems]}
+              label="Select Decoder"
+              onChange={handleOnDecoderChange}
+              placeholder="Please select a decoder"
+              value={decoder}
             />
-          )
-        }
+          </div>
 
-        <QueryButton onClick={handleDecode}>
-          Decode
-          {' '}
-          {decoder}
-        </QueryButton>
+          {
+            decoder
+            && decoders?.[decoder]?.params?.length > 0 && (
+              <InvocationDecoder
+                key={`decoder-${decoder}`}
+                fields={decoders[decoder].params}
+                onChange={handleOnChange}
+              />
+            )
+          }
 
-      </QueryFormContainer>
-      <QueryResultContainer>
-        {
-          queries.map((query) => (
-            <Query
-              key={`query-result-${query.decoder}-${query.id}`}
-              onUnsubscribe={handleOnUnsubscribe}
-              querie={query}
-            />
-          ))
-        }
-      </QueryResultContainer>
-    </QueryViewContainer>
+          <QueryButton onClick={handleDecode}>
+            Decode
+            {' '}
+            {decoder}
+          </QueryButton>
+
+        </QueryFormContainer>
+        <QueryResultContainer>
+          {
+            queries.map((query) => (
+              <Query
+                key={`query-result-${query.decoder}-${query.id}`}
+                onUnsubscribe={handleOnUnsubscribe}
+                querie={query}
+              />
+            ))
+          }
+        </QueryResultContainer>
+      </QueryViewContainer>
+    </>
   );
 };
 
 export default Decoder;
 
-interface IQuery {
-  decoder: string;
-  id: string;
-  args: IDecoderField[];
-}
-
 const Query = (
   {
     querie,
     onUnsubscribe,
-  }: {
-    querie: IQuery;
-    onUnsubscribe: (id: string) => void;
-  }) => {
+  }: TDecoderQueryProps) => {
   const [
     result,
     setResult,
   ] = useState<unknown>();
 
+  const chain = useStoreChain.use.chain?.();
+
   useEffect(() => {
     const catchError = (err?: Error) => {
       setResult(err?.message || 'Unexpected Error');
     };
+
+    if (!querie.isCachedQuery) {
+      void addRecentQuerieToStorage({
+        querie,
+        chainId: chain.id,
+        category: QUERY_CATEGORIES.DECODER,
+      });
+    }
 
     try {
       switch (querie.decoder) {
@@ -214,7 +265,7 @@ const Query = (
   return (
     <QueryResult
       onRemove={handleUnsubscribe}
-      path={`${querie.decoder}`}
+      path={querie.decoder}
       result={result}
       title="Decoded"
     />
