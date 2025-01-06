@@ -48,7 +48,7 @@ const ChainState = () => {
       return storageCalls?.map((item) => ({
         label: item.name,
         value: item.name,
-        key: `chainState-call-${item.name}`,
+        key: `chain1State-call-${item.name}`,
       }));
     }
     return undefined;
