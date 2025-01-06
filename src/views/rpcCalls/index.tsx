@@ -1,3 +1,4 @@
+import { useEventBus } from '@pivanov/event-bus';
 import React, {
   useCallback,
   useEffect,
@@ -7,7 +8,10 @@ import React, {
 } from 'react';
 
 import { CallDocs } from '@components/callDocs';
+import { RecentQueriesDrawer } from '@components/drawers/recentQueries';
+import { Icon } from '@components/icon';
 import { Loader } from '@components/loader';
+import { PageHeader } from '@components/pageHeader';
 import { QueryButton } from '@components/papiQuery/queryButton';
 import { QueryFormContainer } from '@components/papiQuery/queryFormContainer';
 import { QueryResult } from '@components/papiQuery/queryResult';
@@ -18,6 +22,7 @@ import {
   PDSelect,
 } from '@components/pdSelect';
 import { InvocationRpcArgs } from '@components/rpcCalls';
+import { QUERY_CATEGORIES } from '@constants/recentQueries';
 import {
   newRpcCalls,
   oldRpcCalls,
@@ -27,23 +32,22 @@ import {
   blockHeaderCodec,
   decodeExtrinsic,
 } from '@utils/codec';
+import { cn } from '@utils/helpers';
 import { unwrapApiResult } from '@utils/papi/helpers';
+import { addRecentQuerieToStorage } from '@utils/recentQueries';
 import {
   mapRpcCallsToSelectMethodItems,
   mapRpcCallsToSelectPalletItems,
 } from '@utils/rpc/rpc-calls';
+import { useDrawer } from 'src/hooks/useDrawer';
 import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
-interface ICallParam {
-  name: string;
-  value: unknown;
-}
-interface IQuery {
-  pallet: string;
-  method: string;
-  id: string;
-  args: ICallParam[];
-}
+import type { IEventBusRunRecentQuery } from '@custom-types/eventBus';
+import type {
+  IQueryParam,
+  IRpcCallsQuery,
+  TRpcCallsQueryProps,
+} from '@custom-types/recentQueries';
 
 const newRpcKeys = Object.keys(newRpcCalls);
 const RpcCalls = () => {
@@ -51,6 +55,23 @@ const RpcCalls = () => {
   const chain = useStoreChain?.use?.chain?.();
   const rawClient = useStoreChain?.use?.rawClient?.();
   const rawClientSubscription = useStoreChain?.use?.rawClientSubscription?.();
+  const { isOpen, open, close } = useDrawer();
+
+  useEventBus<IEventBusRunRecentQuery>('@@-recent-query', ({ data }) => {
+
+    setQueries((queries) => ([
+      {
+        name: `${data.pallet}/${data.method}`,
+        pallet: data.pallet || 'defaultPallet',
+        method: data.method || 'defaultMethod',
+        id: crypto.randomUUID(),
+        args: data.args as IQueryParam[],
+        storage: data.storage || undefined,
+        isCachedQuery: true,
+      },
+      ...queries,
+    ]));
+  });
 
   const allRpcCalls = useMemo(() => ({
     ...newRpcCalls,
@@ -113,17 +134,21 @@ const RpcCalls = () => {
   const [
     callParams,
     setCallParams,
-  ] = useState<ICallParam[]>([]);
+  ] = useState<IQueryParam[]>([]);
+
   const [
     queries,
     setQueries,
-  ] = useState<IQuery[]>([]);
+  ] = useState<IRpcCallsQuery[]>([]);
 
   const rpcCall = useMemo(() => {
     const call = `${palletSelected}_${methodSelected}`;
-
     if (allRpcCalls[call]) {
-      setCallParams(allRpcCalls[call].params?.map((param) => ({ name: param.name, value: undefined })));
+      setCallParams(allRpcCalls[call].params?.map((param) => ({
+        name: param.name,
+        value: undefined,
+        key: param.name,
+      })));
       return allRpcCalls[call];
     }
 
@@ -187,6 +212,7 @@ const RpcCalls = () => {
           method: methodSelected,
           args: callParams,
           id: crypto.randomUUID(),
+          name: `${palletSelected}_${methodSelected}`,
         });
         return newQueries;
       });
@@ -203,62 +229,87 @@ const RpcCalls = () => {
   }
 
   return (
-    <QueryViewContainer>
-      <QueryFormContainer>
-        <div className="grid w-full grid-cols-2 gap-4">
-          <PDSelect
-            key={`rpc-pallet-${palletSelected}`}
-            emptyPlaceHolder="No pallets available"
-            items={palletSelectItems}
-            label="Pallet"
-            onChange={handlePalletSelect}
-            value={palletSelected}
-            groups={[
-              'New',
-              'Old',
-            ]}
-          />
-          <PDSelect
-            key={`rpc-method-${methodSelected}`}
-            emptyPlaceHolder="No methods available"
-            items={[methodSelectItems]}
-            label="Method"
-            onChange={handleMathodSelect}
-            value={methodSelected}
+    <>
+      <PageHeader
+        className="mb-10"
+        title="RPC Calls"
+      >
+        <div
+          onClick={open}
+          className={cn(
+            'cursor-pointer duration-300 ease-out',
+            'bg-dev-purple-700 p-2 dark:bg-dev-purple-50',
+            'hover:bg-dev-purple-900 hover:dark:bg-dev-purple-200',
+          )}
+        >
+          <Icon
+            className="text-dev-white-200 dark:text-dev-purple-700"
+            name="icon-history"
           />
         </div>
-
-        {
-          rpcCall
-          && rpcCall?.params?.length > 0 && (
-            <InvocationRpcArgs
-              key={`invocation-rpc-${palletSelected}-${methodSelected}`}
-              onChange={handleOnChange}
-              rpcs={rpcCall.params}
+      </PageHeader>
+      <QueryViewContainer>
+        <RecentQueriesDrawer
+          category={QUERY_CATEGORIES.RPC_CALLS}
+          handleClose={close}
+          isOpen={isOpen}
+        />
+        <QueryFormContainer>
+          <div className="grid w-full grid-cols-2 gap-4">
+            <PDSelect
+              key={`rpc-pallet-${palletSelected}`}
+              emptyPlaceHolder="No pallets available"
+              items={palletSelectItems}
+              label="Pallet"
+              onChange={handlePalletSelect}
+              value={palletSelected}
+              groups={[
+                'New',
+                'Old',
+              ]}
             />
-          )
-        }
-
-        <QueryButton onClick={handleSubmit}>
-          Submit Rpc Call
-        </QueryButton>
-
-        <CallDocs docs={allRpcCalls?.[`${palletSelected}_${methodSelected}`]?.docs || []} />
-
-      </QueryFormContainer>
-      <QueryResultContainer>
-        {
-          queries.map((query) => (
-            <Query
-              key={`query-result-${query.pallet}-${query.method}-${query.id}`}
-              onUnsubscribe={handleUnsubscribe}
-              querie={query}
-              unCleanedSubscriptions={refUncleanedSubscriptions}
+            <PDSelect
+              key={`rpc-method-${methodSelected}`}
+              emptyPlaceHolder="No methods available"
+              items={[methodSelectItems]}
+              label="Method"
+              onChange={handleMathodSelect}
+              value={methodSelected}
             />
-          ))
-        }
-      </QueryResultContainer>
-    </QueryViewContainer>
+          </div>
+
+          {
+            rpcCall
+            && rpcCall?.params?.length > 0 && (
+              <InvocationRpcArgs
+                key={`invocation-rpc-${palletSelected}-${methodSelected}`}
+                onChange={handleOnChange}
+                rpcs={rpcCall.params}
+              />
+            )
+          }
+
+          <QueryButton onClick={handleSubmit}>
+            Submit Rpc Call
+          </QueryButton>
+
+          <CallDocs docs={allRpcCalls?.[`${palletSelected}_${methodSelected}`]?.docs || []} />
+
+        </QueryFormContainer>
+        <QueryResultContainer>
+          {
+            queries.map((query) => (
+              <Query
+                key={`query-result-${query.pallet}-${query.method}-${query.id}`}
+                onUnsubscribe={handleUnsubscribe}
+                querie={query}
+                unCleanedSubscriptions={refUncleanedSubscriptions}
+              />
+            ))
+          }
+        </QueryResultContainer>
+      </QueryViewContainer>
+    </>
   );
 
 };
@@ -267,15 +318,13 @@ const Query = ({
   querie,
   onUnsubscribe,
   unCleanedSubscriptions,
-}: {
-  querie: IQuery;
-  onUnsubscribe: (id: string) => void;
-  unCleanedSubscriptions: React.MutableRefObject<string[]>;
-}) => {
+}: TRpcCallsQueryProps) => {
 
   const rawClient = useStoreChain?.use?.rawClient?.();
   const rawClientSubscription = useStoreChain?.use?.rawClientSubscription?.();
   const dynamicBuilder = useDynamicBuilder();
+
+  const chain = useStoreChain.use.chain?.();
 
   const [
     result,
@@ -295,6 +344,14 @@ const Query = ({
       setIsLoading(false);
       setResult(err?.message || 'Unexpected Error');
     };
+
+    if (!querie.isCachedQuery) {
+      void addRecentQuerieToStorage({
+        querie,
+        chainId: chain.id,
+        category: QUERY_CATEGORIES.RPC_CALLS,
+      });
+    }
 
     const runRawQuery = (onSucess?: (res: unknown) => void) => {
       const args = querie?.args ? querie.args.map((arg) => arg.value).filter((arg) => arg !== undefined) : [];
