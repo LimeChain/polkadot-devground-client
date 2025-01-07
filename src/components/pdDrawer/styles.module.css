@@ -1,0 +1,4 @@
+.drawer {
+  @apply border-l border-l-dev-white-700 bg-dev-purple-100;
+  @apply dark:border-l-dev-black-600 dark:bg-dev-black-900;
+}

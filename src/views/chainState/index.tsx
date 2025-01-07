@@ -1,3 +1,4 @@
+import { useEventBus } from '@pivanov/event-bus';
 import {
   useCallback,
   useEffect,
@@ -7,19 +8,31 @@ import {
 
 import { CallDocs } from '@components/callDocs';
 import { InvocationStorageArgs } from '@components/chainState';
+import { RecentQueriesDrawer } from '@components/drawers/recentQueries';
+import { Icon } from '@components/icon';
 import { Loader } from '@components/loader';
+import { PageHeader } from '@components/pageHeader';
 import { QueryButton } from '@components/papiQuery/queryButton';
 import { QueryFormContainer } from '@components/papiQuery/queryFormContainer';
 import { QueryResult } from '@components/papiQuery/queryResult';
 import { QueryResultContainer } from '@components/papiQuery/queryResultContainer';
 import { QueryViewContainer } from '@components/papiQuery/queryViewContainer';
 import { PDSelect } from '@components/pdSelect';
+import { QUERY_CATEGORIES } from '@constants/recentQueries';
 import { useStoreChain } from '@stores';
+import { cn } from '@utils/helpers';
+import { addRecentQuerieToStorage } from '@utils/recentQueries';
+import { useDrawer } from 'src/hooks/useDrawer';
 import { useDynamicBuilder } from 'src/hooks/useDynamicBuilder';
 
 import type { TRelayApi } from '@custom-types/chain';
+import type { IEventBusRunRecentQuery } from '@custom-types/eventBus';
+import type {
+  TChainStateQueryProps,
+  TRequiredQuery,
+} from '@custom-types/recentQueries';
 
-interface ISubscription {
+export interface ISubscription {
   unsubscribe: () => void;
   id?: string;
 }
@@ -75,12 +88,14 @@ const ChainState = () => {
   const [
     queries,
     setQueries,
-  ] = useState<{ pallet: string; storage: string; id: string; args: unknown }[]>([]);
+  ] = useState<TRequiredQuery[]>([]);
 
   const [
     subscriptions,
     setSubscriptions,
   ] = useState<ISubscription[]>([]);
+
+  const { isOpen, open, close } = useDrawer();
 
   useEffect(() => {
     setQueries([]);
@@ -157,6 +172,7 @@ const ChainState = () => {
           storage: storageSelected.name,
           id: crypto.randomUUID(),
           args: callArgs,
+          name: `${palletSelected.name}/${storageSelected.name}`,
         });
         return newQueries;
       });
@@ -167,6 +183,20 @@ const ChainState = () => {
     storageSelected,
     callArgs,
   ]);
+
+  useEventBus<IEventBusRunRecentQuery>('@@-recent-query', ({ data }) => {
+    setQueries((queries) => ([
+      {
+        name: `${data.pallet}/${data.storage}`,
+        pallet: data.pallet,
+        storage: data.storage,
+        id: crypto.randomUUID(),
+        args: data?.args,
+        isCachedQuery: true,
+      },
+      ...queries,
+    ]));
+  });
 
   const handleSubscribe = useCallback((subscription: ISubscription) => {
     setSubscriptions((subs) => ([
@@ -190,78 +220,105 @@ const ChainState = () => {
   }
 
   return (
-    <QueryViewContainer>
-      <QueryFormContainer>
-        <div className="grid w-full grid-cols-2 gap-4">
-          <PDSelect
-            emptyPlaceHolder="No pallets available"
-            items={[palletSelectItems || []]}
-            label="Select Pallet"
-            onChange={handlePalletSelect}
-            placeholder="Please select a pallet"
-            value={palletSelected?.name}
+    <>
+      <PageHeader
+        className="mb-10"
+        title="Chain State"
+      >
+        <div
+          onClick={open}
+          className={cn(
+            'cursor-pointer duration-300 ease-out',
+            'bg-dev-purple-700 p-2 dark:bg-dev-purple-50',
+            'hover:bg-dev-purple-900 hover:dark:bg-dev-purple-200',
+          )}
+        >
+          <Icon
+            className="text-dev-white-200 dark:text-dev-purple-700"
+            name="icon-history"
           />
+        </div>
+      </PageHeader>
+      <QueryViewContainer>
+
+        <RecentQueriesDrawer
+          category={QUERY_CATEGORIES.CHAIN_STATE}
+          handleClose={close}
+          isOpen={isOpen}
+        />
+        <QueryFormContainer>
+          <div className="grid w-full grid-cols-2 gap-4">
+            <PDSelect
+              emptyPlaceHolder="No pallets available"
+              items={[palletSelectItems || []]}
+              label="Select Pallet"
+              onChange={handlePalletSelect}
+              placeholder="Please select a pallet"
+              value={palletSelected?.name}
+            />
+
+            {
+              storageCallItems && (
+                <PDSelect
+                  key={`storage-select-${palletSelected?.name}`}
+                  emptyPlaceHolder="No storages available"
+                  items={[storageCallItems]}
+                  label="Select Storage"
+                  onChange={handleStorageSelect}
+                  placeholder="Please select a storage"
+                  value={storageSelected?.name}
+                />
+              )
+            }
+          </div>
 
           {
-            storageCallItems && (
-              <PDSelect
-                key={`storage-select-${palletSelected?.name}`}
-                emptyPlaceHolder="No storages available"
-                items={[storageCallItems]}
-                label="Select Storage"
-                onChange={handleStorageSelect}
-                placeholder="Please select a storage"
-                value={storageSelected?.name}
+            storageSelected && (
+              <InvocationStorageArgs
+                key={`incovation-storage-${storageSelected.name}`}
+                args={storageSelected}
+                onChange={setCallArgs}
               />
             )
           }
-        </div>
 
-        {
-          storageSelected && (
-            <InvocationStorageArgs
-              key={`incovation-storage-${storageSelected.name}`}
-              args={storageSelected}
-              onChange={setCallArgs}
-            />
-          )
-        }
+          <QueryButton onClick={handleQuerySubmit}>
+            Subscribe to
+            {' '}
+            {palletSelected?.name}
+            /
+            {storageSelected?.name}
+          </QueryButton>
 
-        <QueryButton onClick={handleQuerySubmit}>
-          Subscribe to
-          {' '}
-          {palletSelected?.name}
-          /
-          {storageSelected?.name}
-        </QueryButton>
+          {
+            (encodedStorageKey) && (
+              <p className="break-all">
+                Encoded Storage Key:
+                <br />
+                {' '}
+                {encodedStorageKey}
+              </p>
+            )
+          }
 
-        {
-          (encodedStorageKey) && (
-            <p className="break-all">
-              Encoded Storage Key:
-              <br />
-              {' '}
-              {encodedStorageKey}
-            </p>
-          )
-        }
+          <CallDocs docs={storageSelected?.docs?.filter((d) => d) || []} />
 
-        <CallDocs docs={storageSelected?.docs?.filter((d) => d) || []} />
+        </QueryFormContainer>
+        <QueryResultContainer>
+          {
+            queries.map((query) => (
+              <Query
+                key={`query-result-${query.pallet}-${query.storage}-${query.id}`}
+                onSubscribe={handleSubscribe}
+                onUnsubscribe={handleUnsubscribe}
+                querie={query}
+              />
+            ))
+          }
+        </QueryResultContainer>
+      </QueryViewContainer>
+    </>
 
-      </QueryFormContainer>
-      <QueryResultContainer>
-        {
-          queries.map((query) => (
-            <Query
-              key={`query-result-${query.pallet}-${query.storage}-${query.id}`}
-              onSubscribe={handleSubscribe}
-              onUnsubscribe={handleUnsubscribe}
-              querie={query}
-            />
-          ))
-        }
-      </QueryResultContainer>
-    </QueryViewContainer>
   );
 };
 
@@ -272,13 +329,9 @@ const Query = (
     querie,
     onSubscribe,
     onUnsubscribe,
-  }: {
-    querie: { pallet: string; storage: string; id: string; args: unknown };
-    onSubscribe: (subscription: ISubscription) => void;
-    onUnsubscribe: (id: string) => void;
-  }) => {
+  }: TChainStateQueryProps) => {
   const api = useStoreChain?.use?.api?.() as TRelayApi;
-
+  const chain = useStoreChain.use.chain?.();
   const [
     result,
     setResult,
@@ -289,30 +342,41 @@ const Query = (
   ] = useState(true);
 
   useEffect(() => {
-    const catchError = (err: Error) => {
-      setIsLoading(false);
-      setResult(err?.message || 'Unexpected Error');
-    };
+    (async () => {
+      const catchError = (err: Error) => {
+        setIsLoading(false);
+        setResult(err?.message || 'Unexpected Error');
+      };
 
-    if (api) {
-      try {
-        // @TODO: fix types
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const subscription = (api.query as any)[querie.pallet][querie.storage]
-          .watchValue(querie.args || 'finalized')
-          .subscribe((res: unknown) => {
-            setResult(res);
-            setIsLoading(false);
-          });
-
-        subscription.id = querie.id;
-        onSubscribe(subscription);
-
-      } catch (error) {
-        catchError(error as Error);
+      // save to recent queries
+      if (!querie.isCachedQuery) {
+        void addRecentQuerieToStorage({
+          querie,
+          chainId: chain.id,
+          category: QUERY_CATEGORIES.CHAIN_STATE,
+        });
       }
-    }
+      if (api) {
+        try {
+          if (querie.pallet && querie.storage) {
+            // @TODO: fix types
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const subscription = (api.query as any)[querie.pallet][querie.storage]
+              .watchValue(querie.args || 'finalized')
+              .subscribe((res: unknown) => {
+                setResult(res);
+                setIsLoading(false);
+              });
 
+            subscription.id = querie.id;
+            onSubscribe(subscription);
+          }
+        } catch (error) {
+          catchError(error as Error);
+        }
+      }
+    })()
+      .catch(console.log);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     querie,
@@ -330,7 +394,7 @@ const Query = (
     <QueryResult
       isLoading={isLoading}
       onRemove={handleUnsubscribe}
-      path={`${querie.pallet}/${querie.storage}`}
+      path={querie.name}
       result={result}
       title="Storage Subscription"
     />

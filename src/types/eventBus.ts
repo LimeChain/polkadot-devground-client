@@ -93,3 +93,20 @@ export interface IEditExampleInfoModalClose {
 export interface IDeleteExampleModalClose {
   type: '@@-close-delete-example-modal';
 }
+
+export interface IRecentQueryData {
+  pallet: string;
+  storage: string;
+  name: string;
+  id: string;
+  args: unknown;
+  isCachedQuery: boolean;
+  decoder?: string;
+  method?: string;
+  type?: string;
+}
+
+export interface IEventBusRunRecentQuery {
+  type: '@@-recent-query';
+  data: IRecentQueryData;
+}

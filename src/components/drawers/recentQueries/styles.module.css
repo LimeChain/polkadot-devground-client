@@ -1,0 +1,38 @@
+.historyButton {
+  @apply fixed right-14 top-20 size-10;
+  @apply flex items-center justify-center;
+  @apply text-white dark:text-black;
+  @apply bg-dev-purple-700 dark:bg-dev-purple-50;
+}
+
+.drawerHeader {
+  @apply relative flex flex-row items-center justify-between;
+  @apply py-4;
+}
+
+.drawerTitle {
+  @apply pl-4;
+  @apply text-lg font-semibold;
+  @apply text-dev-black-1000 dark:text-dev-purple-50;
+}
+
+.recentQuery {
+  @apply flex flex-col justify-between gap-1;
+  @apply py-4 pl-4 pr-28;
+  @apply transition-[background] duration-300;
+  @apply text-left text-dev-purple-300 dark:text-dev-black-800;
+  @apply hover:bg-dev-purple-200 dark:hover:bg-dev-purple-900;
+  @apply border-b border-b-dev-white-700 last:border-b-0 dark:border-b-dev-black-600;
+}
+
+.timestamp {
+  @apply text-sm font-normal text-dev-black-600 dark:text-dev-purple-300;
+}
+
+.queryItemName {
+  @apply text-sm font-semibold text-dev-black-1000 dark:text-dev-purple-50
+}
+
+.queryItemMethod {
+  @apply text-sm font-normal text-dev-pink-500;
+}
