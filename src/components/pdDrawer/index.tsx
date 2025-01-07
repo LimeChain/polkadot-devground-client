@@ -20,7 +20,6 @@ export const PDDrawer = ({
   children,
   position = 'right',
 }: DrawerProps) => {
-  console.log('@@', isOpen);
 
   const positionClasses = {
     right: 'right-0 top-0 h-full max-w-[90%]',
