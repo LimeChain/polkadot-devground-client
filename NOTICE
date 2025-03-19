@@ -1,0 +1,157 @@
+# NOTICE
+
+This file contains the licenses and notices for open source software used in this project.
+
+## Dependencies
+
+### MIT Licensed Dependencies
+
+The following dependencies are licensed under the MIT License:
+
+- @pivanov/event-bus (1.0.0)
+- @pivanov/use-toggle-visibility (0.0.1)
+- @radix-ui/react-scroll-area (1.1.0)
+- @radix-ui/react-select (2.1.1)
+- @radix-ui/react-switch (1.1.0)
+- @radix-ui/react-tooltip (1.1.3)
+- @shikijs/monaco (1.10.0)
+- @stylistic/eslint-plugin (2.8.0)
+- @stylistic/eslint-plugin-jsx (2.8.0)
+- @tanstack/react-table (8.20.5)
+- @tanstack/react-virtual (3.8.2)
+- @typescript/ata (0.9.6)
+- @vitejs/plugin-react-swc (3.7.0)
+- axios (1.7.2)
+- clsx (2.1.1)
+- date-fns (^3.6.0)
+- file-saver (2.0.5)
+- monaco-editor (0.50.0)
+- nanoid (5.0.7)
+- pako (2.1.0)
+- prettier (3.3.2)
+- prism-themes (1.9.0)
+- prismjs (1.29.0)
+- react (18.3.1)
+- react-dom (18.3.1)
+- react-hot-toast (2.4.1)
+- react-resizable-panels (2.0.19)
+- react-router-dom (6.24.0)
+- react18-json-view (0.2.8)
+- shiki (1.10.0)
+- styled-components (6.1.12)
+- sucrase (3.35.0)
+- tailwind-merge (2.5.2)
+- ts-node (10.9.2)
+- vite (5.3.1)
+- zustand (4.5.4)
+- @pivanov/vite-plugin-svg-sprite (2.1.0)
+- @types/file-saver (2.0.7)
+- @types/pako (2.0.3)
+- @types/prismjs (1.26.4)
+- @types/react (18.3.3)
+- @types/react-dom (18.3.0)
+- @types/react-router-dom (5.3.3)
+- @typescript-eslint/eslint-plugin (7.14.1)
+- @typescript-eslint/parser (7.13.1)
+- autoprefixer (10.4.19)
+- eslint (8.57.0)
+- eslint-import-resolver-typescript (3.6.1)
+- eslint-plugin-filenames (^1.3.2)
+- eslint-plugin-import (2.29.1)
+- eslint-plugin-import-newlines (1.4.0)
+- eslint-plugin-prefer-arrow (1.2.3)
+- eslint-plugin-react (7.34.3)
+- eslint-plugin-react-hooks (4.6.2)
+- eslint-plugin-react-refresh (0.4.7)
+- eslint-plugin-tailwindcss (3.17.4)
+- eslint-plugin-unused-imports (4.0.0)
+- lint-staged (15.2.7)
+- rollup-plugin-visualizer (5.12.0)
+- tailwindcss (3.4.4)
+- vite-plugin-pwa (0.20.0)
+- vite-plugin-static-copy (1.0.6)
+- vite-tsconfig-paths (4.3.2)
+
+### Apache-2.0 Licensed Dependencies
+
+The following dependencies are licensed under the Apache License, Version 2.0:
+
+- @polkadot-api/descriptors (file:.papi/descriptors)
+- @polkadot-api/metadata-builders (0.7.0)
+- @polkadot-api/view-builder (0.3.3)
+- @polkadot/react-identicon (3.9.1)
+- @polkadot/types (12.2.3)
+- firebase (10.14.0)
+- polkadot-api (1.4.1)
+- react-helmet-async (2.0.5)
+- scale-ts (1.6.0)
+- typescript (5.4.5)
+
+### BSD-3-Clause Licensed Dependencies
+
+The following dependencies are licensed under the BSD 3-Clause License:
+
+- terser (5.31.1)
+
+## License Texts
+
+### MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+### Apache License, Version 2.0
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+### BSD 3-Clause License
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
