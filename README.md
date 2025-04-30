@@ -15,13 +15,13 @@ A developer tool application, utilizing the new light-client first Polkadot-API 
 Clone the project
 
 ```bash
-  git clone https://github.com/LimeChain/polkadot-js-client.git
+  git clone https://github.com/LimeChain/polkadot-devground-client.git
 ```
 
 Go to the project directory
 
 ```bash
-  cd polkadot-js-client
+  cd polkadot-devground-client
 ```
 
 Install dependencies
@@ -44,4 +44,4 @@ Start the app
 
 ## Feedback
 
-If you have any feedback, please reach out to us at hristo.dimitrov@limechain.tech
+If you have any feedback, please reach out to us at <hristo.dimitrov@limechain.tech>
