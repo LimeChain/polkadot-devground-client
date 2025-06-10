@@ -1,3 +1,5 @@
+import { getDynamicBuilder } from '@polkadot-api/metadata-builders';
+
 import {
   baseStoreChain,
   type StoreInterface,
@@ -5,6 +7,7 @@ import {
 import {
   babeDigestCodec,
   decodeExtrinsic,
+  decodeExtrinsicImproved,
 } from '@utils/codec';
 import { formatPrettyNumberString } from '@utils/helpers';
 import {
@@ -109,9 +112,11 @@ export const getBlockDetailsWithPAPI = async ({
   const api = baseStoreChain.getState().api as StoreInterface['api'];
   const client = baseStoreChain.getState().client as StoreInterface['client'];
   const runtime = baseStoreChain.getState().runtime as StoreInterface['runtime'];
+  const lookup = baseStoreChain.getState().lookup as StoreInterface['lookup'];
 
   assert(api, 'Api is not defined');
   assert(client, 'Client is not defined');
+  assert(lookup, 'Lookup is not defined');
 
   const [
     blockHeader,
@@ -125,12 +130,54 @@ export const getBlockDetailsWithPAPI = async ({
     getBlockValidator({ blockHash }),
   ]);
 
+  // Debug events failure
+  if (events.status === 'rejected') {
+    // Try alternative approach using raw client if available
+    const rawClient = baseStoreChain.getState().rawClient;
+    const lookup = baseStoreChain.getState().lookup;
+
+    if (rawClient && lookup) {
+      try {
+        const dynamicBuilder = getDynamicBuilder(lookup);
+        const storageCodec = dynamicBuilder.buildStorage('System', 'Events');
+        const encodedKey = storageCodec.enc();
+
+        const storageValue = await rawClient.request('state_getStorage', [
+          encodedKey,
+          blockHash,
+        ]);
+
+        if (storageValue && storageValue !== '0x') {
+          const decodedEvents = storageCodec.dec(storageValue) as any[];
+
+          // Override events with successful fallback
+          (events as any).status = 'fulfilled';
+          (events as any).value = decodedEvents;
+        }
+      } catch (fallbackError) {
+        // Fallback failed, continue with rejected events
+      }
+    }
+  }
+
   // Initialize timestamp variable
   let timestamp: number = 0;
 
   const extrinsics: IMappedBlockExtrinsic[] = [];
   extrinsicsRaw.status === 'fulfilled' && extrinsicsRaw?.value.forEach((e, i) => {
-    const extrinsic = decodeExtrinsic(e);
+    // Try the improved decoder first, fall back to legacy if needed
+    const lookup = baseStoreChain.getState().lookup as StoreInterface['lookup'];
+
+    let extrinsic;
+    if (lookup) {
+      const dynamicBuilder = getDynamicBuilder(lookup);
+      extrinsic = decodeExtrinsicImproved(e, dynamicBuilder, lookup);
+    }
+
+    // If improved decoder failed or isn't available, try legacy
+    if (!extrinsic) {
+      extrinsic = decodeExtrinsic(e);
+    }
 
     // EXTRINSIC DECODING CAN FAIL
     if (extrinsic) {
@@ -142,11 +189,35 @@ export const getBlockDetailsWithPAPI = async ({
         },
       } = extrinsic;
 
-      const isTimeStampExtrinsic = method === 'set' && section === 'timestamp';
+      const isTimeStampExtrinsic = method === 'set' && section.toLowerCase() === 'timestamp';
       if (isTimeStampExtrinsic) {
-        const _args = args as { now: string };
-        // turn the time string of type "1,451,313,413,21" into a number
-        timestamp = formatPrettyNumberString(_args?.now);
+        // Try different possible formats for timestamp args
+        let timestampValue;
+
+        if (args && typeof args === 'object') {
+          // Check various possible structures
+          if ((args as any).now) {
+            timestampValue = (args as any).now;
+          } else if ((args as any).value && (args as any).value.now) {
+            timestampValue = (args as any).value.now;
+          } else if ((args as any)[0]) {
+            timestampValue = (args as any)[0];
+          } else if (Array.isArray(args) && args.length > 0) {
+            timestampValue = args[0];
+          }
+        }
+
+        if (timestampValue) {
+          // Convert to number and then to milliseconds if needed
+          const numericTimestamp = typeof timestampValue === 'string'
+            ? formatPrettyNumberString(timestampValue)
+            : Number(timestampValue);
+
+          // Substrate timestamps are usually in milliseconds, but let's check
+          const finalTimestamp = numericTimestamp > 1000000000000 ? numericTimestamp : numericTimestamp * 1000;
+
+          timestamp = finalTimestamp;
+        }
       }
 
       extrinsics.push({
@@ -160,6 +231,8 @@ export const getBlockDetailsWithPAPI = async ({
         timestamp,
         extrinsicData: extrinsic,
       });
+    } else {
+      // Fallback failed, continue with rejected extrinsic
     }
 
   });
@@ -175,6 +248,8 @@ export const getBlockDetailsWithPAPI = async ({
     }
   });
 
+  const eventsArray = events.status === 'fulfilled' ? events.value : [];
+
   return {
     header: {
       hash: blockHash,
@@ -185,8 +260,8 @@ export const getBlockDetailsWithPAPI = async ({
     },
     body: {
       extrinsics,
-      // eventsCount: events.length,
-      events: events.status === 'fulfilled' ? events.value : [],
+      events: eventsArray,
+      eventsCount: eventsArray.length,
     },
   };
 };
@@ -203,9 +278,11 @@ export const getBlockDetailsWithRawClient = async ({
   assert(blockNumber, 'Block Number prop is not defined');
 
   const rawClient = baseStoreChain.getState().rawClient as StoreInterface['rawClient'];
+  const lookup = baseStoreChain.getState().lookup as StoreInterface['lookup'];
   const blockHash = await rawClient?.request('chain_getBlockHash', [blockNumber]) as string;
 
   assert(blockHash, 'Block Hash prop is not defined');
+  assert(lookup, 'Lookup is not defined');
 
   const storageCodec = dynamicBuilder.buildStorage('System', 'Events');
   const encodedKey = storageCodec.enc();
@@ -238,7 +315,7 @@ export const getBlockDetailsWithRawClient = async ({
   try {
     events = storageCodec.dec(storageValue) as Awaited<ReturnType<typeof getSystemEvents>>;
   } catch (error) {
-    console.log('Could not decode storage value!');
+    // Could not decode storage value
   }
 
   // Initialize timestamp variable
@@ -246,7 +323,7 @@ export const getBlockDetailsWithRawClient = async ({
 
   const extrinsics: IMappedBlockExtrinsic[] = [];
   extrinsicsRaw?.forEach((e, i) => {
-    const extrinsic = decodeExtrinsic(e);
+    const extrinsic = decodeExtrinsicImproved(e, dynamicBuilder, lookup);
 
     // EXTRINSIC DECODING CAN FAIL
     if (extrinsic) {
@@ -258,15 +335,21 @@ export const getBlockDetailsWithRawClient = async ({
         },
       } = extrinsic;
 
-      const isTimeStampExtrinsic = method === 'set' && section === 'timestamp';
+      const isTimeStampExtrinsic = method === 'set' && section.toLowerCase() === 'timestamp';
       if (isTimeStampExtrinsic) {
-        const _args = args as { now: string };
-        // turn the time string of type "1,451,313,413,21" into a number
-        timestamp = formatPrettyNumberString(_args?.now);
+        // Timestamp.set always takes a single argument (timestamp in milliseconds)
+        const timestampArg = Array.isArray(args) ? args[0] : args;
+
+        if (timestampArg) {
+          const numericTimestamp = typeof timestampArg === 'string'
+            ? formatPrettyNumberString(timestampArg)
+            : Number(timestampArg);
+
+          timestamp = numericTimestamp; // Already in milliseconds in Substrate
+        }
       }
 
       extrinsics.push({
-        ...extrinsic,
         id: `${blockNumber}-${i}`,
         blockNumber: blockNumber || 0,
         // assume a success by default (updated later)
@@ -278,7 +361,6 @@ export const getBlockDetailsWithRawClient = async ({
         extrinsicData: extrinsic,
       });
     }
-
   });
 
   events?.forEach((ev) => {
