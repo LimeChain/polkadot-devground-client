@@ -119,7 +119,10 @@ export const subscribeToBestBlocks = ({
       Promise.allSettled(promises).then((results) => {
         results.forEach((blockData) => {
           if (blockData.status === 'fulfilled') {
-            const blockExtrinsics = (blockData?.value.body?.extrinsics ?? [])
+            const allExtrinsics = blockData?.value.body?.extrinsics ?? [];
+            const allEvents = blockData?.value.body?.events ?? [];
+
+            const blockExtrinsics = allExtrinsics
               .reverse()
               .map((extrinsic) => {
                 const { id, blockNumber, extrinsicData, timestamp, isSuccess } = extrinsic;
@@ -139,7 +142,7 @@ export const subscribeToBestBlocks = ({
               number: blockData.value.header.number,
               hash: blockData.value.header.hash,
               timestamp: blockData.value.header.timestamp,
-              eventsLength: blockData.value.body.events.length,
+              eventsLength: allEvents.length,
               validator: blockData.value.header.identity?.address?.toString?.(),
               extrinsics: blockExtrinsics,
               identity: blockData.value.header.identity,
@@ -147,9 +150,8 @@ export const subscribeToBestBlocks = ({
 
             if (typeof newBlockData.number == 'number') {
               blocksData.set(newBlockData.number, newBlockData);
+
             }
-          } else {
-            console.log(blockData);
           }
         });
         // UPDATE STORE AFTER GETTING THE DATA
@@ -164,8 +166,8 @@ export const subscribeToBestBlocks = ({
         });
     },
     // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
-    error(err) {
-      console.log('Unexpected best blocks subscription error!', err.message);
+    error(_err) {
+      // Unexpected best blocks subscription error
       subscription.unsubscribe();
       // RETRY SUBSCRIBING TO CHAIN HEAD
       subscribeToBestBlocks({ client, set });
@@ -191,7 +193,7 @@ export const createSubstrateWsClient = ({
 
   const rawClientSubscription = rawClient.chainHead(
     true,
-    () => {},
+    () => { },
     async (error) => {
       console.log('Unexpected Raw client subscription error', error);
       rawClientSubscription.unfollow();
