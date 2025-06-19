@@ -4,3 +4,5 @@ export const STORAGE_AUTH_JWT_TOKEN = 'jwt-token';
 export const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 export const STORAGE_AUTH_SUCCESSFUL_REDIRECT_TO = 'polkadot-devground-auth-redirect';
+
+export const FEEDBACK_WIDGET_BOARD = import.meta.env.VITE_FEEDBACK_WIDGET_BOARD; 
