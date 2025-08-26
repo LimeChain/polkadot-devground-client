@@ -5,7 +5,6 @@ import {
 } from 'react';
 import { Outlet } from 'react-router-dom';
 
-import FeedbackWidget from '@components/feedbackWidget';
 import { Footer } from '@components/footer';
 import { Header } from '@components/header';
 import { PDScrollArea } from '@components/pdScrollArea';
@@ -65,7 +64,6 @@ export const LayoutBasic = (props: ILayoutBasic) => {
           )
         }
       </div>
-      <FeedbackWidget />
     </Suspense>
   );
 };
